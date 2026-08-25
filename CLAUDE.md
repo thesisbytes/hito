@@ -60,11 +60,15 @@ the Hito scheme. Everything below already works:
   Kanit
 - Version stamp in `<title>`, header, and boot toast
 
-**Pending:** The project's native Thai teacher completed a full recording
-session for all 44 consonants in v0.9.2. That exported JSON must be baked
-into the build as default recordings. It is the second recording session;
-the first was lost to non-persistent browser storage. Nothing may ever again
-exist only in browser storage.
+**Pending:** The 44 consonants still need recording. Earlier sessions with
+the project's native Thai teacher did not survive — nothing usable exists in
+the repo today, and no recording JSON has ever been committed. The loss point
+each time was non-persistent browser storage, so the fix is at the export
+step, not the capture step: a recording must become a file on disk the
+moment it is made. Nothing may ever again exist only in browser storage.
+
+Recording requires the built HTML (teacher mode lives inside it), so this is
+blocked on getting a build into `dist/`.
 
 ### Glyph Forge — `glyph-forge/`
 
