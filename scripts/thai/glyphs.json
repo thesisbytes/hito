@@ -4,7 +4,7 @@
   "count": 44,
   "traceFont": "sarabun",
   "printFonts": ["noto-sans-thai-looped", "kanit"],
-  "strokeSource": "kru-recordings",
+  "strokeSource": "teacher-recordings",
   "note": "Glyph list is baked into the existing build; extract into this file when the build is committed to dist/.",
   "glyphs": []
 }

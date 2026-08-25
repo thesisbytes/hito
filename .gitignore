@@ -7,3 +7,5 @@ scratch/
 *.tmp
 # seed archive the repo was bootstrapped from
 hito-seed.zip
+# unscrubbed local copy of the project brief
+CLAUDE.local.md
