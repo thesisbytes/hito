@@ -9,3 +9,6 @@ scratch/
 hito-seed.zip
 # unscrubbed local copy of the project brief
 CLAUDE.local.md
+# Claude Code local state
+.claude/settings.local.json
+.claude/*.tmp.*
