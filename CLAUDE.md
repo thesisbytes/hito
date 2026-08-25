@@ -59,14 +59,22 @@ the Hito scheme. Everything below already works:
 - Version stamp in `<title>`, header, and boot toast
 
 **Pending:** The 44 consonants still need recording. Earlier sessions with
-the project's native Thai teacher did not survive — nothing usable exists in
-the repo today, and no recording JSON has ever been committed. The loss point
-each time was non-persistent browser storage, so the fix is at the export
-step, not the capture step: a recording must become a file on disk the
-moment it is made. Nothing may ever again exist only in browser storage.
+the project's native Thai teacher did not survive, and no recording JSON has
+ever been committed.
 
-Recording requires the built HTML (teacher mode lives inside it), so this is
-blocked on getting a build into `dist/`.
+The cause is now known, and it was not browser settings or user error.
+`window.storage` is called throughout the engine and **defined nowhere** — it
+is not a browser API. Every call sits behind `if(window.storage)`, so saving
+and loading were silent no-ops, while the save button reported `saved ✓`
+regardless. The recordings were never written anywhere.
+
+`dist/thai-v0.9.3.html` still has this bug. **Do not run a recording session
+on it.** The fix exists in `build/stitch.py` (a real localStorage-backed
+`window.storage`, plus a save that reports failure honestly) and needs to be
+applied to a Thai build before recording resumes.
+
+The standing rule stays, and now has a second reason behind it: a recording
+must become a file on disk the moment it is made.
 
 ### Glyph Forge — `glyph-forge/`
 
