@@ -5,17 +5,15 @@ script-agnostic: Thai and Hiragana are the first two realms, others follow.
 It is *used by* nirathai.com but is not owned by it — keep the engine free of
 nirathai branding, URLs, or assumptions.
 
-This file is the shared brain between two workspaces:
+This file is the project's brain. All work happens in this repo — design,
+engine, builds, and commits alike. It previously described a split between a
+design chat and this workspace; that split is gone.
 
-- **Claude.ai chat (Hito project)** — design decisions, economy design,
-  and the heavy single-file builds (font embedding, stroke-data baking).
-  It cannot push to git. It hands back finished files.
-- **Claude Code (this repo, local)** — commits, pushes, build scripts,
-  anything that touches the filesystem or credentials.
-
-If you are Claude Code reading this: you are the hands. Don't redesign the
-engine or the economy here; if something in the plan looks wrong, note it in
-`NOTES.md` and move on. The maintainer will take it back to the design chat.
+If something in the plan looks wrong, say so and fix it rather than working
+around it, and record the decision in `NOTES.md` so the reasoning survives.
+The plan below is a starting position, not a specification to be executed
+literally — where reality disagrees with it, reality wins and the doc gets
+updated.
 
 ---
 
@@ -157,7 +155,7 @@ lights read.
 ## The economy (idle-game layer)
 
 Designed, not yet implemented. Ship it stubbed (counters, no polish) in the
-first hiragana build unless the design chat says otherwise.
+first hiragana build.
 
 **Two stats per glyph, never conflated:**
 
@@ -212,9 +210,13 @@ per-character ledger. Save data must have export/import from day one.
   - Kanit — SIL OFL.
   - Avoid commercial Thai foundry families (DB, PSL).
   - KanjiVG stroke data — CC BY-SA 3.0, credit required in-app.
-- **Chat ↔ repo handoff:** chat produces a file; the maintainer drops it into
-  the repo via Claude Code. Now that the repo is public, chat can read the
-  current build from raw.githubusercontent.com instead of needing an upload.
+- **Builds are made here and committed here.** A build that exists only as a
+  download is not a build yet — `dist/` is the only place one counts. This
+  has already cost the project a tracer and two recording sessions.
+- **Testing:** GitHub Pages serves `dist/` over HTTPS at
+  https://thesisbytes.github.io/hito/ — open a build there to test on a
+  phone or tablet. Secure context matters: `navigator.clipboard` and the
+  File System Access API both need it.
 
 ---
 
