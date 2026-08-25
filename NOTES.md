@@ -17,3 +17,6 @@ Running log. Append at the bottom, don't rewrite history.
 - Removed the custom domain from thesisbytes.github.io (it was parked on a stub page). Project pages had been inheriting it and serving over plain HTTP, which breaks navigator.clipboard — the recording mode's Copy button needs a secure context. github.io gives HTTPS automatically.
 - Added .nojekyll so Pages serves the single-file builds byte-for-byte instead of running them through Jekyll.
 - Decided: record on desktop (File System Access API can write straight into the repo folder; Android has no equivalent), trace and test on the phone via Pages.
+- v0.9.3 committed to dist/. It does NOT match CLAUDE.md's description: zero @font-face blocks and zero embedded fonts (CLAUDE.md claims three base64 woff2 subsets), and it fetches https://nirathai.com/fonts/kru-hand.woff2 at runtime — which breaks the offline/zero-dependency rule, breaks the no-nirathai-URLs rule, and 404s anyway. Net effect: the tracer falls back to whatever Thai font the device has.
+- Priority: hiragana first. Thai is bottlenecked on instructor availability; hiragana is not bottlenecked at all, since KanjiVG supplies stroke order for all 46 gojuon.
+- Note for the hiragana build: font embedding is the step that silently didn't happen in v0.9.3. Klee One and Noto Sans JP must be verified as embedded, not linked.
