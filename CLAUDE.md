@@ -1,0 +1,226 @@
+# Hito (人)
+
+A stylus-first script-tracing engine with idle-game dynamics. Portable and
+script-agnostic: Thai and Hiragana are the first two realms, others follow.
+It is *used by* nirathai.com but is not owned by it — keep the engine free of
+nirathai branding, URLs, or assumptions.
+
+This file is the shared brain between two workspaces:
+
+- **Claude.ai chat (Hito project)** — design decisions, economy design,
+  and the heavy single-file builds (font embedding, stroke-data baking).
+  It cannot push to git. It hands back finished files.
+- **Claude Code (this repo, local)** — commits, pushes, build scripts,
+  anything that touches the filesystem or credentials.
+
+If you are Claude Code reading this: you are the hands. Don't redesign the
+engine or the economy here; if something in the plan looks wrong, note it in
+`NOTES.md` and move on. Moopha will take it back to the design chat.
+
+---
+
+## Repo layout
+
+```
+hito/
+  CLAUDE.md            this file
+  README.md            public-facing description
+  NOTES.md             running log / open questions (append, don't rewrite)
+  scripts/
+    thai/              glyph list, Kru's stroke recordings, theme, font refs
+    hiragana/          glyph list, KanjiVG-derived strokes, font refs
+  fonts/               source .woff2 files (embedded as base64 at build time)
+  glyph-forge/         Ann's handwriting capture tool (separate app, same aesthetic)
+  build/               stitch script: engine + one script pack -> single HTML
+  dist/                built single-file outputs, one per script, versioned
+```
+
+Single-file HTML with zero external dependencies is a deliberate constraint.
+Every deliverable must open from a double-click, offline, on a tablet.
+
+---
+
+## Where things stand (Aug 2026)
+
+### Thai tracer — `dist/thai-v0.9.3.html` (last known build)
+
+Built iteratively in chat as `nirathai-trace-vX.Y.Z.html`; being renamed into
+the Hito scheme. Everything below already works:
+
+- Gold glowing ink trail on a dark lacquer theme ("spell conjuring")
+- Continuous path-following scoring (not per-stroke judging)
+- Operation-style zap when straying: shake, red flash, haptic buzz, ember sparks
+- Mastery/leveling: each successful conjure shrinks the outline and tightens
+  tolerance ~12%
+- Dotted glowing trail showing the remaining path, cached offscreen
+- Teacher recording mode (teal UI): capture numbered stroke paths, export JSON,
+  Copy button with clipboard fallbacks
+- Per-font recording books keyed by font ID
+- Three fonts embedded as base64 woff2 subsets: Sarabun, Noto Sans Thai Looped,
+  Kanit
+- Version stamp in `<title>`, header, and boot toast
+
+**Pending:** Kru (family member, native teacher) completed a full recording
+session for all 44 consonants in v0.9.2. That exported JSON must be baked
+into the build as default recordings. It is the second recording session;
+the first was lost to non-persistent browser storage. Nothing may ever again
+exist only in browser storage.
+
+### Glyph Forge — `glyph-forge/`
+
+Capture tool for Ann to hand-draw her own Thai letterforms on a pen display
+(pressure disabled at driver level, uniform stroke width). Same gold-on-lacquer
+look. Exports 1024×1024 black-on-white PNGs named by codepoint (AGL style,
+`uni0E01.png`) in a ZIP built with a hand-rolled writer, plus `metadata.json`
+with baseline / body-top pixel positions. Covers all 80 Thai glyphs (44
+consonants, vowel signs, tone marks, thanthakhat, numerals).
+
+Next step, when Ann finishes: a FontForge script that imports the PNGs and
+places combining-mark anchors so tone marks stack correctly.
+
+### Hiragana — not yet built
+
+First build target: `dist/hiragana-v0.1.0.html`. See "Hiragana plan" below.
+
+---
+
+## Hiragana plan (first build)
+
+Scope: the 46 gojūon only. No dakuten, handakuten, or yōon yet.
+Glyph list with row/order/romaji is in `scripts/hiragana/glyphs.json`.
+
+**The hook problem.** Print Gothic fonts join strokes that handwriting keeps
+separate (き, さ, ふ, り are the obvious ones — see `hookNote` fields).
+Learners who trace a print font learn wrong shapes. So:
+
+- **Trace font:** Klee One (SIL OFL). Textbook-style, separated hooks.
+- **Print font:** Noto Sans JP (SIL OFL). Shown small beside the trace glyph
+  so the learner sees what the character looks like in the wild.
+- **Stroke data:** KanjiVG (CC BY-SA 3.0). Has official stroke-order SVGs for
+  all kana. Convert each stroke path to the same point-array format Kru's
+  recordings use and bake them in as the default book. Recording mode stays
+  available so the family can override any stroke. KanjiVG requires a credit
+  line in the app footer.
+- **Layout:** 5×10 gojūon grid replaces the Thai consonant list.
+- **Engine:** unchanged. Zap, scoring, trail caching, mastery all carry over.
+
+---
+
+## The name
+
+人 (hito, "person") is two strokes, and neither can stand on its own — each
+leans on the other, and if you take one away the character falls. Moopha's
+massage-school mentor taught the kanji that way: we depend on one another.
+That's the project. Kru records, Ann draws, the kids test, Moopha builds,
+and every learner leans on all of them.
+
+人 is the first kanji past the kana border. Two strokes. It should be the
+first thing a learner traces once hiragana is done.
+
+## The world (lore direction)
+
+Not for the first build. Written down so it survives.
+
+Two traditions, both load-bearing:
+
+- **Unification** — Nobunaga's *tenka fubu* and Rama's campaign to Lanka in
+  the Ramakien. Each script is a realm; each character is a province.
+  Trace it cleanly to take it. Hold it (potency) or it drifts back to the
+  wild. Unify it (mastery) and it stops rebelling for good.
+- **The wild** — Thai phi (khamot, kong koi, pop, krasue) and Japanese yokai
+  haunt unconquered provinces. Ghost lights (phi khamot / hitodama) are the
+  visual language for potency: a lit glyph is a flame you tend.
+
+Cast, roughly:
+
+- Hanuman's monkey army is the idle workforce — they gather while you're away.
+- Thotsakan and his generals guard the boss provinces (ฒ, ฬ, ฐ, and
+  whatever the kids find hardest).
+- The guide comet is a kodama or a hopping kong koi leading the stroke.
+- Zaps are the biters: stray off the path and a phi pop takes a bite.
+- A mastered glyph is a tsukumogami — a thing used so long it woke up.
+- Prestige is Honnō-ji: Nobunaga never finished. Unify, fall, begin again as
+  the next lord with a permanent edge.
+
+All of this is folklore and history. No IP shadow.
+
+Aesthetic: gold on dark lacquer for the Thai realm stays. The shared engine
+leans night-forest — cold blue-green wisps against dark — so the ghost
+lights read.
+
+---
+
+## The economy (idle-game layer)
+
+Designed, not yet implemented. Ship it stubbed (counters, no polish) in the
+first hiragana build unless the design chat says otherwise.
+
+**Two stats per glyph, never conflated:**
+
+| stat     | behaviour                         | drives                              |
+|----------|-----------------------------------|-------------------------------------|
+| mastery  | ratchet. Only goes up.            | tolerance tightening, unlocks       |
+| potency  | charge. Decays over days.         | idle income, glow brightness        |
+
+Mastery is "you learned it". Potency is "you still remember it". The decay
+*is* spaced repetition, dressed as a candle that wants tending. Nobody loses
+mastery; a dim glyph just needs a quick re-trace to reignite.
+
+**Loop:**
+
+- Active: a clean trace earns ink. Clean (no zaps) pays more. Mastered glyphs
+  pay less per trace, so the game pushes toward new characters rather than
+  farming あ.
+- Idle: glyphs with potency generate ink while away. Offline gains computed
+  from a timestamp on return.
+- Spend: ink buys wider tolerance early (training wheels), then cosmetics
+  (ink colours, trail effects), then new realms/fonts.
+- Prestige (later): reset and re-trace everything at tighter tolerances for a
+  permanent multiplier.
+
+**Progression tiers (later):** glyphs → words → sentences. A character traced
+inside a word feeds that character's potency. Word tracing is also where Thai
+vowel placement and tone-mark stacking finally get practised. A word is a
+sequence of glyph recordings laid out with the font's advance widths; no new
+stroke format, only a layout step.
+
+**Hard rule:** save data is keyed by **Unicode codepoint**, not grid position
+or index. Words, sentences, and future scripts all write to the same
+per-character ledger. Save data must have export/import from day one.
+
+---
+
+## Conventions
+
+- **Versioning:** `dist/<script>-vX.Y.Z.html`. Bump on *every* change, even
+  one-liners. Stamp the version in `<title>`, the header, and the boot toast
+  so a cached build is obvious.
+- **Nothing lives only in browser storage.** Fonts, stroke data, and defaults
+  are embedded in the HTML. User progress has export/import.
+- **Performance:** no per-frame shadow blur. Cache trails offscreen.
+- **Beginner pacing:** comet/guide speed stays slow. Tested with kids; keep it.
+- **Aesthetic:** traditional/classic first, modern refinements later. Gold on
+  dark lacquer is the Thai theme; hiragana may share it or get its own.
+- **Fonts and licences:**
+  - Sarabun, Noto Sans Thai Looped, Noto Sans JP, Klee One — SIL OFL, fine
+    for commercial use.
+  - Kanit — SIL OFL.
+  - Avoid commercial Thai foundry families (DB, PSL).
+  - KanjiVG stroke data — CC BY-SA 3.0, credit required in-app.
+- **Chat ↔ repo handoff:** chat produces a file; Moopha drops it into the repo
+  via Claude Code. Once the repo is public, chat can read the current build
+  from raw.githubusercontent.com instead of needing an upload.
+
+---
+
+## People
+
+- **Moopha** — owner, builds nirathai.com, decides direction.
+- **Kru** — family member and native Thai teacher; records official stroke
+  paths. Their recordings are the ground truth for Thai.
+- **Ann** — collaborator drawing a Thai handwriting font in Glyph Forge.
+- Young family members test builds and find bugs (one found ink persisting
+  across letter transitions). Their feedback counts.
+
+Tone of the project is affectionate and a bit silly. Keep it that way in
+comments and UI copy.

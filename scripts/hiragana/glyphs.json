@@ -1,0 +1,340 @@
+{
+  "script": "hiragana",
+  "name": "Hiragana (gojūon)",
+  "count": 46,
+  "traceFont": "klee-one",
+  "printFont": "noto-sans-jp",
+  "strokeSource": "kanjivg",
+  "glyphs": [
+    {
+      "cp": "U+3042",
+      "char": "あ",
+      "romaji": "a",
+      "row": "a",
+      "order": 1
+    },
+    {
+      "cp": "U+3044",
+      "char": "い",
+      "romaji": "i",
+      "row": "a",
+      "order": 2
+    },
+    {
+      "cp": "U+3046",
+      "char": "う",
+      "romaji": "u",
+      "row": "a",
+      "order": 3,
+      "hookNote": "1st stroke is a short separate tick, print may attach"
+    },
+    {
+      "cp": "U+3048",
+      "char": "え",
+      "romaji": "e",
+      "row": "a",
+      "order": 4
+    },
+    {
+      "cp": "U+304A",
+      "char": "お",
+      "romaji": "o",
+      "row": "a",
+      "order": 5
+    },
+    {
+      "cp": "U+304B",
+      "char": "か",
+      "romaji": "ka",
+      "row": "ka",
+      "order": 6
+    },
+    {
+      "cp": "U+304D",
+      "char": "き",
+      "romaji": "ki",
+      "row": "ka",
+      "order": 7,
+      "hookNote": "3rd/4th stroke separate in textbook form; print fonts often join them"
+    },
+    {
+      "cp": "U+304F",
+      "char": "く",
+      "romaji": "ku",
+      "row": "ka",
+      "order": 8
+    },
+    {
+      "cp": "U+3051",
+      "char": "け",
+      "romaji": "ke",
+      "row": "ka",
+      "order": 9
+    },
+    {
+      "cp": "U+3053",
+      "char": "こ",
+      "romaji": "ko",
+      "row": "ka",
+      "order": 10
+    },
+    {
+      "cp": "U+3055",
+      "char": "さ",
+      "romaji": "sa",
+      "row": "sa",
+      "order": 11,
+      "hookNote": "2nd/3rd stroke separate in textbook form; print fonts join"
+    },
+    {
+      "cp": "U+3057",
+      "char": "し",
+      "romaji": "shi",
+      "row": "sa",
+      "order": 12
+    },
+    {
+      "cp": "U+3059",
+      "char": "す",
+      "romaji": "su",
+      "row": "sa",
+      "order": 13
+    },
+    {
+      "cp": "U+305B",
+      "char": "せ",
+      "romaji": "se",
+      "row": "sa",
+      "order": 14
+    },
+    {
+      "cp": "U+305D",
+      "char": "そ",
+      "romaji": "so",
+      "row": "sa",
+      "order": 15,
+      "hookNote": "two-stroke form in many textbooks; print is one continuous stroke"
+    },
+    {
+      "cp": "U+305F",
+      "char": "た",
+      "romaji": "ta",
+      "row": "ta",
+      "order": 16
+    },
+    {
+      "cp": "U+3061",
+      "char": "ち",
+      "romaji": "chi",
+      "row": "ta",
+      "order": 17
+    },
+    {
+      "cp": "U+3064",
+      "char": "つ",
+      "romaji": "tsu",
+      "row": "ta",
+      "order": 18
+    },
+    {
+      "cp": "U+3066",
+      "char": "て",
+      "romaji": "te",
+      "row": "ta",
+      "order": 19
+    },
+    {
+      "cp": "U+3068",
+      "char": "と",
+      "romaji": "to",
+      "row": "ta",
+      "order": 20
+    },
+    {
+      "cp": "U+306A",
+      "char": "な",
+      "romaji": "na",
+      "row": "na",
+      "order": 21
+    },
+    {
+      "cp": "U+306B",
+      "char": "に",
+      "romaji": "ni",
+      "row": "na",
+      "order": 22
+    },
+    {
+      "cp": "U+306C",
+      "char": "ぬ",
+      "romaji": "nu",
+      "row": "na",
+      "order": 23
+    },
+    {
+      "cp": "U+306D",
+      "char": "ね",
+      "romaji": "ne",
+      "row": "na",
+      "order": 24
+    },
+    {
+      "cp": "U+306E",
+      "char": "の",
+      "romaji": "no",
+      "row": "na",
+      "order": 25
+    },
+    {
+      "cp": "U+306F",
+      "char": "は",
+      "romaji": "ha",
+      "row": "ha",
+      "order": 26
+    },
+    {
+      "cp": "U+3072",
+      "char": "ひ",
+      "romaji": "hi",
+      "row": "ha",
+      "order": 27
+    },
+    {
+      "cp": "U+3075",
+      "char": "ふ",
+      "romaji": "fu",
+      "row": "ha",
+      "order": 28,
+      "hookNote": "four separate strokes in textbook form; print merges into one loop"
+    },
+    {
+      "cp": "U+3078",
+      "char": "へ",
+      "romaji": "he",
+      "row": "ha",
+      "order": 29
+    },
+    {
+      "cp": "U+307B",
+      "char": "ほ",
+      "romaji": "ho",
+      "row": "ha",
+      "order": 30
+    },
+    {
+      "cp": "U+307E",
+      "char": "ま",
+      "romaji": "ma",
+      "row": "ma",
+      "order": 31
+    },
+    {
+      "cp": "U+307F",
+      "char": "み",
+      "romaji": "mi",
+      "row": "ma",
+      "order": 32
+    },
+    {
+      "cp": "U+3080",
+      "char": "む",
+      "romaji": "mu",
+      "row": "ma",
+      "order": 33
+    },
+    {
+      "cp": "U+3081",
+      "char": "め",
+      "romaji": "me",
+      "row": "ma",
+      "order": 34
+    },
+    {
+      "cp": "U+3082",
+      "char": "も",
+      "romaji": "mo",
+      "row": "ma",
+      "order": 35
+    },
+    {
+      "cp": "U+3084",
+      "char": "や",
+      "romaji": "ya",
+      "row": "ya",
+      "order": 36,
+      "hookNote": "2nd stroke is a short separate tick"
+    },
+    {
+      "cp": "U+3086",
+      "char": "ゆ",
+      "romaji": "yu",
+      "row": "ya",
+      "order": 37,
+      "hookNote": "hook on 1st stroke is open in textbook form"
+    },
+    {
+      "cp": "U+3088",
+      "char": "よ",
+      "romaji": "yo",
+      "row": "ya",
+      "order": 38
+    },
+    {
+      "cp": "U+3089",
+      "char": "ら",
+      "romaji": "ra",
+      "row": "ra",
+      "order": 39
+    },
+    {
+      "cp": "U+308A",
+      "char": "り",
+      "romaji": "ri",
+      "row": "ra",
+      "order": 40,
+      "hookNote": "two separate strokes in textbook form; print joins"
+    },
+    {
+      "cp": "U+308B",
+      "char": "る",
+      "romaji": "ru",
+      "row": "ra",
+      "order": 41
+    },
+    {
+      "cp": "U+308C",
+      "char": "れ",
+      "romaji": "re",
+      "row": "ra",
+      "order": 42
+    },
+    {
+      "cp": "U+308D",
+      "char": "ろ",
+      "romaji": "ro",
+      "row": "ra",
+      "order": 43
+    },
+    {
+      "cp": "U+308F",
+      "char": "わ",
+      "romaji": "wa",
+      "row": "wa",
+      "order": 44
+    },
+    {
+      "cp": "U+3092",
+      "char": "を",
+      "romaji": "wo",
+      "row": "wa",
+      "order": 45
+    },
+    {
+      "cp": "U+3093",
+      "char": "ん",
+      "romaji": "n",
+      "row": "wa",
+      "order": 46
+    }
+  ]
+}

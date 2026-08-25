@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+node_modules/
+*.log
+# scratch exports from recording/save-data testing
+scratch/
+*.tmp
+# seed archive the repo was bootstrapped from
+hito-seed.zip
