@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Turn recorded stroke point-arrays into KanjiVG-shaped SVG.
 
-This is the inverse of kanjivg_to_strokes.py, and it is the piece ThaiVG
+This is the inverse of kanjivg_to_strokes.py, and it is the piece KhienThai
 needs: a recording session produces sampled points, and the dataset wants
 smooth cubic Beziers in stroke order, one <path> per stroke, on the same
 109x109 canvas KanjiVG uses. Matching that shape means renderers and
@@ -15,7 +15,7 @@ dataset.
 
     strokes_to_svg.py <strokes.json> <out-dir> [--tolerance N] [--smooth N]
 
-Destined for the ThaiVG project; it lives here until that repo exists.
+Destined for the KhienThai project; it lives here until that repo exists.
 """
 
 import json
@@ -216,7 +216,7 @@ Stroke order data for {char} (U+{cp:04X}).
 {credit}
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109">
-<g id="tvg:{cpl}" style="fill:none;stroke:#000000;stroke-width:3;\
+<g id="kt:{cpl}" style="fill:none;stroke:#000000;stroke-width:3;\
 stroke-linecap:round;stroke-linejoin:round;">
 {paths}
 </g>
@@ -247,7 +247,7 @@ def main():
             if curves is None:
                 continue
             total_curves += len(curves)
-            paths.append(f'\t<path id="tvg:{cp:05x}-s{i}" d="{to_path_data(curves)}"/>')
+            paths.append(f'\t<path id="kt:{cp:05x}-s{i}" d="{to_path_data(curves)}"/>')
         (out_dir / f"{cp:05x}.svg").write_text(
             SVG.format(char=char, cp=cp, cpl=f"{cp:05x}",
                        credit=credit, paths="\n".join(paths)),
