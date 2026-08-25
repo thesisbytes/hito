@@ -164,7 +164,11 @@ def fit_cubic(pts, t1, t2, tol, depth=0):
 # ---------------------------------------------------------------- output
 
 def fmt(v):
-    return f"{v:.2f}".rstrip("0").rstrip(".")
+    # floor(x + 0.5), matching JavaScript's Math.round. Python's round() is
+    # half-to-even and would disagree with the browser recorder on exact
+    # .xx5 values, putting two dialects in one dataset.
+    n = math.floor(v * 100 + 0.5)
+    return f"{n / 100:.2f}".rstrip("0").rstrip(".")
 
 
 def to_path_data(curves):
