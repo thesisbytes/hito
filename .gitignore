@@ -12,3 +12,5 @@ CLAUDE.local.md
 # Claude Code local state
 .claude/settings.local.json
 .claude/*.tmp.*
+# local python env for build scripts
+.venv/
