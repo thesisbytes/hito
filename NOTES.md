@@ -46,3 +46,4 @@ Running log. Append at the bottom, don't rewrite history.
 - Khien is a deliberate blend — kh from RTGS for the aspirated consonant, ien for English readability. Standard RTGS would be khian. Worth confirming with a native reader before publishing, since it is permanent afterwards.
 - SVG id prefix is now kt: (KhienThai), the analogue of KanjiVG's kvg:. Renamed throughout, including build/strokes_to_svg.py here.
 - Checked: no software or dataset uses either spelling. Nearest hit is an unrelated construction firm in Da Nang.
+- KhienThai pushed: github.com/thesisbytes/khienthai (private). Private and licence-less on purpose — visibility flips with one command, a licence does not, so nothing is published under any terms until that is chosen.
