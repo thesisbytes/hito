@@ -1,0 +1,28 @@
+{
+  "script": "hiragana",
+  "version": "0.1.0",
+  "title": "hito 人 · hiragana trace · v0.1.0",
+  "brand": "hito 人 · hiragana",
+  "fontDir": "fonts",
+  "probeChars": "あかん",
+  "exportName": "hito-hiragana-strokes.json",
+  "fonts": [
+    {
+      "id": "klee-one",
+      "key": "klee",
+      "label": "Klee One (textbook)",
+      "family": "HT-KleeOne",
+      "file": "klee-one-kana.woff2",
+      "role": "trace"
+    },
+    {
+      "id": "noto-sans-jp",
+      "key": "noto",
+      "label": "Noto Sans JP (print)",
+      "family": "HT-NotoSansJP",
+      "file": "noto-sans-jp-kana.woff2",
+      "role": "print"
+    }
+  ],
+  "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License."
+}
