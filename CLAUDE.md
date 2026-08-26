@@ -40,7 +40,7 @@ Every deliverable must open from a double-click, offline, on a tablet.
 
 ## Where things stand (Aug 2026)
 
-### Thai tracer — `dist/thai-v0.9.3.html` (last known build)
+### Thai tracer — `dist/thai-v0.9.4.html`
 
 Built iteratively in chat as `nirathai-trace-vX.Y.Z.html`; being renamed into
 the Hito scheme. Everything below already works:
@@ -93,9 +93,14 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — not yet built
+### Hiragana — `dist/hiragana-v0.1.0.html`
 
-First build target: `dist/hiragana-v0.1.0.html`. See "Hiragana plan" below.
+Built. 46 gojūon with KanjiVG stroke order baked in as the default book, Klee
+One and Noto Sans JP embedded, laid out as a proper gojūon chart with the ya
+and wa rows keeping their gaps and ん on its own row. Stitched from the Thai
+engine by `build/stitch.py`, which is the reusable path for the next realm.
+
+Not yet implemented: the economy stubs called for below.
 
 ---
 
@@ -111,9 +116,9 @@ Learners who trace a print font learn wrong shapes. So:
 - **Trace font:** Klee One (SIL OFL). Textbook-style, separated hooks.
 - **Print font:** Noto Sans JP (SIL OFL). Shown small beside the trace glyph
   so the learner sees what the character looks like in the wild.
-- **Stroke data:** KanjiVG (CC BY-SA 3.0). Has official stroke-order SVGs for
-  all kana. Convert each stroke path to the same point-array format the Thai
-  recordings use and bake them in as the default book. Recording mode stays
+- **Stroke data:** KanjiVG (CC BY-SA 3.0), converted by
+  `build/kanjivg_to_strokes.py` into `scripts/hiragana/strokes.json` and baked
+  in as the default book. Recording mode stays
   available so contributors can override any stroke. KanjiVG requires a credit
   line in the app footer.
 - **Layout:** 5×10 gojūon grid replaces the Thai consonant list.
