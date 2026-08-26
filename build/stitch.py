@@ -148,7 +148,11 @@ def main():
           "$('cls').textContent=cls+")
 
     # ---- the baked stroke book, and a restore() that doesn't clobber it
+    # Carry the alignment metadata through: tooling that re-derives guide
+    # coordinates needs to know what transform was already baked in.
     default_book = {"fonts": book["fonts"]}
+    if "alignment" in book:
+        default_book["alignment"] = book["alignment"]
     s.sub("teacher init",
           r"let TEACHER=\{version:2,activeFont:'[^']*',fonts:\{\},customFonts:\[\]\};",
           f"const DEFAULT_BOOK={js_string(default_book)};\n"

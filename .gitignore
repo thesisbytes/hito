@@ -14,3 +14,4 @@ CLAUDE.local.md
 .claude/*.tmp.*
 # local python env for build scripts
 .venv/
+build/engine.html

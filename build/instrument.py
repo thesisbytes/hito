@@ -88,8 +88,39 @@ LAYER = r"""
   pad.addEventListener('pointerup', up, true);
   pad.addEventListener('pointercancel', up, true);
 
+  // ---- alignment nudge
+  // The baked coordinates assume canvas anchors textBaseline='middle' at the
+  // em-square middle (0.38 em above the baseline for Klee One). Chrome may
+  // instead use hhea metrics, which would put it at 0.436. Rather than guess,
+  // this lets the alignment be corrected by eye and the numbers reported back.
+  const ALIGN = (function(){
+    try { return DEFAULT_BOOK.alignment || {baseF:0.62, glyphCy:0.44}; }
+    catch(_){ return {baseF:0.62, glyphCy:0.44}; }
+  })();
+  const PRISTINE = JSON.parse(JSON.stringify(
+    (function(){ try { return DEFAULT_BOOK.fonts; } catch(_){ return {}; } })()));
+
+  function realign(scale, cy){
+    for (const fid in PRISTINE){
+      const src = PRISTINE[fid].letters, dst = TEACHER.fonts[fid];
+      if (!dst) continue;
+      for (const ch in src){
+        dst.letters[ch] = { strokes: src[ch].strokes.map(st => st.map(q => {
+          // undo the baked transform, then re-apply the nudged one
+          const kx = (q.x - 0.5) / ALIGN.baseF + 0.5;
+          const ky = (q.y - 0.5) / ALIGN.baseF + ALIGN.glyphCy;
+          return { x: +(0.5 + scale*(kx - 0.5)).toFixed(4),
+                   y: +(0.5 + scale*(ky - cy)).toFixed(4), p: q.p, t: q.t };
+        })) };
+      }
+    }
+    try { load(idx); } catch(_){}
+  }
+
   // ---- export
   window.__hito = {
+    realign,
+    alignment: ALIGN,
     get log(){ return log; },
     export(){
       const blob = new Blob([JSON.stringify(log, null, 1)], {type:'application/json'});
@@ -111,6 +142,29 @@ LAYER = r"""
       + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
     b.onclick = () => window.__hito.export();
     document.body.appendChild(b);
+
+    const panel = document.createElement('div');
+    panel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:9999;'
+      + 'background:#1d1a16;border:1px solid #2f2a24;border-radius:8px;padding:10px 12px;'
+      + 'font:12px ui-sans-serif,system-ui;color:#ece4d8;opacity:.9;min-width:210px';
+    panel.innerHTML =
+      '<div style="color:#8d8378;margin-bottom:7px">guide alignment</div>'
+      + '<label style="display:block;margin-bottom:5px">size '
+      + '<input id="__as" type="range" min="0.35" max="0.95" step="0.005" '
+      + `value="${ALIGN.baseF}" style="width:100%"></label>`
+      + '<label style="display:block">height '
+      + '<input id="__ac" type="range" min="0.25" max="0.65" step="0.005" '
+      + `value="${ALIGN.glyphCy}" style="width:100%"></label>`
+      + '<div id="__av" style="margin-top:7px;font-family:ui-monospace,monospace;'
+      + `color:#e9c46a">baseF ${ALIGN.baseF}  cy ${ALIGN.glyphCy}</div>`;
+    document.body.appendChild(panel);
+    const as = panel.querySelector('#__as'), ac = panel.querySelector('#__ac');
+    const apply = () => {
+      const s = +as.value, c = +ac.value;
+      panel.querySelector('#__av').textContent = `baseF ${s.toFixed(3)}  cy ${c.toFixed(3)}`;
+      realign(s, c);
+    };
+    as.oninput = apply; ac.oninput = apply;
   });
 
   reset();
