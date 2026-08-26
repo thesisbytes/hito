@@ -1,17 +1,26 @@
-.DS_Store
-Thumbs.db
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
 node_modules/
-*.log
-# scratch exports from recording/save-data testing
-scratch/
-*.tmp
-# seed archive the repo was bootstrapped from
-hito-seed.zip
-# unscrubbed local copy of the project brief
-CLAUDE.local.md
+
 # Claude Code local state
 .claude/settings.local.json
 .claude/*.tmp.*
-# local python env for build scripts
-.venv/
-build/engine.html
+
+# Unscrubbed copy of the project brief
+CLAUDE.local.md
+
+# Exports from recording / save-data testing
+scratch/
+*.tmp
+*.log
+
+# Archive the repo was bootstrapped from
+hito-seed.zip
+
+# OS
+.DS_Store
+Thumbs.db

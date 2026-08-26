@@ -7,12 +7,12 @@ Running log. Append at the bottom, don't rewrite history.
 - Decided: two per-glyph stats, mastery (ratchet) and potency (decays).
 - Decided: save data keyed by codepoint.
 - Decided: lore frame is unification (Nobunaga / Ramakien) over a haunted wild (phi / yokai). Not in the first build.
-- Open: the teacher's v0.9.2 recording JSON still needs baking into the Thai build.
-- Open: where does the last Thai build actually live? Drop it in dist/ and update CLAUDE.md with the real version number.
+- ~~Open: the teacher's v0.9.2 recording JSON still needs baking into the Thai build.~~ RESOLVED: no such JSON ever existed — see the window.storage entry below.
+- ~~Open: where does the last Thai build actually live?~~ RESOLVED: recovered, committed, and superseded by dist/thai-v0.9.4.html.
 - Repo published: github.com/thesisbytes/hito (public). Personal names replaced with roles before pushing; unscrubbed brief kept locally as CLAUDE.local.md (gitignored).
 - Correction: the 44 Thai consonants are NOT recorded. CLAUDE.md claimed the v0.9.2 session was complete and only needed baking in; that was wrong. No recording JSON has ever been committed. CLAUDE.md updated.
 - Recording is blocked on the build — teacher mode lives inside the Thai HTML, so nothing can be captured until a build lands in dist/.
-- Open: replace the export-JSON button with a save that writes each character to disk as it's recorded, so a lost tab can't cost a session again.
+- ~~Open: replace the export-JSON button with a per-character save to disk.~~ MOVED: recording now happens in the Nira Thai dashboard and persists server-side. See the KhienThai repo.
 - Pages enabled: https://thesisbytes.github.io/hito/ — builds will be at /hito/dist/<file>.html
 - Removed the custom domain from thesisbytes.github.io (it was parked on a stub page). Project pages had been inheriting it and serving over plain HTTP, which breaks navigator.clipboard — the recording mode's Copy button needs a secure context. github.io gives HTTPS automatically.
 - Added .nojekyll so Pages serves the single-file builds byte-for-byte instead of running them through Jekyll.
@@ -78,3 +78,11 @@ Running log. Append at the bottom, don't rewrite history.
 - v0.1.6 sequential reveal: the trail and comet show only the stroke being worked on. Strokes already made stay lit, the current one is drawn by the pen, later ones have not caught light yet. Finishing a stroke throws sparks along its length and buzzes, then the guide moves to the next stroke's start, so a lift is answered by an invitation rather than a repeat.
 - Caught before shipping: _gi was read in the trail-cache check one line above its own const declaration — a temporal dead zone ReferenceError that would have fired every animation frame and killed the guide. node --check accepts it happily; it is a runtime fault, not a syntax one.
 - Added build/test/smoke.test.mjs: runs a built engine in a stubbed DOM and drives animation frames. All five builds pass. This is the class of bug syntax checking cannot see.
+
+## 2026-08-26 — cleanup
+- Tracked build/engine.html. It had been gitignored as "recoverable from history", but it is the source every build comes from — a fresh clone could not build without it.
+- Untracked build/__pycache__ and rewrote .gitignore. Note gitignore has no trailing-comment syntax: `CLAUDE.local.md  # note` matches a filename containing the comment, which silently unignored two files.
+- README claimed Thai had "stroke paths recorded by a native teacher". Nothing has ever been recorded. Replaced with a state table and a link to the playable build.
+- Added scripts/PACK.md — the pack format had grown to eight tracing and difficulty options with no documentation anywhere.
+- Added build/test/run.sh: scoring tests, a stubbed-DOM smoke run over every build, and a check that the committed build rebuilds byte-identical from source. All pass.
+- Resolved the three stale "Open" items at the top of this log.

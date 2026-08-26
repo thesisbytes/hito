@@ -25,14 +25,15 @@
     }
   ],
   "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",
-  "shadowScale": 2.4,
   "shadow": "none",
+  "shadowScale": 2.4,
   "strictFollow": true,
   "coverThreshold": 0.85,
+  "maxTravel": 2.5,
+  "sequentialReveal": true,
   "difficulty": {
     "shrinkPerLevel": 0.93,
     "minGlyph": 0.32,
     "minTolerance": 0.045
-  },
-  "sequentialReveal": true
+  }
 }

@@ -23,15 +23,28 @@ updated.
 hito/
   CLAUDE.md            this file
   README.md            public-facing description
-  NOTES.md             running log / open questions (append, don't rewrite)
+  NOTES.md             running log (append, don't rewrite)
   scripts/
-    thai/              glyph list, teacher's stroke recordings, theme, font refs
-    hiragana/          glyph list, KanjiVG-derived strokes, font refs
-  fonts/               source .woff2 files (embedded as base64 at build time)
+    PACK.md            the pack format — read before adding a realm
+    thai/              glyph list (stub; strokes not yet recorded)
+    hiragana/          glyph list, KanjiVG-derived strokes, pack settings
+  fonts/               subset .woff2 files, embedded as base64 at build time
   glyph-forge/         handwriting capture tool (separate app, same aesthetic)
-  build/               stitch script: engine + one script pack -> single HTML
+  build/
+    engine.html        the tracer engine — the source everything builds from
+    stitch.py          engine + pack -> a single self-contained HTML
+    kanjivg_to_strokes.py   KanjiVG SVG -> the engine's stroke format
+    strokes_to_svg.py       the inverse; belongs to KhienThai
+    make_fonts.py           subset fonts down to a pack's characters
+    instrument.py           add attempt telemetry to a build, for debugging
+    fix_persistence.py      repair the window.storage bug in an old build
+    test/run.sh             every check that does not need a browser
   dist/                built single-file outputs, one per script, versioned
 ```
+
+Run `build/test/run.sh` before shipping. It checks the scoring against
+scripted attempts, executes each build in a stubbed DOM, and confirms the
+committed build rebuilds byte-identical from source.
 
 Single-file HTML with zero external dependencies is a deliberate constraint.
 Every deliverable must open from a double-click, offline, on a tablet.
@@ -93,18 +106,40 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.0.html`
+### Hiragana — `dist/hiragana-v0.1.6.html`
 
-Built. 46 gojūon with KanjiVG stroke order baked in as the default book, Klee
-One and Noto Sans JP embedded, laid out as a proper gojūon chart with the ya
-and wa rows keeping their gaps and ん on its own row. Stitched from the Thai
-engine by `build/stitch.py`, which is the reusable path for the next realm.
+Playable, and traced end to end without a break. 46 gojūon with KanjiVG
+stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
+proper gojūon chart with the ya and wa rows keeping their gaps and ん on its
+own row.
+
+What the tracing enforces, all of it learned by finding it broken:
+
+- **Stroke order.** Progress is clamped to the current stroke, so a later one
+  cannot be started early.
+- **Separate strokes stay separate.** Crossing a boundary needs a real pen
+  lift. Without this a single unbroken line satisfied a four-stroke glyph,
+  which defeats the hook problem this pack exists for.
+- **The whole path must be traced**, not merely reached — 85% coverage,
+  measured by where the pen actually went.
+- **Scribbles fail on distance.** An honest trace runs about the length of
+  the path; scribbles run 30–120×. This is what stops single-stroke glyphs,
+  which have no lift barrier.
+
+Presentation: one stroke lit at a time. Finished strokes stay shining, the
+current one is drawn by the pen, later ones have not caught light yet.
+
+The shadow is drawn from the stroke data rather than the font. KanjiVG's
+centrelines describe KanjiVG's letterforms, and only 66% of the path fell
+inside Klee One's ink even at the best possible alignment — a shape
+difference, not a misalignment. Deriving the target from the same data as the
+guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
 ---
 
-## Hiragana plan (first build)
+## Hiragana plan (delivered — kept for the reasoning)
 
 Scope: the 46 gojūon only. No dakuten, handakuten, or yōon yet.
 Glyph list with row/order/romaji is in `scripts/hiragana/glyphs.json`.
@@ -122,7 +157,8 @@ Learners who trace a print font learn wrong shapes. So:
   available so contributors can override any stroke. KanjiVG requires a credit
   line in the app footer.
 - **Layout:** 5×10 gojūon grid replaces the Thai consonant list.
-- **Engine:** unchanged. Zap, scoring, trail caching, mastery all carry over.
+- **Engine:** shared. Everything above is delivered by `build/stitch.py`
+  applying pack settings to `build/engine.html`; see `scripts/PACK.md`.
 
 ---
 
