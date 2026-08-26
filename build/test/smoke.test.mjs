@@ -1,7 +1,8 @@
 // Execute the engine's script in a stubbed DOM to catch runtime errors that
 // a syntax check cannot see — the temporal dead zone bug was exactly this.
 import { readFileSync } from 'fs';
-const html = readFileSync('process.argv[2] || 'dist/hiragana-v0.1.6.html'','utf8');
+const target = process.argv[2] || 'dist/hiragana-v0.1.6.html';
+const html = readFileSync(target,'utf8');
 const blocks = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
 let raf=[];
 const ctx = new Proxy({}, { get:()=>function(){ return {data:new Uint8ClampedArray(4)}; }, set:()=>true });
@@ -36,4 +37,5 @@ let err=null;
 try { for (const b of blocks) new Function(b)(); } catch(e){ err=e; }
 // drive one animation frame — where the dead-zone bug would have fired
 try { for(let i=0;i<3 && raf.length;i++){ const f=raf.shift(); f(0); } } catch(e){ err=err||e; }
-console.log(err ? `RUNTIME ERROR: ${err.message}` : 'engine script executes, animation frame runs clean');
+if (err) { console.log(`RUNTIME ERROR in ${target}: ${err.message}`); process.exit(1); }
+console.log(`${target}: engine executes, animation frames run clean`);
