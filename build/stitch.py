@@ -325,6 +325,74 @@ def main():
               f"const R_ON=()=>Math.max({d.get('minTolerance', 0.045)},"
               "R_ON0*Math.sqrt(curS));")
 
+    # ---- sequential reveal (requires strictFollow for SEGS/segIdx)
+    #
+    # Showing the whole glyph at once tells the learner the answer before they
+    # have made a mark. One stroke at a time turns the character into a
+    # sequence they earn: strokes already made stay lit, the current one is
+    # drawn by the pen, and the ones after it have not caught light yet.
+    if pack.get("sequentialReveal") and pack.get("strictFollow"):
+        s.sub("trail: current stroke only",
+              r"  paintPath\(tr,prog,PATH\.length-1,"
+              r"\{alpha:\.38,blur:10,nocore:true,scale:\.75\}\);[^\n]*\n"
+              r"  for\(let i=prog;i<PATH\.length;i\+=4\)\{ const q=denorm\(PATH\[i\]\);[^\n]*\n",
+              "  const _si=(awaitLift&&segIdx<SEGS.length-1)?segIdx+1:segIdx;\n"
+              "  const _sg=SEGS[_si]||[0,PATH.length-1];\n"
+              "  const _ss=Math.max(prog,_sg[0]), _se=_sg[1];\n"
+              "  paintPath(tr,_ss,_se,{alpha:.38,blur:10,nocore:true,scale:.75});"
+              "   // road, this stroke only\n"
+              "  for(let i=_ss;i<=_se;i+=4){ const q=denorm(PATH[i]);\n")
+
+        s.sub("ghost demonstrates this stroke",
+              r"  const rem=PATH\.length-1-prog, dur=2200\+rem\*17,"
+              r" now=performance\.now\(\), ph=\(\(now-ghostAnim\.t\)%dur\)/dur,"
+              r" end=PATH\.length-1;",
+              "  // The comet shows the stroke you are on, not a lap of the whole\n"
+              "  // glyph — the later strokes have not been revealed yet. Once a\n"
+              "  // stroke is finished it shows the next one instead, so lifting\n"
+              "  // the pen is answered by an invitation rather than a repeat.\n"
+              "  const _g=SEGS[_gi]||[0,PATH.length-1], _a=_g[0], end=_g[1];\n"
+              "  const rem=end-_a, dur=1500+rem*17, now=performance.now(),"
+              " ph=((now-ghostAnim.t)%dur)/dur;")
+        s.sub("ghost comet range",
+              r"  const n=prog\+Math\.max\(2,Math\.floor\(ph\*\(end-prog\)\)\);"
+              r" paintPath\(fx,Math\.max\(prog,n-16\),n,\{alpha:\.9,blur:18,scale:\.8\}\);",
+              "  const n=_a+Math.max(2,Math.floor(ph*(end-_a)));"
+              " paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8});")
+        s.sub("start dot marks where the pen goes next",
+              r"const s0=denorm\(PATH\[prog\]\), pulse=",
+              "const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)"
+              "?SEGS[segIdx+1][0]:prog]), pulse=")
+        s.sub("ghost keeps running between strokes",
+              r"if\(!PATH\.length\|\|done\|\|prog>=PATH\.length-1\)"
+              r"\{fx\.clearRect\(0,0,W,H\);return;\}",
+              "if(!PATH.length||done){fx.clearRect(0,0,W,H);return;}")
+
+        # the shine: a finished stroke throws light along its whole length
+        s.sub("trail cache tracks the segment too",
+              r"  if\(trailProg!==prog\) renderTrail\(\);",
+              "  // Declared here because the cache check below is the first use;\n"
+              "  // declaring it further down put it in the temporal dead zone.\n"
+              "  const _gi=(awaitLift&&segIdx<SEGS.length-1)?segIdx+1:segIdx;\n"
+              "  if(trailProg!==prog||trailSeg!==_gi) { trailSeg=_gi; renderTrail(); }")
+        s.sub("trail cache state", r"let SEGS=\[\],segIdx=0,",
+              "let trailSeg=-1;\nlet SEGS=[],segIdx=0,")
+
+        s.sub("shine on stroke completion",
+              r"function fizzle\(\)\{",
+              "function shine(a,b){ const step=Math.max(1,Math.round((b-a)/16));\n"
+              "  for(let i=a;i<=b;i+=step){ const q=denorm(PATH[i]);\n"
+              "    for(let k=0;k<3;k++){ const ang=Math.random()*6.28, v=.3+Math.random()*1.4;\n"
+              "      parts.push({x:q.x,y:q.y,vx:Math.cos(ang)*v,vy:Math.sin(ang)*v,\n"
+              "        life:1,r:1+Math.random()*2,c:'255,241,184'}); } }\n"
+              "  if(navigator.vibrate) navigator.vibrate(12);\n"
+              "  loop(); }\n"
+              "function fizzle(){")
+        s.sub("call shine",
+              r"      awaitLift=true;   // hooks are separate strokes, so prove it",
+              "      shine(seg[0],seg[1]);\n"
+              "      awaitLift=true;   // hooks are separate strokes, so prove it")
+
     # ---- metadata line: 'a-row', not 'a-row class'
     s.sub("class label", r"\$\('cls'\)\.textContent=cls\+' class'\+",
           "$('cls').textContent=cls+")
