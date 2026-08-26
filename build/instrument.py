@@ -88,6 +88,18 @@ LAYER = r"""
   pad.addEventListener('pointerup', up, true);
   pad.addEventListener('pointercancel', up, true);
 
+  // ---- grid toggle
+  const GRIDS = ['cross','quarters','none'];
+  function cycleGrid(){
+    try {
+      GRID_MODE = GRIDS[(GRIDS.indexOf(GRID_MODE)+1) % GRIDS.length];
+      const b = document.getElementById('__gr');
+      if (b) b.textContent = 'grid: ' + GRID_MODE;
+      drawGuide();
+      return GRID_MODE;
+    } catch(_){ return null; }
+  }
+
   // ---- mastery control
   // A glyph that becomes unpassable is also untestable, because there is no
   // way back down. This sets the level for the current character directly.
@@ -161,6 +173,7 @@ LAYER = r"""
   window.__hito = {
     realign,
     cycleShadow,
+    cycleGrid,
     setLevel,
     alignment: ALIGN,
     get log(){ return log; },
@@ -194,6 +207,16 @@ LAYER = r"""
       + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
     sb.onclick = cycleShadow;
     document.body.appendChild(sb);
+
+    const gb = document.createElement('button');
+    gb.id = '__gr';
+    gb.textContent = 'grid: ' + (typeof GRID_MODE !== 'undefined' ? GRID_MODE : '?');
+    gb.title = 'Cycle the practice grid';
+    gb.style.cssText = 'position:fixed;left:120px;bottom:10px;z-index:9999;'
+      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
+    gb.onclick = cycleGrid;
+    document.body.appendChild(gb);
 
     const lv = document.createElement('div');
     lv.style.cssText = 'position:fixed;left:10px;bottom:48px;z-index:9999;display:flex;gap:4px';

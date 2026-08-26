@@ -49,6 +49,21 @@ which a kana-only subset does not contain, so every font reported as blocked.
 | `maxTravel` | `2.5` | Cap on pen distance ÷ path length. An honest trace runs about 1.0×; scribbles run 30–120×. This is what stops a scribble on single-stroke glyphs, which have no lift barrier. |
 | `sequentialReveal` | `false` | Light one stroke at a time. Requires `strictFollow`. |
 
+### Practice grid
+
+| key | default | meaning |
+|---|---|---|
+| `grid` | `none` | `cross` — the glyph's box with a dashed centre cross, like a practice sheet. `quarters` — adds quarter lines. `none` — off. |
+
+The box is the glyph's own em square, derived from the same transform the
+stroke data was baked with, so "starts left of centre, ends on the lower
+line" means the same thing on every character. It shrinks with mastery.
+
+Independent of `mode` on purpose: a grid says where the box is, never what to
+draw, so it can stay on at any difficulty. It exists because paper practice
+sheets have one, and a stroke floating in empty space gives a learner nothing
+to judge length or position against.
+
 ### Difficulty mode
 
 | key | default | meaning |

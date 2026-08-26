@@ -443,6 +443,52 @@ def main():
               "    if(_ns) label(g,denorm(PATH[_ns[0]]),_ni+1);\n"
               "  }")
 
+    # ---- practice grid
+    #
+    # Paper practice sheets put the character in a square with a cross through
+    # it, and that frame is what makes length and position judgeable — a
+    # stroke floating in empty space gives nothing to measure against.
+    #
+    # It marks the glyph's own box, derived from the same transform the stroke
+    # data was baked with, so "starts just left of centre, ends on the lower
+    # line" means the same thing every time. It shrinks with mastery like
+    # everything else.
+    #
+    # Deliberately independent of difficulty: a grid says where the box is,
+    # never what to draw, so it can stay on in medium and hard.
+    if pack.get("grid", "none") != "none":
+        s.sub("grid state", r"let SHADOW_MODE=",
+              f"let GRID_MODE='{pack.get('grid')}';let SHADOW_MODE=")
+        s.sub("draw the grid",
+              r"function drawGuide\(\)\{\n"
+              r"  g\.clearRect\(0,0,W,H\); if\(!guideOn&&mode==='practice'&&!done\) return;",
+              "function gridBox(){\n"
+              "  const A=(typeof DEFAULT_BOOK!=='undefined'&&DEFAULT_BOOK.alignment)"
+              "||{glyphCy:0.44};\n"
+              "  const cy=A.glyphCy;\n"
+              "  return {x0:(0.5-curF/2)*W, x1:(0.5+curF/2)*W,\n"
+              "          y0:(0.5-curF*cy)*H, y1:(0.5+curF*(1-cy))*H}; }\n"
+              "function drawGrid(){\n"
+              "  if(GRID_MODE==='none') return;\n"
+              "  const b=gridBox();\n"
+              "  g.save(); g.lineWidth=1;\n"
+              "  g.strokeStyle='rgba(233,196,106,.16)';\n"
+              "  g.strokeRect(b.x0,b.y0,b.x1-b.x0,b.y1-b.y0);\n"
+              "  const mx=(b.x0+b.x1)/2, my=(b.y0+b.y1)/2;\n"
+              "  g.setLineDash([5,7]); g.strokeStyle='rgba(233,196,106,.13)';\n"
+              "  g.beginPath(); g.moveTo(mx,b.y0); g.lineTo(mx,b.y1);\n"
+              "  g.moveTo(b.x0,my); g.lineTo(b.x1,my); g.stroke();\n"
+              "  if(GRID_MODE==='quarters'){\n"
+              "    g.strokeStyle='rgba(233,196,106,.07)'; g.beginPath();\n"
+              "    for(const f of [0.25,0.75]){\n"
+              "      g.moveTo(b.x0+(b.x1-b.x0)*f,b.y0); g.lineTo(b.x0+(b.x1-b.x0)*f,b.y1);\n"
+              "      g.moveTo(b.x0,b.y0+(b.y1-b.y0)*f); g.lineTo(b.x1,b.y0+(b.y1-b.y0)*f); }\n"
+              "    g.stroke(); }\n"
+              "  g.restore(); }\n"
+              "function drawGuide(){\n"
+              "  g.clearRect(0,0,W,H); if(!guideOn&&mode==='practice'&&!done) return;\n"
+              "  drawGrid();")
+
     # ---- metadata line: 'a-row', not 'a-row class'
     s.sub("class label", r"\$\('cls'\)\.textContent=cls\+' class'\+",
           "$('cls').textContent=cls+")

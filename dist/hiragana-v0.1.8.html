@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana trace · v0.1.7</title>
+<title>hito 人 · hiragana trace · v0.1.8</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.7';
+const APP_VERSION='0.1.8';
 const LETTERS=[["あ","あ行","a","","a-row",1,1],["い","あ行","i","","a-row",2,1],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1],["え","あ行","e","","a-row",4,1],["お","あ行","o","","a-row",5,1],["か","か行","ka","","ka-row",1,2],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2],["く","か行","ku","","ka-row",3,2],["け","か行","ke","","ka-row",4,2],["こ","か行","ko","","ka-row",5,2],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3],["し","さ行","shi","","sa-row",2,3],["す","さ行","su","","sa-row",3,3],["せ","さ行","se","","sa-row",4,3],["そ","さ行","so","","sa-row",5,3],["た","た行","ta","","ta-row",1,4],["ち","た行","chi","","ta-row",2,4],["つ","た行","tsu","","ta-row",3,4],["て","た行","te","","ta-row",4,4],["と","た行","to","","ta-row",5,4],["な","な行","na","","na-row",1,5],["に","な行","ni","","na-row",2,5],["ぬ","な行","nu","","na-row",3,5],["ね","な行","ne","","na-row",4,5],["の","な行","no","","na-row",5,5],["は","は行","ha","","ha-row",1,6],["ひ","は行","hi","","ha-row",2,6],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6],["へ","は行","he","","ha-row",4,6],["ほ","は行","ho","","ha-row",5,6],["ま","ま行","ma","","ma-row",1,7],["み","ま行","mi","","ma-row",2,7],["む","ま行","mu","","ma-row",3,7],["め","ま行","me","","ma-row",4,7],["も","ま行","mo","","ma-row",5,7],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8],["よ","や行","yo","","ya-row",5,8],["ら","ら行","ra","","ra-row",1,9],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9],["る","ら行","ru","","ra-row",3,9],["れ","ら行","re","","ra-row",4,9],["ろ","ら行","ro","","ra-row",5,9],["わ","わ行","wa","","wa-row",1,10],["を","わ行","wo","","wa-row",5,10],["ん","","n","","",1,11]];
 
 // ---------- state
@@ -172,7 +172,7 @@ const cover=document.createElement('canvas'),cv=cover.getContext('2d'),COV=160; 
 const FONT=()=>`"${curFont().family}","Noto Sans Thai Looped","Thonburi","Leelawadee UI","Tahoma",sans-serif`;
 let W=0,H=0,DPR=1,idx=0,mode='practice',done=false,penOnly=true,guideOn=true;
 let MASTERY={};                                        // letter → times conjured
-const BASE_F=0.62;const SHADOW_SCALE=2.4;let SHADOW_MODE='none';let GUIDE_ON=true,GUIDE_NUMBERS=true;
+const BASE_F=0.62;const SHADOW_SCALE=2.4;let GRID_MODE='cross';let SHADOW_MODE='none';let GUIDE_ON=true,GUIDE_NUMBERS=true;
 const glyphF=le=>Math.max(0.32,BASE_F*Math.pow(0.93,MASTERY[le]||0)); // shrinks 12% per conjure
 let curF=BASE_F,curS=1,curShrink=q=>q;                   // current fraction & scale vs recording
 async function persistM(){ try{ if(window.storage) await window.storage.set('hito-mastery',JSON.stringify(MASTERY),false); }catch(_){} }
@@ -244,8 +244,31 @@ function label(ctx,p,n){ ctx.save(); ctx.font='bold 13px system-ui'; ctx.fillSty
 // ---------- guide layer
 function fontBook(){ return TEACHER.fonts[fontId]||(TEACHER.fonts[fontId]={letters:{}}); }
 function teacherStrokes(){ const r=fontBook().letters[LETTERS[idx][0]]; return r&&r.strokes&&r.strokes.length?r.strokes:null; }
+function gridBox(){
+  const A=(typeof DEFAULT_BOOK!=='undefined'&&DEFAULT_BOOK.alignment)||{glyphCy:0.44};
+  const cy=A.glyphCy;
+  return {x0:(0.5-curF/2)*W, x1:(0.5+curF/2)*W,
+          y0:(0.5-curF*cy)*H, y1:(0.5+curF*(1-cy))*H}; }
+function drawGrid(){
+  if(GRID_MODE==='none') return;
+  const b=gridBox();
+  g.save(); g.lineWidth=1;
+  g.strokeStyle='rgba(233,196,106,.16)';
+  g.strokeRect(b.x0,b.y0,b.x1-b.x0,b.y1-b.y0);
+  const mx=(b.x0+b.x1)/2, my=(b.y0+b.y1)/2;
+  g.setLineDash([5,7]); g.strokeStyle='rgba(233,196,106,.13)';
+  g.beginPath(); g.moveTo(mx,b.y0); g.lineTo(mx,b.y1);
+  g.moveTo(b.x0,my); g.lineTo(b.x1,my); g.stroke();
+  if(GRID_MODE==='quarters'){
+    g.strokeStyle='rgba(233,196,106,.07)'; g.beginPath();
+    for(const f of [0.25,0.75]){
+      g.moveTo(b.x0+(b.x1-b.x0)*f,b.y0); g.lineTo(b.x0+(b.x1-b.x0)*f,b.y1);
+      g.moveTo(b.x0,b.y0+(b.y1-b.y0)*f); g.lineTo(b.x1,b.y0+(b.y1-b.y0)*f); }
+    g.stroke(); }
+  g.restore(); }
 function drawGuide(){
   g.clearRect(0,0,W,H); if(!guideOn&&mode==='practice'&&!done) return;
+  drawGrid();
   const L=LETTERS[idx][0],size=Math.round(H*curF);
   const rec=mode==='practice'&&teacherStrokes();
   if(rec&&PATH.length&&SHADOW_MODE!=='font'){
@@ -544,7 +567,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.7');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.8');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.</div>
