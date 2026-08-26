@@ -8,6 +8,13 @@ echo "── scoring ───────────────────�
 node build/test/scoring.test.mjs | sed 's/^/  /' || fail=1
 
 echo
+echo "── alignment (strokes, glyph and grid agree) ───────"
+for f in dist/hiragana-*.html; do
+  case "$f" in *-debug.html) continue;; esac
+  node build/test/alignment.test.mjs "$f" | sed 's/^/  /' || fail=1
+done
+
+echo
 echo "── smoke (engine executes, frames run) ─────────────"
 for f in dist/*.html; do
   node build/test/smoke.test.mjs "$f" | sed 's/^/  /' || fail=1
