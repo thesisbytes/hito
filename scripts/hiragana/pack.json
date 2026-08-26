@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "version": "0.1.1",
-  "title": "hito 人 · hiragana trace · v0.1.1",
+  "version": "0.1.2",
+  "title": "hito 人 · hiragana trace · v0.1.2",
   "brand": "hito 人 · hiragana",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -24,5 +24,7 @@
       "role": "print"
     }
   ],
-  "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License."
+  "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",
+  "shadowFromStrokes": true,
+  "shadowScale": 2.4
 }

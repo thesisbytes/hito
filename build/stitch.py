@@ -143,6 +143,46 @@ def main():
           "if(L[5]){b.style.gridColumn=L[5];b.style.gridRow=L[6];}"
           "b.onclick=()=>load(i);gr.appendChild(b);});")
 
+    # ---- the shadow: draw it from the stroke data, not the font
+    #
+    # The guide comes from KanjiVG, whose centrelines describe KanjiVG's
+    # letterforms. Overlaid on Klee One only 66% of the path fell inside the
+    # glyph's ink — and that is the ceiling across every possible scale and
+    # offset, so it is a shape difference, not a misalignment. Hooks diverge
+    # most, which is exactly where two textbook designs disagree.
+    #
+    # Thai never hit this: its recordings were captured by tracing the
+    # rendered glyph. Deriving the target from the same data as the guide is
+    # what makes the two agree by construction.
+    if pack.get("shadowFromStrokes"):
+        # sub() replaces literally — backreferences do not expand — so read
+        # the value out first and write the whole replacement.
+        m = re.search(r"const BASE_F=([\d.]+);", s.text)
+        if not m:
+            sys.exit("cannot find BASE_F to anchor the shadow scale on.")
+        s.sub("shadow scale", r"const BASE_F=[\d.]+;",
+              f"const BASE_F={m.group(1)};"
+              f"const SHADOW_SCALE={pack.get('shadowScale', 2.4)};")
+        s.sub("shadow from strokes",
+              r"g\.save\(\); g\.font=glyphFont\(size\); g\.textAlign='center'; "
+              r"g\.textBaseline='middle';\s*\n\s*const rec=mode==='practice'&&teacherStrokes\(\);"
+              r"\s*\n\s*g\.fillStyle=[^\n]*\n\s*"
+              r"if\(done\)\{g\.shadowColor='rgba\(233,196,106,\.9\)';g\.shadowBlur=40;\}\s*\n\s*"
+              r"g\.fillText\(L,W/2,H/2\+size\*\.06\); g\.restore\(\);",
+              "const rec=mode==='practice'&&teacherStrokes();\n"
+              "  if(rec&&PATH.length){\n"
+              "    paintPath(g,0,PATH.length-1,{alpha:done?.5:.13,blur:done?28:7,"
+              "scale:SHADOW_SCALE,nocore:true,"
+              "color:done?'rgba(255,241,184,.95)':'#e9c46a'});\n"
+              "  } else {\n"
+              "    g.save(); g.font=glyphFont(size); g.textAlign='center'; "
+              "g.textBaseline='middle';\n"
+              "    g.fillStyle=done?'rgba(255,241,184,.9)':(mode==='record'?"
+              "'rgba(127,209,196,.13)':'rgba(233,196,106,.16)');\n"
+              "    if(done){g.shadowColor='rgba(233,196,106,.9)';g.shadowBlur=40;}\n"
+              "    g.fillText(L,W/2,H/2+size*.06); g.restore();\n"
+              "  }", flags=re.S)
+
     # ---- metadata line: 'a-row', not 'a-row class'
     s.sub("class label", r"\$\('cls'\)\.textContent=cls\+' class'\+",
           "$('cls').textContent=cls+")
