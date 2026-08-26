@@ -47,3 +47,7 @@ Running log. Append at the bottom, don't rewrite history.
 - SVG id prefix is now kt: (KhienThai), the analogue of KanjiVG's kvg:. Renamed throughout, including build/strokes_to_svg.py here.
 - Checked: no software or dataset uses either spelling. Nearest hit is an unrelated construction firm in Da Nang.
 - KhienThai pushed: github.com/thesisbytes/khienthai (private). Private and licence-less on purpose — visibility flips with one command, a licence does not, so nothing is published under any terms until that is chosen.
+- Shipped dist/thai-v0.9.4.html: window.storage shim, save that reports failure instead of always toasting success, and the three version stamps finally agreeing (APP_VERSION was 0.9.0 while title and toast said 0.9.3). 23 lines changed, everything else byte-identical to v0.9.3.
+- Deleted dist/thai-v0.9.3.html. It silently destroys recordings while reporting success, and keeping a superseded data-eating build publicly linkable is a hazard, not an archive. Git history retains it.
+- build/fix_persistence.py applies the persistence fix to any pre-existing build, separate from stitch.py which builds a new one from a pack.
+- Caught while verifying: sub() replaces via a lambda, so regex backreferences never expand and the title became a literal \g<1>. The verify-every-substitution habit is what surfaced it before it shipped.

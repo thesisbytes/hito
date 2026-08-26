@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>nirathai · stylus trace · v0.9.3</title>
+<title>nirathai · stylus trace · v0.9.4</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -74,6 +74,17 @@
 </style>
 </head>
 <body>
+<script>
+// The engine calls window.storage but never defines it, so every save and
+// load was a silent no-op. This is that implementation. set() returns false
+// when the write genuinely failed (quota, private browsing) so the UI can
+// tell the truth about it.
+window.storage=window.storage||{
+  async get(k){ try{ const v=localStorage.getItem(k); return v==null?null:{value:v}; }catch(_){ return null; } },
+  async set(k,v){ try{ localStorage.setItem(k,v); return true; }catch(_){ return false; } }
+};
+</script>
+
 <header>
   <div class="brand">nirathai · stylus <span id="ver"></span></div>
   <div class="tabs"><button id="tabP" aria-pressed="true">Practice</button><button id="tabR" aria-pressed="false">Record</button></div>
@@ -154,7 +165,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.9.0';
+const APP_VERSION='0.9.4';
 const LETTERS=[["ก","ไก่","gor gai","chicken","mid"],["ข","ไข่","khor khai","egg","high"],["ฃ","ขวด","khor khuat","bottle (obsolete)","high"],["ค","ควาย","khor khwai","buffalo","low"],["ฅ","คน","khor khon","person (obsolete)","low"],["ฆ","ระฆัง","khor rakhang","bell","low"],["ง","งู","ngor ngu","snake","low"],["จ","จาน","jor jan","plate","mid"],["ฉ","ฉิ่ง","chor ching","small cymbals","high"],["ช","ช้าง","chor chang","elephant","low"],["ซ","โซ่","sor so","chain","low"],["ฌ","เฌอ","chor choe","tree","low"],["ญ","หญิง","yor ying","woman","low"],["ฎ","ชฎา","dor chada","headdress","mid"],["ฏ","ปฏัก","tor patak","goad","mid"],["ฐ","ฐาน","thor than","pedestal","high"],["ฑ","มณโฑ","thor montho","Montho (a queen)","low"],["ฒ","ผู้เฒ่า","thor phu thao","elder","low"],["ณ","เณร","nor nen","novice monk","low"],["ด","เด็ก","dor dek","child","mid"],["ต","เต่า","tor tao","turtle","mid"],["ถ","ถุง","thor thung","bag","high"],["ท","ทหาร","thor thahan","soldier","low"],["ธ","ธง","thor thong","flag","low"],["น","หนู","nor nu","mouse","low"],["บ","ใบไม้","bor baimai","leaf","mid"],["ป","ปลา","por pla","fish","mid"],["ผ","ผึ้ง","phor phueng","bee","high"],["ฝ","ฝา","for fa","lid","high"],["พ","พาน","phor phan","tray","low"],["ฟ","ฟัน","for fan","teeth","low"],["ภ","สำเภา","phor samphao","junk boat","low"],["ม","ม้า","mor ma","horse","low"],["ย","ยักษ์","yor yak","giant","low"],["ร","เรือ","ror ruea","boat","low"],["ล","ลิง","lor ling","monkey","low"],["ว","แหวน","wor waen","ring","low"],["ศ","ศาลา","sor sala","pavilion","high"],["ษ","ฤๅษี","sor ruesi","hermit","high"],["ส","เสือ","sor suea","tiger","high"],["ห","หีบ","hor hip","chest","high"],["ฬ","จุฬา","lor chula","kite","low"],["อ","อ่าง","or ang","basin","mid"],["ฮ","นกฮูก","hor nok huk","owl","low"]];
 
 // ---------- state
@@ -365,7 +376,7 @@ async function replay(){ const rec=mode==='record'?strokes.map(s=>s.map(norm)):(
 
 // ---------- record mode UI
 function updateRecordUI(){ const n=strokes.length; $('pct').textContent=n?`${n} stroke${n>1?'s':''} drawn`:'write the letter'; $('rUndo').disabled=!n; $('rSave').disabled=!n; $('rReplay').disabled=!n; }
-function saveCurrent(){ if(!strokes.length) return; fontBook().letters[LETTERS[idx][0]]={strokes:strokes.map(s=>s.map(norm))}; persist(); toast('saved ✓'); renderGrid(); load(idx+1); }
+function saveCurrent(){ if(!strokes.length) return; fontBook().letters[LETTERS[idx][0]]={strokes:strokes.map(s=>s.map(norm))}; persist().then(ok=>toast(ok?'saved ✓':'SAVE FAILED — export before you close this tab')); renderGrid(); load(idx+1); }
 function slimTeacher(){ const r4=v=>Math.round(v*1e4)/1e4, r2=v=>Math.round(v*100)/100;
   const o=JSON.parse(JSON.stringify(TEACHER));
   for(const fid in o.fonts) for(const le in o.fonts[fid].letters)
@@ -383,7 +394,9 @@ function exportJSON(){ const txt=JSON.stringify(slimTeacher()); $('io').value=tx
 function importJSON(){ const ta=$('io'); if(!ta.classList.contains('show')){ta.value='';ta.classList.add('show');ta.focus();return;}
   try{ const o=JSON.parse(ta.value); if(o.letters){ o.fonts={[o.activeFont||'noto-looped']:{letters:o.letters}}; delete o.letters; } if(!o.fonts) throw 0;
     TEACHER=Object.assign({version:2,activeFont:fontId,customFonts:[]},o); registerCustomFonts(); if(TEACHER.activeFont) setFont(TEACHER.activeFont); else {renderGrid();load(idx);} toast('imported ✓'); ta.classList.remove('show'); persist(); }catch(_){ toast('that did not look like exported JSON'); } }
-async function persist(){ try{ if(window.storage) await window.storage.set('nirathai-teacher-strokes',JSON.stringify(TEACHER),false); }catch(_){} }
+async function persist(){ try{ if(!window.storage) return false;
+  return await window.storage.set('nirathai-teacher-strokes',JSON.stringify(TEACHER),false);
+}catch(_){ return false; } }
 async function restore(){ try{ if(window.storage){ const r=await window.storage.get('nirathai-teacher-strokes',false); if(r&&r.value) TEACHER=JSON.parse(r.value); } }catch(_){} }
 function renderGrid(){ const gr=$('grid'); gr.innerHTML=''; LETTERS.forEach((L,i)=>{const b=document.createElement('button');b.textContent=L[0];b.className=(fontBook().letters[L[0]]?'rec':'')+(i===idx?' cur':'');b.onclick=()=>load(i);gr.appendChild(b);}); }
 
@@ -429,7 +442,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.9.3');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.9.4');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 </body>

@@ -68,10 +68,15 @@ is not a browser API. Every call sits behind `if(window.storage)`, so saving
 and loading were silent no-ops, while the save button reported `saved ✓`
 regardless. The recordings were never written anywhere.
 
-`dist/thai-v0.9.3.html` still has this bug. **Do not run a recording session
-on it.** The fix exists in `build/stitch.py` (a real localStorage-backed
-`window.storage`, plus a save that reports failure honestly) and needs to be
-applied to a Thai build before recording resumes.
+Fixed in `dist/thai-v0.9.4.html` — a real localStorage-backed
+`window.storage`, and a save that says `SAVE FAILED` instead of always
+claiming success. v0.9.3 has been removed from `dist/` rather than left
+sitting there: it silently destroys work, and a superseded build that eats
+data is not worth keeping accessible. Git history has it if it is ever
+needed.
+
+`build/fix_persistence.py` applies the same fix to any build that predates
+it.
 
 The standing rule stays, and now has a second reason behind it: a recording
 must become a file on disk the moment it is made.
