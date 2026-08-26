@@ -248,6 +248,55 @@ Two traditions, both load-bearing:
   haunt unconquered provinces. Ghost lights (phi khamot / hitodama) are the
   visual language for potency: a lit glyph is a flame you tend.
 
+### Combat, as far as it is decided
+
+Sketched in discussion, not built. Two of these constrain the data model, so
+they are recorded as decisions; the rest is explicitly open.
+
+**DECIDED — affinity is linguistic structure, not invented elements.**
+A monster weak to the k-row must be killed with か き く け こ. Affinities map
+to the gojūon grid: rows, vowel columns, stroke count. Two reasons, and the
+second is the one that matters:
+
+- Learning the type chart *is* learning that か き く け こ are siblings
+  because they share a consonant. That is a real fact about the language.
+- Arbitrary affinities let a player min-max toward the characters they
+  already know. A learner needs the opposite — practice on their weakest
+  glyphs. Structural affinity makes a monster demand a specific row, so
+  nothing can be substituted.
+
+It is also the cheap option: `glyphs.json` already carries `row`, so no pack
+needs a new field and nobody hand-authors 46 assignments per script forever.
+
+**DECIDED — the hero cannot read.** A villager who finds a tablet, not a
+scribe. This is mechanical rather than sentimental: the player starts unable
+to read, so the hero's ignorance is the player's ignorance and every glyph
+they learn, the player learns. A scribe already knows the characters, which
+makes the fiction and the mechanics tell opposite stories.
+
+**Sketched, not decided:**
+
+- **The stroke is the attack.** Each completed stroke fires along its own
+  direction, so the character's shape is the attack pattern and stroke count
+  is damage. つ is a jab, き is four shots, の is one long spiral. Stroke
+  order becomes tactical as well as pedagogical.
+- **You identify, you do not aim.** Draw the kana above a monster's head and
+  it hits that monster. The skill under test is reading the sign, and nothing
+  is ever chased with the pen — which is what keeps tracing accurate while
+  the screen moves.
+- **Monsters are the glyphs you are forgetting.** Potency decays; a glyph
+  whose flame has gone out comes back as something to fight. Encounter rate
+  then follows what actually needs review, and the roster needs no content —
+  it is the gojūon. This is the existing spaced-repetition design wearing the
+  lore it was already written in.
+- **Movement belongs in the gaps.** If monsters move, they hold still once
+  the pen comes down. Urgency between strokes, accuracy during them.
+
+**Open question worth settling early:** is the sign above a monster's head the
+kana or the romaji? Kana tests recall of the shape; romaji tests the reading →
+shape mapping, which is harder and probably more useful. It may be the
+difficulty axis rather than how much guide is shown.
+
 Cast, roughly:
 
 - Hanuman's monkey army is the idle workforce — they gather while you're away.
