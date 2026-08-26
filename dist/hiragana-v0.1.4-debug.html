@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana trace · v0.1.3</title>
+<title>hito 人 · hiragana trace · v0.1.4</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.3';
+const APP_VERSION='0.1.4';
 const LETTERS=[["あ","あ行","a","","a-row",1,1],["い","あ行","i","","a-row",2,1],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1],["え","あ行","e","","a-row",4,1],["お","あ行","o","","a-row",5,1],["か","か行","ka","","ka-row",1,2],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2],["く","か行","ku","","ka-row",3,2],["け","か行","ke","","ka-row",4,2],["こ","か行","ko","","ka-row",5,2],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3],["し","さ行","shi","","sa-row",2,3],["す","さ行","su","","sa-row",3,3],["せ","さ行","se","","sa-row",4,3],["そ","さ行","so","","sa-row",5,3],["た","た行","ta","","ta-row",1,4],["ち","た行","chi","","ta-row",2,4],["つ","た行","tsu","","ta-row",3,4],["て","た行","te","","ta-row",4,4],["と","た行","to","","ta-row",5,4],["な","な行","na","","na-row",1,5],["に","な行","ni","","na-row",2,5],["ぬ","な行","nu","","na-row",3,5],["ね","な行","ne","","na-row",4,5],["の","な行","no","","na-row",5,5],["は","は行","ha","","ha-row",1,6],["ひ","は行","hi","","ha-row",2,6],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6],["へ","は行","he","","ha-row",4,6],["ほ","は行","ho","","ha-row",5,6],["ま","ま行","ma","","ma-row",1,7],["み","ま行","mi","","ma-row",2,7],["む","ま行","mu","","ma-row",3,7],["め","ま行","me","","ma-row",4,7],["も","ま行","mo","","ma-row",5,7],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8],["よ","や行","yo","","ya-row",5,8],["ら","ら行","ra","","ra-row",1,9],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9],["る","ら行","ru","","ra-row",3,9],["れ","ら行","re","","ra-row",4,9],["ろ","ら行","ro","","ra-row",5,9],["わ","わ行","wa","","wa-row",1,10],["を","わ行","wo","","wa-row",5,10],["ん","","n","","",1,11]];
 
 // ---------- state
@@ -181,7 +181,8 @@ const DEFAULT_BOOK={"fonts":{"klee-one":{"letters":{"あ":{"strokes":[[{"x":0.36
 let TEACHER={version:2,activeFont:'klee-one',fonts:JSON.parse(JSON.stringify(DEFAULT_BOOK.fonts)),customFonts:[]}; // recordings per font id, normalized 0..1
 let strokes=[],cur=null,drawing=false,activeId=null,t0=0;
 let glyphPts=[],endPts=[],fullMask=null;  // fallback (no recording) scoring + outline mask
-let PATH=[],SEGEND=new Set(),prog=0,offCount=0; // practice: teacher path (dense, normalized), progress index
+let PATH=[],SEGEND=new Set(),prog=0,offCount=0;
+let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;const COVER_MIN=0.85,END_SLACK=4,MAX_TRAVEL=2.5,TRAVEL_EPS=0.006; // practice: teacher path (dense, normalized), progress index
 let lit=[];
 let ghostAnim=null;                       // guide animation handle
 const trail=document.createElement('canvas'); const tr=trail.getContext('2d'); let trailProg=-1;
@@ -287,7 +288,11 @@ function ghostTick(){ if(!ghostAnim) return; if(!PATH.length||done||prog>=PATH.l
 // ---------- pointer input
 function pos(e){const r=iC.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top,p:e.pointerType==='pen'?Math.max(.15,e.pressure||.5):.5,t:Math.round(performance.now()-t0)};}
 function accept(e){ if(done) return false; if(penOnly) return e.pointerType==='pen'; return e.pointerType!=='mouse'||e.buttons===1; }
-iC.addEventListener('pointerdown',e=>{ if(!accept(e)||activeId!==null) return; if(PATH.length&&mode==='practice'){ const q=pos(e); if(PATH.length) follow(q,true); } activeId=e.pointerId; iC.setPointerCapture(e.pointerId);
+iC.addEventListener('pointerdown',e=>{ if(!accept(e)||activeId!==null) return; if(PATH.length&&mode==='practice'){
+    // A lift is what separates one stroke from the next, so the
+    // pen coming down is what advances to it.
+    if(awaitLift&&segIdx<SEGS.length-1){ segIdx++; prog=SEGS[segIdx][0]; awaitLift=false; offCount=0; }
+    follow(pos(e),true); } activeId=e.pointerId; iC.setPointerCapture(e.pointerId);
   if(!strokes.length) t0=performance.now(); cur=[pos(e)]; drawing=true; e.preventDefault(); });
 iC.addEventListener('pointermove',e=>{ if(done||!drawing||e.pointerId!==activeId) return;
   for(const ev of (e.getCoalescedEvents?e.getCoalescedEvents():[e])){const q=pos(ev);cur.push(q);
@@ -302,11 +307,58 @@ iC.addEventListener('pointerup',endStroke); iC.addEventListener('pointercancel',
 const R_ON0=0.07, LOOK=24, DRAIN=1.6, FIZZ=90;
 const R_ON=()=>Math.max(.03,R_ON0*curS);
 let smudge=0;
-function follow(q,down){ const n=norm(q); let best=-1,bd=R_ON();
-  for(let i=prog;i<=Math.min(PATH.length-1,prog+LOOK);i++){ const d=Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y); if(d<bd){bd=d;best=i;} }
+function covered(){ if(!hit) return 0; let c=0; for(let i=0;i<hit.length;i++) c+=hit[i]; return c/hit.length; }
+function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];
+  if(!seg) return;
+  // How far the pen has actually travelled. A correct trace runs
+  // about the length of the path; a scribble runs many times it,
+  // and that is the one thing a scribble cannot disguise. Single
+  // stroke glyphs have no lift barrier, so without this they let
+  // a dense scribble through on coverage alone.
+  if(down) lastN=null;
+  if(!lastN){ lastN={x:n.x,y:n.y}; }
+  else { const step=Math.hypot(n.x-lastN.x,n.y-lastN.y);
+    // Sub-threshold movement is digitizer noise, not travel.
+    // Summing every raw sample would let a jittery pen inflate
+    // the ratio and fail an honest trace.
+    if(step>=TRAVEL_EPS){ travel+=step; lastN={x:n.x,y:n.y}; } }
+  if(awaitLift){   // stroke finished — the pen must come up first
+    // Overshooting the end slightly is just finishing the stroke,
+    // not an error. Only complain once the pen leaves the end and
+    // keeps going, which is what running two strokes together
+    // actually looks like.
+    const e=PATH[seg[1]];
+    if(Math.hypot(n.x-e.x,n.y-e.y)<R_ON()*1.6){ q.on=true; return; }
+    q.on=false; offCount++;
+    if(offCount===1) toast('lift the pen — the next stroke is separate');
+    if(offCount%14===1) zap(q); return; }
+  const R=R_ON(), lo=Math.max(prog,seg[0]), hi=Math.min(seg[1],prog+LOOK);
+  // Coverage and progress answer different questions and must not
+  // share a window. Progress is ordering, so it only looks ahead.
+  // Coverage is 'did the pen actually go here', so it sweeps the
+  // whole stroke — otherwise a hook that curls back within LOOK
+  // lets prog leap and leaves the skipped points unmarked.
+  for(let i=seg[0];i<=seg[1];i++)
+    if(Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y)<R) hit[i]=1;
+  let best=-1,bd=R;
+  for(let i=lo;i<=hi;i++){ const d=Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y);
+    if(d<bd){bd=d;best=i;} }
   if(best>=0){ q.on=true; prog=Math.max(prog,best); offCount=0; smudge=Math.max(0,smudge-2); spark(q.x,q.y,q.p);
-    if(SEGEND.has(prog)&&prog<PATH.length-1) prog++;
-    runeUI(); drawGuide(); if(prog>=PATH.length-2) conjure(); return; }
+    // Near the end counts as the end: requiring the exact final
+    // index makes completion depend on where samples happen to
+    // land, and a sparse sample can stop one point short.
+    if(prog>=seg[1]-END_SLACK){ for(let i=prog;i<=seg[1];i++) hit[i]=1; prog=seg[1];
+      if(segIdx>=SEGS.length-1){
+        const cov=covered(), eff=PATHLEN?travel/PATHLEN:1;
+        if(cov>=COVER_MIN&&eff<=MAX_TRAVEL){ runeUI(); drawGuide(); conjure(); return; }
+        toast(cov<COVER_MIN
+          ? `missed ${Math.round((1-cov)*100)}% of the path — trace all of it`
+          : 'too much wandering — follow the stroke, do not scrub');
+        fizzle(); return;
+      }
+      awaitLift=true;   // hooks are separate strokes, so prove it
+    }
+    runeUI(); drawGuide(); return; }
   // off the path: the spell leaks — bzzt!
   q.on=false; offCount++; smudge++;
   if(offCount===1||offCount%14===0) zap(q);
@@ -328,6 +380,8 @@ function zap(q){
     parts.push({x:q.x,y:q.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.7,r:1+Math.random()*2,c:'220,90,60'});} loop();
 }
 function fizzle(){ smudge=0; offCount=0; prog=Math.max(0,Math.round(prog*0.5));
+  segIdx=0; while(segIdx<SEGS.length-1&&prog>SEGS[segIdx][1]) segIdx++;
+  awaitLift=false; if(hit) for(let i=prog;i<hit.length;i++) hit[i]=0;
   dropPen(); strokes=[]; redrawInk(); runeUI(); drawGuide();
   stage.style.animation='none'; void stage.offsetWidth; stage.style.animation='shake .4s';
   for(let i=0;i<40;i++){const a=Math.random()*Math.PI*2,v=1+Math.random()*3;parts.push({x:W/2,y:H/2,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,r:1+Math.random()*2.5,c:'200,132,47'});} loop();
@@ -437,7 +491,11 @@ function load(i){ idx=(i+LETTERS.length)%LETTERS.length; dropPen(); done=false; 
   const shrink=curShrink;
   const rec0=teacherStrokes(); const rec=rec0?rec0.map(st=>st.map(shrink)):null;
   lit=[]; PATH=[]; SEGEND=new Set(); prog=0; offCount=0; smudge=0; outCount=0;
-  if(rec){ rec.forEach(st=>{ const R=resample(st,Math.max(6,Math.round((resample(st).len||.05)/0.008))); PATH.push(...R); SEGEND.add(PATH.length-1); }); }
+  SEGS=[];segIdx=0;awaitLift=false;
+  if(rec){ rec.forEach(st=>{ const a=PATH.length; const R=resample(st,Math.max(6,Math.round((resample(st).len||.05)/0.008))); PATH.push(...R); SEGEND.add(PATH.length-1); SEGS.push([a,PATH.length-1]); }); }
+  hit=new Uint8Array(PATH.length); travel=0; lastN=null;
+  PATHLEN=0; for(const g of SEGS) for(let i=g[0];i<g[1];i++)
+    PATHLEN+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y);
   $('badge').textContent=mode==='record'?`recording · ${curFont().loaded===false?'device font':curFont().label}`:(rec?`teacher guide · ${curFont().loaded===false?'device font':curFont().label}`:`no recording yet · ${curFont().loaded===false?'device font':curFont().label}`);
   $('powerLbl').textContent=mode==='record'?'teacher':'spell power';
   $('watch').disabled=!rec;
@@ -458,9 +516,168 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.3');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.4');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.</div>
+
+<script>
+/* ---- attempt telemetry -------------------------------------------------
+   Records what was drawn and what the engine decided. Export with the button
+   in the corner, or from the console: __hito.export()
+   Nothing here changes scoring; it only observes.                        */
+(function(){
+  const KEY = 'hito-attempts';
+  const log = [];
+  let cur = null, strokes = [], stroke = null, zaps = 0, t0 = 0;
+
+  function expected(ch){
+    try { return DEFAULT_BOOK.fonts[TEACHER.activeFont].letters[ch].strokes.length; }
+    catch(_){ return null; }
+  }
+
+  function flush(outcome){
+    if (!cur || !strokes.length) { reset(); return; }
+    log.push({
+      char: cur,
+      expectedStrokes: expected(cur),
+      drawnStrokes: strokes.length,
+      penLifts: strokes.length - 1,
+      points: strokes.map(s => s.length),
+      zaps,
+      outcome,
+      ms: Math.round(performance.now() - t0),
+      at: new Date().toISOString(),
+      strokes,                       // normalised 0..1, for offline analysis
+    });
+    save();
+    reset();
+  }
+  function reset(){ strokes = []; stroke = null; zaps = 0; t0 = performance.now(); }
+
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify(log)); } catch(_){}
+    const b = document.getElementById('__tel');
+    if (b) b.textContent = `● ${log.length} attempt${log.length===1?'':'s'}`;
+  }
+
+  // ---- outcomes: wrap the globals whose calls mean something happened
+  const _conjure = window.conjure, _zap = window.zap, _load = window.load;
+  window.conjure = function(){ flush('conjured'); return _conjure.apply(this, arguments); };
+  window.zap     = function(){ zaps++;            return _zap.apply(this, arguments); };
+  window.load    = function(i){
+    if (cur !== null) flush('abandoned');
+    const r = _load.apply(this, arguments);
+    try { cur = LETTERS[idx][0]; } catch(_){ cur = null; }
+    reset();
+    return r;
+  };
+
+  // ---- what was drawn: our own listeners, capture phase, passive
+  const pad = document.getElementById('ink');
+  const box = () => pad.getBoundingClientRect();
+  const at = e => { const r = box();
+    return [ +(((e.clientX-r.left)/r.width).toFixed(4)),
+             +(((e.clientY-r.top )/r.height).toFixed(4)) ]; };
+
+  pad.addEventListener('pointerdown', e => { stroke = [at(e)]; }, true);
+  pad.addEventListener('pointermove', e => {
+    if (!stroke) return;
+    const c = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+    (c.length ? c : [e]).forEach(s => stroke.push(at(s)));
+  }, true);
+  const up = () => { if (stroke && stroke.length > 1) strokes.push(stroke); stroke = null; };
+  pad.addEventListener('pointerup', up, true);
+  pad.addEventListener('pointercancel', up, true);
+
+  // ---- shadow mode toggle
+  // Three ways to show the target, cycled live so they can be compared on the
+  // same glyph instead of across deploys:
+  //   none    only the trail — road ahead, dots, and the stroke already made
+  //   strokes a thick faint path under the trail
+  //   font    the glyph drawn in the trace font (misaligned by design: the
+  //           stroke data describes KanjiVG's letterforms, not this font's)
+  const MODES = ['none','strokes','font'];
+  function cycleShadow(){
+    try {
+      SHADOW_MODE = MODES[(MODES.indexOf(SHADOW_MODE)+1) % MODES.length];
+      const b = document.getElementById('__sm');
+      if (b) b.textContent = 'shadow: ' + SHADOW_MODE;
+      drawGuide();
+      return SHADOW_MODE;
+    } catch(_){ return null; }
+  }
+
+  // ---- alignment nudge
+  // The baked coordinates assume canvas anchors textBaseline='middle' at the
+  // em-square middle (0.38 em above the baseline for Klee One). Chrome may
+  // instead use hhea metrics, which would put it at 0.436. Rather than guess,
+  // this lets the alignment be corrected by eye and the numbers reported back.
+  const ALIGN = (function(){
+    try { return DEFAULT_BOOK.alignment || {baseF:0.62, glyphCy:0.44}; }
+    catch(_){ return {baseF:0.62, glyphCy:0.44}; }
+  })();
+  const PRISTINE = JSON.parse(JSON.stringify(
+    (function(){ try { return DEFAULT_BOOK.fonts; } catch(_){ return {}; } })()));
+
+  function realign(scale, cy){
+    for (const fid in PRISTINE){
+      const src = PRISTINE[fid].letters, dst = TEACHER.fonts[fid];
+      if (!dst) continue;
+      for (const ch in src){
+        dst.letters[ch] = { strokes: src[ch].strokes.map(st => st.map(q => {
+          // undo the baked transform, then re-apply the nudged one
+          const kx = (q.x - 0.5) / ALIGN.baseF + 0.5;
+          const ky = (q.y - 0.5) / ALIGN.baseF + ALIGN.glyphCy;
+          return { x: +(0.5 + scale*(kx - 0.5)).toFixed(4),
+                   y: +(0.5 + scale*(ky - cy)).toFixed(4), p: q.p, t: q.t };
+        })) };
+      }
+    }
+    try { load(idx); } catch(_){}
+  }
+
+  // ---- export
+  window.__hito = {
+    realign,
+    cycleShadow,
+    alignment: ALIGN,
+    get log(){ return log; },
+    export(){
+      const blob = new Blob([JSON.stringify(log, null, 1)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `hito-attempts-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+      a.click();
+    },
+    clear(){ log.length = 0; try{ localStorage.removeItem(KEY); }catch(_){} save(); },
+  };
+
+  addEventListener('DOMContentLoaded', () => {
+    const b = document.createElement('button');
+    b.id = '__tel';
+    b.textContent = '● 0 attempts';
+    b.title = 'Download this session\'s attempts';
+    b.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;'
+      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
+    b.onclick = () => window.__hito.export();
+    document.body.appendChild(b);
+
+    const sb = document.createElement('button');
+    sb.id = '__sm';
+    sb.textContent = 'shadow: ' + (typeof SHADOW_MODE !== 'undefined' ? SHADOW_MODE : '?');
+    sb.title = 'Cycle how the target is shown';
+    sb.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:9999;'
+      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
+    sb.onclick = cycleShadow;
+    document.body.appendChild(sb);
+
+  });
+
+  reset();
+})();
+</script>
 </body>
 </html>

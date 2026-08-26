@@ -190,6 +190,122 @@ def main():
               "    g.fillText(L,W/2,H/2+size*.06); g.restore();\n"
               "  }", flags=re.S)
 
+    # ---- strict following: no skipped strokes, no free boundary crossing
+    #
+    # The original follow() searched prog..prog+LOOK and kept any jump
+    # (prog = max(prog, best)), so one lucky touch 24 points ahead skipped
+    # everything between. Enough leaps reached the end without tracing the
+    # middle, and the dot teleported on the way. SEGEND also auto-advanced,
+    # so a single unbroken line satisfied a four-stroke glyph — which defeats
+    # the hook problem the whole hiragana pack exists for.
+    #
+    # Three changes: the search is clamped to the current stroke, every path
+    # point the pen actually passes near is recorded, and completion needs
+    # real coverage rather than merely arriving at the last index.
+    if pack.get("strictFollow"):
+        s.sub("strict state",
+              r"let PATH=\[\],SEGEND=new Set\(\),prog=0,offCount=0;",
+              "let PATH=[],SEGEND=new Set(),prog=0,offCount=0;\n"
+              "let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;"
+              f"const COVER_MIN={pack.get('coverThreshold', 0.85)},END_SLACK=4,"
+              f"MAX_TRAVEL={pack.get('maxTravel', 2.5)},TRAVEL_EPS=0.006;")
+
+        s.sub("build segments",
+              r"if\(rec\)\{ rec\.forEach\(st=>\{ const R=resample\(st,"
+              r"Math\.max\(6,Math\.round\(\(resample\(st\)\.len\|\|\.05\)/0\.008\)\)\);"
+              r" PATH\.push\(\.\.\.R\); SEGEND\.add\(PATH\.length-1\); \}\); \}",
+              "SEGS=[];segIdx=0;awaitLift=false;\n"
+              "  if(rec){ rec.forEach(st=>{ const a=PATH.length;"
+              " const R=resample(st,Math.max(6,Math.round((resample(st).len||.05)/0.008)));"
+              " PATH.push(...R); SEGEND.add(PATH.length-1); SEGS.push([a,PATH.length-1]); }); }\n"
+              "  hit=new Uint8Array(PATH.length); travel=0; lastN=null;\n"
+              "  PATHLEN=0; for(const g of SEGS) for(let i=g[0];i<g[1];i++)\n"
+              "    PATHLEN+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y);")
+
+        s.sub("strict follow",
+              r"function follow\(q,down\)\{ const n=norm\(q\); let best=-1,bd=R_ON\(\);\n"
+              r"  for\(let i=prog;i<=Math\.min\(PATH\.length-1,prog\+LOOK\);i\+\+\)"
+              r"\{ const d=Math\.hypot\(n\.x-PATH\[i\]\.x,n\.y-PATH\[i\]\.y\);"
+              r" if\(d<bd\)\{bd=d;best=i;\} \}\n"
+              r"  if\(best>=0\)\{ q\.on=true; prog=Math\.max\(prog,best\); offCount=0;"
+              r" smudge=Math\.max\(0,smudge-2\); spark\(q\.x,q\.y,q\.p\);\n"
+              r"    if\(SEGEND\.has\(prog\)&&prog<PATH\.length-1\) prog\+\+;\n"
+              r"    runeUI\(\); drawGuide\(\); if\(prog>=PATH\.length-2\) conjure\(\); return; \}",
+              "function covered(){ if(!hit) return 0; let c=0;"
+              " for(let i=0;i<hit.length;i++) c+=hit[i]; return c/hit.length; }\n"
+              "function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];\n"
+              "  if(!seg) return;\n"
+              "  // How far the pen has actually travelled. A correct trace runs\n"
+              "  // about the length of the path; a scribble runs many times it,\n"
+              "  // and that is the one thing a scribble cannot disguise. Single\n"
+              "  // stroke glyphs have no lift barrier, so without this they let\n"
+              "  // a dense scribble through on coverage alone.\n"
+              "  if(down) lastN=null;\n"
+              "  if(!lastN){ lastN={x:n.x,y:n.y}; }\n"
+              "  else { const step=Math.hypot(n.x-lastN.x,n.y-lastN.y);\n"
+              "    // Sub-threshold movement is digitizer noise, not travel.\n"
+              "    // Summing every raw sample would let a jittery pen inflate\n"
+              "    // the ratio and fail an honest trace.\n"
+              "    if(step>=TRAVEL_EPS){ travel+=step; lastN={x:n.x,y:n.y}; } }\n"
+              "  if(awaitLift){   // stroke finished — the pen must come up first\n"
+              "    // Overshooting the end slightly is just finishing the stroke,\n"
+              "    // not an error. Only complain once the pen leaves the end and\n"
+              "    // keeps going, which is what running two strokes together\n"
+              "    // actually looks like.\n"
+              "    const e=PATH[seg[1]];\n"
+              "    if(Math.hypot(n.x-e.x,n.y-e.y)<R_ON()*1.6){ q.on=true; return; }\n"
+              "    q.on=false; offCount++;\n"
+              "    if(offCount===1) toast('lift the pen — the next stroke is separate');\n"
+              "    if(offCount%14===1) zap(q); return; }\n"
+              "  const R=R_ON(), lo=Math.max(prog,seg[0]), hi=Math.min(seg[1],prog+LOOK);\n"
+              "  // Coverage and progress answer different questions and must not\n"
+              "  // share a window. Progress is ordering, so it only looks ahead.\n"
+              "  // Coverage is 'did the pen actually go here', so it sweeps the\n"
+              "  // whole stroke — otherwise a hook that curls back within LOOK\n"
+              "  // lets prog leap and leaves the skipped points unmarked.\n"
+              "  for(let i=seg[0];i<=seg[1];i++)\n"
+              "    if(Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y)<R) hit[i]=1;\n"
+              "  let best=-1,bd=R;\n"
+              "  for(let i=lo;i<=hi;i++){ const d=Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y);\n"
+              "    if(d<bd){bd=d;best=i;} }\n"
+              "  if(best>=0){ q.on=true; prog=Math.max(prog,best); offCount=0;"
+              " smudge=Math.max(0,smudge-2); spark(q.x,q.y,q.p);\n"
+              "    // Near the end counts as the end: requiring the exact final\n"
+              "    // index makes completion depend on where samples happen to\n"
+              "    // land, and a sparse sample can stop one point short.\n"
+              "    if(prog>=seg[1]-END_SLACK){ for(let i=prog;i<=seg[1];i++) hit[i]=1; prog=seg[1];\n"
+              "      if(segIdx>=SEGS.length-1){\n"
+              "        const cov=covered(), eff=PATHLEN?travel/PATHLEN:1;\n"
+              "        if(cov>=COVER_MIN&&eff<=MAX_TRAVEL){"
+              " runeUI(); drawGuide(); conjure(); return; }\n"
+              "        toast(cov<COVER_MIN\n"
+              "          ? `missed ${Math.round((1-cov)*100)}% of the path — trace all of it`\n"
+              "          : 'too much wandering — follow the stroke, do not scrub');\n"
+              "        fizzle(); return;\n"
+              "      }\n"
+              "      awaitLift=true;   // hooks are separate strokes, so prove it\n"
+              "    }\n"
+              "    runeUI(); drawGuide(); return; }")
+        s.sub("advance on pen down",
+              r"if\(PATH\.length&&mode==='practice'\)\{ const q=pos\(e\);"
+              r" if\(PATH\.length\) follow\(q,true\); \}",
+              "if(PATH.length&&mode==='practice'){\n"
+              "    // A lift is what separates one stroke from the next, so the\n"
+              "    // pen coming down is what advances to it.\n"
+              "    if(awaitLift&&segIdx<SEGS.length-1){"
+              " segIdx++; prog=SEGS[segIdx][0]; awaitLift=false; offCount=0; }\n"
+              "    follow(pos(e),true); }")
+
+        # fizzle rewinds prog; the segment cursor and coverage have to follow it
+        # back or the two disagree and the glyph becomes untraceable.
+        s.sub("fizzle resets strict state",
+              r"function fizzle\(\)\{ smudge=0; offCount=0;"
+              r" prog=Math\.max\(0,Math\.round\(prog\*0\.5\)\);",
+              "function fizzle(){ smudge=0; offCount=0;"
+              " prog=Math.max(0,Math.round(prog*0.5));\n"
+              "  segIdx=0; while(segIdx<SEGS.length-1&&prog>SEGS[segIdx][1]) segIdx++;\n"
+              "  awaitLift=false; if(hit) for(let i=prog;i<hit.length;i++) hit[i]=0;")
+
     # ---- metadata line: 'a-row', not 'a-row class'
     s.sub("class label", r"\$\('cls'\)\.textContent=cls\+' class'\+",
           "$('cls').textContent=cls+")
