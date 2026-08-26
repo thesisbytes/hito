@@ -88,6 +88,20 @@ LAYER = r"""
   pad.addEventListener('pointerup', up, true);
   pad.addEventListener('pointercancel', up, true);
 
+  // ---- mastery control
+  // A glyph that becomes unpassable is also untestable, because there is no
+  // way back down. This sets the level for the current character directly.
+  function setLevel(n){
+    try {
+      const ch = LETTERS[idx][0];
+      if (n <= 0) delete MASTERY[ch]; else MASTERY[ch] = n;
+      persistM(); load(idx);
+      const b = document.getElementById('__lv');
+      if (b) b.textContent = 'lv ' + (MASTERY[ch] || 0) + ' ▲▼';
+      return MASTERY[ch] || 0;
+    } catch(_){ return null; }
+  }
+
   // ---- shadow mode toggle
   // Three ways to show the target, cycled live so they can be compared on the
   // same glyph instead of across deploys:
@@ -139,6 +153,7 @@ LAYER = r"""
   window.__hito = {
     realign,
     cycleShadow,
+    setLevel,
     alignment: ALIGN,
     get log(){ return log; },
     export(){
@@ -171,6 +186,25 @@ LAYER = r"""
       + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
     sb.onclick = cycleShadow;
     document.body.appendChild(sb);
+
+    const lv = document.createElement('div');
+    lv.style.cssText = 'position:fixed;left:10px;bottom:48px;z-index:9999;display:flex;gap:4px';
+    const mk = (t, fn) => { const b=document.createElement('button');
+      b.textContent=t; b.onclick=fn;
+      b.style.cssText='background:#1d1a16;color:#e9c46a;border:1px solid #57492f;'
+        +'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;'
+        +'cursor:pointer;opacity:.85'; return b; };
+    const lab = document.createElement('button');
+    lab.id='__lv'; lab.textContent='lv ?';
+    lab.style.cssText='background:#1d1a16;color:#ece4d8;border:1px solid #2f2a24;'
+      +'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;cursor:default';
+    lv.append(mk('−', ()=>setLevel((MASTERY[LETTERS[idx][0]]||0)-1)), lab,
+                mk('+', ()=>setLevel((MASTERY[LETTERS[idx][0]]||0)+1)),
+                mk('reset all', ()=>{ for(const k in MASTERY) delete MASTERY[k];
+                  persistM(); load(idx); setLevel(0); }));
+    document.body.appendChild(lv);
+    const sync=()=>{ lab.textContent='lv '+(MASTERY[LETTERS[idx][0]]||0); };
+    sync(); setInterval(sync, 400);
 
   });
 

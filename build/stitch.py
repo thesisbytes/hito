@@ -306,6 +306,25 @@ def main():
               "  segIdx=0; while(segIdx<SEGS.length-1&&prog>SEGS[segIdx][1]) segIdx++;\n"
               "  awaitLift=false; if(hit) for(let i=prog;i<hit.length;i++) hit[i]=0;")
 
+    # ---- difficulty curve
+    #
+    # Mastery shrank the glyph 12% a level AND tightened tolerance in the same
+    # proportion. Those compound: a smaller target is already harder to hit,
+    # and a hand's precision does not shrink with it — finger contact stays the
+    # same size while the glyph halves, and by level 4 the finger covers what
+    # it is meant to trace. Tolerance now falls with the square root of the
+    # scale, so difficulty still rises but stops outrunning the hand.
+    if pack.get("difficulty"):
+        d = pack["difficulty"]
+        s.sub("shrink rate",
+              r"const glyphF=le=>Math\.max\(\.28,BASE_F\*Math\.pow\(\.88,MASTERY\[le\]\|\|0\)\);",
+              f"const glyphF=le=>Math.max({d.get('minGlyph', 0.32)},"
+              f"BASE_F*Math.pow({d.get('shrinkPerLevel', 0.93)},MASTERY[le]||0));")
+        s.sub("tolerance curve",
+              r"const R_ON=\(\)=>Math\.max\(\.03,R_ON0\*curS\);",
+              f"const R_ON=()=>Math.max({d.get('minTolerance', 0.045)},"
+              "R_ON0*Math.sqrt(curS));")
+
     # ---- metadata line: 'a-row', not 'a-row class'
     s.sub("class label", r"\$\('cls'\)\.textContent=cls\+' class'\+",
           "$('cls').textContent=cls+")

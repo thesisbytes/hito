@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "version": "0.1.4",
-  "title": "hito 人 · hiragana trace · v0.1.4",
+  "version": "0.1.5",
+  "title": "hito 人 · hiragana trace · v0.1.5",
   "brand": "hito 人 · hiragana",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -28,5 +28,10 @@
   "shadowScale": 2.4,
   "shadow": "none",
   "strictFollow": true,
-  "coverThreshold": 0.85
+  "coverThreshold": 0.85,
+  "difficulty": {
+    "shrinkPerLevel": 0.93,
+    "minGlyph": 0.32,
+    "minTolerance": 0.045
+  }
 }
