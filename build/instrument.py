@@ -88,6 +88,24 @@ LAYER = r"""
   pad.addEventListener('pointerup', up, true);
   pad.addEventListener('pointercancel', up, true);
 
+  // ---- shadow mode toggle
+  // Three ways to show the target, cycled live so they can be compared on the
+  // same glyph instead of across deploys:
+  //   none    only the trail — road ahead, dots, and the stroke already made
+  //   strokes a thick faint path under the trail
+  //   font    the glyph drawn in the trace font (misaligned by design: the
+  //           stroke data describes KanjiVG's letterforms, not this font's)
+  const MODES = ['none','strokes','font'];
+  function cycleShadow(){
+    try {
+      SHADOW_MODE = MODES[(MODES.indexOf(SHADOW_MODE)+1) % MODES.length];
+      const b = document.getElementById('__sm');
+      if (b) b.textContent = 'shadow: ' + SHADOW_MODE;
+      drawGuide();
+      return SHADOW_MODE;
+    } catch(_){ return null; }
+  }
+
   // ---- alignment nudge
   // The baked coordinates assume canvas anchors textBaseline='middle' at the
   // em-square middle (0.38 em above the baseline for Klee One). Chrome may
@@ -120,6 +138,7 @@ LAYER = r"""
   // ---- export
   window.__hito = {
     realign,
+    cycleShadow,
     alignment: ALIGN,
     get log(){ return log; },
     export(){
@@ -143,28 +162,16 @@ LAYER = r"""
     b.onclick = () => window.__hito.export();
     document.body.appendChild(b);
 
-    const panel = document.createElement('div');
-    panel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:9999;'
-      + 'background:#1d1a16;border:1px solid #2f2a24;border-radius:8px;padding:10px 12px;'
-      + 'font:12px ui-sans-serif,system-ui;color:#ece4d8;opacity:.9;min-width:210px';
-    panel.innerHTML =
-      '<div style="color:#8d8378;margin-bottom:7px">guide alignment</div>'
-      + '<label style="display:block;margin-bottom:5px">size '
-      + '<input id="__as" type="range" min="0.35" max="0.95" step="0.005" '
-      + `value="${ALIGN.baseF}" style="width:100%"></label>`
-      + '<label style="display:block">height '
-      + '<input id="__ac" type="range" min="0.25" max="0.65" step="0.005" '
-      + `value="${ALIGN.glyphCy}" style="width:100%"></label>`
-      + '<div id="__av" style="margin-top:7px;font-family:ui-monospace,monospace;'
-      + `color:#e9c46a">baseF ${ALIGN.baseF}  cy ${ALIGN.glyphCy}</div>`;
-    document.body.appendChild(panel);
-    const as = panel.querySelector('#__as'), ac = panel.querySelector('#__ac');
-    const apply = () => {
-      const s = +as.value, c = +ac.value;
-      panel.querySelector('#__av').textContent = `baseF ${s.toFixed(3)}  cy ${c.toFixed(3)}`;
-      realign(s, c);
-    };
-    as.oninput = apply; ac.oninput = apply;
+    const sb = document.createElement('button');
+    sb.id = '__sm';
+    sb.textContent = 'shadow: ' + (typeof SHADOW_MODE !== 'undefined' ? SHADOW_MODE : '?');
+    sb.title = 'Cycle how the target is shown';
+    sb.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:9999;'
+      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
+    sb.onclick = cycleShadow;
+    document.body.appendChild(sb);
+
   });
 
   reset();

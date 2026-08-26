@@ -154,15 +154,16 @@ def main():
     # Thai never hit this: its recordings were captured by tracing the
     # rendered glyph. Deriving the target from the same data as the guide is
     # what makes the two agree by construction.
-    if pack.get("shadowFromStrokes"):
+    if pack.get("shadow", "none") != "font":
         # sub() replaces literally — backreferences do not expand — so read
         # the value out first and write the whole replacement.
         m = re.search(r"const BASE_F=([\d.]+);", s.text)
         if not m:
             sys.exit("cannot find BASE_F to anchor the shadow scale on.")
-        s.sub("shadow scale", r"const BASE_F=[\d.]+;",
+        s.sub("shadow mode", r"const BASE_F=[\d.]+;",
               f"const BASE_F={m.group(1)};"
-              f"const SHADOW_SCALE={pack.get('shadowScale', 2.4)};")
+              f"const SHADOW_SCALE={pack.get('shadowScale', 2.4)};"
+              f"let SHADOW_MODE='{pack.get('shadow', 'none')}';")
         s.sub("shadow from strokes",
               r"g\.save\(\); g\.font=glyphFont\(size\); g\.textAlign='center'; "
               r"g\.textBaseline='middle';\s*\n\s*const rec=mode==='practice'&&teacherStrokes\(\);"
@@ -170,10 +171,16 @@ def main():
               r"if\(done\)\{g\.shadowColor='rgba\(233,196,106,\.9\)';g\.shadowBlur=40;\}\s*\n\s*"
               r"g\.fillText\(L,W/2,H/2\+size\*\.06\); g\.restore\(\);",
               "const rec=mode==='practice'&&teacherStrokes();\n"
-              "  if(rec&&PATH.length){\n"
-              "    paintPath(g,0,PATH.length-1,{alpha:done?.5:.13,blur:done?28:7,"
+              "  if(rec&&PATH.length&&SHADOW_MODE!=='font'){\n"
+              "    // 'none' leaves only the trail: road ahead, dots, and the\n"
+              "    // stroke already made. A thick shadow bulges on the outside\n"
+              "    // of curves, so the thin trail down its centreline cannot\n"
+              "    // cover it, and the stacked glows read as blur.\n"
+              "    if(SHADOW_MODE==='strokes'||done){\n"
+              "      paintPath(g,0,PATH.length-1,{alpha:done?.5:.13,blur:done?28:7,"
               "scale:SHADOW_SCALE,nocore:true,"
               "color:done?'rgba(255,241,184,.95)':'#e9c46a'});\n"
+              "    }\n"
               "  } else {\n"
               "    g.save(); g.font=glyphFont(size); g.textAlign='center'; "
               "g.textBaseline='middle';\n"
