@@ -162,6 +162,67 @@ Learners who trace a print font learn wrong shapes. So:
 
 ---
 
+## Difficulty modes
+
+Set per pack as `mode` (see `scripts/PACK.md`).
+
+| mode | shows | tests |
+|---|---|---|
+| **easy** | path, dots, comet, and a numbered badge on the stroke you are about to draw | the motion — can you make the shape |
+| **medium** | the shape only | where each stroke starts and what order they go in |
+| **hard** | nothing | recall of the whole character |
+
+`label()` had drawn numbered stroke badges since the beginning but only ever
+in record mode. Stroke order is precisely what a learner is trying to recall,
+so on easy the number now appears on the stroke about to be drawn.
+
+### Hard mode — planned, not built
+
+Free draw needs a different scorer. Path-following asks *"did you follow this
+line"*, which a glyph drawn from memory will always fail — not because it is
+wrong but because it was never tracing. The question has to become **"is what
+you drew あ?"**
+
+**This is verification, not recognition.** Recognition is "which of 2,000+
+characters is this", an open-set problem needing a trained model.
+Verification is binary against a reference already in hand: the expected
+stroke count, the expected order, and the exact geometry of every stroke.
+A recogniser would be rediscovering what `strokes.json` already states.
+
+Porting one would also fight the architecture — Zinnia or Tegaki means WASM
+and GPL, a tf.js model is megabytes, a cloud API breaks offline. All three
+break "single file, opens from a double-click, works offline", which is the
+constraint the whole project is built on.
+
+The engine already contains most of the scorer. `compare(u, t)` compares two
+normalised strokes and returns `{ok, reason}`, catching reversed direction,
+a wrong starting point, and a stroke cut short or run long — with the failure
+messages already written for a human. **It is dead code today; nothing calls
+it.**
+
+What hard mode still needs:
+
+1. **Normalise** the drawn glyph's bounding box onto the reference's. This is
+   what makes size and position free, which is how writing actually works.
+2. **Stroke count must match**, checked at the glyph level. This is where
+   hooks are enforced: き drawn as three strokes is wrong even if it looks
+   right, and that is the entire reason the data comes from KanjiVG.
+3. **Stroke order**, by comparing drawn stroke *i* against reference stroke
+   *i* rather than searching for a best match. Order is not a bonus check —
+   it is half of what the dataset knows.
+4. **Per-stroke `compare()`** with loosened thresholds. The current ones
+   assume tracing; how they behave on genuine freehand is unknown until
+   somebody draws at them. That is a tuning session, not research.
+5. **A completion signal.** There is no path to finish, so evaluate after a
+   short pause following a pen lift — *not* on reaching the expected stroke
+   count, because the moment of evaluation would itself reveal the count,
+   and the count is part of what hard mode tests.
+
+Medium is the honest next step regardless: it already tests start points and
+stroke order, and it works with the scorer that exists.
+
+---
+
 ## The name
 
 人 (hito, "person") is two strokes, and neither can stand on its own — each

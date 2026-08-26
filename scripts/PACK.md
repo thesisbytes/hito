@@ -49,7 +49,15 @@ which a kana-only subset does not contain, so every font reported as blocked.
 | `maxTravel` | `2.5` | Cap on pen distance ÷ path length. An honest trace runs about 1.0×; scribbles run 30–120×. This is what stops a scribble on single-stroke glyphs, which have no lift barrier. |
 | `sequentialReveal` | `false` | Light one stroke at a time. Requires `strictFollow`. |
 
-### Difficulty
+### Difficulty mode
+
+| key | default | meaning |
+|---|---|---|
+| `mode` | *(unset)* | `easy` — path, dots, comet, numbered stroke badge. `medium` — the shape only; start points and order are on you. `hard` — nothing shown; **needs a scorer that does not exist yet**, see `CLAUDE.md`. |
+
+Unset leaves whatever `shadow` specifies and the guide always on.
+
+### Mastery
 
 `difficulty` controls what mastery does to a glyph:
 

@@ -86,3 +86,7 @@ Running log. Append at the bottom, don't rewrite history.
 - Added scripts/PACK.md — the pack format had grown to eight tracing and difficulty options with no documentation anywhere.
 - Added build/test/run.sh: scoring tests, a stubbed-DOM smoke run over every build, and a check that the committed build rebuilds byte-identical from source. All pass.
 - Resolved the three stale "Open" items at the top of this log.
+- v0.1.7 difficulty modes: easy (path, dots, comet, numbered stroke badge), medium (shape only), hard (nothing). One `mode` key in the pack sets all three renderers; the debug build cycles them live.
+- label() has drawn numbered stroke badges since the start but only ever in record mode. A learner on easy is mostly trying to recall stroke order, so the number of the stroke about to be drawn is now shown. Free feature that was already written.
+- Hard mode drafted in CLAUDE.md rather than built — nobody here can freehand kana yet, so it could not be verified, and shipping an unverifiable scorer is how the last three bugs happened.
+- Key finding for that plan: compare(u,t) already exists in the engine and is never called. It does per-stroke shape comparison with reversed-direction detection and human-readable failure reasons. Hard mode is verification against a known reference, not recognition over an open set — a recogniser would rediscover what strokes.json already states, and porting one (WASM, tf.js, cloud) would break the single-file offline constraint.

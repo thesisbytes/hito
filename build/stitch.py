@@ -393,6 +393,56 @@ def main():
               "      shine(seg[0],seg[1]);\n"
               "      awaitLift=true;   // hooks are separate strokes, so prove it")
 
+    # ---- difficulty modes
+    #
+    # easy    the path, the dots, the comet, and a numbered badge on the
+    #         stroke you are about to draw
+    # medium  the shape only — you know what the character looks like but not
+    #         where to start or in what order
+    # hard    nothing. Reserved: free draw needs a different scorer, since
+    #         path-following cannot judge a glyph drawn from memory.
+    if pack.get("mode"):
+        m = {"easy":   ("'none'",    "true",  "true"),
+             "medium": ("'strokes'", "false", "false"),
+             "hard":   ("'none'",    "false", "false")}[pack["mode"]]
+        s.sub("mode state", r"let SHADOW_MODE='[a-z]+';",
+              f"let SHADOW_MODE={m[0]};let GUIDE_ON={m[1]},GUIDE_NUMBERS={m[2]};")
+
+        # the trail, comet and start dot are the guide; the shape is not
+        s.sub("guide can be hidden",
+              r"  fx\.save\(\); fx\.globalAlpha=\.85\+\.15\*Math\.sin\(now/600\);"
+              r" fx\.drawImage\(trail,0,0,W,H\); fx\.restore\(\);\n"
+              r"  const n=_a\+Math\.max\(2,Math\.floor\(ph\*\(end-_a\)\)\);"
+              r" paintPath\(fx,Math\.max\(_a,n-16\),n,\{alpha:\.9,blur:18,scale:\.8\}\);[^\n]*\n"
+              r"  const s0=denorm\(PATH\[\(awaitLift&&segIdx<SEGS\.length-1\)"
+              r"\?SEGS\[segIdx\+1\]\[0\]:prog\]\), pulse=\.5\+\.5\*Math\.sin\(now/260\);"
+              r" fx\.save\(\); fx\.fillStyle=`rgba\(255,241,184,\$\{\.5\+\.4\*pulse\}\)`;"
+              r" fx\.shadowColor='#fff1b8'; fx\.shadowBlur=16\+10\*pulse;\n"
+              r"  fx\.beginPath\(\); fx\.arc\(s0\.x,s0\.y,4\+3\*pulse,0,7\); fx\.fill\(\); fx\.restore\(\);",
+              "  if(GUIDE_ON){\n"
+              "    fx.save(); fx.globalAlpha=.85+.15*Math.sin(now/600);"
+              " fx.drawImage(trail,0,0,W,H); fx.restore();\n"
+              "    const n=_a+Math.max(2,Math.floor(ph*(end-_a)));"
+              " paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); // comet\n"
+              "    const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)"
+              "?SEGS[segIdx+1][0]:prog]), pulse=.5+.5*Math.sin(now/260);\n"
+              "    fx.save(); fx.fillStyle=`rgba(255,241,184,${.5+.4*pulse})`;"
+              " fx.shadowColor='#fff1b8'; fx.shadowBlur=16+10*pulse;\n"
+              "    fx.beginPath(); fx.arc(s0.x,s0.y,4+3*pulse,0,7); fx.fill(); fx.restore();\n"
+              "  }")
+
+        # label() drew numbered badges but only ever in record mode. Stroke
+        # order is the thing a learner is actually trying to recall, so on
+        # easy the number of the stroke you are about to draw is shown.
+        s.sub("stroke numbers on the guide",
+              r"  if\(rec&&!done&&prog>1\) paintPath\(g,0,prog,\{alpha:\.9\}\);",
+              "  if(rec&&!done&&prog>1) paintPath(g,0,prog,{alpha:.9});\n"
+              "  if(GUIDE_NUMBERS&&rec&&!done&&SEGS.length>1){\n"
+              "    const _ni=(awaitLift&&segIdx<SEGS.length-1)?segIdx+1:segIdx;\n"
+              "    const _ns=SEGS[_ni];\n"
+              "    if(_ns) label(g,denorm(PATH[_ns[0]]),_ni+1);\n"
+              "  }")
+
     # ---- metadata line: 'a-row', not 'a-row class'
     s.sub("class label", r"\$\('cls'\)\.textContent=cls\+' class'\+",
           "$('cls').textContent=cls+")

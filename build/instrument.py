@@ -109,14 +109,22 @@ LAYER = r"""
   //   strokes a thick faint path under the trail
   //   font    the glyph drawn in the trace font (misaligned by design: the
   //           stroke data describes KanjiVG's letterforms, not this font's)
-  const MODES = ['none','strokes','font'];
+  // easy / medium / hard, matching the pack's `mode` presets.
+  const MODES = [
+    {name:'easy',   shadow:'none',    guide:true,  numbers:true},
+    {name:'medium', shadow:'strokes', guide:false, numbers:false},
+    {name:'hard',   shadow:'none',    guide:false, numbers:false},
+  ];
+  let modeIdx = 0;
   function cycleShadow(){
     try {
-      SHADOW_MODE = MODES[(MODES.indexOf(SHADOW_MODE)+1) % MODES.length];
+      modeIdx = (modeIdx+1) % MODES.length;
+      const m = MODES[modeIdx];
+      SHADOW_MODE = m.shadow; GUIDE_ON = m.guide; GUIDE_NUMBERS = m.numbers;
       const b = document.getElementById('__sm');
-      if (b) b.textContent = 'shadow: ' + SHADOW_MODE;
+      if (b) b.textContent = 'mode: ' + m.name;
       drawGuide();
-      return SHADOW_MODE;
+      return m.name;
     } catch(_){ return null; }
   }
 
@@ -179,8 +187,8 @@ LAYER = r"""
 
     const sb = document.createElement('button');
     sb.id = '__sm';
-    sb.textContent = 'shadow: ' + (typeof SHADOW_MODE !== 'undefined' ? SHADOW_MODE : '?');
-    sb.title = 'Cycle how the target is shown';
+    sb.textContent = 'mode: easy';
+    sb.title = 'Cycle easy / medium / hard';
     sb.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:9999;'
       + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
       + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
