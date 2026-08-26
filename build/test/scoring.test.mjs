@@ -47,8 +47,8 @@ function simFor(ch, pen){            // pen = array of strokes, each array of {x
       }
       if(best>=0){
         prog=Math.max(prog,best);
-        if(prog>=seg[1]-4){
-          for(let i=prog;i<=seg[1];i++) hit[i]=1; prog=seg[1];
+        if(prog>=seg[1]-4 && Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y)<R_ON){
+          prog=seg[1];
           if(segIdx>=SEGS.length-1){
             const eff=PATHLEN?travel/PATHLEN:1;
             if(covered()>=COVER_MIN && eff<=2.5){ conjured=true; }
@@ -78,6 +78,16 @@ R('one continuous line, no lifts', [raw.flat()]);
 R('stroke 3 skipped', [raw[0], raw[1], raw[3]]);
 R('strokes in wrong order', [raw[1], raw[0], raw[2], raw[3]]);
 R('every 6th point only (fast sloppy)', raw.map(s=>s.filter((_,i)=>i%6===0)));
+// Hooks live in the tail of a stroke, so the tail is what must not be
+// forgiven. Cuts are proportional: an absolute point count means something
+// different on a long stroke than a short one, and different again once
+// mastery shrinks the glyph.
+R('tail cut 5%  (a few px — should pass)',
+  raw.map(s=>s.slice(0, Math.max(2, Math.round(s.length*0.95)))));
+R('tail cut 10% (hook skipped)',
+  raw.map(s=>s.slice(0, Math.max(2, Math.round(s.length*0.90)))));
+R('tail cut 20% (hook clearly skipped)',
+  raw.map(s=>s.slice(0, Math.max(2, Math.round(s.length*0.80)))));
 R('full-canvas scribble', [Array.from({length:1200},(_,i)=>({
     x:0.5+0.34*Math.cos(i*0.41), y:0.5+0.34*Math.sin(i*0.27)}))]);
 R('dense raster scribble', [(()=>{const p=[];for(let r=0;r<40;r++)for(let c=0;c<40;c++)
