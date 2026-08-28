@@ -28,6 +28,7 @@ LAYER = r"""
   const KEY = 'hito-attempts';
   const log = [];
   let cur = null, strokes = [], stroke = null, zaps = 0, t0 = 0;
+  let level = 0, fizzles = 0, lastToast = null;
 
   function expected(ch){
     try { return DEFAULT_BOOK.fonts[TEACHER.activeFont].letters[ch].strokes.length; }
@@ -36,13 +37,19 @@ LAYER = r"""
 
   function flush(outcome){
     if (!cur || !strokes.length) { reset(); return; }
+    let coverage = null;
+    try { coverage = +covered().toFixed(3); } catch(_){}
     log.push({
       char: cur,
+      level,                         // mastery level at the time
       expectedStrokes: expected(cur),
       drawnStrokes: strokes.length,
       penLifts: strokes.length - 1,
       points: strokes.map(s => s.length),
       zaps,
+      fizzles,                       // attempt restarts before this outcome
+      reason: lastToast,             // why the engine complained, if it did
+      coverage,
       outcome,
       ms: Math.round(performance.now() - t0),
       at: new Date().toISOString(),
@@ -51,7 +58,11 @@ LAYER = r"""
     save();
     reset();
   }
-  function reset(){ strokes = []; stroke = null; zaps = 0; t0 = performance.now(); }
+  function reset(){
+    strokes = []; stroke = null; zaps = 0; fizzles = 0; lastToast = null;
+    t0 = performance.now();
+    try { level = MASTERY[LETTERS[idx][0]] || 0; } catch(_){ level = 0; }
+  }
 
   function save(){
     try { localStorage.setItem(KEY, JSON.stringify(log)); } catch(_){}
@@ -60,6 +71,13 @@ LAYER = r"""
   }
 
   // ---- outcomes: wrap the globals whose calls mean something happened
+  // The toast text is the engine's own explanation of a refusal — the
+  // difference between "missed 40% of the path" and "too much wandering" is
+  // exactly what a bug report cannot tell us, so capture it.
+  const _toast = window.toast, _fizzle = window.fizzle;
+  window.toast = function(m){ lastToast = m; return _toast.apply(this, arguments); };
+  window.fizzle = function(){ fizzles++; return _fizzle.apply(this, arguments); };
+
   const _conjure = window.conjure, _zap = window.zap, _load = window.load;
   window.conjure = function(){ flush('conjured'); return _conjure.apply(this, arguments); };
   window.zap     = function(){ zaps++;            return _zap.apply(this, arguments); };
