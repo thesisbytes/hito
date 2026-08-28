@@ -313,7 +313,13 @@ def main():
               "function fizzle(){ smudge=0; offCount=0;"
               " prog=Math.max(0,Math.round(prog*0.5));\n"
               "  segIdx=0; while(segIdx<SEGS.length-1&&prog>SEGS[segIdx][1]) segIdx++;\n"
-              "  awaitLift=false; if(hit) for(let i=prog;i<hit.length;i++) hit[i]=0;")
+              "  awaitLift=false; if(hit) for(let i=prog;i<hit.length;i++) hit[i]=0;\n"
+              "  // Every per-attempt accumulator has to clear here, not just in\n"
+              "  // load(). travel did not, so it carried across fizzles: one bad\n"
+              "  // attempt pushed travel/PATHLEN past MAX_TRAVEL and every later\n"
+              "  // attempt was rejected for wandering it had not done. The glyph\n"
+              "  // became unpassable until something reloaded it.\n"
+              "  travel=0; lastN=null;")
 
     # ---- difficulty curve
     #
