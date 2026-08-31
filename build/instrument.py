@@ -187,22 +187,135 @@ LAYER = r"""
     try { load(idx); } catch(_){}
   }
 
+  // ---- size control
+  // The whole point of separating size from mastery. SIZE_PIN holds one size
+  // while the alphabet is walked, so the question becomes "which glyph fails
+  // at which size" instead of "which level was I on", which is what made the
+  // last bug take three releases to corner.
+  const SIZE_LADDER = (function(){
+    const out = [];
+    try {
+      for (let f = SIZE_MAX; f >= SIZE_MIN - 1e-9; f -= 0.02) out.push(Math.round(f*1000)/1000);
+      if (!out.length || out[out.length-1] > SIZE_MIN) out.push(SIZE_MIN);
+    } catch(_){ }
+    return out.length ? out : [0.62];
+  })();
+  let sizeIdx = 0;
+
+  const glyphPx = () => { try { return Math.round(document.getElementById('ink').getBoundingClientRect().height * curF); }
+                          catch(_){ return null; } };
+  function syncSize(){
+    const b = document.getElementById('__sz');
+    if (!b) return;
+    let f = null; try { f = curF; } catch(_){}
+    const pinned = (function(){ try { return SIZE_PIN != null; } catch(_){ return false; } })();
+    b.textContent = (pinned ? 'pinned ' : 'size ') + (f==null ? '?' : f.toFixed(2))
+      + (glyphPx()==null ? '' : ` · ${glyphPx()}px`);
+    b.style.color = pinned ? '#7fd1c4' : '#ece4d8';
+  }
+  function setSizeIdx(i){
+    try {
+      sizeIdx = Math.max(0, Math.min(SIZE_LADDER.length-1, i));
+      SIZE_PIN = SIZE_LADDER[sizeIdx];
+      load(idx); syncSize();
+      return SIZE_PIN;
+    } catch(_){ return null; }
+  }
+  function unpinSize(){
+    try { SIZE_PIN = null; load(idx); syncSize(); } catch(_){}
+  }
+  // Walking the alphabet at a fixed size is the sweep. Navigation already
+  // calls load(), and a pinned size survives it, so next/prev is the loop.
+  function stepGlyph(d){ try { load(idx + d); syncSize(); } catch(_){} }
+
+  // ---- the fail flag
+  // A fizzle is one bad attempt; "this is impossible here" is a judgement only
+  // the hand can make, after several. The engine cannot infer it, so it gets a
+  // button. Everything needed to tell the three suspects apart is captured at
+  // the moment it is pressed: the size (difficulty curve), the glyph (stroke
+  // data), and the live accumulators (state).
+  const flags = [];
+  const FKEY = 'hito-size-flags';
+  try { const r = localStorage.getItem(FKEY); if (r) flags.push(...JSON.parse(r)); } catch(_){}
+  function saveFlags(){
+    try { localStorage.setItem(FKEY, JSON.stringify(flags)); } catch(_){}
+    const b = document.getElementById('__fl');
+    if (b) b.textContent = `✗ fails here (${flags.length})`;
+  }
+  function flagFail(){
+    let rec = {at: new Date().toISOString()};
+    try { rec.char = LETTERS[idx][0]; } catch(_){}
+    try { rec.romaji = LETTERS[idx][2]; } catch(_){}
+    try { rec.size = +curF.toFixed(3); } catch(_){}
+    try { rec.px = glyphPx(); } catch(_){}
+    try { rec.pinned = SIZE_PIN != null; } catch(_){}
+    try { rec.level = MASTERY[LETTERS[idx][0]] || 0; } catch(_){}
+    try { rec.coverage = +covered().toFixed(3); } catch(_){}
+    try { rec.travel = PATHLEN ? +(travel/PATHLEN).toFixed(2) : null; } catch(_){}
+    try { rec.progress = prog; rec.stroke = segIdx; } catch(_){}
+    try { rec.attempts = fizzles; } catch(_){}
+    rec.reason = lastToast;
+    try { rec.mode = MODES[modeIdx].name; } catch(_){}
+    flags.push(rec); saveFlags();
+    // _toast, not toast: the wrapper records lastToast, and a flag
+    // confirmation is not the engine's explanation of anything.
+    try { _toast(`flagged: ${rec.char} at ${rec.size} (${rec.px}px)`); } catch(_){}
+    return rec;
+  }
+
+  // A glyph × size grid is the thing the flags are for; rendering it here
+  // means it can be read on the tablet without exporting anything first.
+  function matrix(){
+    if (!flags.length) return '(nothing flagged yet)';
+    const sizes = [...new Set(flags.map(f=>f.size))].sort((a,b)=>b-a);
+    const chars = [...new Set(flags.map(f=>f.char))];
+    const head = 'glyph  ' + sizes.map(s=>s.toFixed(2)).join(' ');
+    const rows = chars.map(c => {
+      const cells = sizes.map(s => {
+        const n = flags.filter(f=>f.char===c && f.size===s).length;
+        return String(n || '·').padStart(4);
+      });
+      return `  ${c}   ${cells.join(' ')}`;
+    });
+    return [head, ...rows].join('\n');
+  }
+
   // ---- export
   window.__hito = {
     realign,
     cycleShadow,
     cycleGrid,
     setLevel,
+    setSize: f => setSizeIdx(SIZE_LADDER.indexOf(
+      SIZE_LADDER.reduce((a,b)=>Math.abs(b-f)<Math.abs(a-f)?b:a))),
+    sizeUp: () => setSizeIdx(sizeIdx-1),
+    sizeDown: () => setSizeIdx(sizeIdx+1),
+    unpinSize,
+    sizes: SIZE_LADDER,
+    flagFail,
+    matrix,
     alignment: ALIGN,
     get log(){ return log; },
+    get flags(){ return flags; },
+    clearFlags(){ flags.length = 0; saveFlags(); },
     export(){
-      const blob = new Blob([JSON.stringify(log, null, 1)], {type:'application/json'});
+      const payload = {
+        exported: new Date().toISOString(),
+        canvasPx: (function(){ try { return Math.round(
+          document.getElementById('ink').getBoundingClientRect().height); } catch(_){ return null; } })(),
+        sizeLadder: SIZE_LADDER,
+        flags,                         // "impossible here", judged by the hand
+        matrix: matrix(),              // the same thing, readable
+        attempts: log,
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 1)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `hito-attempts-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
       a.click();
     },
     clear(){ log.length = 0; try{ localStorage.removeItem(KEY); }catch(_){} save(); },
+    stepGlyph,
   };
 
   addEventListener('DOMContentLoaded', () => {
@@ -253,7 +366,39 @@ LAYER = r"""
                   persistM(); load(idx); setLevel(0); }));
     document.body.appendChild(lv);
     const sync=()=>{ lab.textContent='lv '+(MASTERY[LETTERS[idx][0]]||0); };
-    sync(); setInterval(sync, 400);
+    sync(); setInterval(() => { sync(); syncSize(); }, 400);
+
+    // ---- size row: the sweep controls
+    // Deliberately a row of its own above the mastery row. They look alike but
+    // they are no longer the same axis, and conflating them is the mistake
+    // this whole build exists to stop making.
+    const sz = document.createElement('div');
+    sz.style.cssText = 'position:fixed;left:10px;bottom:86px;z-index:9999;display:flex;gap:4px';
+    const szLab = document.createElement('button');
+    szLab.id = '__sz'; szLab.textContent = 'size ?';
+    szLab.title = 'Tap to release the pin and let the mode choose again';
+    szLab.style.cssText = 'background:#1d1a16;color:#ece4d8;border:1px solid #2f2a24;'
+      + 'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;cursor:pointer';
+    szLab.onclick = unpinSize;
+    sz.append(mk('◀', ()=>stepGlyph(-1)),
+              mk('−', ()=>setSizeIdx(sizeIdx+1)),   // down the ladder = smaller
+              szLab,
+              mk('+', ()=>setSizeIdx(sizeIdx-1)),
+              mk('▶', ()=>stepGlyph(1)));
+    document.body.appendChild(sz);
+
+    // ---- the fail flag, put where a thumb already is
+    const fb = document.createElement('button');
+    fb.id = '__fl';
+    fb.textContent = `✗ fails here (${flags.length})`;
+    fb.title = 'This glyph cannot be traced at this size';
+    fb.style.cssText = 'position:fixed;right:10px;bottom:48px;z-index:9999;'
+      + 'background:#2a1614;color:#ef8a7a;border:1px solid #6b3129;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.9';
+    fb.onclick = flagFail;
+    document.body.appendChild(fb);
+
+    syncSize();
 
   });
 
@@ -276,7 +421,12 @@ def main():
             sys.exit(f"cannot find {name} — the engine has changed shape.")
 
     # Must land after the engine's own script, so the globals exist to wrap.
-    s, n = re.subn(r"</body>", LAYER + "</body>", s, count=1)
+    #
+    # Replaced through a lambda, because re.sub expands escapes in a
+    # replacement *string*: a literal \n anywhere in the layer would become a
+    # real newline and break whatever line it landed in. stitch.py learned
+    # this the same way. The layer must go in exactly as written.
+    s, n = re.subn(r"</body>", lambda _: LAYER + "</body>", s, count=1)
     if n != 1:
         sys.exit("no </body> to append to.")
 

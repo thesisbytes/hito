@@ -16,7 +16,7 @@ a font by hand, kids finding bugs — all lean on each other, and so will you.
 Each realm ships as a single HTML file. No install, no server, no
 dependencies. Open it on a tablet and start tracing:
 
-**[Try hiragana](https://thesisbytes.github.io/hito/dist/hiragana-v0.1.6.html)**
+**[Try hiragana](https://thesisbytes.github.io/hito/dist/hiragana-v0.1.12.html)**
 
 ## How the tracing works
 
@@ -35,6 +35,9 @@ nothing:
 - **You have to trace the whole path**, not just reach the end of it.
 - **Scribbling does not work.** An honest trace covers about the length of
   the path; a scribble covers many times it, and that is measured.
+
+Each glyph appears at a size drawn at random, rather than shrinking as you
+master it. A hand that can only trace す at one size has not learned much.
 
 ## Layout
 

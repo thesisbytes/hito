@@ -340,6 +340,45 @@ def main():
               f"const R_ON=()=>Math.max({d.get('minTolerance', 0.045)},"
               "R_ON0*Math.sqrt(curS));")
 
+    # ---- glyph size as a first-class value
+    #
+    # Size used to be a pure function of mastery, reachable only by conjuring
+    # a glyph six times over. That made the small sizes — where every scale
+    # bug so far has lived — the least likely to ever be played, and it is why
+    # "level 6 is impossible" took three releases to even instrument: changing
+    # the level was the only way to change the size, so the two could not be
+    # told apart. A size that can be set directly separates them.
+    #
+    # sizeFor() is the single seam. Everything scale-dependent — tolerance,
+    # the grid, the shadow, the stroke transform — already derives from curF,
+    # so intercepting it here moves all of them together and cannot leave one
+    # of them behind.
+    size_mode = pack.get("sizeMode", "mastery")
+    if size_mode not in ("mastery", "random"):
+        raise SystemExit(f"pack sizeMode must be 'mastery' or 'random', not {size_mode!r}")
+    diff = pack.get("difficulty") or {}
+    lo, hi = pack.get("sizeRange", [diff.get("minGlyph", 0.32), 0.62])
+    if not (0 < lo <= hi):
+        raise SystemExit(f"pack sizeRange must be an ascending pair inside (0,1]: {[lo, hi]!r}")
+    s.sub("size seam",
+          r"let curF=BASE_F,curS=1,curShrink=q=>q;",
+          "let curF=BASE_F,curS=1,curShrink=q=>q;\n"
+          f"let SIZE_MODE='{size_mode}',SIZE_MIN={lo},SIZE_MAX={hi},SIZE_PIN=null;\n"
+          "// A pinned size outranks everything else. It is what lets one size\n"
+          "// be held steady while the alphabet is walked, which is the only way\n"
+          "// to ask which glyph fails at which size rather than at which level.\n"
+          "// Random mode draws a fresh size per glyph so that a single session\n"
+          "// samples the whole range instead of walking down it six conjures at\n"
+          "// a time. Mastery still counts up; it just no longer sets the size.\n"
+          "function sizeFor(le){\n"
+          "  if(SIZE_PIN!=null) return SIZE_PIN;\n"
+          "  if(SIZE_MODE==='random') return SIZE_MIN+Math.random()*(SIZE_MAX-SIZE_MIN);\n"
+          "  return glyphF(le);\n"
+          "}")
+    s.sub("size from sizeFor",
+          r"curF=glyphF\(LETTERS\[idx\]\[0\]\); curS=curF/BASE_F;",
+          "curF=sizeFor(LETTERS[idx][0]); curS=curF/BASE_F;")
+
     # ---- sequential reveal (requires strictFollow for SEGS/segIdx)
     #
     # Showing the whole glyph at once tells the learner the answer before they

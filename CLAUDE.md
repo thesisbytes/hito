@@ -39,6 +39,8 @@ hito/
     instrument.py           add attempt telemetry to a build, for debugging
     fix_persistence.py      repair the window.storage bug in an old build
     test/run.sh             every check that does not need a browser
+    test/size.test.mjs      46 glyphs x 16 sizes, offline
+    test/harness.test.mjs   the debug controls actually reach the engine
   dist/                built single-file outputs, one per script, versioned
 ```
 
@@ -106,7 +108,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.6.html`
+### Hiragana — `dist/hiragana-v0.1.12.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -128,6 +130,41 @@ What the tracing enforces, all of it learned by finding it broken:
 
 Presentation: one stroke lit at a time. Finished strokes stay shining, the
 current one is drawn by the pen, later ones have not caught light yet.
+
+**Size is its own axis** as of v0.1.12, and no longer a function of mastery.
+`sizeFor()` is the single seam — everything scale-dependent already derives
+from `curF`, so intercepting the one line that sets it moves tolerance, the
+grid, the shadow and the stroke transform together. The pack ships
+`sizeMode: random` over `[0.32, 0.62]`: a fresh size per glyph, so a hand has
+to handle any of them and a session samples the whole range instead of
+walking down it six conjures at a time. Mastery still counts; it just no
+longer sets the size.
+
+That separation is the point. While size *was* mastery, "this size is too
+small" and "this level is broken" were the same observation, which is why the
+level-6 report survived three releases — and why changing the level to test it
+also called `load()`, clearing the very state that was at fault.
+
+The debug build carries the sweep: a size row with a pin that survives glyph
+navigation (so the alphabet can be walked at one fixed size), and a
+`✗ fails here` button. A fizzle is one bad attempt; *impossible here* is a
+judgement only the hand can make, so it is a button rather than an inference.
+The flag records size, glyph, level, coverage, travel, progress, attempts and
+the engine's own toast — enough to tell the difficulty curve, the stroke data
+and the state apart at the moment the hand says no. `__hito.matrix()` renders
+the glyph x size grid on the tablet.
+
+**What the offline sweep settled, and what it did not.** `size.test.mjs` holds
+sample spacing and wobble amplitude constant *in pixels* — the earlier
+simulations scaled the pen path along with the ideal path, so their simulated
+hand shrank with the target and the travel ratio was constant by construction.
+With that fixed: travel is flat across the range (1.06x -> 1.01x against a
+2.5x cap), and the hand budget holds near 32px while the glyph goes 223px ->
+115px. Tolerance falls 25px -> 18px absolutely but *rises* from 11.3% to 15.7%
+of the glyph. So neither the curve nor the scorer explains a small glyph being
+impossible. Occlusion of the target by the hand is the standing suspect and no
+model here can see it. This is the fourth time a simulation has been more
+forgiving than the hand: it is a regression guard, not evidence of comfort.
 
 The shadow is drawn from the stroke data rather than the font. KanjiVG's
 centrelines describe KanjiVG's letterforms, and only 66% of the path fell

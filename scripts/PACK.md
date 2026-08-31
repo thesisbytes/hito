@@ -72,6 +72,27 @@ to judge length or position against.
 
 Unset leaves whatever `shadow` specifies and the guide always on.
 
+### Glyph size
+
+| key | default | meaning |
+|---|---|---|
+| `sizeMode` | `mastery` | `mastery` — size is a function of how often the glyph has been conjured, shrinking down the curve below. `random` — a fresh size is drawn per glyph from `sizeRange`, and mastery no longer sets it. |
+| `sizeRange` | `[minGlyph, 0.62]` | The bounds `random` draws between, as a fraction of canvas height. |
+
+`random` exists for two reasons that happen to want the same thing.
+
+As a game, it is the honest test: a hand that can trace す at one size has not
+learned much, and under `mastery` the only way to meet a small glyph was to
+conjure it six times first. As a workshop, it means one session samples the
+whole range — and every scale bug this project has shipped lived at the small
+end, which was the end least likely to be reached.
+
+Mastery still counts up and still shows under `random`. It just stops being
+the thing that sets the size, which also means levelling can no longer be
+confused with resizing. That confusion is why "level 6 is impossible" took
+three releases to corner: changing the level was the only way to change the
+size, so nothing could tell the two apart.
+
 ### Mastery
 
 `difficulty` controls what mastery does to a glyph:

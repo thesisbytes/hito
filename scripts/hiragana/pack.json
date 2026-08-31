@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "version": "0.1.11",
-  "title": "hito 人 · hiragana trace · v0.1.11",
+  "version": "0.1.12",
+  "title": "hito 人 · hiragana trace · v0.1.12",
   "brand": "hito 人 · hiragana",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -36,6 +36,11 @@
     "minGlyph": 0.32,
     "minTolerance": 0.045
   },
+  "sizeMode": "random",
+  "sizeRange": [
+    0.32,
+    0.62
+  ],
   "mode": "easy",
   "grid": "cross"
 }
