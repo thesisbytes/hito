@@ -66,6 +66,20 @@ const advance = (ms, stepMs = 16) => {
 ok(F && P, 'the field layer did not initialise');
 if (!F || !P) process.exit(1);
 
+// ---- the sketchbook stays square
+// Not a style preference. norm() divides x by W and y by H separately, so on a
+// rectangular stage every distance in normalised space becomes anisotropic —
+// tolerance, coverage radius and travel ratio all stop meaning one thing, and
+// the pen gets forgiven more sideways than vertically. This is a lint on the
+// built CSS because the geometry itself is not observable in a stubbed DOM.
+const stageCss = html.match(/body\.field \.stage\{([^}]*)\}/);
+ok(stageCss, 'no body.field .stage rule — the shell is not sizing the sketchbook');
+if (stageCss){
+  ok(/aspect-ratio:\s*1/.test(stageCss[1]),
+     'the sketchbook is not square: norm() is anisotropic on a rectangular stage');
+  ok(!/aspect-ratio:\s*auto/.test(stageCss[1]), 'the square aspect ratio is explicitly disabled');
+}
+
 // ---- the field starts with something to fight, and the tracer is on it
 ok(F.monsters.length >= 1, 'no monster at boot — there is nothing to answer');
 ok(F.target, 'no target chosen');

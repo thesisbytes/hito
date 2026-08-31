@@ -39,8 +39,17 @@ STYLE = """
     background:radial-gradient(70% 60% at 50% 70%,rgba(90,160,150,.07),transparent 70%),
                var(--lacquer-2);
     box-shadow:inset 0 0 0 1px rgba(233,196,106,.10),0 18px 50px rgba(0,0,0,.45); }
-  body.field .stage{ width:min(96vw,760px); aspect-ratio:auto;
-                     flex:1 1 0; min-height:0; margin:8px 0 10px; }
+  /* The sketchbook MUST stay square. norm() in the engine divides x by W and
+     y by H independently, so a rectangular stage does not merely stretch the
+     glyph — it makes every distance in normalised space anisotropic, and the
+     tolerance, coverage radius and travel ratio all stop meaning one thing.
+     At 760x250 the pen would be forgiven three times as much sideways as
+     vertically. The tracer has always assumed a square; this shell must not
+     be the thing that quietly breaks that assumption. */
+  body.field .stage{ flex:0 0 auto; aspect-ratio:1;
+                     width:min(96vw,34dvh); height:min(96vw,34dvh);
+                     margin:8px auto 10px; }
+  body.field .field-wrap{ flex:1 1 auto; }
 </style>
 """
 
