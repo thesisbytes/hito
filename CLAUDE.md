@@ -41,6 +41,9 @@ hito/
     test/run.sh             every check that does not need a browser
     test/size.test.mjs      46 glyphs x 16 sizes, offline
     test/harness.test.mjs   the debug controls actually reach the engine
+    test/tail.test.mjs      a stroke's end cannot be skipped, at any size
+    test/field.test.mjs     the game loop runs and the tracer seam holds
+    shell_field.py          the game shell, appended as a layer
   dist/                built single-file outputs, one per script, versioned
 ```
 
@@ -108,7 +111,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.13.html`
+### Hiragana — `dist/hiragana-v0.1.14.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -332,6 +335,26 @@ reasons:
 The monsters being farang is the same joke as the hero who cannot read: the
 player is the one who cannot read the sign yet.
 
+Built in v0.1.14 as `build/shell_field.py`, appended as a layer rather than
+woven into the engine with substitutions. It reaches the engine only through
+globals the engine already exposes — `load`, `conjure`, `LETTERS`, `idx` — so
+the tracer and its scoring stay the single authority on what counts as a
+correct glyph. The game cannot disagree with the workshop about that, because
+it does not carry its own copy of it.
+
+The seam is `load()`. The field wraps it so every load the *engine* initiates
+on its own — `conjure()`'s delayed advance, the clear button, a mode change —
+lands on whatever the field is asking for rather than the next character in
+the chart. If that slips, the player traces one character to kill a monster
+carrying another, so `field.test.mjs` tests the wrapper directly rather than
+the boot state, which passes either way.
+
+Monsters advance in polar coordinates around the ward, so the geometry is
+resolution independent and rotating a tablet changes nothing. Encounter rate
+is biased toward glyphs whose mastery has gone quiet — a monster is a
+character you are forgetting, which is the spaced-repetition design already
+written into the lore.
+
 **The current single-canvas screen is the workshop, not the game.** Everything
 in `dist/hiragana-*.html` today — the gojūon chart, the stroke controls, the
 size ladder, the flag button — is the instrument this project uses on itself.
@@ -354,8 +377,11 @@ game wants almost none of them.
   then follows what actually needs review, and the roster needs no content —
   it is the gojūon. This is the existing spaced-repetition design wearing the
   lore it was already written in.
-- **Movement belongs in the gaps.** If monsters move, they hold still once
-  the pen comes down. Urgency between strokes, accuracy during them.
+- ~~**Movement belongs in the gaps.**~~ Superseded by the split screen.
+  Monsters move continuously, including while the pen is down. The reason to
+  freeze them was that a moving screen fights the hand — but the sketchbook is
+  its own fixed rectangle in the bottom third and never moves, so the two
+  never compete. Continuous movement is what makes the clock mean anything.
 
 **Open question worth settling early:** is the sign above a monster's head the
 kana or the romaji? Kana tests recall of the shape; romaji tests the reading →

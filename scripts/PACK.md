@@ -81,6 +81,26 @@ to judge length or position against.
 
 Unset leaves whatever `shadow` specifies and the guide always on.
 
+### Shell
+
+| key | default | meaning |
+|---|---|---|
+| `shell` | `workshop` | `workshop` — the gojūon chart, stroke controls and everything else this project uses on itself. `field` — the game: sketchbook in the bottom third, battle in the top two thirds. |
+| `field.sign` | `kana` | What a monster's speech bubble shows. `kana` tests recall of the shape; `romaji` tests the reading → shape mapping, which is harder and only bites once the guide is off. |
+| `field.speed` | `0.055` | How fast a monster closes on the ward, in field-radii per second. |
+| `field.wardHp` | `5` | How many monsters can reach the centre before the run ends. |
+| `field.spawnMs` | `5200` | Gap between spawns, falling by `spawnRamp` each wave down to `spawnMin`. |
+
+Both shells build from the same pack directory — pass a `.json` file to
+`stitch.py` instead of a directory to use a variant. `scripts/hiragana/game.json`
+is `pack.json` plus a shell, sharing one 400KB stroke book, because duplicating
+the data to change one key is how two builds silently drift apart.
+
+The split screen is what makes real-time movement safe. Monsters march
+continuously because they never share space with the pen: the sketchbook is a
+fixed rectangle that does not scroll, scale or reflow while the field moves
+above it.
+
 ### Glyph size
 
 | key | default | meaning |

@@ -8,10 +8,12 @@ let raf=[];
 const ctx = new Proxy({}, { get:()=>function(){ return {data:new Uint8ClampedArray(4)}; }, set:()=>true });
 const el = () => new Proxy({ style:{}, classList:{add(){},remove(){},contains:()=>false},
   getContext:()=>ctx, getBoundingClientRect:()=>({left:0,top:0,width:400,height:400}),
-  querySelectorAll:()=>[], children:[], dataset:{} },
+  querySelectorAll:()=>[], children:[], dataset:{},
+  insertBefore(){}, removeChild(){} },
   { get(t,k){
       if (k in t) return t[k];
       if (k==='width'||k==='height'||k==='offsetWidth') return 400;
+      if (k==='parentNode') return el();   // a node, so a layer can insert beside it
       if (typeof k==='symbol') return undefined;
       // unknown property: a DOM node is mostly methods, so hand back one
       return new Proxy(function(){ return el(); }, { get:()=>'' });
@@ -33,8 +35,25 @@ globalThis.FontFace = class { load(){ return Promise.resolve(this); } };
 globalThis.atob = s => Buffer.from(s,'base64').toString('binary');
 globalThis.matchMedia = () => ({matches:false, addEventListener(){}});
 globalThis.devicePixelRatio = 1;
+// One scope for every block, the way a browser shares the global lexical
+// environment between classic scripts. Running them separately hides any
+// dependency an appended layer has on the engine's top-level let/const —
+// which is most of what a layer is for.
+
+// A classic <script> puts its top-level function declarations on window; a
+// new Function body does not. Appended layers wrap those globals (window.load,
+// window.conjure), so without this bridge they wrap undefined and the rig
+// fails on code that is correct in a browser.
+function bridgeFor(src){
+  const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
+  return names.length
+    ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n`
+    : '';
+}
+const source = blocks.map((b,i) => b + bridgeFor(b)).join('\n;\n');
+
 let err=null;
-try { for (const b of blocks) new Function(b)(); } catch(e){ err=e; }
+try { new Function(source)(); } catch(e){ err=e; }
 // drive one animation frame — where the dead-zone bug would have fired
 try { for(let i=0;i<3 && raf.length;i++){ const f=raf.shift(); f(0); } } catch(e){ err=err||e; }
 if (err) { console.log(`RUNTIME ERROR in ${target}: ${err.message}`); process.exit(1); }

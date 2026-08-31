@@ -1,8 +1,8 @@
 {
   "script": "hiragana",
   "version": "0.1.14",
-  "title": "hito 人 · hiragana trace · v0.1.14",
-  "brand": "hito 人 · hiragana",
+  "title": "hito 人 · hiragana · v0.1.14",
+  "brand": "hito 人",
   "fontDir": "fonts",
   "probeChars": "あかん",
   "exportName": "hito-hiragana-strokes.json",
@@ -44,5 +44,14 @@
     0.62
   ],
   "mode": "easy",
-  "grid": "cross"
+  "grid": "cross",
+  "shell": "field",
+  "field": {
+    "sign": "kana",
+    "speed": 0.055,
+    "wardHp": 5,
+    "spawnMs": 5200,
+    "spawnRamp": 140,
+    "spawnMin": 1800
+  }
 }

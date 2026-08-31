@@ -4,7 +4,7 @@
 Takes the tracer engine from an existing build, swaps in a script pack's
 glyph list, stroke book and fonts, and writes a new versioned file to dist/.
 
-    stitch.py <engine.html> <pack-dir> <out.html>
+    stitch.py <engine.html> <pack-dir|pack.json> <out.html>
 
 Every substitution is checked: if an anchor stops matching because the engine
 moved on, the build fails loudly rather than quietly emitting a file with the
@@ -26,6 +26,8 @@ import json
 import re
 import sys
 from pathlib import Path
+
+import shell_field
 
 VOWELS = "aiueo"          # gojuon column order
 GRID_COLS = 5
@@ -88,10 +90,20 @@ def build_letters(glyphs):
 def main():
     if len(sys.argv) != 4:
         sys.exit(__doc__)
-    engine_path, pack_dir, out_path = (Path(a) for a in sys.argv[1:])
+    engine_path, pack_arg, out_path = (Path(a) for a in sys.argv[1:])
+
+    # A pack is normally a directory holding pack.json beside its data. It may
+    # also be given as a .json file, in which case its own directory supplies
+    # the glyphs, strokes and fonts: the game and the workshop are the same
+    # character set with different shells, and duplicating a 400KB stroke book
+    # to change one key is how the two silently drift apart.
+    if pack_arg.suffix == ".json":
+        pack_dir, pack_file = pack_arg.parent, pack_arg
+    else:
+        pack_dir, pack_file = pack_arg, pack_arg / "pack.json"
 
     engine = engine_path.read_text(encoding="utf-8")
-    pack = json.loads((pack_dir / "pack.json").read_text(encoding="utf-8"))
+    pack = json.loads(pack_file.read_text(encoding="utf-8"))
     glyphs = json.loads((pack_dir / "glyphs.json").read_text(encoding="utf-8"))["glyphs"]
     book = json.loads((pack_dir / "strokes.json").read_text(encoding="utf-8"))
 
@@ -640,6 +652,20 @@ def main():
         "</script>\n"
     )
     s.sub("storage shim", r"<body>", "<body>\n" + shim, count=1)
+
+    # ---- the game shell
+    #
+    # Appended rather than woven in, the way instrument.py is. The field only
+    # touches globals the engine already exposes, so the tracer and its scoring
+    # remain the single authority on what counts as a correct glyph — the game
+    # cannot disagree with the workshop about that, because it does not have
+    # its own copy of it.
+    shell = pack.get("shell", "workshop")
+    if shell not in ("workshop", "field"):
+        raise SystemExit(f"pack shell must be 'workshop' or 'field', not {shell!r}")
+    if shell == "field":
+        s.sub("field shell", r"</body>",
+              shell_field.config(pack) + shell_field.LAYER + "</body>")
 
     s.sub("credit", r"</body>",
           f'<div class="credit">{pack["credit"]}</div>\n</body>')

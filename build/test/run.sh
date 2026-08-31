@@ -39,6 +39,10 @@ echo "── harness (the debug controls reach the engine) ───"
 node build/test/harness.test.mjs "dist/hiragana-v$ver-debug.html" | sed 's/^/  /' || fail=1
 
 echo
+echo "── field (the game loop runs and the seam holds) ───"
+node build/test/field.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── smoke (engine executes, frames run) ─────────────"
 for f in dist/*.html; do
   node build/test/smoke.test.mjs "$f" | sed 's/^/  /' || fail=1
@@ -47,13 +51,16 @@ done
 echo
 echo "── build reproducibility ───────────────────────────"
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
-.venv/bin/python build/stitch.py build/engine.html scripts/hiragana "$tmp/out.html" >/dev/null
-if cmp -s "$tmp/out.html" "dist/hiragana-v$ver.html"; then
-  echo "  hiragana v$ver rebuilds byte-identical"
-else
-  echo "  MISMATCH: dist/hiragana-v$ver.html differs from a fresh build"
-  fail=1
-fi
+for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiragana-game-v$ver"; do
+  src=${pack%%:*}; name=${pack##*:}
+  .venv/bin/python build/stitch.py build/engine.html "$src" "$tmp/$name.html" >/dev/null
+  if cmp -s "$tmp/$name.html" "dist/$name.html"; then
+    echo "  $name rebuilds byte-identical"
+  else
+    echo "  MISMATCH: dist/$name.html differs from a fresh build"
+    fail=1
+  fi
+done
 
 echo
 [ "$fail" = 0 ] && echo "all checks passed" || { echo "FAILURES above"; exit 1; }
