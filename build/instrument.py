@@ -257,6 +257,9 @@ LAYER = r"""
     rec.reason = lastToast;
     try { rec.mode = MODES[modeIdx].name; } catch(_){}
     flags.push(rec); saveFlags();
+    // Also into the outbox, so a flag can reach a machine without the
+    // mobile-devtools detour that reading the first three of these took.
+    try { window.__sync && window.__sync.record('flag', rec); } catch(_){}
     // _toast, not toast: the wrapper records lastToast, and a flag
     // confirmation is not the engine's explanation of anything.
     try { _toast(`flagged: ${rec.char} at ${rec.size} (${rec.px}px)`); } catch(_){}

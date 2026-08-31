@@ -28,6 +28,7 @@ import sys
 from pathlib import Path
 
 import shell_field
+import sync_layer
 
 VOWELS = "aiueo"          # gojuon column order
 GRID_COLS = 5
@@ -664,6 +665,15 @@ def main():
         "</script>\n"
     )
     s.sub("storage shim", r"<body>", "<body>\n" + shim, count=1)
+
+    # ---- sync
+    #
+    # Always present, off unless a pack names an endpoint. An always-installed
+    # outbox that records locally means the offline build and the syncing build
+    # are the same code path with the network stubbed out, rather than two
+    # behaviours that drift apart between releases.
+    s.sub("sync layer", r"</body>",
+          sync_layer.config(pack) + sync_layer.LAYER + "</body>")
 
     # ---- the game shell
     #

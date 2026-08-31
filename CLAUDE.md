@@ -44,6 +44,8 @@ hito/
     test/tail.test.mjs      a stroke's end cannot be skipped, at any size
     test/field.test.mjs     the game loop runs and the tracer seam holds
     shell_field.py          the game shell, appended as a layer
+    sync_layer.py           offline outbox, appended as a layer
+    test/sync.test.mjs      offline stays offline and nothing is lost
   dist/                built single-file outputs, one per script, versioned
 ```
 
@@ -53,6 +55,18 @@ committed build rebuilds byte-identical from source.
 
 Single-file HTML with zero external dependencies is a deliberate constraint.
 Every deliverable must open from a double-click, offline, on a tablet.
+
+**Sync does not weaken this.** As of v0.1.20 there is an outbox layer, but it
+is offline-first by construction: events are recorded locally and flushed
+opportunistically, a build with no `sync.endpoint` makes no network calls at
+all, and a failed or impossible request is the normal case rather than an
+error. Nothing in the game ever waits on a response. If a network call ever
+becomes load-bearing, the constraint above is gone — so it must not.
+
+The one thing that will need a real exception is the idle economy, which
+cannot be client-authoritative without being editable by anyone with devtools.
+That is why it is last: everything before it merges cleanly offline, and it
+does not. See `server/README.md`.
 
 ---
 
@@ -111,7 +125,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.19.html`
+### Hiragana — `dist/hiragana-v0.1.20.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -337,7 +351,7 @@ reasons:
 The monsters being farang is the same joke as the hero who cannot read: the
 player is the one who cannot read the sign yet.
 
-Built in v0.1.19 as `build/shell_field.py`, appended as a layer rather than
+Built in v0.1.20 as `build/shell_field.py`, appended as a layer rather than
 woven into the engine with substitutions. It reaches the engine only through
 globals the engine already exposes — `load`, `conjure`, `LETTERS`, `idx` — so
 the tracer and its scoring stay the single authority on what counts as a

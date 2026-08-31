@@ -246,6 +246,12 @@ LAYER = STYLE + r"""
       monsters = monsters.filter(x => x !== m);
       if (m === locked) locked = null;
       killed++;
+      // An observation, not a claim: what was answered and how long it took.
+      // Deliberately not a score — the client does not get to assert totals.
+      try { window.__sync && window.__sync.record('banish', {
+        glyph: LETTERS[m.i][0], level: MASTERY[LETTERS[m.i][0]] || 0,
+        ms: Math.round(performance.now() - m.born), sign: CFG.sign,
+      }); } catch(_){}
       retarget();
     }
   }
@@ -269,7 +275,11 @@ LAYER = STYLE + r"""
         if (m.d <= 0.06){
           monsters = monsters.filter(x => x !== m);
           if (m === locked) locked = null;
-          ward--; retarget();
+          ward--;
+          try { window.__sync && window.__sync.record('breach', {
+            glyph: LETTERS[m.i][0], wardLeft: ward, wave,
+          }); } catch(_){}
+          retarget();
           if (navigator.vibrate) navigator.vibrate(90);
           if (ward <= 0){ over = true; toast('the ward falls ✦ tap to begin again'); }
         }

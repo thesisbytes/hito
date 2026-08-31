@@ -39,6 +39,10 @@ echo "── harness (the debug controls reach the engine) ───"
 node build/test/harness.test.mjs "dist/hiragana-v$ver-debug.html" | sed 's/^/  /' || fail=1
 
 echo
+echo "── sync (offline stays offline, nothing is lost) ───"
+node build/test/sync.test.mjs "dist/hiragana-v$ver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── field (the game loop runs and the seam holds) ───"
 node build/test/field.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
 

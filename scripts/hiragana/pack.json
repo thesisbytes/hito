@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "version": "0.1.19",
-  "title": "hito 人 · hiragana trace · v0.1.19",
+  "version": "0.1.20",
+  "title": "hito 人 · hiragana trace · v0.1.20",
   "brand": "hito 人 · hiragana",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -44,5 +44,10 @@
     0.62
   ],
   "mode": "easy",
-  "grid": "cross"
+  "grid": "cross",
+  "sync": {
+    "endpoint": "",
+    "batch": 40,
+    "cap": 500
+  }
 }
