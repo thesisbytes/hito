@@ -16,8 +16,8 @@ a font by hand, kids finding bugs — all lean on each other, and so will you.
 Each realm ships as a single HTML file. No install, no server, no
 dependencies. Open it on a tablet and start tracing:
 
-**[Play](https://thesisbytes.github.io/hito/dist/hiragana-game-v0.1.16.html)** — the game: draw below, farang advance above.  
-**[Workshop](https://thesisbytes.github.io/hito/dist/hiragana-v0.1.16.html)** — the full gojūon chart and every control, which is what this project uses on itself.
+**[Play](https://thesisbytes.github.io/hito/dist/hiragana-game-v0.1.17.html)** — the game: draw below, farang advance above.  
+**[Workshop](https://thesisbytes.github.io/hito/dist/hiragana-v0.1.17.html)** — the full gojūon chart and every control, which is what this project uses on itself.
 
 ## How the tracing works
 

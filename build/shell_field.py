@@ -137,6 +137,7 @@ LAYER = STYLE + r"""
     }
     if (best && best !== locked){
       locked = best;
+      pendingRetarget = false;
       loading = true; try { _load(best.i); } finally { loading = false; }
       return true;
     }
@@ -154,19 +155,42 @@ LAYER = STYLE + r"""
     const t = targetIdx();
     return _load.call(this, t === null ? i : t);
   };
-  function retarget(){
+  // A trace in progress is not to be interrupted. When several monsters land
+  // at once the field churns — each arrival clears the lock and retargets —
+  // and every one of those reloads wipes whatever the player had drawn. The
+  // glyph changing under a working hand is what makes a swarm feel broken
+  // rather than hard.
+  function tracing(){ return activeId !== null || prog > 0; }
+  let pendingRetarget = false;
+  function retarget(force){
     if (locked && !monsters.includes(locked)) locked = null;
     const t = targetIdx();
-    if (t === null || t === idx) return;
+    if (t === null || t === idx) { pendingRetarget = false; return; }
+    if (!force && tracing()){ pendingRetarget = true; return; }
+    pendingRetarget = false;
     loading = true; try { _load(t); } finally { loading = false; }
   }
 
   // ---- a finished glyph is the attack
+  // What was drawn decides what is hit — not which object happened to be
+  // locked when the pen came up. "You identify, you do not aim" taken
+  // literally: finish ぬ and the nearest ぬ on the field takes it. If the
+  // monster you were answering reached the ward mid-glyph, the character is
+  // still correct and still finds a mark; if nothing on the field carries it,
+  // the shot has nowhere to go and dissipates.
+  function bearer(ch){
+    let best = null;
+    for (const m of monsters)
+      if (LETTERS[m.i][0] === ch && (!best || m.d < best.d)) best = m;
+    return best;
+  }
+
   const _conjure = window.conjure;
   window.conjure = function(){
-    const t = target();
+    const drew = LETTERS[idx][0];
+    const t = bearer(drew) || (monsters.includes(locked) ? locked : null);
     if (t){
-      shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:LETTERS[t.i][0]});
+      shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:drew});
       if (navigator.vibrate) navigator.vibrate([12,30,40]);
     }
     const r = _conjure.apply(this, arguments);
@@ -177,7 +201,7 @@ LAYER = STYLE + r"""
     // The engine's own delayed load(idx+1) needs no cancelling: load() clears
     // `done`, and that callback is guarded by it, so an early advance disarms
     // the late one. Without that it would fire mid-trace and wipe the strokes.
-    setTimeout(() => { locked = null; retarget(); }, CFG.advanceMs);
+    setTimeout(() => { locked = null; retarget(true); }, CFG.advanceMs);
     return r;
   };
 
@@ -221,6 +245,13 @@ LAYER = STYLE + r"""
         if (s.t >= 1){ hit(s.to); }
       }
       shots = shots.filter(s => s.t < 1 && monsters.includes(s.to));
+    }
+    // Deferred work, once the hand is free: a queued retarget, or a glyph that
+    // no monster carries any more — which would otherwise strand the player
+    // tracing a character that can no longer hit anything.
+    if (!over && !tracing()){
+      if (pendingRetarget) retarget();
+      else if (monsters.length && !bearer(LETTERS[idx][0])) retarget();
     }
     for (const p of motes){ p.x += p.vx; p.y += p.vy; p.life -= dt*1.6; }
     motes = motes.filter(p => p.life > 0);
@@ -335,6 +366,8 @@ LAYER = STYLE + r"""
     get killed(){ return killed; },
     get target(){ return target(); },
     get locked(){ return locked; },
+    get pending(){ return pendingRetarget; },
+    bearer,
     spawn, restart, retarget, pick,
     posOf: px,
     frame(now){ step(now); },

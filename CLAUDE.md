@@ -111,7 +111,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.16.html`
+### Hiragana — `dist/hiragana-v0.1.17.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -335,7 +335,7 @@ reasons:
 The monsters being farang is the same joke as the hero who cannot read: the
 player is the one who cannot read the sign yet.
 
-Built in v0.1.16 as `build/shell_field.py`, appended as a layer rather than
+Built in v0.1.17 as `build/shell_field.py`, appended as a layer rather than
 woven into the engine with substitutions. It reaches the engine only through
 globals the engine already exposes — `load`, `conjure`, `LETTERS`, `idx` — so
 the tracer and its scoring stay the single authority on what counts as a

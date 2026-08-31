@@ -57,12 +57,18 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
 let fail = 0;
 const ok = (c, m) => { if (!c) { console.log(`  FAIL: ${m}`); fail++; } };
+// Restart the run AND the clock. conjure() queues a forced advance on a timer,
+// and one left over from an earlier block will fire inside a later one and
+// force exactly the reload that block is checking does not happen. This cost
+// a wrong diagnosis once already.
+const fresh = () => { timers = []; F.restart(); T += 100; };
+
 const advance = (ms, stepMs = 16) => {
   for (let e = T + ms; T < e; ){
     T = Math.min(T + stepMs, e);
@@ -112,7 +118,7 @@ ok(P.idx === F.target.i,
 // The bug this replaces: target() returned whichever monster was nearest the
 // ward at that instant, so one overtaking yours mid-glyph stole the shot. You
 // drew one character and something carrying another died for it.
-F.restart(); T += 100;
+fresh();
 F.spawn(); F.spawn();
 const mine = F.target;
 ok(mine, 'no target to lock');
@@ -128,7 +134,7 @@ ok(F.shots.length === 1 && F.shots[0].to === mine,
    'the shot went to a monster other than the one whose glyph was traced');
 
 // ---- tapping picks a different one
-F.restart(); T += 100;
+fresh();
 F.spawn(); F.spawn();
 const other = F.monsters.find(m => m !== F.target);
 if (other){
@@ -139,7 +145,7 @@ if (other){
 }
 
 // ---- the next glyph arrives promptly, not after the celebration
-F.restart(); T += 100;
+fresh();
 const before2 = F.killed;
 globalThis.conjure();
 // the shot flies at t += dt*2.6, so it lands at ~385ms
@@ -154,6 +160,43 @@ ok(F.target && P.idx === F.target.i,
 ok(cfg.advanceMs < 1900,
    `advance delay is ${cfg.advanceMs}ms — the engine's 1.9s celebration is dead time under a clock`);
 
+// ---- the cached trail is dropped when the glyph changes
+// The cache is keyed on prog, and load() resets prog to 0 — so switching from
+// a glyph that was also at 0 left the previous glyph's trail on screen until
+// the first pen touch moved prog. An engine bug, visible in the workshop too.
+ok(/prog=0; offCount=0; smudge=0; outCount=0; trailProg=-1;/.test(html),
+   'load() does not reset trailProg — the previous glyph\'s trail survives the switch');
+
+// ---- what was drawn decides what is hit
+fresh();
+F.spawn(); F.spawn(); F.spawn();
+{
+  const drew = P.LETTERS[P.idx][0];
+  const carriers = F.monsters.filter(m => P.LETTERS[m.i][0] === drew);
+  globalThis.conjure();
+  ok(F.shots.length === 1, 'no shot fired');
+  ok(P.LETTERS[F.shots[0].to.i][0] === drew,
+     `drew ${drew} but the shot flew at a monster carrying ${P.LETTERS[F.shots[0].to.i][0]}`);
+  ok(carriers.includes(F.shots[0].to), 'the shot picked a monster that is not carrying that glyph');
+}
+
+// ---- a retarget will not interrupt a trace in progress
+fresh();
+F.spawn();
+{
+  const held = P.idx;
+  const victim = F.target;
+  // simulate the player being mid-glyph, then a monster reaching the ward
+  globalThis.__probe.setProg(5);
+  for (const m of F.monsters) if (m === victim) m.d = 0.07;
+  advance(400);
+  ok(P.idx === held,
+     'the glyph changed under a trace in progress — a swarm would wipe every attempt');
+  ok(F.pending || P.idx === held, 'no retarget was queued for later');
+  globalThis.__probe.setProg(0);
+  advance(300);
+}
+
 // ---- monsters actually advance
 const d0 = F.target.d;
 advance(2000);
@@ -167,7 +210,7 @@ advance(20000);
 ok(F.monsters.length > n1 || F.ward < 5, `nothing spawned over 20s (still ${n1})`);
 
 // ---- a finished glyph reaches the monster and removes it
-F.restart(); T += 100;
+fresh();
 const victim = F.target, before = F.killed;
 ok(victim, 'no target after restart');
 globalThis.conjure();
@@ -182,14 +225,14 @@ if (F.target) ok(P.idx === F.target.i,
   'after a kill the tracer is still on the dead monster\'s glyph');
 
 // ---- a monster that arrives costs the ward
-F.restart(); T += 100;
+fresh();
 const w0 = F.ward;
 for (const m of F.monsters) m.d = 0.07;
 advance(500);
 ok(F.ward < w0, `a monster reached the centre and the ward stayed at ${w0}`);
 
 // ---- and the ward can fall
-F.restart(); T += 100;
+fresh();
 let guard = 0;
 while (!F.over && guard++ < 400){ for (const m of F.monsters) m.d = 0.07; advance(200); }
 ok(F.over, 'the ward never falls — there is no losing');

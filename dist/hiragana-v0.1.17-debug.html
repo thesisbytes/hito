@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.16</title>
+<title>hito 人 · hiragana trace · v0.1.17</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -87,7 +87,7 @@ window.storage=window.storage||{
 </script>
 
 <header>
-  <div class="brand">hito 人 <span id="ver"></span></div>
+  <div class="brand">hito 人 · hiragana <span id="ver"></span></div>
   <div class="tabs"><button id="tabP" aria-pressed="true">Practice</button><button id="tabR" aria-pressed="false">Record</button></div>
   <div class="count" id="count">1 / 46</div>
 </header>
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.16';
+const APP_VERSION='0.1.17';
 const LETTERS=[["あ","あ行","a","","a-row",1,1],["い","あ行","i","","a-row",2,1],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1],["え","あ行","e","","a-row",4,1],["お","あ行","o","","a-row",5,1],["か","か行","ka","","ka-row",1,2],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2],["く","か行","ku","","ka-row",3,2],["け","か行","ke","","ka-row",4,2],["こ","か行","ko","","ka-row",5,2],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3],["し","さ行","shi","","sa-row",2,3],["す","さ行","su","","sa-row",3,3],["せ","さ行","se","","sa-row",4,3],["そ","さ行","so","","sa-row",5,3],["た","た行","ta","","ta-row",1,4],["ち","た行","chi","","ta-row",2,4],["つ","た行","tsu","","ta-row",3,4],["て","た行","te","","ta-row",4,4],["と","た行","to","","ta-row",5,4],["な","な行","na","","na-row",1,5],["に","な行","ni","","na-row",2,5],["ぬ","な行","nu","","na-row",3,5],["ね","な行","ne","","na-row",4,5],["の","な行","no","","na-row",5,5],["は","は行","ha","","ha-row",1,6],["ひ","は行","hi","","ha-row",2,6],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6],["へ","は行","he","","ha-row",4,6],["ほ","は行","ho","","ha-row",5,6],["ま","ま行","ma","","ma-row",1,7],["み","ま行","mi","","ma-row",2,7],["む","ま行","mu","","ma-row",3,7],["め","ま行","me","","ma-row",4,7],["も","ま行","mo","","ma-row",5,7],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8],["よ","や行","yo","","ya-row",5,8],["ら","ら行","ra","","ra-row",1,9],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9],["る","ら行","ru","","ra-row",3,9],["れ","ら行","re","","ra-row",4,9],["ろ","ら行","ro","","ra-row",5,9],["わ","わ行","wa","","wa-row",1,10],["を","わ行","wo","","wa-row",5,10],["ん","","n","","",1,11]];
 
 // ---------- state
@@ -585,7 +585,7 @@ function load(i){ idx=(i+LETTERS.length)%LETTERS.length; dropPen(); done=false; 
   curShrink=q=>({x:.5+(q.x-.5)*curS, y:cyN+(q.y-cy0)*curS, p:q.p, t:q.t});
   const shrink=curShrink;
   const rec0=teacherStrokes(); const rec=rec0?rec0.map(st=>st.map(shrink)):null;
-  lit=[]; PATH=[]; SEGEND=new Set(); prog=0; offCount=0; smudge=0; outCount=0;
+  lit=[]; PATH=[]; SEGEND=new Set(); prog=0; offCount=0; smudge=0; outCount=0; trailProg=-1;
   SEGS=[];segIdx=0;awaitLift=false;
   if(rec){ rec.forEach(st=>{ const a=PATH.length; const R=resample(st,Math.max(6,Math.round((resample(st).len||.05)/0.008))); PATH.push(...R); SEGEND.add(PATH.length-1); SEGS.push([a,PATH.length-1]); }); }
   hit=new Uint8Array(PATH.length); travel=0; lastN=null;
@@ -619,336 +619,396 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.16');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.17');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
-<script>window.__FIELD_CFG={sign:"kana",speed:0.055,wardHp:5,spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460};</script>
-<style>
-  /* The workshop's furniture, hidden. The engine still maintains all of it —
-     nothing is torn out, so a pack can switch shells without a rebuild of the
-     tracer. */
-  body.field .tabs, body.field .count, body.field .meta, body.field .power,
-  body.field .only-p, body.field .only-r, body.field #fontRow,
-  body.field .grid { display:none !important; }
-
-  body.field { height:100dvh; overflow:hidden; justify-content:flex-start; }
-  body.field header { padding:6px 0 2px; }
-
-  /* Two thirds field, one third sketchbook. The stage loses its square aspect
-     ratio here — resize() reads the element's box, so the tracer follows. */
-  .field-wrap{ position:relative; width:min(96vw,760px); flex:2 1 0;
-               min-height:0; margin-top:4px; }
-  .field-wrap canvas{ position:absolute; inset:0; width:100%; height:100%;
-    border-radius:18px;
-    background:radial-gradient(70% 60% at 50% 70%,rgba(90,160,150,.07),transparent 70%),
-               var(--lacquer-2);
-    box-shadow:inset 0 0 0 1px rgba(233,196,106,.10),0 18px 50px rgba(0,0,0,.45); }
-  /* The sketchbook MUST stay square. norm() in the engine divides x by W and
-     y by H independently, so a rectangular stage does not merely stretch the
-     glyph — it makes every distance in normalised space anisotropic, and the
-     tolerance, coverage radius and travel ratio all stop meaning one thing.
-     At 760x250 the pen would be forgiven three times as much sideways as
-     vertically. The tracer has always assumed a square; this shell must not
-     be the thing that quietly breaks that assumption. */
-  body.field .stage{ flex:0 0 auto; aspect-ratio:1;
-                     width:min(96vw,34dvh); height:min(96vw,34dvh);
-                     margin:8px auto 10px; }
-  body.field .field-wrap{ flex:1 1 auto; }
-</style>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.</div>
 
 <script>
-/* ---- the field ---------------------------------------------------------
-   Monsters advance in polar coordinates around the centre, so the geometry is
-   resolution independent and a rotated tablet changes nothing about the game.
-   d runs 1 at the edge to 0 at the ward.                                  */
+/* ---- attempt telemetry -------------------------------------------------
+   Records what was drawn and what the engine decided. Export with the button
+   in the corner, or from the console: __hito.export()
+   Nothing here changes scoring; it only observes.                        */
 (function(){
-  const CFG = window.__FIELD_CFG;
-  const $ = id => document.getElementById(id);
+  const KEY = 'hito-attempts';
+  const log = [];
+  let cur = null, strokes = [], stroke = null, zaps = 0, t0 = 0;
+  let level = 0, fizzles = 0, lastToast = null;
 
-  document.body.classList.add('field');
-  const wrap = document.createElement('div');
-  wrap.className = 'field-wrap';
-  const fc = document.createElement('canvas');
-  fc.id = 'field';
-  wrap.appendChild(fc);
-  const stageEl = document.getElementById('stage');
-  stageEl.parentNode.insertBefore(wrap, stageEl);
-
-  const cx = () => fc.width / (2*DPRF());
-  const cy = () => fc.height / (2*DPRF()) * 1.06;   // ward sits a touch low
-  function DPRF(){ return Math.min(devicePixelRatio||1, 3); }
-  let FW = 0, FH = 0;
-  function sizeField(){
-    const r = wrap.getBoundingClientRect(), d = DPRF();
-    FW = Math.round(r.width); FH = Math.round(r.height);
-    fc.width = Math.round(FW*d); fc.height = Math.round(FH*d);
-    const g = fc.getContext('2d'); g.setTransform(d,0,0,d,0,0);
+  function expected(ch){
+    try { return DEFAULT_BOOK.fonts[TEACHER.activeFont].letters[ch].strokes.length; }
+    catch(_){ return null; }
   }
 
-  // ---- state
-  let monsters = [], shots = [], motes = [];
-  let ward = CFG.wardHp, over = false, wave = 0, killed = 0;
-  let spawnAt = 0, tPrev = 0;
-
-  const sign = m => CFG.sign === 'romaji' ? LETTERS[m.i][2] : LETTERS[m.i][0];
-
-  function spawn(){
-    // Bias toward glyphs whose flame has gone out: a monster is a character
-    // you are forgetting, so the roster is the gojuon and the encounter rate
-    // follows what actually needs review.
-    let i, tries = 0;
-    do { i = Math.floor(Math.random()*LETTERS.length); tries++; }
-    while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && Math.random() < 0.7);
-    monsters.push({
-      i, a: Math.random()*Math.PI*2, d: 1.05,
-      speed: CFG.speed * (0.8 + Math.random()*0.5),
-      hp: 1, wob: Math.random()*6.28, born: performance.now(),
+  function flush(outcome){
+    if (!cur || !strokes.length) { reset(); return; }
+    let coverage = null;
+    try { coverage = +covered().toFixed(3); } catch(_){}
+    log.push({
+      char: cur,
+      level,                         // mastery level at the time
+      expectedStrokes: expected(cur),
+      drawnStrokes: strokes.length,
+      penLifts: strokes.length - 1,
+      points: strokes.map(s => s.length),
+      zaps,
+      fizzles,                       // attempt restarts before this outcome
+      reason: lastToast,             // why the engine complained, if it did
+      coverage,
+      outcome,
+      ms: Math.round(performance.now() - t0),
+      at: new Date().toISOString(),
+      strokes,                       // normalised 0..1, for offline analysis
     });
-    wave++;
+    save();
+    reset();
+  }
+  function reset(){
+    strokes = []; stroke = null; zaps = 0; fizzles = 0; lastToast = null;
+    t0 = performance.now();
+    try { level = MASTERY[LETTERS[idx][0]] || 0; } catch(_){ level = 0; }
   }
 
-  // The target is LOCKED once the tracer has loaded its glyph, and stays
-  // locked until it dies, reaches the ward, or the player taps another.
-  //
-  // It used to be recomputed as "whichever is nearest right now", which is
-  // wrong the moment anything moves: monsters advance while you trace, so one
-  // could overtake yours mid-glyph and conjure() would fire at the newcomer.
-  // You drew あ and something carrying ぬ died for it. What you are answering
-  // cannot be allowed to change underneath the answer.
-  let locked = null;
-  function nearest(){
-    let best = null;
-    for (const m of monsters) if (!best || m.d < best.d) best = m;
-    return best;
-  }
-  function target(){
-    if (locked && monsters.includes(locked)) return locked;
-    locked = nearest();
-    return locked;
-  }
-  function targetIdx(){ const t = target(); return t ? t.i : null; }
-
-  // Tapping a monster is how you choose what to answer. This is the
-  // identification mechanic arriving early: with the guide up the tracer still
-  // shows you the shape, but which of them you take is yours.
-  function pick(x, y){
-    let best = null, bd = 44;
-    for (const m of monsters){
-      const p = px(m), d = Math.hypot(x-p.x, y-(p.y-14));
-      if (d < bd){ bd = d; best = m; }
-    }
-    if (best && best !== locked){
-      locked = best;
-      loading = true; try { _load(best.i); } finally { loading = false; }
-      return true;
-    }
-    return false;
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify(log)); } catch(_){}
+    const b = document.getElementById('__tel');
+    if (b) b.textContent = `● ${log.length} attempt${log.length===1?'':'s'}`;
   }
 
-  // ---- drive the tracer from the field
-  // Every load() lands on whatever the field is asking for. conjure()'s own
-  // delayed load(idx+1) therefore advances to the next target rather than to
-  // the next character in the chart.
-  const _load = window.load;
-  let loading = false;
-  window.load = function(i){
-    if (loading) return _load.apply(this, arguments);
-    const t = targetIdx();
-    return _load.call(this, t === null ? i : t);
-  };
-  function retarget(){
-    if (locked && !monsters.includes(locked)) locked = null;
-    const t = targetIdx();
-    if (t === null || t === idx) return;
-    loading = true; try { _load(t); } finally { loading = false; }
-  }
+  // ---- outcomes: wrap the globals whose calls mean something happened
+  // The toast text is the engine's own explanation of a refusal — the
+  // difference between "missed 40% of the path" and "too much wandering" is
+  // exactly what a bug report cannot tell us, so capture it.
+  const _toast = window.toast, _fizzle = window.fizzle;
+  window.toast = function(m){ lastToast = m; return _toast.apply(this, arguments); };
+  window.fizzle = function(){ fizzles++; return _fizzle.apply(this, arguments); };
 
-  // ---- a finished glyph is the attack
-  const _conjure = window.conjure;
-  window.conjure = function(){
-    const t = target();
-    if (t){
-      shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:LETTERS[t.i][0]});
-      if (navigator.vibrate) navigator.vibrate([12,30,40]);
-    }
-    const r = _conjure.apply(this, arguments);
-    // The engine celebrates for 1.9s before advancing, which is dead time in a
-    // game with a clock running — a fast hand finishes the next glyph before
-    // the next glyph exists. Advance as soon as the shot lands instead.
-    //
-    // The engine's own delayed load(idx+1) needs no cancelling: load() clears
-    // `done`, and that callback is guarded by it, so an early advance disarms
-    // the late one. Without that it would fire mid-trace and wipe the strokes.
-    setTimeout(() => { locked = null; retarget(); }, CFG.advanceMs);
+  const _conjure = window.conjure, _zap = window.zap, _load = window.load;
+  window.conjure = function(){ flush('conjured'); return _conjure.apply(this, arguments); };
+  window.zap     = function(){ zaps++;            return _zap.apply(this, arguments); };
+  window.load    = function(i){
+    if (cur !== null) flush('abandoned');
+    const r = _load.apply(this, arguments);
+    try { cur = LETTERS[idx][0]; } catch(_){ cur = null; }
+    reset();
     return r;
   };
 
-  function hit(m){
-    m.hp--;
-    for (let k=0;k<18;k++)
-      motes.push({x:px(m).x, y:px(m).y, vx:(Math.random()-.5)*2.4,
-                  vy:(Math.random()-.5)*2.4, life:1});
-    if (m.hp <= 0){
-      monsters = monsters.filter(x => x !== m);
-      if (m === locked) locked = null;
-      killed++;
-      retarget();
-    }
+  // ---- what was drawn: our own listeners, capture phase, passive
+  const pad = document.getElementById('ink');
+  const box = () => pad.getBoundingClientRect();
+  const at = e => { const r = box();
+    return [ +(((e.clientX-r.left)/r.width).toFixed(4)),
+             +(((e.clientY-r.top )/r.height).toFixed(4)) ]; };
+
+  pad.addEventListener('pointerdown', e => { stroke = [at(e)]; }, true);
+  pad.addEventListener('pointermove', e => {
+    if (!stroke) return;
+    const c = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+    (c.length ? c : [e]).forEach(s => stroke.push(at(s)));
+  }, true);
+  const up = () => { if (stroke && stroke.length > 1) strokes.push(stroke); stroke = null; };
+  pad.addEventListener('pointerup', up, true);
+  pad.addEventListener('pointercancel', up, true);
+
+  // ---- grid toggle
+  const GRIDS = ['cross','quarters','none'];
+  function cycleGrid(){
+    try {
+      GRID_MODE = GRIDS[(GRIDS.indexOf(GRID_MODE)+1) % GRIDS.length];
+      const b = document.getElementById('__gr');
+      if (b) b.textContent = 'grid: ' + GRID_MODE;
+      drawGuide();
+      return GRID_MODE;
+    } catch(_){ return null; }
   }
 
-  const px = m => ({ x: cx() + Math.cos(m.a)*m.d*FW*0.52,
-                     y: cy() + Math.sin(m.a)*m.d*FH*0.52 });
+  // ---- mastery control
+  // A glyph that becomes unpassable is also untestable, because there is no
+  // way back down. This sets the level for the current character directly.
+  function setLevel(n){
+    try {
+      const ch = LETTERS[idx][0];
+      if (n <= 0) delete MASTERY[ch]; else MASTERY[ch] = n;
+      persistM(); load(idx);
+      const b = document.getElementById('__lv');
+      if (b) b.textContent = 'lv ' + (MASTERY[ch] || 0) + ' ▲▼';
+      return MASTERY[ch] || 0;
+    } catch(_){ return null; }
+  }
 
-  // ---- the loop
-  function step(now){
-    if (!tPrev) tPrev = now;
-    const dt = Math.min(0.05, (now - tPrev)/1000); tPrev = now;
-    if (!over){
-      if (now > spawnAt){
-        spawn();
-        spawnAt = now + Math.max(CFG.spawnMin, CFG.spawnMs - wave*CFG.spawnRamp);
+  // ---- shadow mode toggle
+  // Three ways to show the target, cycled live so they can be compared on the
+  // same glyph instead of across deploys:
+  //   none    only the trail — road ahead, dots, and the stroke already made
+  //   strokes a thick faint path under the trail
+  //   font    the glyph drawn in the trace font (misaligned by design: the
+  //           stroke data describes KanjiVG's letterforms, not this font's)
+  // easy / medium / hard, matching the pack's `mode` presets.
+  const MODES = [
+    {name:'easy',   shadow:'none',    guide:true,  numbers:true},
+    {name:'medium', shadow:'strokes', guide:false, numbers:false},
+    {name:'hard',   shadow:'none',    guide:false, numbers:false},
+  ];
+  let modeIdx = 0;
+  function cycleShadow(){
+    try {
+      modeIdx = (modeIdx+1) % MODES.length;
+      const m = MODES[modeIdx];
+      SHADOW_MODE = m.shadow; GUIDE_ON = m.guide; GUIDE_NUMBERS = m.numbers;
+      const b = document.getElementById('__sm');
+      if (b) b.textContent = 'mode: ' + m.name;
+      drawGuide();
+      return m.name;
+    } catch(_){ return null; }
+  }
+
+  // ---- alignment nudge
+  // The baked coordinates assume canvas anchors textBaseline='middle' at the
+  // em-square middle (0.38 em above the baseline for Klee One). Chrome may
+  // instead use hhea metrics, which would put it at 0.436. Rather than guess,
+  // this lets the alignment be corrected by eye and the numbers reported back.
+  const ALIGN = (function(){
+    try { return DEFAULT_BOOK.alignment || {baseF:0.62, glyphCy:0.44}; }
+    catch(_){ return {baseF:0.62, glyphCy:0.44}; }
+  })();
+  const PRISTINE = JSON.parse(JSON.stringify(
+    (function(){ try { return DEFAULT_BOOK.fonts; } catch(_){ return {}; } })()));
+
+  function realign(scale, cy){
+    for (const fid in PRISTINE){
+      const src = PRISTINE[fid].letters, dst = TEACHER.fonts[fid];
+      if (!dst) continue;
+      for (const ch in src){
+        dst.letters[ch] = { strokes: src[ch].strokes.map(st => st.map(q => {
+          // undo the baked transform, then re-apply the nudged one
+          const kx = (q.x - 0.5) / ALIGN.baseF + 0.5;
+          const ky = (q.y - 0.5) / ALIGN.baseF + ALIGN.glyphCy;
+          return { x: +(0.5 + scale*(kx - 0.5)).toFixed(4),
+                   y: +(0.5 + scale*(ky - cy)).toFixed(4), p: q.p, t: q.t };
+        })) };
       }
-      for (const m of monsters){
-        m.d -= m.speed*dt;
-        if (m.d <= 0.06){
-          monsters = monsters.filter(x => x !== m);
-          if (m === locked) locked = null;
-          ward--; retarget();
-          if (navigator.vibrate) navigator.vibrate(90);
-          if (ward <= 0){ over = true; toast('the ward falls ✦ tap to begin again'); }
-        }
-      }
-      for (const s of shots){
-        s.t += dt*2.6;
-        if (s.t >= 1){ hit(s.to); }
-      }
-      shots = shots.filter(s => s.t < 1 && monsters.includes(s.to));
     }
-    for (const p of motes){ p.x += p.vx; p.y += p.vy; p.life -= dt*1.6; }
-    motes = motes.filter(p => p.life > 0);
-    draw();
-  }
-  function loop(now){ step(now); requestAnimationFrame(loop); }
-
-  function draw(){
-    const g = fc.getContext('2d');
-    g.clearRect(0,0,FW,FH);
-    const X = cx(), Y = cy();
-
-    // the ward being protected
-    const pulse = 0.6 + 0.4*Math.sin(performance.now()/700);
-    g.save();
-    g.shadowColor = 'rgba(233,196,106,.8)'; g.shadowBlur = 26*pulse;
-    g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(233,196,106,.92)';
-    g.beginPath(); g.arc(X, Y, 13, 0, 6.284); g.fill();
-    g.restore();
-    g.strokeStyle = over ? 'rgba(200,90,70,.35)' : 'rgba(233,196,106,.22)';
-    g.lineWidth = 1;
-    g.beginPath(); g.arc(X, Y, 26 + 5*pulse, 0, 6.284); g.stroke();
-
-    // ward health, as pips under it
-    for (let k=0;k<CFG.wardHp;k++){
-      g.fillStyle = k < ward ? 'rgba(233,196,106,.85)' : 'rgba(233,196,106,.14)';
-      g.beginPath(); g.arc(X - (CFG.wardHp-1)*5 + k*10, Y + 34, 3, 0, 6.284); g.fill();
-    }
-
-    const tgt = target();
-    for (const m of monsters){
-      const p = px(m), isT = m === tgt;
-      const bob = Math.sin(performance.now()/500 + m.wob)*2.5;
-
-      // the farang: a pale drifting shape, brighter the closer it gets
-      const near = 1 - m.d;
-      g.save();
-      g.globalAlpha = 0.5 + 0.5*near;
-      g.shadowColor = isT ? 'rgba(127,209,196,.75)' : 'rgba(150,170,190,.4)';
-      g.shadowBlur = isT ? 20 : 10;
-      g.fillStyle = isT ? 'rgba(127,209,196,.30)' : 'rgba(170,185,200,.20)';
-      g.beginPath(); g.ellipse(p.x, p.y+bob, 17, 21, 0, 0, 6.284); g.fill();
-      g.restore();
-
-      // the sign it carries
-      const label = sign(m);
-      g.font = (CFG.sign === 'romaji' ? '600 15px' : '600 22px')
-        + ' ui-sans-serif,system-ui,"Klee One",sans-serif';
-      const w = g.measureText(label).width + 18;
-      const by = p.y + bob - 36;
-      g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)';
-      g.strokeStyle = isT ? 'rgba(127,209,196,.65)' : 'rgba(180,195,210,.28)';
-      g.lineWidth = 1;
-      g.beginPath();
-      if (g.roundRect) g.roundRect(p.x-w/2, by-16, w, 27, 8);
-      else g.rect(p.x-w/2, by-16, w, 27);
-      g.fill(); g.stroke();
-      g.beginPath(); g.moveTo(p.x-5, by+11); g.lineTo(p.x, by+18); g.lineTo(p.x+5, by+11);
-      g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)'; g.fill();
-      g.fillStyle = isT ? '#bdf0e6' : 'rgba(226,232,240,.8)';
-      g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText(label, p.x, by-2);
-    }
-
-    // the glyph in flight
-    for (const s of shots){
-      const p = px(s.to);
-      const t = s.t, e = t*t*(3-2*t);
-      const x = s.from.x + (p.x - s.from.x)*e;
-      const y = s.from.y + (p.y - s.from.y)*e - Math.sin(t*Math.PI)*46;
-      g.save();
-      g.globalAlpha = 0.9;
-      g.shadowColor = 'rgba(233,196,106,.9)'; g.shadowBlur = 18;
-      g.fillStyle = '#ffe9a8';
-      g.font = '700 26px ui-sans-serif,system-ui,"Klee One",sans-serif';
-      g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText(s.ch, x, y);
-      g.restore();
-    }
-
-    for (const p of motes){
-      g.globalAlpha = Math.max(0, p.life);
-      g.fillStyle = '#ffe9a8';
-      g.fillRect(p.x, p.y, 2, 2);
-    }
-    g.globalAlpha = 1;
-
-    g.fillStyle = 'rgba(233,196,106,.55)';
-    g.font = '12px ui-sans-serif,system-ui'; g.textAlign = 'left';
-    g.textBaseline = 'alphabetic';
-    g.fillText(`banished ${killed}`, 12, 20);
+    try { load(idx); } catch(_){}
   }
 
-  function restart(){
-    monsters = []; shots = []; motes = [];
-    ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
-    spawnAt = 0; tPrev = 0; spawn(); retarget();
-  }
-  fc.addEventListener('pointerdown', e => {
-    if (over){ restart(); return; }
-    const r = fc.getBoundingClientRect();
-    pick(e.clientX - r.left, e.clientY - r.top);
-  });
+  // ---- size control
+  // The whole point of separating size from mastery. SIZE_PIN holds one size
+  // while the alphabet is walked, so the question becomes "which glyph fails
+  // at which size" instead of "which level was I on", which is what made the
+  // last bug take three releases to corner.
+  const SIZE_LADDER = (function(){
+    const out = [];
+    try {
+      for (let f = SIZE_MAX; f >= SIZE_MIN - 1e-9; f -= 0.02) out.push(Math.round(f*1000)/1000);
+      if (!out.length || out[out.length-1] > SIZE_MIN) out.push(SIZE_MIN);
+    } catch(_){ }
+    return out.length ? out : [0.62];
+  })();
+  let sizeIdx = 0;
 
-  // A handle on the field, for the same reason the tracer has one: a game
-  // loop that cannot be inspected can only be tested by playing it.
-  window.__field = {
-    get monsters(){ return monsters; },
-    get shots(){ return shots; },
-    get ward(){ return ward; },
-    get over(){ return over; },
-    get killed(){ return killed; },
-    get target(){ return target(); },
-    get locked(){ return locked; },
-    spawn, restart, retarget, pick,
-    posOf: px,
-    frame(now){ step(now); },
+  const glyphPx = () => { try { return Math.round(document.getElementById('ink').getBoundingClientRect().height * curF); }
+                          catch(_){ return null; } };
+  function syncSize(){
+    const b = document.getElementById('__sz');
+    if (!b) return;
+    let f = null; try { f = curF; } catch(_){}
+    const pinned = (function(){ try { return SIZE_PIN != null; } catch(_){ return false; } })();
+    b.textContent = (pinned ? 'pinned ' : 'size ') + (f==null ? '?' : f.toFixed(2))
+      + (glyphPx()==null ? '' : ` · ${glyphPx()}px`);
+    b.style.color = pinned ? '#7fd1c4' : '#ece4d8';
+  }
+  function setSizeIdx(i){
+    try {
+      sizeIdx = Math.max(0, Math.min(SIZE_LADDER.length-1, i));
+      SIZE_PIN = SIZE_LADDER[sizeIdx];
+      load(idx); syncSize();
+      return SIZE_PIN;
+    } catch(_){ return null; }
+  }
+  function unpinSize(){
+    try { SIZE_PIN = null; load(idx); syncSize(); } catch(_){}
+  }
+  // Walking the alphabet at a fixed size is the sweep. Navigation already
+  // calls load(), and a pinned size survives it, so next/prev is the loop.
+  function stepGlyph(d){ try { load(idx + d); syncSize(); } catch(_){} }
+
+  // ---- the fail flag
+  // A fizzle is one bad attempt; "this is impossible here" is a judgement only
+  // the hand can make, after several. The engine cannot infer it, so it gets a
+  // button. Everything needed to tell the three suspects apart is captured at
+  // the moment it is pressed: the size (difficulty curve), the glyph (stroke
+  // data), and the live accumulators (state).
+  const flags = [];
+  const FKEY = 'hito-size-flags';
+  try { const r = localStorage.getItem(FKEY); if (r) flags.push(...JSON.parse(r)); } catch(_){}
+  function saveFlags(){
+    try { localStorage.setItem(FKEY, JSON.stringify(flags)); } catch(_){}
+    const b = document.getElementById('__fl');
+    if (b) b.textContent = `✗ fails here (${flags.length})`;
+  }
+  function flagFail(){
+    let rec = {at: new Date().toISOString()};
+    try { rec.char = LETTERS[idx][0]; } catch(_){}
+    try { rec.romaji = LETTERS[idx][2]; } catch(_){}
+    try { rec.size = +curF.toFixed(3); } catch(_){}
+    try { rec.px = glyphPx(); } catch(_){}
+    try { rec.pinned = SIZE_PIN != null; } catch(_){}
+    try { rec.level = MASTERY[LETTERS[idx][0]] || 0; } catch(_){}
+    try { rec.coverage = +covered().toFixed(3); } catch(_){}
+    try { rec.travel = PATHLEN ? +(travel/PATHLEN).toFixed(2) : null; } catch(_){}
+    try { rec.progress = prog; rec.stroke = segIdx; } catch(_){}
+    try { rec.attempts = fizzles; } catch(_){}
+    rec.reason = lastToast;
+    try { rec.mode = MODES[modeIdx].name; } catch(_){}
+    flags.push(rec); saveFlags();
+    // _toast, not toast: the wrapper records lastToast, and a flag
+    // confirmation is not the engine's explanation of anything.
+    try { _toast(`flagged: ${rec.char} at ${rec.size} (${rec.px}px)`); } catch(_){}
+    return rec;
+  }
+
+  // A glyph × size grid is the thing the flags are for; rendering it here
+  // means it can be read on the tablet without exporting anything first.
+  function matrix(){
+    if (!flags.length) return '(nothing flagged yet)';
+    const sizes = [...new Set(flags.map(f=>f.size))].sort((a,b)=>b-a);
+    const chars = [...new Set(flags.map(f=>f.char))];
+    const head = 'glyph  ' + sizes.map(s=>s.toFixed(2)).join(' ');
+    const rows = chars.map(c => {
+      const cells = sizes.map(s => {
+        const n = flags.filter(f=>f.char===c && f.size===s).length;
+        return String(n || '·').padStart(4);
+      });
+      return `  ${c}   ${cells.join(' ')}`;
+    });
+    return [head, ...rows].join('\n');
+  }
+
+  // ---- export
+  window.__hito = {
+    realign,
+    cycleShadow,
+    cycleGrid,
+    setLevel,
+    setSize: f => setSizeIdx(SIZE_LADDER.indexOf(
+      SIZE_LADDER.reduce((a,b)=>Math.abs(b-f)<Math.abs(a-f)?b:a))),
+    sizeUp: () => setSizeIdx(sizeIdx-1),
+    sizeDown: () => setSizeIdx(sizeIdx+1),
+    unpinSize,
+    sizes: SIZE_LADDER,
+    flagFail,
+    matrix,
+    alignment: ALIGN,
+    get log(){ return log; },
+    get flags(){ return flags; },
+    clearFlags(){ flags.length = 0; saveFlags(); },
+    export(){
+      const payload = {
+        exported: new Date().toISOString(),
+        canvasPx: (function(){ try { return Math.round(
+          document.getElementById('ink').getBoundingClientRect().height); } catch(_){ return null; } })(),
+        sizeLadder: SIZE_LADDER,
+        flags,                         // "impossible here", judged by the hand
+        matrix: matrix(),              // the same thing, readable
+        attempts: log,
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 1)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `hito-attempts-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+      a.click();
+    },
+    clear(){ log.length = 0; try{ localStorage.removeItem(KEY); }catch(_){} save(); },
+    stepGlyph,
   };
 
-  addEventListener('resize', sizeField);
-  addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
-  sizeField();
-  spawn(); retarget();
-  requestAnimationFrame(loop);
+  addEventListener('DOMContentLoaded', () => {
+    const b = document.createElement('button');
+    b.id = '__tel';
+    b.textContent = '● 0 attempts';
+    b.title = 'Download this session\'s attempts';
+    b.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;'
+      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
+    b.onclick = () => window.__hito.export();
+    document.body.appendChild(b);
+
+    const sb = document.createElement('button');
+    sb.id = '__sm';
+    sb.textContent = 'mode: easy';
+    sb.title = 'Cycle easy / medium / hard';
+    sb.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:9999;'
+      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
+    sb.onclick = cycleShadow;
+    document.body.appendChild(sb);
+
+    const gb = document.createElement('button');
+    gb.id = '__gr';
+    gb.textContent = 'grid: ' + (typeof GRID_MODE !== 'undefined' ? GRID_MODE : '?');
+    gb.title = 'Cycle the practice grid';
+    gb.style.cssText = 'position:fixed;left:120px;bottom:10px;z-index:9999;'
+      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
+    gb.onclick = cycleGrid;
+    document.body.appendChild(gb);
+
+    const lv = document.createElement('div');
+    lv.style.cssText = 'position:fixed;left:10px;bottom:48px;z-index:9999;display:flex;gap:4px';
+    const mk = (t, fn) => { const b=document.createElement('button');
+      b.textContent=t; b.onclick=fn;
+      b.style.cssText='background:#1d1a16;color:#e9c46a;border:1px solid #57492f;'
+        +'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;'
+        +'cursor:pointer;opacity:.85'; return b; };
+    const lab = document.createElement('button');
+    lab.id='__lv'; lab.textContent='lv ?';
+    lab.style.cssText='background:#1d1a16;color:#ece4d8;border:1px solid #2f2a24;'
+      +'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;cursor:default';
+    lv.append(mk('−', ()=>setLevel((MASTERY[LETTERS[idx][0]]||0)-1)), lab,
+                mk('+', ()=>setLevel((MASTERY[LETTERS[idx][0]]||0)+1)),
+                mk('reset all', ()=>{ for(const k in MASTERY) delete MASTERY[k];
+                  persistM(); load(idx); setLevel(0); }));
+    document.body.appendChild(lv);
+    const sync=()=>{ lab.textContent='lv '+(MASTERY[LETTERS[idx][0]]||0); };
+    sync(); setInterval(() => { sync(); syncSize(); }, 400);
+
+    // ---- size row: the sweep controls
+    // Deliberately a row of its own above the mastery row. They look alike but
+    // they are no longer the same axis, and conflating them is the mistake
+    // this whole build exists to stop making.
+    const sz = document.createElement('div');
+    sz.style.cssText = 'position:fixed;left:10px;bottom:86px;z-index:9999;display:flex;gap:4px';
+    const szLab = document.createElement('button');
+    szLab.id = '__sz'; szLab.textContent = 'size ?';
+    szLab.title = 'Tap to release the pin and let the mode choose again';
+    szLab.style.cssText = 'background:#1d1a16;color:#ece4d8;border:1px solid #2f2a24;'
+      + 'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;cursor:pointer';
+    szLab.onclick = unpinSize;
+    sz.append(mk('◀', ()=>stepGlyph(-1)),
+              mk('−', ()=>setSizeIdx(sizeIdx+1)),   // down the ladder = smaller
+              szLab,
+              mk('+', ()=>setSizeIdx(sizeIdx-1)),
+              mk('▶', ()=>stepGlyph(1)));
+    document.body.appendChild(sz);
+
+    // ---- the fail flag, put where a thumb already is
+    const fb = document.createElement('button');
+    fb.id = '__fl';
+    fb.textContent = `✗ fails here (${flags.length})`;
+    fb.title = 'This glyph cannot be traced at this size';
+    fb.style.cssText = 'position:fixed;right:10px;bottom:48px;z-index:9999;'
+      + 'background:#2a1614;color:#ef8a7a;border:1px solid #6b3129;border-radius:7px;'
+      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.9';
+    fb.onclick = flagFail;
+    document.body.appendChild(fb);
+
+    syncSize();
+
+  });
+
+  reset();
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.</div>
 </body>
 </html>

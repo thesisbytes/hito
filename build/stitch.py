@@ -139,6 +139,17 @@ def main():
     s.sub("default font", r"let fontId='[^']*';",
           f"let fontId='{font_defs[0]['id']}';")
 
+    # A new glyph must drop the cached trail. The cache is keyed on prog, and
+    # load() resets prog to 0 — so switching from a glyph that was also at 0
+    # left the check `trailProg!==prog` false and the previous glyph's trail on
+    # screen until the first pen touch moved prog. resize() already cleared it;
+    # load() never did. Visible in the workshop as a stale guide after Next,
+    # and in the field as the old character lingering after tapping a monster.
+    s.sub("a new glyph drops the cached trail",
+          r"lit=\[\]; PATH=\[\]; SEGEND=new Set\(\); prog=0; offCount=0; smudge=0; outCount=0;",
+          "lit=[]; PATH=[]; SEGEND=new Set(); prog=0; offCount=0; smudge=0; outCount=0;"
+          " trailProg=-1;")
+
     s.sub("letters", r"const LETTERS=\[.*?\];", f"const LETTERS={js_string(letters)};",
           flags=re.S)
 

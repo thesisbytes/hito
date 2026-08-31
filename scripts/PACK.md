@@ -97,8 +97,18 @@ Both shells build from the same pack directory — pass a `.json` file to
 is `pack.json` plus a shell, sharing one 400KB stroke book, because duplicating
 the data to change one key is how two builds silently drift apart.
 
+A finished glyph hits **whichever monster is carrying it**, nearest first —
+not whichever object happened to be locked. "You identify, you do not aim,"
+taken literally: finish ぬ and a ぬ takes it. If the monster you were answering
+reached the ward mid-glyph the character is still correct and still finds a
+mark, and if nothing on the field carries it the shot dissipates.
+
 The target is **locked** once the tracer loads its glyph, and stays locked
-until it dies, reaches the ward, or the player taps another monster. It cannot
+until it dies, reaches the ward, or the player taps another monster. A
+retarget never interrupts a trace already in progress — it queues and applies
+when the hand is free, because a reload wipes whatever had been drawn, and
+under a swarm that means every attempt dies to the churn rather than to the
+monsters. It cannot
 be "whichever is nearest right now": monsters advance while you trace, so one
 would overtake yours mid-glyph and the finished character would kill the
 newcomer instead. What you are answering must not change underneath the answer.
