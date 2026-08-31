@@ -57,7 +57,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
@@ -195,6 +195,60 @@ F.spawn();
   ok(F.pending || P.idx === held, 'no retarget was queued for later');
   globalThis.__probe.setProg(0);
   advance(300);
+}
+
+// ---- an emptied field refills, and the tracer wakes up with it
+// The freeze: after a conjure prog sits at the end of the last stroke, so a
+// tracing() guard without a `done` clause stayed true forever. The deferred
+// retarget never ran and the tracer was stranded on the celebration of a glyph
+// nothing was carrying.
+fresh();
+{
+  // The reported freeze, reproduced exactly: the field runs dry at the moment
+  // a glyph is finished. conjure() leaves done=true with prog at the end of
+  // the last stroke; the forced advance then finds nothing to target and gives
+  // up, and nothing ever asks again. The tracer sits on the celebration of a
+  // character nothing is carrying.
+  //
+  // prog is set by hand because nothing traced here — in play the pen has
+  // already driven it to the stroke end, and that is the state that sticks.
+  // Let the field settle first: restart() leaves spawnAt at 0, so without a
+  // frame or two the very next one spawns no matter what, and the dry field
+  // never actually happens.
+  advance(200);
+  P.setProg(9);
+  globalThis.conjure();
+  ok(P.done, 'conjure did not mark the attempt done');
+  ok(P.prog > 0, 'prog was cleared — this test is not reproducing the freeze');
+  F.monsters.length = 0;
+  advance(2500);
+  ok(F.monsters.length >= 1,
+     'an empty field did not refill within 2.5s — a dead screen, not a rest');
+  ok(!P.done, 'still celebrating after 2.5s — the tracer is frozen');
+  ok(F.target && P.idx === F.target.i,
+     `tracer stuck on ${P.LETTERS[P.idx][0]} while the target carries `
+     + `${F.target ? P.LETTERS[F.target.i][0] : '-'}`);
+}
+
+// ---- the reading is shown when a monster falls
+fresh();
+{
+  const before = F.readings.length;
+  globalThis.conjure();
+  advance(500);
+  ok(F.readings.length > before, 'no reading shown on a kill — the sound never arrives');
+  const r = F.readings[F.readings.length-1];
+  ok(r && /^[a-z]+$/.test(r.text),
+     `reading is ${r ? JSON.stringify(r.text) : 'absent'}, expected romaji`);
+}
+
+// ---- a fizzle puts the glyph back to the start
+fresh();
+{
+  P.setProg(9);
+  globalThis.fizzle();
+  advance(400);
+  ok(P.prog === 0, `after a fizzle prog is ${P.prog} — the glyph did not restart`);
 }
 
 // ---- monsters actually advance

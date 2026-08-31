@@ -103,6 +103,9 @@ LAYER = STYLE + r"""
       hp: 1, wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
+    // If the tracer is idle or pointed at a glyph nobody carries, the arrival
+    // is what it should be showing.
+    if (!locked || !monsters.includes(locked)) retarget();
   }
 
   // The target is LOCKED once the tracer has loaded its glyph, and stays
@@ -160,7 +163,11 @@ LAYER = STYLE + r"""
   // and every one of those reloads wipes whatever the player had drawn. The
   // glyph changing under a working hand is what makes a swarm feel broken
   // rather than hard.
-  function tracing(){ return activeId !== null || prog > 0; }
+  // `done` matters here. After a conjure prog sits at the end of the last
+  // stroke, so without that clause tracing() stayed true forever: the deferred
+  // retarget never ran, and when the field emptied and refilled the tracer was
+  // left frozen on the celebration of a glyph nothing was carrying any more.
+  function tracing(){ return !done && (activeId !== null || prog > 0); }
   let pendingRetarget = false;
   function retarget(force){
     if (locked && !monsters.includes(locked)) locked = null;
@@ -205,8 +212,15 @@ LAYER = STYLE + r"""
     return r;
   };
 
+  let readings = [];
   function hit(m){
     m.hp--;
+    // The sound, attached to the kill. Tracing a shape teaches the shape and
+    // nothing else — the hand can learn every stroke of ぬ without the reading
+    // ever arriving. Success is the moment attention is highest, so that is
+    // where the reading goes.
+    if (CFG.reading !== 'off')
+      readings.push({x:px(m).x, y:px(m).y, text:LETTERS[m.i][2], life:1});
     for (let k=0;k<18;k++)
       motes.push({x:px(m).x, y:px(m).y, vx:(Math.random()-.5)*2.4,
                   vy:(Math.random()-.5)*2.4, life:1});
@@ -226,6 +240,8 @@ LAYER = STYLE + r"""
     if (!tPrev) tPrev = now;
     const dt = Math.min(0.05, (now - tPrev)/1000); tPrev = now;
     if (!over){
+      // Nothing to answer is not a rest, it is a dead screen. Refill at once.
+      if (!monsters.length) spawnAt = Math.min(spawnAt, now);
       if (now > spawnAt){
         spawn();
         spawnAt = now + Math.max(CFG.spawnMin, CFG.spawnMs - wave*CFG.spawnRamp);
@@ -255,6 +271,8 @@ LAYER = STYLE + r"""
     }
     for (const p of motes){ p.x += p.vx; p.y += p.vy; p.life -= dt*1.6; }
     motes = motes.filter(p => p.life > 0);
+    for (const r of readings){ r.y -= dt*26; r.life -= dt*0.85; }
+    readings = readings.filter(r => r.life > 0);
     draw();
   }
   function loop(now){ step(now); requestAnimationFrame(loop); }
@@ -332,6 +350,17 @@ LAYER = STYLE + r"""
       g.restore();
     }
 
+    for (const r of readings){
+      const a = Math.min(1, r.life*1.6);
+      g.save();
+      g.globalAlpha = a;
+      g.shadowColor = 'rgba(233,196,106,.9)'; g.shadowBlur = 16;
+      g.fillStyle = '#ffe9a8';
+      g.font = `700 ${Math.round(26 + 10*(1-r.life))}px ui-sans-serif,system-ui`;
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(r.text, r.x, r.y);
+      g.restore();
+    }
     for (const p of motes){
       g.globalAlpha = Math.max(0, p.life);
       g.fillStyle = '#ffe9a8';
@@ -346,7 +375,7 @@ LAYER = STYLE + r"""
   }
 
   function restart(){
-    monsters = []; shots = []; motes = [];
+    monsters = []; shots = []; motes = []; readings = [];
     ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; spawn(); retarget();
   }
@@ -367,11 +396,38 @@ LAYER = STYLE + r"""
     get target(){ return target(); },
     get locked(){ return locked; },
     get pending(){ return pendingRetarget; },
+    get readings(){ return readings; },
     bearer,
     spawn, restart, retarget, pick,
     posOf: px,
     frame(now){ step(now); },
   };
+
+  // A fizzle already clears the ink, but only rewound prog by half — so the
+  // player was left with an empty canvas and credit for a path they could no
+  // longer see, the guide resuming from the middle of a glyph while the toast
+  // said "back to the dot". Under a clock there is no time to work out where
+  // that middle is. The attempt now restarts, which is what the message always
+  // claimed and what the cleared ink already implied.
+  const _fizzle = window.fizzle;
+  window.fizzle = function(){
+    const r = _fizzle.apply(this, arguments);
+    if (CFG.fizzleRestarts) setTimeout(() => {
+      if (!done) { loading = true; try { _load(idx); } finally { loading = false; } }
+    }, 260);
+    return r;
+  };
+
+  // And an explicit way out, because auto-restart only fires on a fizzle and a
+  // trace can go wrong long before it trips one.
+  const redo = document.createElement('button');
+  redo.textContent = '↺ redo';
+  redo.title = 'Start this glyph again';
+  redo.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;'
+    + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+    + 'padding:9px 14px;font:13px ui-sans-serif,system-ui;cursor:pointer;opacity:.9';
+  redo.onclick = () => { loading = true; try { _load(idx); } finally { loading = false; } };
+  addEventListener('DOMContentLoaded', () => document.body.appendChild(redo));
 
   addEventListener('resize', sizeField);
   addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
@@ -397,6 +453,8 @@ def config(pack):
         f"spawnMs:{int(f.get('spawnMs', 5200))},"
         f"spawnRamp:{int(f.get('spawnRamp', 140))},"
         f"spawnMin:{int(f.get('spawnMin', 1800))},"
-        f"advanceMs:{int(f.get('advanceMs', 460))}"
+        f"advanceMs:{int(f.get('advanceMs', 460))},"
+        f"reading:{f.get('reading', 'onComplete')!r},"
+        f"fizzleRestarts:{'true' if f.get('fizzleRestarts', True) else 'false'}"
         "};</script>"
     ).replace("'", '"')

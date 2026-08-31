@@ -91,6 +91,8 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 | `field.wardHp` | `5` | How many monsters can reach the centre before the run ends. |
 | `field.spawnMs` | `5200` | Gap between spawns, falling by `spawnRamp` each wave down to `spawnMin`. |
 | `field.advanceMs` | `460` | Delay before the next target loads after a glyph is finished. The engine celebrates for 1.9s before advancing on its own, which is dead time under a clock — a fast hand finishes the next glyph before it exists. |
+| `field.reading` | `onComplete` | `onComplete` — the romaji blooms where the monster fell. `off` — no reading. Tracing a shape teaches the shape and nothing else: a hand can learn every stroke of ぬ without the sound ever arriving. Success is where attention is highest, so that is where the reading goes. |
+| `field.fizzleRestarts` | `true` | Put the glyph back to the start after a fizzle. `fizzle()` already clears the ink but only rewinds progress halfway, leaving an empty canvas with credit for a path that is no longer visible — and under a clock there is no time to work out where the middle was. |
 
 Both shells build from the same pack directory — pass a `.json` file to
 `stitch.py` instead of a directory to use a variant. `scripts/hiragana/game.json`
