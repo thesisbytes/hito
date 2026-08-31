@@ -35,7 +35,11 @@ globalThis.document = { getElementById:el, createElement:el, body:el(), addEvent
   documentElement:el(), fonts:{ready:Promise.resolve(), add(){}} };
 globalThis.window = globalThis;
 globalThis.addEventListener = () => {};
-globalThis.setTimeout = () => 0;
+// A real timer queue on the fake clock: the field advances to the next glyph
+// on a setTimeout, and a stub that drops callbacks would let a broken advance
+// pass silently.
+let timers = [];
+globalThis.setTimeout = (fn, ms) => { timers.push({fn, at: T + (ms||0)}); return timers.length; };
 globalThis.setInterval = () => 0;
 globalThis.clearTimeout = () => {};
 globalThis.URL = { createObjectURL:()=>"" };
@@ -60,7 +64,13 @@ const F = globalThis.__field, P = globalThis.__probe;
 let fail = 0;
 const ok = (c, m) => { if (!c) { console.log(`  FAIL: ${m}`); fail++; } };
 const advance = (ms, stepMs = 16) => {
-  for (let e = T + ms; T < e; ){ T = Math.min(T + stepMs, e); F.frame(T); }
+  for (let e = T + ms; T < e; ){
+    T = Math.min(T + stepMs, e);
+    const due = timers.filter(t => t.at <= T);
+    timers = timers.filter(t => t.at > T);
+    for (const d of due) d.fn();
+    F.frame(T);
+  }
 };
 
 ok(F && P, 'the field layer did not initialise');
@@ -97,6 +107,52 @@ globalThis.load(away);
 ok(P.idx === F.target.i,
    `load(${away}) landed on ${P.LETTERS[P.idx][0]}, not the target's `
    + `${P.LETTERS[F.target.i][0]} — the field is not driving the tracer`);
+
+// ---- the target is locked, not recomputed
+// The bug this replaces: target() returned whichever monster was nearest the
+// ward at that instant, so one overtaking yours mid-glyph stole the shot. You
+// drew one character and something carrying another died for it.
+F.restart(); T += 100;
+F.spawn(); F.spawn();
+const mine = F.target;
+ok(mine, 'no target to lock');
+// shove every other monster past it — under the old code this would retarget
+for (const m of F.monsters) if (m !== mine) m.d = 0.2;
+mine.d = 0.9;
+advance(300);
+ok(F.target === mine,
+   'the target changed while it was being answered — a closer monster stole it');
+ok(P.idx === mine.i, 'the tracer followed the thief instead of the locked target');
+globalThis.conjure();
+ok(F.shots.length === 1 && F.shots[0].to === mine,
+   'the shot went to a monster other than the one whose glyph was traced');
+
+// ---- tapping picks a different one
+F.restart(); T += 100;
+F.spawn(); F.spawn();
+const other = F.monsters.find(m => m !== F.target);
+if (other){
+  const p = F.posOf(other);
+  ok(F.pick(p.x, p.y - 14), 'tapping a monster did not select it');
+  ok(F.target === other, 'tap did not move the lock');
+  ok(P.idx === other.i, 'tap did not point the tracer at the tapped monster');
+}
+
+// ---- the next glyph arrives promptly, not after the celebration
+F.restart(); T += 100;
+const before2 = F.killed;
+globalThis.conjure();
+// the shot flies at t += dt*2.6, so it lands at ~385ms
+advance(420);
+ok(F.killed === before2 + 1, 'the shot had not landed by 420ms');
+const cfg = JSON.parse(html.match(/window\.__FIELD_CFG=(\{[^}]*\})/)[1]
+  .replace(/([a-zA-Z]+):/g, '"$1":'));
+advance(cfg.advanceMs + 120);
+ok(F.target && P.idx === F.target.i,
+   `after ${cfg.advanceMs}ms the tracer is on ${P.LETTERS[P.idx][0]} `
+   + `but the target carries ${F.target ? P.LETTERS[F.target.i][0] : '-'}`);
+ok(cfg.advanceMs < 1900,
+   `advance delay is ${cfg.advanceMs}ms — the engine's 1.9s celebration is dead time under a clock`);
 
 // ---- monsters actually advance
 const d0 = F.target.d;

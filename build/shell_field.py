@@ -105,15 +105,43 @@ LAYER = STYLE + r"""
     wave++;
   }
 
-  // The most urgent monster is the one being answered. Identification proper —
-  // choosing which of several to answer — waits for a mode with no guide,
-  // because with the guide up the tracer has already told you the answer.
-  function target(){
+  // The target is LOCKED once the tracer has loaded its glyph, and stays
+  // locked until it dies, reaches the ward, or the player taps another.
+  //
+  // It used to be recomputed as "whichever is nearest right now", which is
+  // wrong the moment anything moves: monsters advance while you trace, so one
+  // could overtake yours mid-glyph and conjure() would fire at the newcomer.
+  // You drew あ and something carrying ぬ died for it. What you are answering
+  // cannot be allowed to change underneath the answer.
+  let locked = null;
+  function nearest(){
     let best = null;
     for (const m of monsters) if (!best || m.d < best.d) best = m;
     return best;
   }
+  function target(){
+    if (locked && monsters.includes(locked)) return locked;
+    locked = nearest();
+    return locked;
+  }
   function targetIdx(){ const t = target(); return t ? t.i : null; }
+
+  // Tapping a monster is how you choose what to answer. This is the
+  // identification mechanic arriving early: with the guide up the tracer still
+  // shows you the shape, but which of them you take is yours.
+  function pick(x, y){
+    let best = null, bd = 44;
+    for (const m of monsters){
+      const p = px(m), d = Math.hypot(x-p.x, y-(p.y-14));
+      if (d < bd){ bd = d; best = m; }
+    }
+    if (best && best !== locked){
+      locked = best;
+      loading = true; try { _load(best.i); } finally { loading = false; }
+      return true;
+    }
+    return false;
+  }
 
   // ---- drive the tracer from the field
   // Every load() lands on whatever the field is asking for. conjure()'s own
@@ -127,6 +155,7 @@ LAYER = STYLE + r"""
     return _load.call(this, t === null ? i : t);
   };
   function retarget(){
+    if (locked && !monsters.includes(locked)) locked = null;
     const t = targetIdx();
     if (t === null || t === idx) return;
     loading = true; try { _load(t); } finally { loading = false; }
@@ -140,7 +169,16 @@ LAYER = STYLE + r"""
       shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:LETTERS[t.i][0]});
       if (navigator.vibrate) navigator.vibrate([12,30,40]);
     }
-    return _conjure.apply(this, arguments);
+    const r = _conjure.apply(this, arguments);
+    // The engine celebrates for 1.9s before advancing, which is dead time in a
+    // game with a clock running — a fast hand finishes the next glyph before
+    // the next glyph exists. Advance as soon as the shot lands instead.
+    //
+    // The engine's own delayed load(idx+1) needs no cancelling: load() clears
+    // `done`, and that callback is guarded by it, so an early advance disarms
+    // the late one. Without that it would fire mid-trace and wipe the strokes.
+    setTimeout(() => { locked = null; retarget(); }, CFG.advanceMs);
+    return r;
   };
 
   function hit(m){
@@ -150,6 +188,7 @@ LAYER = STYLE + r"""
                   vy:(Math.random()-.5)*2.4, life:1});
     if (m.hp <= 0){
       monsters = monsters.filter(x => x !== m);
+      if (m === locked) locked = null;
       killed++;
       retarget();
     }
@@ -171,6 +210,7 @@ LAYER = STYLE + r"""
         m.d -= m.speed*dt;
         if (m.d <= 0.06){
           monsters = monsters.filter(x => x !== m);
+          if (m === locked) locked = null;
           ward--; retarget();
           if (navigator.vibrate) navigator.vibrate(90);
           if (ward <= 0){ over = true; toast('the ward falls ✦ tap to begin again'); }
@@ -276,10 +316,14 @@ LAYER = STYLE + r"""
 
   function restart(){
     monsters = []; shots = []; motes = [];
-    ward = CFG.wardHp; over = false; wave = 0; killed = 0;
+    ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; spawn(); retarget();
   }
-  fc.addEventListener('pointerdown', () => { if (over) restart(); });
+  fc.addEventListener('pointerdown', e => {
+    if (over){ restart(); return; }
+    const r = fc.getBoundingClientRect();
+    pick(e.clientX - r.left, e.clientY - r.top);
+  });
 
   // A handle on the field, for the same reason the tracer has one: a game
   // loop that cannot be inspected can only be tested by playing it.
@@ -290,7 +334,9 @@ LAYER = STYLE + r"""
     get over(){ return over; },
     get killed(){ return killed; },
     get target(){ return target(); },
-    spawn, restart, retarget,
+    get locked(){ return locked; },
+    spawn, restart, retarget, pick,
+    posOf: px,
     frame(now){ step(now); },
   };
 
@@ -317,6 +363,7 @@ def config(pack):
         f"wardHp:{int(f.get('wardHp', 5))},"
         f"spawnMs:{int(f.get('spawnMs', 5200))},"
         f"spawnRamp:{int(f.get('spawnRamp', 140))},"
-        f"spawnMin:{int(f.get('spawnMin', 1800))}"
+        f"spawnMin:{int(f.get('spawnMin', 1800))},"
+        f"advanceMs:{int(f.get('advanceMs', 460))}"
         "};</script>"
     ).replace("'", '"')

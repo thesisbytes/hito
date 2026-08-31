@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.15</title>
+<title>hito 人 · hiragana · v0.1.16</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.15';
+const APP_VERSION='0.1.16';
 const LETTERS=[["あ","あ行","a","","a-row",1,1],["い","あ行","i","","a-row",2,1],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1],["え","あ行","e","","a-row",4,1],["お","あ行","o","","a-row",5,1],["か","か行","ka","","ka-row",1,2],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2],["く","か行","ku","","ka-row",3,2],["け","か行","ke","","ka-row",4,2],["こ","か行","ko","","ka-row",5,2],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3],["し","さ行","shi","","sa-row",2,3],["す","さ行","su","","sa-row",3,3],["せ","さ行","se","","sa-row",4,3],["そ","さ行","so","","sa-row",5,3],["た","た行","ta","","ta-row",1,4],["ち","た行","chi","","ta-row",2,4],["つ","た行","tsu","","ta-row",3,4],["て","た行","te","","ta-row",4,4],["と","た行","to","","ta-row",5,4],["な","な行","na","","na-row",1,5],["に","な行","ni","","na-row",2,5],["ぬ","な行","nu","","na-row",3,5],["ね","な行","ne","","na-row",4,5],["の","な行","no","","na-row",5,5],["は","は行","ha","","ha-row",1,6],["ひ","は行","hi","","ha-row",2,6],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6],["へ","は行","he","","ha-row",4,6],["ほ","は行","ho","","ha-row",5,6],["ま","ま行","ma","","ma-row",1,7],["み","ま行","mi","","ma-row",2,7],["む","ま行","mu","","ma-row",3,7],["め","ま行","me","","ma-row",4,7],["も","ま行","mo","","ma-row",5,7],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8],["よ","や行","yo","","ya-row",5,8],["ら","ら行","ra","","ra-row",1,9],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9],["る","ら行","ru","","ra-row",3,9],["れ","ら行","re","","ra-row",4,9],["ろ","ら行","ro","","ra-row",5,9],["わ","わ行","wa","","wa-row",1,10],["を","わ行","wo","","wa-row",5,10],["ん","","n","","",1,11]];
 
 // ---------- state
@@ -619,10 +619,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.15');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.16');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
-<script>window.__FIELD_CFG={sign:"kana",speed:0.055,wardHp:5,spawnMs:5200,spawnRamp:140,spawnMin:1800};</script>
+<script>window.__FIELD_CFG={sign:"kana",speed:0.055,wardHp:5,spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -707,15 +707,43 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     wave++;
   }
 
-  // The most urgent monster is the one being answered. Identification proper —
-  // choosing which of several to answer — waits for a mode with no guide,
-  // because with the guide up the tracer has already told you the answer.
-  function target(){
+  // The target is LOCKED once the tracer has loaded its glyph, and stays
+  // locked until it dies, reaches the ward, or the player taps another.
+  //
+  // It used to be recomputed as "whichever is nearest right now", which is
+  // wrong the moment anything moves: monsters advance while you trace, so one
+  // could overtake yours mid-glyph and conjure() would fire at the newcomer.
+  // You drew あ and something carrying ぬ died for it. What you are answering
+  // cannot be allowed to change underneath the answer.
+  let locked = null;
+  function nearest(){
     let best = null;
     for (const m of monsters) if (!best || m.d < best.d) best = m;
     return best;
   }
+  function target(){
+    if (locked && monsters.includes(locked)) return locked;
+    locked = nearest();
+    return locked;
+  }
   function targetIdx(){ const t = target(); return t ? t.i : null; }
+
+  // Tapping a monster is how you choose what to answer. This is the
+  // identification mechanic arriving early: with the guide up the tracer still
+  // shows you the shape, but which of them you take is yours.
+  function pick(x, y){
+    let best = null, bd = 44;
+    for (const m of monsters){
+      const p = px(m), d = Math.hypot(x-p.x, y-(p.y-14));
+      if (d < bd){ bd = d; best = m; }
+    }
+    if (best && best !== locked){
+      locked = best;
+      loading = true; try { _load(best.i); } finally { loading = false; }
+      return true;
+    }
+    return false;
+  }
 
   // ---- drive the tracer from the field
   // Every load() lands on whatever the field is asking for. conjure()'s own
@@ -729,6 +757,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     return _load.call(this, t === null ? i : t);
   };
   function retarget(){
+    if (locked && !monsters.includes(locked)) locked = null;
     const t = targetIdx();
     if (t === null || t === idx) return;
     loading = true; try { _load(t); } finally { loading = false; }
@@ -742,7 +771,16 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:LETTERS[t.i][0]});
       if (navigator.vibrate) navigator.vibrate([12,30,40]);
     }
-    return _conjure.apply(this, arguments);
+    const r = _conjure.apply(this, arguments);
+    // The engine celebrates for 1.9s before advancing, which is dead time in a
+    // game with a clock running — a fast hand finishes the next glyph before
+    // the next glyph exists. Advance as soon as the shot lands instead.
+    //
+    // The engine's own delayed load(idx+1) needs no cancelling: load() clears
+    // `done`, and that callback is guarded by it, so an early advance disarms
+    // the late one. Without that it would fire mid-trace and wipe the strokes.
+    setTimeout(() => { locked = null; retarget(); }, CFG.advanceMs);
+    return r;
   };
 
   function hit(m){
@@ -752,6 +790,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
                   vy:(Math.random()-.5)*2.4, life:1});
     if (m.hp <= 0){
       monsters = monsters.filter(x => x !== m);
+      if (m === locked) locked = null;
       killed++;
       retarget();
     }
@@ -773,6 +812,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         m.d -= m.speed*dt;
         if (m.d <= 0.06){
           monsters = monsters.filter(x => x !== m);
+          if (m === locked) locked = null;
           ward--; retarget();
           if (navigator.vibrate) navigator.vibrate(90);
           if (ward <= 0){ over = true; toast('the ward falls ✦ tap to begin again'); }
@@ -878,10 +918,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 
   function restart(){
     monsters = []; shots = []; motes = [];
-    ward = CFG.wardHp; over = false; wave = 0; killed = 0;
+    ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; spawn(); retarget();
   }
-  fc.addEventListener('pointerdown', () => { if (over) restart(); });
+  fc.addEventListener('pointerdown', e => {
+    if (over){ restart(); return; }
+    const r = fc.getBoundingClientRect();
+    pick(e.clientX - r.left, e.clientY - r.top);
+  });
 
   // A handle on the field, for the same reason the tracer has one: a game
   // loop that cannot be inspected can only be tested by playing it.
@@ -892,7 +936,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get over(){ return over; },
     get killed(){ return killed; },
     get target(){ return target(); },
-    spawn, restart, retarget,
+    get locked(){ return locked; },
+    spawn, restart, retarget, pick,
+    posOf: px,
     frame(now){ step(now); },
   };
 

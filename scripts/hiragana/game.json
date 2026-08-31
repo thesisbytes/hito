@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "version": "0.1.15",
-  "title": "hito 人 · hiragana · v0.1.15",
+  "version": "0.1.16",
+  "title": "hito 人 · hiragana · v0.1.16",
   "brand": "hito 人",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -52,6 +52,7 @@
     "wardHp": 5,
     "spawnMs": 5200,
     "spawnRamp": 140,
-    "spawnMin": 1800
+    "spawnMin": 1800,
+    "advanceMs": 460
   }
 }
