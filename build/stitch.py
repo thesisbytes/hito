@@ -59,11 +59,11 @@ def js_string(obj):
 
 
 def build_letters(glyphs):
-    """[char, row-label, romaji, note, row-name, column, row] per glyph.
+    """[char, row-label, romaji, note, row-name, column, row, gaijin] per glyph.
 
-    The engine destructures the first five; the trailing two drive explicit
-    grid placement so the ya and wa rows keep their gaps instead of closing
-    up into a dense block.
+    The engine destructures the first five; the next two drive explicit grid
+    placement so the ya and wa rows keep their gaps instead of closing up into
+    a dense block. The last is the English-speaker rendering — see PACK.md.
     """
     rows, heads, letters = [], {}, []
     for g in glyphs:
@@ -83,6 +83,7 @@ def build_letters(glyphs):
             "" if standalone else f"{g['row']}-row",
             col,
             row,
+            g.get("gaijin", g["romaji"].upper()),
         ])
     return letters, len(rows) + 1
 

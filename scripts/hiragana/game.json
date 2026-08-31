@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "version": "0.1.18",
-  "title": "hito 人 · hiragana · v0.1.18",
+  "version": "0.1.19",
+  "title": "hito 人 · hiragana · v0.1.19",
   "brand": "hito 人",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -54,7 +54,7 @@
     "spawnRamp": 140,
     "spawnMin": 1800,
     "advanceMs": 460,
-    "reading": "onComplete",
+    "reading": "both",
     "fizzleRestarts": true
   }
 }

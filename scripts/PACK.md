@@ -86,12 +86,12 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 | key | default | meaning |
 |---|---|---|
 | `shell` | `workshop` | `workshop` — the gojūon chart, stroke controls and everything else this project uses on itself. `field` — the game: sketchbook in the bottom third, battle in the top two thirds. |
-| `field.sign` | `kana` | What a monster's speech bubble shows. `kana` tests recall of the shape; `romaji` tests the reading → shape mapping, which is harder and only bites once the guide is off. |
+| `field.sign` | `kana` | What a monster's speech bubble shows. `kana` tests recall of the shape; `romaji` tests the reading → shape mapping, which is harder and only bites once the guide is off; `gaijin` asks in the learner's own broken accent. |
 | `field.speed` | `0.055` | How fast a monster closes on the ward, in field-radii per second. |
 | `field.wardHp` | `5` | How many monsters can reach the centre before the run ends. |
 | `field.spawnMs` | `5200` | Gap between spawns, falling by `spawnRamp` each wave down to `spawnMin`. |
 | `field.advanceMs` | `460` | Delay before the next target loads after a glyph is finished. The engine celebrates for 1.9s before advancing on its own, which is dead time under a clock — a fast hand finishes the next glyph before it exists. |
-| `field.reading` | `onComplete` | `onComplete` — the romaji blooms where the monster fell. `off` — no reading. Tracing a shape teaches the shape and nothing else: a hand can learn every stroke of ぬ without the sound ever arriving. Success is where attention is highest, so that is where the reading goes. |
+| `field.reading` | `both` | What blooms where a monster falls. `romaji`, `gaijin`, `both` (the reading with the mispronunciation under it), or `off`. Tracing a shape teaches the shape and nothing else: a hand can learn every stroke of ぬ without the sound ever arriving. Success is where attention is highest, so that is where the reading goes. |
 | `field.fizzleRestarts` | `true` | Put the glyph back to the start after a fizzle. `fizzle()` already clears the ink but only rewinds progress halfway, leaving an empty canvas with credit for a path that is no longer visible — and under a clock there is no time to work out where the middle was. |
 
 Both shells build from the same pack directory — pass a `.json` file to
@@ -119,6 +119,33 @@ The split screen is what makes real-time movement safe. Monsters march
 continuously because they never share space with the pen: the sketchbook is a
 fixed rectangle that does not scroll, scale or reflow while the field moves
 above it.
+
+### The three voices
+
+Each glyph carries three labels, and they ask for different things:
+
+| voice | ぬ | what it tests |
+|---|---|---|
+| `kana` | ぬ | the shape, by copying it |
+| `romaji` | `nu` | the reading → shape mapping, which is the direction that matters |
+| `gaijin` | `NEW` | nothing, and that is the point — it is the joke |
+
+The third is a `gaijin` field per glyph in `glyphs.json`: the English speaker's
+rendering, exaggerated the way a Japanese friend would tease you with it. It is
+self-directed humour, the same joke as the hero who cannot read — the player is
+the foreigner here, and the monsters are farang.
+
+It also does real work, which is why it earns its place beside the other two.
+Each entry aims at a specific error rather than a generic accent: `つ` → `SOO`
+names the dropped t, `ふ` → `FOO` names the labiodental f that should be
+bilabial, `り` → `RRREE` names the American r standing in for a tap, and `い` →
+`EYE`, `う` → `YOO`, `え` → `EE` name the vowels read as their English letter
+names. A learner recognises the wrong one as *theirs* in a way a correct
+spelling never quite manages.
+
+Worth a native reader's eye on the tone before this goes anywhere public — the
+same care the KhienThai spelling got, and for the same reason: it is much
+easier to change now than after.
 
 ### Glyph size
 

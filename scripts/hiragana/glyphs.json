@@ -11,14 +11,16 @@
       "char": "あ",
       "romaji": "a",
       "row": "a",
-      "order": 1
+      "order": 1,
+      "gaijin": "AH"
     },
     {
       "cp": "U+3044",
       "char": "い",
       "romaji": "i",
       "row": "a",
-      "order": 2
+      "order": 2,
+      "gaijin": "EYE"
     },
     {
       "cp": "U+3046",
@@ -26,28 +28,32 @@
       "romaji": "u",
       "row": "a",
       "order": 3,
-      "hookNote": "1st stroke is a short separate tick, print may attach"
+      "hookNote": "1st stroke is a short separate tick, print may attach",
+      "gaijin": "YOO"
     },
     {
       "cp": "U+3048",
       "char": "え",
       "romaji": "e",
       "row": "a",
-      "order": 4
+      "order": 4,
+      "gaijin": "EE"
     },
     {
       "cp": "U+304A",
       "char": "お",
       "romaji": "o",
       "row": "a",
-      "order": 5
+      "order": 5,
+      "gaijin": "OH"
     },
     {
       "cp": "U+304B",
       "char": "か",
       "romaji": "ka",
       "row": "ka",
-      "order": 6
+      "order": 6,
+      "gaijin": "KAH"
     },
     {
       "cp": "U+304D",
@@ -55,28 +61,32 @@
       "romaji": "ki",
       "row": "ka",
       "order": 7,
-      "hookNote": "3rd/4th stroke separate in textbook form; print fonts often join them"
+      "hookNote": "3rd/4th stroke separate in textbook form; print fonts often join them",
+      "gaijin": "KEY"
     },
     {
       "cp": "U+304F",
       "char": "く",
       "romaji": "ku",
       "row": "ka",
-      "order": 8
+      "order": 8,
+      "gaijin": "KOO"
     },
     {
       "cp": "U+3051",
       "char": "け",
       "romaji": "ke",
       "row": "ka",
-      "order": 9
+      "order": 9,
+      "gaijin": "KAY"
     },
     {
       "cp": "U+3053",
       "char": "こ",
       "romaji": "ko",
       "row": "ka",
-      "order": 10
+      "order": 10,
+      "gaijin": "KOH"
     },
     {
       "cp": "U+3055",
@@ -84,119 +94,136 @@
       "romaji": "sa",
       "row": "sa",
       "order": 11,
-      "hookNote": "2nd/3rd stroke separate in textbook form; print fonts join"
+      "hookNote": "2nd/3rd stroke separate in textbook form; print fonts join",
+      "gaijin": "SAH"
     },
     {
       "cp": "U+3057",
       "char": "し",
       "romaji": "shi",
       "row": "sa",
-      "order": 12
+      "order": 12,
+      "gaijin": "SHE"
     },
     {
       "cp": "U+3059",
       "char": "す",
       "romaji": "su",
       "row": "sa",
-      "order": 13
+      "order": 13,
+      "gaijin": "SUE"
     },
     {
       "cp": "U+305B",
       "char": "せ",
       "romaji": "se",
       "row": "sa",
-      "order": 14
+      "order": 14,
+      "gaijin": "SAY"
     },
     {
       "cp": "U+305D",
       "char": "そ",
       "romaji": "so",
       "row": "sa",
-      "order": 15
+      "order": 15,
+      "gaijin": "SEW"
     },
     {
       "cp": "U+305F",
       "char": "た",
       "romaji": "ta",
       "row": "ta",
-      "order": 16
+      "order": 16,
+      "gaijin": "TAH"
     },
     {
       "cp": "U+3061",
       "char": "ち",
       "romaji": "chi",
       "row": "ta",
-      "order": 17
+      "order": 17,
+      "gaijin": "CHEE"
     },
     {
       "cp": "U+3064",
       "char": "つ",
       "romaji": "tsu",
       "row": "ta",
-      "order": 18
+      "order": 18,
+      "gaijin": "SOO"
     },
     {
       "cp": "U+3066",
       "char": "て",
       "romaji": "te",
       "row": "ta",
-      "order": 19
+      "order": 19,
+      "gaijin": "TAY"
     },
     {
       "cp": "U+3068",
       "char": "と",
       "romaji": "to",
       "row": "ta",
-      "order": 20
+      "order": 20,
+      "gaijin": "TOE"
     },
     {
       "cp": "U+306A",
       "char": "な",
       "romaji": "na",
       "row": "na",
-      "order": 21
+      "order": 21,
+      "gaijin": "NAH"
     },
     {
       "cp": "U+306B",
       "char": "に",
       "romaji": "ni",
       "row": "na",
-      "order": 22
+      "order": 22,
+      "gaijin": "KNEE"
     },
     {
       "cp": "U+306C",
       "char": "ぬ",
       "romaji": "nu",
       "row": "na",
-      "order": 23
+      "order": 23,
+      "gaijin": "NEW"
     },
     {
       "cp": "U+306D",
       "char": "ね",
       "romaji": "ne",
       "row": "na",
-      "order": 24
+      "order": 24,
+      "gaijin": "NAY"
     },
     {
       "cp": "U+306E",
       "char": "の",
       "romaji": "no",
       "row": "na",
-      "order": 25
+      "order": 25,
+      "gaijin": "NOH"
     },
     {
       "cp": "U+306F",
       "char": "は",
       "romaji": "ha",
       "row": "ha",
-      "order": 26
+      "order": 26,
+      "gaijin": "HAH"
     },
     {
       "cp": "U+3072",
       "char": "ひ",
       "romaji": "hi",
       "row": "ha",
-      "order": 27
+      "order": 27,
+      "gaijin": "HEE"
     },
     {
       "cp": "U+3075",
@@ -204,56 +231,64 @@
       "romaji": "fu",
       "row": "ha",
       "order": 28,
-      "hookNote": "four separate strokes in textbook form; print merges into one loop"
+      "hookNote": "four separate strokes in textbook form; print merges into one loop",
+      "gaijin": "FOO"
     },
     {
       "cp": "U+3078",
       "char": "へ",
       "romaji": "he",
       "row": "ha",
-      "order": 29
+      "order": 29,
+      "gaijin": "HAY"
     },
     {
       "cp": "U+307B",
       "char": "ほ",
       "romaji": "ho",
       "row": "ha",
-      "order": 30
+      "order": 30,
+      "gaijin": "HOE"
     },
     {
       "cp": "U+307E",
       "char": "ま",
       "romaji": "ma",
       "row": "ma",
-      "order": 31
+      "order": 31,
+      "gaijin": "MAH"
     },
     {
       "cp": "U+307F",
       "char": "み",
       "romaji": "mi",
       "row": "ma",
-      "order": 32
+      "order": 32,
+      "gaijin": "ME"
     },
     {
       "cp": "U+3080",
       "char": "む",
       "romaji": "mu",
       "row": "ma",
-      "order": 33
+      "order": 33,
+      "gaijin": "MOO"
     },
     {
       "cp": "U+3081",
       "char": "め",
       "romaji": "me",
       "row": "ma",
-      "order": 34
+      "order": 34,
+      "gaijin": "MAY"
     },
     {
       "cp": "U+3082",
       "char": "も",
       "romaji": "mo",
       "row": "ma",
-      "order": 35
+      "order": 35,
+      "gaijin": "MOE"
     },
     {
       "cp": "U+3084",
@@ -261,7 +296,8 @@
       "romaji": "ya",
       "row": "ya",
       "order": 36,
-      "hookNote": "2nd stroke is a short separate tick"
+      "hookNote": "2nd stroke is a short separate tick",
+      "gaijin": "YAH"
     },
     {
       "cp": "U+3086",
@@ -269,21 +305,24 @@
       "romaji": "yu",
       "row": "ya",
       "order": 37,
-      "hookNote": "hook on 1st stroke is open in textbook form"
+      "hookNote": "hook on 1st stroke is open in textbook form",
+      "gaijin": "YOO"
     },
     {
       "cp": "U+3088",
       "char": "よ",
       "romaji": "yo",
       "row": "ya",
-      "order": 38
+      "order": 38,
+      "gaijin": "YO"
     },
     {
       "cp": "U+3089",
       "char": "ら",
       "romaji": "ra",
       "row": "ra",
-      "order": 39
+      "order": 39,
+      "gaijin": "RRRAH"
     },
     {
       "cp": "U+308A",
@@ -291,49 +330,56 @@
       "romaji": "ri",
       "row": "ra",
       "order": 40,
-      "hookNote": "two separate strokes in textbook form; print joins"
+      "hookNote": "two separate strokes in textbook form; print joins",
+      "gaijin": "RRREE"
     },
     {
       "cp": "U+308B",
       "char": "る",
       "romaji": "ru",
       "row": "ra",
-      "order": 41
+      "order": 41,
+      "gaijin": "ROO"
     },
     {
       "cp": "U+308C",
       "char": "れ",
       "romaji": "re",
       "row": "ra",
-      "order": 42
+      "order": 42,
+      "gaijin": "RAY"
     },
     {
       "cp": "U+308D",
       "char": "ろ",
       "romaji": "ro",
       "row": "ra",
-      "order": 43
+      "order": 43,
+      "gaijin": "ROW"
     },
     {
       "cp": "U+308F",
       "char": "わ",
       "romaji": "wa",
       "row": "wa",
-      "order": 44
+      "order": 44,
+      "gaijin": "WAH"
     },
     {
       "cp": "U+3092",
       "char": "を",
       "romaji": "wo",
       "row": "wa",
-      "order": 45
+      "order": 45,
+      "gaijin": "W-OH"
     },
     {
       "cp": "U+3093",
       "char": "ん",
       "romaji": "n",
       "row": "wa",
-      "order": 46
+      "order": 46,
+      "gaijin": "EN"
     }
   ]
 }

@@ -240,6 +240,21 @@ fresh();
   const r = F.readings[F.readings.length-1];
   ok(r && /^[a-z]+$/.test(r.text),
      `reading is ${r ? JSON.stringify(r.text) : 'absent'}, expected romaji`);
+  // and the way you probably said it, underneath
+  ok(r && typeof r.sub === 'string' && /^[A-Z-]+$/.test(r.sub),
+     `no gaijin reading under it (got ${r ? JSON.stringify(r.sub) : 'nothing'})`);
+}
+
+// ---- every glyph has all three voices, and they are distinct
+{
+  const L = P.LETTERS;
+  const missing = L.filter(e => !e[7]);
+  ok(!missing.length, `${missing.length} glyph(s) have no gaijin reading`);
+  const same = L.filter(e => e[7] && e[7].toLowerCase() === e[2].toLowerCase());
+  ok(same.length < L.length,
+     'every gaijin reading is just the romaji uppercased — the joke is not there');
+  ok(L.every(e => !e[7] || /^[A-Z-]+$/.test(e[7])),
+     'a gaijin reading is not in the shouty caps the joke depends on');
 }
 
 // ---- a fizzle puts the glyph back to the start

@@ -88,7 +88,15 @@ LAYER = STYLE + r"""
   let ward = CFG.wardHp, over = false, wave = 0, killed = 0;
   let spawnAt = 0, tPrev = 0;
 
-  const sign = m => CFG.sign === 'romaji' ? LETTERS[m.i][2] : LETTERS[m.i][0];
+  // Three ways a monster can ask. kana tests recall of the shape; romaji tests
+  // the reading, which is the direction that actually matters; gaijin asks in
+  // the learner's own broken accent, which is the same joke as the hero who
+  // cannot read — the player is the foreigner here.
+  const label = (i, which) =>
+    which === 'romaji' ? LETTERS[i][2] :
+    which === 'gaijin' ? (LETTERS[i][7] || LETTERS[i][2].toUpperCase()) :
+    LETTERS[i][0];
+  const sign = m => label(m.i, CFG.sign);
 
   function spawn(){
     // Bias toward glyphs whose flame has gone out: a monster is a character
@@ -219,8 +227,18 @@ LAYER = STYLE + r"""
     // nothing else — the hand can learn every stroke of ぬ without the reading
     // ever arriving. Success is the moment attention is highest, so that is
     // where the reading goes.
-    if (CFG.reading !== 'off')
-      readings.push({x:px(m).x, y:px(m).y, text:LETTERS[m.i][2], life:1});
+    // The correct reading, and underneath it the way you probably said it.
+    // The joke is the teaching: "SOO" next to "tsu" names the dropped t far
+    // better than the correct spelling does on its own, because the learner
+    // recognises the wrong one as theirs.
+    if (CFG.reading !== 'off'){
+      const p = px(m);
+      readings.push({
+        x:p.x, y:p.y, life:1,
+        text: CFG.reading === 'gaijin' ? label(m.i,'gaijin') : LETTERS[m.i][2],
+        sub:  CFG.reading === 'both'   ? label(m.i,'gaijin') : null,
+      });
+    }
     for (let k=0;k<18;k++)
       motes.push({x:px(m).x, y:px(m).y, vx:(Math.random()-.5)*2.4,
                   vy:(Math.random()-.5)*2.4, life:1});
@@ -359,6 +377,12 @@ LAYER = STYLE + r"""
       g.font = `700 ${Math.round(26 + 10*(1-r.life))}px ui-sans-serif,system-ui`;
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(r.text, r.x, r.y);
+      if (r.sub){
+        g.globalAlpha = a*0.8;
+        g.fillStyle = '#9fd8cc';
+        g.font = `600 ${Math.round(15 + 5*(1-r.life))}px ui-sans-serif,system-ui`;
+        g.fillText(r.sub, r.x, r.y + 26);
+      }
       g.restore();
     }
     for (const p of motes){
@@ -443,8 +467,11 @@ def config(pack):
     """The field's tuning, as a JS object literal written into the page."""
     f = pack.get("field") or {}
     sign = f.get("sign", "kana")
-    if sign not in ("kana", "romaji"):
-        raise SystemExit(f"field.sign must be 'kana' or 'romaji', not {sign!r}")
+    if sign not in ("kana", "romaji", "gaijin"):
+        raise SystemExit(f"field.sign must be kana, romaji or gaijin, not {sign!r}")
+    reading = f.get("reading", "both")
+    if reading not in ("romaji", "gaijin", "both", "off"):
+        raise SystemExit(f"field.reading must be romaji, gaijin, both or off, not {reading!r}")
     return (
         "<script>window.__FIELD_CFG={"
         f"sign:{sign!r},"
@@ -454,7 +481,7 @@ def config(pack):
         f"spawnRamp:{int(f.get('spawnRamp', 140))},"
         f"spawnMin:{int(f.get('spawnMin', 1800))},"
         f"advanceMs:{int(f.get('advanceMs', 460))},"
-        f"reading:{f.get('reading', 'onComplete')!r},"
+        f"reading:{reading!r},"
         f"fizzleRestarts:{'true' if f.get('fizzleRestarts', True) else 'false'}"
         "};</script>"
     ).replace("'", '"')
