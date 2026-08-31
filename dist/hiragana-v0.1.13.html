@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana trace · v0.1.12</title>
+<title>hito 人 · hiragana trace · v0.1.13</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.12';
+const APP_VERSION='0.1.13';
 const LETTERS=[["あ","あ行","a","","a-row",1,1],["い","あ行","i","","a-row",2,1],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1],["え","あ行","e","","a-row",4,1],["お","あ行","o","","a-row",5,1],["か","か行","ka","","ka-row",1,2],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2],["く","か行","ku","","ka-row",3,2],["け","か行","ke","","ka-row",4,2],["こ","か行","ko","","ka-row",5,2],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3],["し","さ行","shi","","sa-row",2,3],["す","さ行","su","","sa-row",3,3],["せ","さ行","se","","sa-row",4,3],["そ","さ行","so","","sa-row",5,3],["た","た行","ta","","ta-row",1,4],["ち","た行","chi","","ta-row",2,4],["つ","た行","tsu","","ta-row",3,4],["て","た行","te","","ta-row",4,4],["と","た行","to","","ta-row",5,4],["な","な行","na","","na-row",1,5],["に","な行","ni","","na-row",2,5],["ぬ","な行","nu","","na-row",3,5],["ね","な行","ne","","na-row",4,5],["の","な行","no","","na-row",5,5],["は","は行","ha","","ha-row",1,6],["ひ","は行","hi","","ha-row",2,6],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6],["へ","は行","he","","ha-row",4,6],["ほ","は行","ho","","ha-row",5,6],["ま","ま行","ma","","ma-row",1,7],["み","ま行","mi","","ma-row",2,7],["む","ま行","mu","","ma-row",3,7],["め","ま行","me","","ma-row",4,7],["も","ま行","mo","","ma-row",5,7],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8],["よ","や行","yo","","ya-row",5,8],["ら","ら行","ra","","ra-row",1,9],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9],["る","ら行","ru","","ra-row",3,9],["れ","ら行","re","","ra-row",4,9],["ろ","ら行","ro","","ra-row",5,9],["わ","わ行","wa","","wa-row",1,10],["を","わ行","wo","","wa-row",5,10],["ん","","n","","",1,11]];
 
 // ---------- state
@@ -195,7 +195,7 @@ let strokes=[],cur=null,drawing=false,activeId=null,t0=0;
 let glyphPts=[],endPts=[],fullMask=null;  // fallback (no recording) scoring + outline mask
 let PATH=[],SEGEND=new Set(),prog=0,offCount=0;
 let trailSeg=-1;
-let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;const COVER_MIN=0.85,END_SLACK=4,MAX_TRAVEL=2.5,TRAVEL_EPS=0.006; // practice: teacher path (dense, normalized), progress index
+let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;let SEGLEN=[],SEGSLACK=[];const COVER_MIN=0.85,END_SLACK=4,MAX_TRAVEL=2.5,TRAVEL_EPS=0.006,TAIL_FRAC=0.12,END_MIN=0.02; // practice: teacher path (dense, normalized), progress index
 let lit=[];
 let ghostAnim=null;                       // guide animation handle
 const trail=document.createElement('canvas'); const tr=trail.getContext('2d'); let trailProg=-1;
@@ -363,6 +363,23 @@ const R_ON0=0.07, LOOK=24, DRAIN=1.6, FIZZ=90;
 const R_ON=()=>Math.max(0.045,R_ON0*Math.sqrt(curS));
 let smudge=0;
 function covered(){ if(!hit) return 0; let c=0; for(let i=0;i<hit.length;i++) c+=hit[i]; return c/hit.length; }
+// How near the end of a stroke counts as having reached it.
+//
+// This was a flat R_ON(), and a flat radius means the same pixels on a
+// 300px stroke and on a 21px one. As the glyph shrinks it therefore
+// swallows the short strokes whole: at the 0.32 floor, R_ON is 86% of
+// the length of お's third stroke. Hooks live at stroke ends, and
+// forgiving hooks is the exact failure this pack uses KanjiVG to avoid.
+//
+// So it is a fraction of the stroke's own length — but floored in
+// absolute terms as well, because no hand lands inside a few pixels and
+// shrinking the target and the tolerance together in lockstep is what
+// made level 4 unpassable before. Proportional above the floor, absolute
+// below it, and never looser than the general tolerance.
+function endTol(i){
+  const L=SEGLEN[i]; if(!L) return R_ON();
+  return Math.max(END_MIN, Math.min(R_ON(), TAIL_FRAC*L));
+}
 function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];
   if(!seg) return;
   // How far the pen has actually travelled. A correct trace runs
@@ -383,7 +400,7 @@ function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];
     // keeps going, which is what running two strokes together
     // actually looks like.
     const e=PATH[seg[1]];
-    if(Math.hypot(n.x-e.x,n.y-e.y)<R_ON()*1.6){ q.on=true; return; }
+    if(Math.hypot(n.x-e.x,n.y-e.y)<endTol(segIdx)*1.6){ q.on=true; return; }
     q.on=false; offCount++;
     if(offCount===1) toast('lift the pen — the next stroke is separate');
     if(offCount%14===1) zap(q); return; }
@@ -410,8 +427,8 @@ function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];
     // level 0 and 67% by level 12: the smaller the glyph, the
     // more of the hook could be skipped. A distance is
     // scale-invariant; an index count is not.
-    if(prog>=seg[1]-END_SLACK
-       && Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y)<R){ prog=seg[1];
+    if(prog>=seg[1]-SEGSLACK[segIdx]
+       && Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y)<endTol(segIdx)){ prog=seg[1];
       if(segIdx>=SEGS.length-1){
         const cov=covered(), eff=PATHLEN?travel/PATHLEN:1;
         if(cov>=COVER_MIN&&eff<=MAX_TRAVEL){ runeUI(); drawGuide(); conjure(); return; }
@@ -574,6 +591,14 @@ function load(i){ idx=(i+LETTERS.length)%LETTERS.length; dropPen(); done=false; 
   hit=new Uint8Array(PATH.length); travel=0; lastN=null;
   PATHLEN=0; for(const g of SEGS) for(let i=g[0];i<g[1];i++)
     PATHLEN+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y);
+  // Each stroke's own length, because endpoint forgiveness has to be
+  // measured against the stroke it belongs to and not against the
+  // canvas. SEGSLACK is the same fraction expressed in path points,
+  // which works because resample() spaces them evenly by arc length.
+  SEGLEN=SEGS.map(g=>{ let L=0; for(let i=g[0];i<g[1];i++)
+    L+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y); return L; });
+  SEGSLACK=SEGS.map(g=>Math.max(1,Math.min(END_SLACK,
+    Math.round(TAIL_FRAC*(g[1]-g[0])))));
   $('badge').textContent=mode==='record'?`recording · ${curFont().loaded===false?'device font':curFont().label}`:(rec?`teacher guide · ${curFont().loaded===false?'device font':curFont().label}`:`no recording yet · ${curFont().loaded===false?'device font':curFont().label}`);
   $('powerLbl').textContent=mode==='record'?'teacher':'spell power';
   $('watch').disabled=!rec;
@@ -594,7 +619,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.12');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.13');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.</div>

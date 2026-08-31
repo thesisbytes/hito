@@ -24,6 +24,10 @@ for f in dist/hiragana-*.html; do
 done
 
 echo
+echo "── tail (a stroke's end cannot be skipped) ─────────"
+node build/test/tail.test.mjs "dist/hiragana-v$ver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── size (an honest trace passes at every size) ─────"
 # Only the current build, and only the verdict. The full glyph x size table is
 # what you want when investigating, not when shipping:

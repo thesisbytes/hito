@@ -47,7 +47,16 @@ which a kana-only subset does not contain, so every font reported as blocked.
 | `strictFollow` | `false` | Enforce stroke order, require a pen lift between strokes, and require the path actually be traced. Off means the original permissive scoring. |
 | `coverThreshold` | `0.85` | Fraction of path points the pen must pass near. Guards against reaching the end without tracing the middle. |
 | `maxTravel` | `2.5` | Cap on pen distance ÷ path length. An honest trace runs about 1.0×; scribbles run 30–120×. This is what stops a scribble on single-stroke glyphs, which have no lift barrier. |
+| `tailFraction` | `0.12` | How much of a stroke's own length counts as "at the end". Endpoint forgiveness is a fraction of the stroke it belongs to, never a fixed radius. |
+| `minEndTolerance` | `0.02` | Absolute floor under `tailFraction`, as a fraction of canvas. A hand cannot land inside a few pixels, and shrinking the target and the tolerance together is what made level 4 unpassable in v0.1.5. |
 | `sequentialReveal` | `false` | Light one stroke at a time. Requires `strictFollow`. |
+
+A stroke's tail is where its hook is, and forgiving hooks is the reason this
+pack takes stroke data from KanjiVG rather than a font. v0.1.9 replaced a flat
+index count with a distance test for exactly that reason — then the distance
+was itself a flat radius, which is the same pixels on a 300px stroke and a
+21px one. Measured only at full size, it looked fine; at the 0.32 floor it was
+forgiving a third of the short strokes. Both halves are now proportional.
 
 ### Practice grid
 

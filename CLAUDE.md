@@ -108,7 +108,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.12.html`
+### Hiragana — `dist/hiragana-v0.1.13.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -310,6 +310,34 @@ scribe. This is mechanical rather than sentimental: the player starts unable
 to read, so the hero's ignorance is the player's ignorance and every glyph
 they learn, the player learns. A scribe already knows the characters, which
 makes the fiction and the mechanics tell opposite stories.
+
+**DECIDED — the screen splits: you draw below, the battle happens above.**
+The bottom third is the input surface and nothing else. The top two thirds is
+the field: farang monsters advance from the edges toward a centre you are
+protecting, each carrying a speech bubble with the sign you have to answer.
+Upgrade tabs come later and belong to the shell, not the field.
+
+Two things follow from the split, and both were already decided for other
+reasons:
+
+- The pen never chases anything. Monsters move in the top two thirds; the
+  hand works in the bottom third, on a surface that never scrolls or scales
+  under it. This is what "you identify, you do not aim" needs in order to
+  hold — tracing accuracy survives a moving screen only if the tracing area
+  does not move.
+- The sign lives in the bubble, so the open kana-or-romaji question is a
+  property of one text field rather than of the layout. It can be flipped per
+  difficulty, or per monster, without redrawing anything.
+
+The monsters being farang is the same joke as the hero who cannot read: the
+player is the one who cannot read the sign yet.
+
+**The current single-canvas screen is the workshop, not the game.** Everything
+in `dist/hiragana-*.html` today — the gojūon chart, the stroke controls, the
+size ladder, the flag button — is the instrument this project uses on itself.
+The game does not look like it. That is a deliberate split rather than a
+redesign pending: the workshop wants every control visible at once, and the
+game wants almost none of them.
 
 **Sketched, not decided:**
 

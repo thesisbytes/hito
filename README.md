@@ -16,7 +16,7 @@ a font by hand, kids finding bugs — all lean on each other, and so will you.
 Each realm ships as a single HTML file. No install, no server, no
 dependencies. Open it on a tablet and start tracing:
 
-**[Try hiragana](https://thesisbytes.github.io/hito/dist/hiragana-v0.1.12.html)**
+**[Try hiragana](https://thesisbytes.github.io/hito/dist/hiragana-v0.1.13.html)**
 
 ## How the tracing works
 

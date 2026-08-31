@@ -207,8 +207,11 @@ def main():
               r"let PATH=\[\],SEGEND=new Set\(\),prog=0,offCount=0;",
               "let PATH=[],SEGEND=new Set(),prog=0,offCount=0;\n"
               "let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;"
+              "let SEGLEN=[],SEGSLACK=[];"
               f"const COVER_MIN={pack.get('coverThreshold', 0.85)},END_SLACK=4,"
-              f"MAX_TRAVEL={pack.get('maxTravel', 2.5)},TRAVEL_EPS=0.006;")
+              f"MAX_TRAVEL={pack.get('maxTravel', 2.5)},TRAVEL_EPS=0.006,"
+              f"TAIL_FRAC={pack.get('tailFraction', 0.12)},"
+              f"END_MIN={pack.get('minEndTolerance', 0.02)};")
 
         s.sub("build segments",
               r"if\(rec\)\{ rec\.forEach\(st=>\{ const R=resample\(st,"
@@ -220,7 +223,15 @@ def main():
               " PATH.push(...R); SEGEND.add(PATH.length-1); SEGS.push([a,PATH.length-1]); }); }\n"
               "  hit=new Uint8Array(PATH.length); travel=0; lastN=null;\n"
               "  PATHLEN=0; for(const g of SEGS) for(let i=g[0];i<g[1];i++)\n"
-              "    PATHLEN+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y);")
+              "    PATHLEN+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y);\n"
+              "  // Each stroke's own length, because endpoint forgiveness has to be\n"
+              "  // measured against the stroke it belongs to and not against the\n"
+              "  // canvas. SEGSLACK is the same fraction expressed in path points,\n"
+              "  // which works because resample() spaces them evenly by arc length.\n"
+              "  SEGLEN=SEGS.map(g=>{ let L=0; for(let i=g[0];i<g[1];i++)\n"
+              "    L+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y); return L; });\n"
+              "  SEGSLACK=SEGS.map(g=>Math.max(1,Math.min(END_SLACK,\n"
+              "    Math.round(TAIL_FRAC*(g[1]-g[0])))));")
 
         s.sub("strict follow",
               r"function follow\(q,down\)\{ const n=norm\(q\); let best=-1,bd=R_ON\(\);\n"
@@ -233,6 +244,23 @@ def main():
               r"    runeUI\(\); drawGuide\(\); if\(prog>=PATH\.length-2\) conjure\(\); return; \}",
               "function covered(){ if(!hit) return 0; let c=0;"
               " for(let i=0;i<hit.length;i++) c+=hit[i]; return c/hit.length; }\n"
+              "// How near the end of a stroke counts as having reached it.\n"
+              "//\n"
+              "// This was a flat R_ON(), and a flat radius means the same pixels on a\n"
+              "// 300px stroke and on a 21px one. As the glyph shrinks it therefore\n"
+              "// swallows the short strokes whole: at the 0.32 floor, R_ON is 86% of\n"
+              "// the length of お's third stroke. Hooks live at stroke ends, and\n"
+              "// forgiving hooks is the exact failure this pack uses KanjiVG to avoid.\n"
+              "//\n"
+              "// So it is a fraction of the stroke's own length — but floored in\n"
+              "// absolute terms as well, because no hand lands inside a few pixels and\n"
+              "// shrinking the target and the tolerance together in lockstep is what\n"
+              "// made level 4 unpassable before. Proportional above the floor, absolute\n"
+              "// below it, and never looser than the general tolerance.\n"
+              "function endTol(i){\n"
+              "  const L=SEGLEN[i]; if(!L) return R_ON();\n"
+              "  return Math.max(END_MIN, Math.min(R_ON(), TAIL_FRAC*L));\n"
+              "}\n"
               "function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];\n"
               "  if(!seg) return;\n"
               "  // How far the pen has actually travelled. A correct trace runs\n"
@@ -253,7 +281,7 @@ def main():
               "    // keeps going, which is what running two strokes together\n"
               "    // actually looks like.\n"
               "    const e=PATH[seg[1]];\n"
-              "    if(Math.hypot(n.x-e.x,n.y-e.y)<R_ON()*1.6){ q.on=true; return; }\n"
+              "    if(Math.hypot(n.x-e.x,n.y-e.y)<endTol(segIdx)*1.6){ q.on=true; return; }\n"
               "    q.on=false; offCount++;\n"
               "    if(offCount===1) toast('lift the pen — the next stroke is separate');\n"
               "    if(offCount%14===1) zap(q); return; }\n"
@@ -281,8 +309,9 @@ def main():
               "    // level 0 and 67% by level 12: the smaller the glyph, the\n"
               "    // more of the hook could be skipped. A distance is\n"
               "    // scale-invariant; an index count is not.\n"
-              "    if(prog>=seg[1]-END_SLACK\n"
-              "       && Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y)<R){ prog=seg[1];\n"
+              "    if(prog>=seg[1]-SEGSLACK[segIdx]\n"
+              "       && Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y)<endTol(segIdx)){"
+              " prog=seg[1];\n"
               "      if(segIdx>=SEGS.length-1){\n"
               "        const cov=covered(), eff=PATHLEN?travel/PATHLEN:1;\n"
               "        if(cov>=COVER_MIN&&eff<=MAX_TRAVEL){"
