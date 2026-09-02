@@ -125,7 +125,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.20.html`
+### Hiragana — `dist/hiragana-v0.1.21.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -370,6 +370,16 @@ resolution independent and rotating a tablet changes nothing. Encounter rate
 is biased toward glyphs whose mastery has gone quiet — a monster is a
 character you are forgetting, which is the spaced-repetition design already
 written into the lore.
+
+**Hitodama (v0.1.21)** is the first piece of the economy in play. Every
+finished glyph kindles a ghost light (人魂) on its character, and a lit
+character throws its own wisp at any monster carrying it, one charge per
+cast. The tracer is pointed at the nearest *dark* character, so the hand goes
+where the flame is out — which is the spaced-repetition design doing its job
+without a schedule. A dash on the seam between field and sketchbook shows the
+loaded character and its charge. Keyed by character, kept in localStorage,
+and it survives the ward falling. Tuning lives in `field.hitodama*` and
+`field.castMs`; see `scripts/PACK.md`.
 
 **The current single-canvas screen is the workshop, not the game.** Everything
 in `dist/hiragana-*.html` today — the gojūon chart, the stroke controls, the

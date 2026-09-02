@@ -67,7 +67,10 @@ const ok = (c, m) => { if (!c) { console.log(`  FAIL: ${m}`); fail++; } };
 // and one left over from an earlier block will fire inside a later one and
 // force exactly the reload that block is checking does not happen. This cost
 // a wrong diagnosis once already.
-const fresh = () => { timers = []; F.restart(); T += 100; };
+// Quench the ghost lights too: a lit character answers its own monsters, and
+// a charge left over from an earlier block would kill something a later block
+// is counting on to still be there.
+const fresh = () => { timers = []; F.restart(); F.quench(); T += 100; };
 
 const advance = (ms, stepMs = 16) => {
   for (let e = T + ms; T < e; ){
@@ -130,7 +133,10 @@ ok(F.target === mine,
    'the target changed while it was being answered — a closer monster stole it');
 ok(P.idx === mine.i, 'the tracer followed the thief instead of the locked target');
 globalThis.conjure();
-ok(F.shots.length === 1 && F.shots[0].to === mine,
+// By character, not identity: a finished glyph hits whichever monster carries
+// it, nearest first, and the spawn is random enough that one of the shoved
+// monsters carries the same character every twenty runs or so.
+ok(F.shots.length === 1 && P.LETTERS[F.shots[0].to.i][0] === P.LETTERS[mine.i][0],
    'the shot went to a monster other than the one whose glyph was traced');
 
 // ---- tapping picks a different one
@@ -159,6 +165,31 @@ ok(F.target && P.idx === F.target.i,
    + `but the target carries ${F.target ? P.LETTERS[F.target.i][0] : '-'}`);
 ok(cfg.advanceMs < 1900,
    `advance delay is ${cfg.advanceMs}ms — the engine's 1.9s celebration is dead time under a clock`);
+
+// ---- two of the same in a row do not strand the tracer in its celebration
+// retarget() used to return early whenever the target's glyph was already
+// loaded, which after a conjure meant `done` stayed set until the engine's
+// own 1.9s timer — dead time exactly when two monsters carrying the same
+// character arrive together.
+fresh();
+{
+  F.spawn();
+  const twin = F.monsters.find(m => m !== F.target);
+  if (twin){
+    twin.i = F.target.i;
+    // restart() leaves spawnAt at 0, so the first frame adds a third monster;
+    // let it arrive, then send it away so only the twin can be next.
+    advance(50);
+    for (const m of [...F.monsters]) if (m !== F.target && m !== twin) F.monsters.splice(F.monsters.indexOf(m), 1);
+    globalThis.conjure();
+    // The conjure kindles the character, and a wisp would take the twin, empty
+    // the field, and let the refill clear `done` for the wrong reason.
+    F.quench();
+    advance(cfg.advanceMs + 120);
+    ok(!P.done, 'after a conjure the next target carried the same glyph and the tracer stayed in its celebration');
+    ok(F.target && P.idx === F.target.i, 'the tracer is not on the twin');
+  }
+}
 
 // ---- the cached trail is dropped when the glyph changes
 // The cache is keyed on prog, and load() resets prog to 0 — so switching from
@@ -266,6 +297,98 @@ fresh();
   ok(P.prog === 0, `after a fizzle prog is ${P.prog} — the glyph did not restart`);
 }
 
+// ---- hitodama: a traced character lights, and a lit character defends itself
+// The idle economy's potency stat with teeth: every trace kindles the
+// character, and a lit character throws its own wisp at any monster carrying
+// it, spending one charge per cast. The hand is pushed toward the characters
+// whose flame is out, which are exactly the ones that need practice.
+fresh();
+{
+  const drew = P.LETTERS[P.idx][0];
+  ok(F.charge(drew) === 0, 'a fresh run starts with a lit character');
+  globalThis.conjure();
+  const clean = F.charge(drew);
+  ok(clean >= 1, `tracing ${drew} left its charge at ${clean} — nothing was kindled`);
+  advance(cfg.advanceMs + 600);
+  // a scrappy trace pays less than a clean one
+  F.quench();
+  const drew2 = P.LETTERS[P.idx][0];
+  globalThis.zap({x:10, y:10});
+  globalThis.conjure();
+  ok(F.charge(drew2) < clean,
+     `a zapped trace kindled ${F.charge(drew2)}, a clean one ${clean} — clean does not pay more`);
+  advance(cfg.advanceMs + 600);
+}
+
+// a lit character answers its own monster, without the pen
+fresh();
+{
+  F.spawn(); F.spawn();
+  const m = F.monsters[F.monsters.length - 1];
+  const ch = P.LETTERS[m.i][0];
+  // point the tracer somewhere else so the lock is not on this one
+  for (const o of F.monsters) if (o !== m) { const p = F.posOf(o); F.pick(p.x, p.y-14); break; }
+  F.kindle(ch, 2);
+  const c0 = F.charge(ch), k0 = F.killed;
+  // The wisp lands at ~385ms and is gone from `shots` once it has. Look for it
+  // while it is still in the air — asserting on it after a full second is the
+  // same mistake the shot-timing test made once already.
+  advance(100);
+  const auto = F.shots.find(s => s.auto);
+  ok(auto, 'a lit character did not throw a wisp at its own monster');
+  ok(!auto || P.LETTERS[auto.to.i][0] === ch, 'the wisp flew at a monster carrying a different character');
+  ok(F.charge(ch) === c0 - 1, `the cast spent ${c0 - F.charge(ch)} charge(s), expected 1`);
+  advance(600);
+  ok(F.killed === k0 + 1, 'the wisp did not banish the monster');
+}
+
+// an unlit character does not, and the pen is pointed at it
+// The lock holds through a retarget, so nearest() is only consulted once the
+// lock is gone: let the current target breach the ward, with a lit monster
+// nearer than an unlit one, and see which the tracer is pointed at after.
+fresh();
+{
+  F.spawn(); F.spawn(); F.spawn();
+  const A = F.target;
+  const [B, C] = F.monsters.filter(m => m !== A);
+  if (B && C && P.LETTERS[B.i][0] !== P.LETTERS[C.i][0]){
+    B.d = 0.5; C.d = 0.8;
+    F.kindle(P.LETTERS[B.i][0], 3);
+    A.d = 0.07;
+    advance(300);   // ~180ms to close from 0.07 to the 0.06 breach line
+    ok(!F.monsters.includes(A), 'test setup: the old target should have breached');
+    ok(F.target === C,
+       `after the breach the tracer went to ${F.target === B ? 'the lit, nearer' : 'an unexpected'} monster, not the unlit one`);
+  }
+  const dark = F.target;
+  if (F.charge(P.LETTERS[dark.i][0]) === 0){
+    advance(cfg.castMs * 3);
+    ok(F.monsters.includes(dark) || F.ward < cfg.wardHp,
+       'an unlit monster was banished without a trace');
+    ok(!F.shots.some(s => s.auto && s.to === dark), 'a wisp flew at an unlit character');
+  }
+}
+
+// the one under the pen is yours: no wisp at the locked target mid-trace
+fresh();
+{
+  const mine = F.target;
+  const ch = P.LETTERS[mine.i][0];
+  F.kindle(ch, 3);
+  P.setProg(4);
+  advance(cfg.castMs * 2 + 100);
+  ok(F.monsters.includes(mine) && !F.shots.some(s => s.auto && s.to === mine),
+     'a wisp took the monster the hand was answering');
+  P.setProg(0);
+}
+
+// the charge is capped
+fresh();
+{
+  F.kindle('あ', 999);
+  ok(F.charge('あ') === cfg.hitodamaCap, `charge went to ${F.charge('あ')}, cap is ${cfg.hitodamaCap}`);
+}
+
 // ---- monsters actually advance
 const d0 = F.target.d;
 advance(2000);
@@ -283,6 +406,9 @@ fresh();
 const victim = F.target, before = F.killed;
 ok(victim, 'no target after restart');
 globalThis.conjure();
+// The conjure also kindles the character, and every forty runs or so a second
+// monster carries it and a wisp would make this two banishments, not one.
+F.quench();
 ok(F.shots.length === 1, `conjure fired ${F.shots.length} shots, expected 1`);
 ok(F.shots[0].to === victim, 'the shot is aimed at something other than the target');
 advance(1200);

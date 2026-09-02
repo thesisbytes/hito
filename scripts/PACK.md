@@ -92,6 +92,10 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 | `field.spawnMs` | `5200` | Gap between spawns, falling by `spawnRamp` each wave down to `spawnMin`. |
 | `field.advanceMs` | `460` | Delay before the next target loads after a glyph is finished. The engine celebrates for 1.9s before advancing on its own, which is dead time under a clock — a fast hand finishes the next glyph before it exists. |
 | `field.reading` | `both` | What blooms where a monster falls. `romaji`, `gaijin`, `both` (the reading with the mispronunciation under it), or `off`. Tracing a shape teaches the shape and nothing else: a hand can learn every stroke of ぬ without the sound ever arriving. Success is where attention is highest, so that is where the reading goes. |
+| `field.hitodamaGain` | `1` | Ghost lights a finished glyph kindles on its character. See *Hitodama* below. |
+| `field.cleanBonus` | `1` | Extra ghost lights for a trace with no zaps. Clean pays more, as the economy design says it should. |
+| `field.hitodamaCap` | `6` | The most a character can hold. Tracing past it is not wasted (mastery still counts), it just does not bank. |
+| `field.castMs` | `900` | Cooldown between wisps. One at a time, so a swarm of three ぬ is answered visibly rather than vanishing in a frame. |
 | `field.fizzleRestarts` | `true` | Put the glyph back to the start after a fizzle. `fizzle()` already clears the ink but only rewinds progress halfway, leaving an empty canvas with credit for a path that is no longer visible — and under a clock there is no time to work out where the middle was. |
 
 Both shells build from the same pack directory — pass a `.json` file to
@@ -114,6 +118,27 @@ monsters. It cannot
 be "whichever is nearest right now": monsters advance while you trace, so one
 would overtake yours mid-glyph and the finished character would kill the
 newcomer instead. What you are answering must not change underneath the answer.
+
+### Hitodama
+
+Every finished glyph *kindles* its character: a hitodama (人魂, a ghost
+light) is lit over it, and a lit character defends itself. When a monster
+carrying it appears, a wisp flies from the dash on its own and one charge
+burns down. Trace ぬ twice and the next few ぬ die without the pen.
+
+This is the economy's potency stat given teeth before the economy exists.
+It also does the spaced-repetition job in play: the tracer is pointed at the
+nearest monster whose character is *dark*, because a lit one will be answered
+by its wisp, so the hand is pushed toward exactly the characters that need
+practice. The monster under the pen is never taken by a wisp mid-trace — the
+one you are answering is yours.
+
+The dash sits on the seam between field and sketchbook and shows the
+character loaded in the sketchbook with its charge as a row of flames. A
+small teal light on a monster's bubble means its character is lit and it
+will be handled. Charge is keyed by character, persists in localStorage, and
+survives the ward falling: it is what was learned, and losing a run does not
+unlearn anything. A trace with nothing to hit is banked, not wasted.
 
 The split screen is what makes real-time movement safe. Monsters march
 continuously because they never share space with the pen: the sketchbook is a

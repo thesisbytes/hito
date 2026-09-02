@@ -7,6 +7,14 @@ third is the sketchbook and never moves, and the top two thirds is the field:
 farang advance on a centre you are protecting, each carrying the sign you have
 to answer. Finish the glyph and it flies up and hits them.
 
+A finished glyph also *kindles* it: every clean trace of a character lights a
+hitodama (人魂, a ghost light) over that character, and a lit character
+defends itself. When a monster carrying it appears, a wisp flies on its own
+and the charge burns down by one. Trace ぬ three times and the next few ぬ
+die without the pen. This is the idle economy's potency stat given teeth
+before the economy exists: the hand is pushed toward the characters whose
+flame is out, which are exactly the ones that need practice.
+
 The split is what makes real-time movement safe. Monsters can march
 continuously because they never share space with the pen: the drawing surface
 is a fixed rectangle that does not scroll, scale or reflow while the field
@@ -88,6 +96,53 @@ LAYER = STYLE + r"""
   let ward = CFG.wardHp, over = false, wave = 0, killed = 0;
   let spawnAt = 0, tPrev = 0;
 
+  // ---- hitodama
+  // A ghost light per character, keyed by the character itself (a codepoint,
+  // never a grid index — words and future scripts write to the same ledger).
+  // Tracing kindles it; a monster carrying the character spends it. Kept in
+  // localStorage rather than a run, because it is what was learned, and the
+  // ward falling does not unlearn anything.
+  const HKEY = 'hito-hitodama';
+  let HITODAMA = {};
+  try { HITODAMA = JSON.parse(localStorage.getItem(HKEY) || '{}') || {}; } catch(_){ HITODAMA = {}; }
+  function saveH(){ try { localStorage.setItem(HKEY, JSON.stringify(HITODAMA)); } catch(_){} }
+  const charge = ch => HITODAMA[ch] || 0;
+  function kindle(ch, n){
+    HITODAMA[ch] = Math.min(CFG.hitodamaCap, charge(ch) + n);
+    saveH();
+    try { window.__sync && window.__sync.record('kindle', { glyph: ch, charge: HITODAMA[ch] }); } catch(_){}
+    return HITODAMA[ch];
+  }
+  function quench(){ HITODAMA = {}; saveH(); }
+  // Zaps during the attempt, so a clean trace can pay more than a scrappy one.
+  // conjure() does not say how it went; zap() is the only global that does.
+  let zapped = 0;
+  const _zap = window.zap;
+  window.zap = function(){ zapped++; return _zap.apply(this, arguments); };
+
+  // A lit character throws its own wisp. One at a time, on a cooldown, so a
+  // swarm of three ぬ is answered visibly rather than vanishing in a frame.
+  // Never at the monster the hand is answering right now: that one is yours.
+  let castAt = 0;
+  function dash(){ return { x: cx(), y: FH - 14 }; }
+  function autocast(now){
+    if (now - castAt < CFG.castMs) return null;
+    let best = null;
+    for (const m of monsters){
+      if (charge(LETTERS[m.i][0]) < 1) continue;
+      if (m === locked && tracing()) continue;
+      if (shots.some(s => s.to === m)) continue;
+      if (!best || m.d < best.d) best = m;
+    }
+    if (!best) return null;
+    const ch = LETTERS[best.i][0];
+    HITODAMA[ch] = charge(ch) - 1; saveH();
+    shots.push({ from: dash(), to: best, t: 0, ch, auto: true });
+    castAt = now;
+    try { window.__sync && window.__sync.record('cast', { glyph: ch, left: HITODAMA[ch] }); } catch(_){}
+    return best;
+  }
+
   // Three ways a monster can ask. kana tests recall of the shape; romaji tests
   // the reading, which is the direction that actually matters; gaijin asks in
   // the learner's own broken accent, which is the same joke as the hero who
@@ -125,10 +180,16 @@ LAYER = STYLE + r"""
   // You drew あ and something carrying ぬ died for it. What you are answering
   // cannot be allowed to change underneath the answer.
   let locked = null;
+  // The hand goes where the flame is out. A monster carrying a lit character
+  // will be answered by its own wisp, so the tracer is pointed at the nearest
+  // one that will not — which is the character that actually needs practice.
   function nearest(){
-    let best = null;
-    for (const m of monsters) if (!best || m.d < best.d) best = m;
-    return best;
+    let best = null, dark = null;
+    for (const m of monsters){
+      if (!best || m.d < best.d) best = m;
+      if (charge(LETTERS[m.i][0]) < 1 && (!dark || m.d < dark.d)) dark = m;
+    }
+    return dark || best;
   }
   function target(){
     if (locked && monsters.includes(locked)) return locked;
@@ -162,6 +223,7 @@ LAYER = STYLE + r"""
   const _load = window.load;
   let loading = false;
   window.load = function(i){
+    zapped = 0;
     if (loading) return _load.apply(this, arguments);
     const t = targetIdx();
     return _load.call(this, t === null ? i : t);
@@ -180,9 +242,15 @@ LAYER = STYLE + r"""
   function retarget(force){
     if (locked && !monsters.includes(locked)) locked = null;
     const t = targetIdx();
-    if (t === null || t === idx) { pendingRetarget = false; return; }
+    // Already on the right glyph is only a reason to do nothing if the tracer
+    // is live on it. After a conjure `done` is set, and if the next target
+    // happens to carry the same character the old early return left the
+    // tracer sitting in its celebration until the engine's own 1.9s timer
+    // fired — a dead spot precisely when two of the same arrive together.
+    if (t === null || (t === idx && !done)) { pendingRetarget = false; return; }
     if (!force && tracing()){ pendingRetarget = true; return; }
     pendingRetarget = false;
+    zapped = 0;
     loading = true; try { _load(t); } finally { loading = false; }
   }
 
@@ -208,6 +276,14 @@ LAYER = STYLE + r"""
       shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:drew});
       if (navigator.vibrate) navigator.vibrate([12,30,40]);
     }
+    // And the character is kindled whether or not anything carried it — a
+    // trace with nothing to hit is banked, not wasted. Clean pays more.
+    const gain = CFG.hitodamaGain + (zapped ? 0 : CFG.cleanBonus);
+    kindle(drew, gain);
+    const d = dash();
+    for (let k=0;k<14;k++)
+      motes.push({x:d.x, y:d.y, vx:(Math.random()-.5)*1.8, vy:-Math.random()*2.2,
+                  life:1, wisp:true});
     const r = _conjure.apply(this, arguments);
     // The engine celebrates for 1.9s before advancing, which is dead time in a
     // game with a clock running — a fast hand finishes the next glyph before
@@ -284,6 +360,7 @@ LAYER = STYLE + r"""
           if (ward <= 0){ over = true; toast('the ward falls ✦ tap to begin again'); }
         }
       }
+      autocast(now);
       for (const s of shots){
         s.t += dt*2.6;
         if (s.t >= 1){ hit(s.to); }
@@ -360,6 +437,14 @@ LAYER = STYLE + r"""
       g.fillStyle = isT ? '#bdf0e6' : 'rgba(226,232,240,.8)';
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(label, p.x, by-2);
+      // a lit character: its own wisp will answer this one
+      if (charge(LETTERS[m.i][0]) >= 1){
+        g.save();
+        g.shadowColor = 'rgba(127,209,196,.9)'; g.shadowBlur = 10;
+        g.fillStyle = 'rgba(160,230,215,.95)';
+        g.beginPath(); g.arc(p.x + w/2 + 2, by-14, 3.2, 0, 6.284); g.fill();
+        g.restore();
+      }
     }
 
     // the glyph in flight
@@ -369,12 +454,33 @@ LAYER = STYLE + r"""
       const x = s.from.x + (p.x - s.from.x)*e;
       const y = s.from.y + (p.y - s.from.y)*e - Math.sin(t*Math.PI)*46;
       g.save();
-      g.globalAlpha = 0.9;
-      g.shadowColor = 'rgba(233,196,106,.9)'; g.shadowBlur = 18;
-      g.fillStyle = '#ffe9a8';
-      g.font = '700 26px ui-sans-serif,system-ui,"Klee One",sans-serif';
-      g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText(s.ch, x, y);
+      if (s.auto){
+        // the ghost light, cold and trailing, the character faint inside it
+        for (let k=3;k>=1;k--){
+          const tt = Math.max(0, t - k*0.05), ee = tt*tt*(3-2*tt);
+          const tx = s.from.x + (p.x - s.from.x)*ee;
+          const ty = s.from.y + (p.y - s.from.y)*ee - Math.sin(tt*Math.PI)*46;
+          g.globalAlpha = 0.28 - k*0.07;
+          g.fillStyle = 'rgba(127,209,196,1)';
+          g.beginPath(); g.arc(tx, ty, 9 - k*1.5, 0, 6.284); g.fill();
+        }
+        g.globalAlpha = 0.95;
+        g.shadowColor = 'rgba(127,209,196,.95)'; g.shadowBlur = 22;
+        g.fillStyle = 'rgba(190,240,228,.9)';
+        g.beginPath(); g.ellipse(x, y, 11, 13, 0, 0, 6.284); g.fill();
+        g.shadowBlur = 0;
+        g.fillStyle = 'rgba(20,40,40,.9)';
+        g.font = '700 15px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText(s.ch, x, y+1);
+      } else {
+        g.globalAlpha = 0.9;
+        g.shadowColor = 'rgba(233,196,106,.9)'; g.shadowBlur = 18;
+        g.fillStyle = '#ffe9a8';
+        g.font = '700 26px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText(s.ch, x, y);
+      }
       g.restore();
     }
 
@@ -397,10 +503,43 @@ LAYER = STYLE + r"""
     }
     for (const p of motes){
       g.globalAlpha = Math.max(0, p.life);
-      g.fillStyle = '#ffe9a8';
+      g.fillStyle = p.wisp ? '#a8ecdc' : '#ffe9a8';
       g.fillRect(p.x, p.y, 2, 2);
     }
     g.globalAlpha = 1;
+
+    // ---- the hitodama dash: the character in the sketchbook and how many
+    // ghost lights it holds. Sits on the seam between field and sketchbook,
+    // which is where the wisps set out from.
+    {
+      const ch = LETTERS[idx][0], c = charge(ch), cap = CFG.hitodamaCap;
+      const d = dash();
+      const pipW = 14, w = 58 + cap*pipW;
+      const x0 = d.x - w/2;
+      g.fillStyle = 'rgba(16,22,24,.78)';
+      g.strokeStyle = c >= 1 ? 'rgba(127,209,196,.45)' : 'rgba(233,196,106,.16)';
+      g.lineWidth = 1;
+      g.beginPath();
+      if (g.roundRect) g.roundRect(x0, d.y-13, w, 26, 13); else g.rect(x0, d.y-13, w, 26);
+      g.fill(); g.stroke();
+      g.textBaseline = 'middle';
+      g.fillStyle = c >= 1 ? '#bdf0e6' : 'rgba(226,232,240,.75)';
+      g.font = '700 17px ui-sans-serif,system-ui,"Klee One",sans-serif';
+      g.textAlign = 'left';
+      g.fillText(ch, x0 + 11, d.y + 1);
+      g.font = '10px ui-sans-serif,system-ui';
+      g.fillStyle = 'rgba(160,190,185,.7)';
+      g.fillText('人魂', x0 + 32, d.y + 1);
+      const flick = 0.75 + 0.25*Math.sin(performance.now()/160);
+      for (let k=0;k<cap;k++){
+        const px = x0 + 58 + k*pipW + 4, lit = k < c;
+        g.save();
+        if (lit){ g.shadowColor = 'rgba(127,209,196,.95)'; g.shadowBlur = 9*flick; }
+        g.fillStyle = lit ? 'rgba(170,236,220,.95)' : 'rgba(127,209,196,.14)';
+        g.beginPath(); g.ellipse(px, d.y, 3.4, lit ? 4.6*flick+1 : 3.4, 0, 0, 6.284); g.fill();
+        g.restore();
+      }
+    }
 
     g.fillStyle = 'rgba(233,196,106,.55)';
     g.font = '12px ui-sans-serif,system-ui'; g.textAlign = 'left';
@@ -411,7 +550,7 @@ LAYER = STYLE + r"""
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
     ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
-    spawnAt = 0; tPrev = 0; spawn(); retarget();
+    spawnAt = 0; tPrev = 0; castAt = 0; spawn(); retarget();
   }
   fc.addEventListener('pointerdown', e => {
     if (over){ restart(); return; }
@@ -431,6 +570,8 @@ LAYER = STYLE + r"""
     get locked(){ return locked; },
     get pending(){ return pendingRetarget; },
     get readings(){ return readings; },
+    get hitodama(){ return HITODAMA; },
+    charge, kindle, quench, autocast,
     bearer,
     spawn, restart, retarget, pick,
     posOf: px,
@@ -492,6 +633,10 @@ def config(pack):
         f"spawnMin:{int(f.get('spawnMin', 1800))},"
         f"advanceMs:{int(f.get('advanceMs', 460))},"
         f"reading:{reading!r},"
-        f"fizzleRestarts:{'true' if f.get('fizzleRestarts', True) else 'false'}"
+        f"fizzleRestarts:{'true' if f.get('fizzleRestarts', True) else 'false'},"
+        f"hitodamaGain:{int(f.get('hitodamaGain', 1))},"
+        f"cleanBonus:{int(f.get('cleanBonus', 1))},"
+        f"hitodamaCap:{int(f.get('hitodamaCap', 6))},"
+        f"castMs:{int(f.get('castMs', 900))}"
         "};</script>"
     ).replace("'", '"')

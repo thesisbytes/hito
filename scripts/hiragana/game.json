@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "version": "0.1.20",
-  "title": "hito 人 · hiragana · v0.1.20",
+  "version": "0.1.21",
+  "title": "hito 人 · hiragana · v0.1.21",
   "brand": "hito 人",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -55,7 +55,11 @@
     "spawnMin": 1800,
     "advanceMs": 460,
     "reading": "both",
-    "fizzleRestarts": true
+    "fizzleRestarts": true,
+    "hitodamaGain": 1,
+    "cleanBonus": 1,
+    "hitodamaCap": 6,
+    "castMs": 900
   },
   "sync": {
     "endpoint": "",
