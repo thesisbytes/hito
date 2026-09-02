@@ -216,19 +216,22 @@ F.retarget(true);
     fol(den(P.PATH[b]));
     ok(P.prog === b && (P.awaitLift || P.done), `dragging the light to the end did not finish the stroke (prog ${P.prog} of ${b})`);
   } else ok(false, 'no stroke on this glyph is long enough to test a chord');
-  // and nothing is cast or kindled here
+  // and nothing is cast or kindled here. A lit monster that is not the
+  // target, so the check is on the charge (a wisp would spend one) rather
+  // than on a shot that would have landed and gone, and nothing else on the
+  // field is trying to kill it.
   F.quench();
   fresh(); F.setDifficulty('guided');
+  F.spawn();
+  const other = F.monsters.find(m => m !== F.target) || F.target;
+  const lit = P.LETTERS[other.i][0];
+  F.kindle(lit, 3);
+  advance(cfg.castMs * 2);
+  ok(F.charge(lit) === 3, `a wisp flew in guided (charge ${F.charge(lit)} of 3)`);
+  F.quench();
   const drew = P.LETTERS[P.idx][0];
   globalThis.conjure();
   ok(F.charge(drew) === 0, 'a guided trace kindled the character');
-  // a lit target is not answered by a wisp here: the charge is not spent
-  // (the wisp itself would have landed and gone by the time it was looked for)
-  F.spawn();
-  const lit = P.LETTERS[F.target.i][0];
-  F.kindle(lit, 3);
-  advance(cfg.castMs * 2);
-  ok(F.charge(lit) === 3 && !F.shots.some(s => s.auto), `a wisp flew in guided (charge ${F.charge(lit)})`);
   F.quench();
 }
 F.setDifficulty('easy');
