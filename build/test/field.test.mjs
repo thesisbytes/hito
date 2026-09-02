@@ -57,7 +57,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
@@ -97,6 +97,46 @@ if (stageCss){
   ok(/aspect-ratio:\s*1/.test(stageCss[1]),
      'the sketchbook is not square: norm() is anisotropic on a rectangular stage');
   ok(!/aspect-ratio:\s*auto/.test(stageCss[1]), 'the square aspect ratio is explicitly disabled');
+}
+
+// ---- the start page: the field holds still, and difficulty is a switch
+// Before any fresh(): restart() is what begins a run, and the point here is
+// the state before one has begun.
+{
+  ok(F.paused, 'the field is running under the start page at boot');
+  const d0 = F.target && F.target.d;
+  advance(1500);
+  ok(F.target && F.target.d === d0, 'monsters advance under the start page');
+  const B = F.base;
+  ok(B && B.R_ON0 > 0 && B.DRAIN > 0 && B.FIZZ > 0, 'the base penalties were not read off the engine');
+  ok(F.setDifficulty('guided'), 'guided is not selectable');
+  ok(P.DRAIN === 0 && P.FIZZ === Infinity && P.R_ON0 > B.R_ON0,
+     `guided still punishes: drain ${P.DRAIN}, fizz ${P.FIZZ}, tolerance ${P.R_ON0} vs base ${B.R_ON0}`);
+  ok(P.GUIDE_ON && P.SHADOW_MODE === 'none', 'guided lost the light it is named for');
+  ok(F.setDifficulty('medium'), 'medium is not selectable');
+  ok(!P.GUIDE_ON && P.SHADOW_MODE === 'strokes' && P.DRAIN === B.DRAIN,
+     'medium is not shape-only with the pack penalties');
+  ok(!F.setDifficulty('hard'), 'hard is selectable, and there is no scorer for it');
+  ok(F.difficulty === 'medium', 'a refused difficulty changed the current one');
+  ok(F.setDifficulty('easy') && P.R_ON0 === B.R_ON0 && P.DRAIN === B.DRAIN && P.FIZZ === B.FIZZ
+     && P.GUIDE_ON && P.SHADOW_MODE === 'none', 'easy did not restore the pack values');
+  ok(F.setSign('romaji') && F.signOf(F.target) === P.LETTERS[F.target.i][2], 'the sign did not switch to romaji');
+  ok(!F.setSign('klingon') && F.sign === 'romaji', 'an unknown sign voice was accepted');
+  F.setSign('kana');
+  F.begin();
+  ok(!F.paused, 'begin did not start the field');
+  const d1 = F.target && F.target.d;
+  advance(500);
+  ok(F.target && F.target.d < d1, 'the field is still frozen after begin');
+  F.openStart();
+  ok(F.paused, 'the menu did not pause the field');
+  F.openCredits();
+  ok(F.view === 'credits', 'the credits page did not open');
+  ok(/KanjiVG/.test(F.startHtml), 'the credits page does not carry the KanjiVG credit the licence requires');
+  ok(/leans on/.test(F.startHtml), 'the credits page has lost the point of the name');
+  F.openStart();
+  ok(F.view === 'start', 'back from credits did not return to the start page');
+  F.begin();
 }
 
 // ---- the workshop's practice controls and hint are gone from the game

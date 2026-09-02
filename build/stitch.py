@@ -510,7 +510,8 @@ def main():
     # hard    nothing. Reserved: free draw needs a different scorer, since
     #         path-following cannot judge a glyph drawn from memory.
     if pack.get("mode"):
-        m = {"easy":   ("'none'",    "true",  "true"),
+        m = {"guided": ("'none'",    "true",  "true"),
+             "easy":   ("'none'",    "true",  "true"),
              "medium": ("'strokes'", "false", "false"),
              "hard":   ("'none'",    "false", "false")}[pack["mode"]]
         s.sub("mode state", r"let SHADOW_MODE='[a-z]+';",
@@ -665,6 +666,15 @@ def main():
         "</script>\n"
     )
     s.sub("storage shim", r"<body>", "<body>\n" + shim, count=1)
+
+    # ---- the penalties are state, not constants
+    #
+    # The field's start page switches difficulty at runtime, and guided mode
+    # is easy with the drain and the fizzle turned off. Constants cannot be
+    # reassigned from a later script; lets can. The values are untouched.
+    s.sub("penalties are state",
+          r"const R_ON0=0\.07, LOOK=24, DRAIN=1\.6, FIZZ=90;",
+          "let R_ON0=0.07, LOOK=24, DRAIN=1.6, FIZZ=90;")
 
     # ---- sync
     #

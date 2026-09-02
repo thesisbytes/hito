@@ -43,7 +43,7 @@ const letters = book.fonts[Object.keys(book.fonts)[0]].letters;
 const BASE_F  = num(/const BASE_F=([\d.]+);/);
 const SHRINK  = num(/Math\.pow\(([\d.]+),MASTERY/);
 const FLOOR   = num(/Math\.max\(([\d.]+),BASE_F\*Math\.pow/);
-const R_ON0   = num(/const R_ON0=([\d.]+)/);
+const R_ON0   = num(/(?:const|let) R_ON0=([\d.]+)/);
 const MIN_TOL = num(/const R_ON=\(\)=>Math\.max\(([\d.]+)/);
 const SQRT_TOL= /R_ON0\*Math\.sqrt\(curS\)/.test(s);
 const COVER   = num(/COVER_MIN=([\d.]+)/, 0.85);

@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "version": "0.1.23",
-  "title": "hito 人 · hiragana · v0.1.23",
+  "version": "0.1.24",
+  "title": "hito 人 · hiragana · v0.1.24",
   "brand": "hito 人",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -65,5 +65,11 @@
     "endpoint": "",
     "batch": 40,
     "cap": 500
-  }
+  },
+  "credits": [
+    "Stroke order recorded and checked by the project's teachers.",
+    "Letterforms drawn by hand by the project's artist.",
+    "Bugs found by the testers, several of them young, all of them right.",
+    "Built by the maintainer, one version at a time."
+  ]
 }

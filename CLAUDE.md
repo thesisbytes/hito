@@ -125,7 +125,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.23.html`
+### Hiragana — `dist/hiragana-v0.1.24.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -380,6 +380,14 @@ without a schedule. A dash on the seam between field and sketchbook shows the
 loaded character and its charge. Keyed by character, kept in localStorage,
 and it survives the ward falling. Tuning lives in `field.hitodama*` and
 `field.castMs`; see `scripts/PACK.md`.
+
+**The start page (v0.1.24)** opens the game on its two real axes: how much
+help (`guided`, `easy`, `medium`, with `hard` locked until its scorer
+exists) and what the sign says (`kana`, `romaji`, `gaijin`). Difficulty is
+a runtime switch — the penalties became engine state so the shell can
+reassign them — and `guided` is easy with the drain and fizzle off, which is
+the "drag the circle" mode a player asked for. The field holds still while
+the page is up.
 
 **The current single-canvas screen is the workshop, not the game.** Everything
 in `dist/hiragana-*.html` today — the gojūon chart, the stroke controls, the

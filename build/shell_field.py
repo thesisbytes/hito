@@ -58,6 +58,45 @@ STYLE = """
                      width:min(96vw,34dvh); height:min(96vw,34dvh);
                      margin:8px auto 10px; }
   body.field .field-wrap{ flex:1 1 auto; }
+
+  /* The start page. A lacquer sheet over everything, with the two axes the
+     game actually has: how much help, and what the sign says. */
+  .start{ position:fixed; inset:0; z-index:9998; display:flex; align-items:center;
+          justify-content:center; padding:18px;
+          background:radial-gradient(60% 50% at 50% 40%,rgba(90,160,150,.10),transparent 70%),
+                     rgba(12,10,8,.94); }
+  .start[hidden]{ display:none; }
+  .start-card{ width:min(94vw,520px); max-height:94dvh; overflow:auto;
+               font:14px ui-sans-serif,system-ui; color:#e8e0cc; }
+  .start-title{ font-size:34px; font-weight:700; color:#e9c46a; letter-spacing:.02em;
+                text-shadow:0 0 24px rgba(233,196,106,.35); }
+  .start-title span{ font-size:40px; margin-left:8px; }
+  .start-sub{ color:rgba(232,224,204,.55); margin:2px 0 18px; font-size:12px; }
+  .start-h{ font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+            color:rgba(127,209,196,.8); margin:14px 0 8px; }
+  .start-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
+  .start-row button{ text-align:left; background:#1d1a16; color:#e8e0cc; border:1px solid #57492f;
+                     border-radius:10px; padding:10px 12px; cursor:pointer; font:inherit; min-height:74px; }
+  .start-row button b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
+  .start-row button b i{ font-style:normal; color:#bdf0e6; margin-right:6px; }
+  .start-row button small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
+  .start-row button[aria-pressed="true"]{ border-color:#7fd1c4; background:#172422;
+                     box-shadow:0 0 0 1px rgba(127,209,196,.5), 0 0 22px rgba(127,209,196,.18); }
+  .start-row button[disabled]{ opacity:.42; cursor:default; }
+  .start-go{ width:100%; margin-top:20px; background:#e9c46a; color:#1d1a16; border:0;
+             border-radius:12px; padding:14px; font:700 17px ui-sans-serif,system-ui; cursor:pointer;
+             box-shadow:0 0 30px rgba(233,196,106,.25); }
+  .start-foot{ margin-top:12px; font-size:11px; color:rgba(232,224,204,.4); text-align:center; }
+  .start-links{ display:flex; gap:8px; margin-top:10px; }
+  .start-links button{ flex:1; background:transparent; color:rgba(233,196,106,.75); border:1px solid #3d3324;
+                       border-radius:9px; padding:9px; font:13px ui-sans-serif,system-ui; cursor:pointer; }
+  .credits p{ line-height:1.55; color:rgba(232,224,204,.85); margin:10px 0; }
+  .credits p.lead{ font-size:15px; color:#e8e0cc; }
+  .credits p.lead b{ color:#e9c46a; font-size:22px; margin-right:6px; }
+  .credits p.small{ font-size:12px; color:rgba(232,224,204,.6); }
+  .menu-btn{ position:fixed; left:10px; bottom:10px; z-index:9999; background:#1d1a16; color:#e9c46a;
+             border:1px solid #57492f; border-radius:7px; padding:9px 12px;
+             font:13px ui-sans-serif,system-ui; cursor:pointer; opacity:.9; }
 </style>
 """
 
@@ -95,6 +134,58 @@ LAYER = STYLE + r"""
   let monsters = [], shots = [], motes = [];
   let ward = CFG.wardHp, over = false, wave = 0, killed = 0;
   let spawnAt = 0, tPrev = 0;
+  // The field holds still while the start page is up. Nothing moves, nothing
+  // spawns, no wisp flies; the clock resumes from where it stopped.
+  let paused = true;
+
+  // ---- difficulty, at runtime
+  // The pack bakes in the penalties; the start page chooses between them.
+  // The values themselves are read off the engine at boot rather than
+  // written here, so a pack that tunes them stays authoritative.
+  const BASE = { R_ON0, DRAIN, FIZZ };
+  const DIFF = {
+    guided: { kana:'導', blurb:'drag the light. nothing can go wrong.',
+              R_ON0: BASE.R_ON0*2, DRAIN: 0, FIZZ: Infinity,
+              guide:true, numbers:true, shadow:'none' },
+    easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
+              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ,
+              guide:true, numbers:true, shadow:'none' },
+    medium: { kana:'中', blurb:'the shape only. where each stroke starts, and in what order, is on you.',
+              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ,
+              guide:false, numbers:false, shadow:'strokes' },
+    hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
+              locked:true },
+  };
+  const SIGNS = {
+    kana:   { blurb:'ぬ — the shape, by copying it' },
+    romaji: { blurb:'nu — the reading, which is the direction that matters' },
+    gaijin: { blurb:'NEW — the way you probably say it' },
+  };
+  const SKEY = 'hito-start';
+  let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'easy';
+  try {
+    const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {};
+    if (s.difficulty in DIFF && !DIFF[s.difficulty].locked) difficulty = s.difficulty;
+    if (s.sign in SIGNS) CFG.sign = s.sign;
+  } catch(_){}
+  function saveStart(){ try { localStorage.setItem(SKEY, JSON.stringify({difficulty, sign:CFG.sign})); } catch(_){} }
+  function applyDifficulty(name){
+    const d = DIFF[name];
+    if (!d || d.locked) return false;
+    difficulty = name;
+    R_ON0 = d.R_ON0; DRAIN = d.DRAIN; FIZZ = d.FIZZ;
+    GUIDE_ON = d.guide; GUIDE_NUMBERS = d.numbers; SHADOW_MODE = d.shadow;
+    saveStart();
+    return true;
+  }
+  // and the glyph is redrawn under the new rules
+  function setDifficulty(name){
+    if (!applyDifficulty(name)) return false;
+    loading = true; try { _load(idx); } finally { loading = false; }
+    return true;
+  }
+  function setSign(v){ if (!(v in SIGNS)) return false; CFG.sign = v; saveStart(); return true; }
+  applyDifficulty(difficulty);
 
   // ---- hitodama
   // A ghost light per character, keyed by the character itself (a codepoint,
@@ -389,6 +480,7 @@ LAYER = STYLE + r"""
   function step(now){
     if (!tPrev) tPrev = now;
     const dt = Math.min(0.05, (now - tPrev)/1000); tPrev = now;
+    if (paused){ draw(); return; }
     if (!over){
       // Nothing to answer is not a rest, it is a dead screen. Refill at once.
       if (!monsters.length) spawnAt = Math.min(spawnAt, now);
@@ -600,10 +692,73 @@ LAYER = STYLE + r"""
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
     ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
-    spawnAt = 0; tPrev = 0; castAt = 0; spawn(); retarget();
+    spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
   }
+
+  // ---- the start page
+  const start = document.createElement('div');
+  start.className = 'start'; start.id = 'start';
+  let view = 'start', markup = '';
+  const esc = t => String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  function renderCredits(){
+    const lines = (CFG.credits || []).map(l => `<p>${esc(l)}</p>`).join('');
+    start.innerHTML = markup = `<div class="start-card credits">
+      <div class="start-title">hito<span>人</span></div>
+      <div class="start-sub">who this leans on</div>
+      <p class="lead"><b>人</b>is two strokes, and neither can stand on its own. Take one away and the character falls.</p>
+      <p>That is the project. One person records the strokes, another draws the letterforms, testers find the bugs, someone builds it, and every learner leans on all of them.</p>
+      ${lines}
+      <p class="small">${esc(CFG.credit || '')}</p>
+      <p class="small">Single file, no network, opens from a double-click. Your progress lives on this device.</p>
+      <button class="start-go">back</button>
+    </div>`;
+    const go = start.querySelector('.start-go');
+    if (go) go.onclick = () => { view = 'start'; renderStart(); };
+  }
+  function renderStart(){
+    if (view === 'credits') return renderCredits();
+    const row = (k, table, cur) => Object.entries(table).map(([n, d]) =>
+      `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
+      + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
+    start.innerHTML = markup = `<div class="start-card">
+      <div class="start-title">hito<span>人</span></div>
+      <div class="start-sub">hiragana · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
+      <div class="start-h">how much help</div>
+      <div class="start-row">${row('diff', DIFF, difficulty)}</div>
+      <div class="start-h">what the sign says</div>
+      <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
+      <button class="start-go">${over ? 'begin again' : 'begin'}</button>
+      <div class="start-links"><button class="start-credits">who this leans on</button></div>
+      <div class="start-foot">draw below · the farang come from above · the one you are answering is yours</div>
+    </div>`;
+    const cr = start.querySelector('.start-credits');
+    if (cr) cr.onclick = () => { view = 'credits'; renderStart(); };
+    for (const b of start.querySelectorAll('button[data-k]')){
+      b.onclick = () => {
+        if (b.dataset.k === 'diff') setDifficulty(b.dataset.v); else setSign(b.dataset.v);
+        renderStart();
+      };
+    }
+    const go = start.querySelector('.start-go');
+    if (go) go.onclick = begin;
+  }
+  function openStart(){ paused = true; view = 'start'; renderStart(); start.hidden = false; }
+  function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; }
+  function begin(){
+    start.hidden = true;
+    if (over) restart(); else paused = false;
+    tPrev = 0;
+  }
+  addEventListener('DOMContentLoaded', () => {
+    document.body.appendChild(start);
+    const menu = document.createElement('button');
+    menu.className = 'menu-btn'; menu.textContent = '☰';
+    menu.title = 'Difficulty and the sign';
+    menu.onclick = openStart;
+    document.body.appendChild(menu);
+  });
   fc.addEventListener('pointerdown', e => {
-    if (over){ restart(); return; }
+    if (over){ openStart(); return; }
     const r = fc.getBoundingClientRect();
     pick(e.clientX - r.left, e.clientY - r.top);
   });
@@ -620,6 +775,11 @@ LAYER = STYLE + r"""
     get locked(){ return locked; },
     get pending(){ return pendingRetarget; },
     get readings(){ return readings; },
+    get paused(){ return paused; },
+    get difficulty(){ return difficulty; },
+    get sign(){ return CFG.sign; },
+    base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
+    get view(){ return view; }, get startHtml(){ return markup; },
     get hitodama(){ return HITODAMA; },
     charge, kindle, quench, autocast, tidy,
     touch(){ penAt = performance.now(); },
@@ -659,6 +819,7 @@ LAYER = STYLE + r"""
   addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
   sizeField();
   spawn(); retarget();
+  openStart();
   requestAnimationFrame(loop);
 })();
 </script>
@@ -666,6 +827,7 @@ LAYER = STYLE + r"""
 
 
 def config(pack):
+    import json
     """The field's tuning, as a JS object literal written into the page."""
     f = pack.get("field") or {}
     sign = f.get("sign", "kana")
@@ -676,14 +838,17 @@ def config(pack):
         raise SystemExit(f"field.reading must be romaji, gaijin, both or off, not {reading!r}")
     return (
         "<script>window.__FIELD_CFG={"
-        f"sign:{sign!r},"
+        f"sign:{json.dumps(sign)},"
+        f"mode:{json.dumps(pack.get('mode', 'easy'))},"
+        f"credit:{json.dumps(pack.get('credit', ''), ensure_ascii=False)},"
+        f"credits:{json.dumps(list(pack.get('credits', [])), ensure_ascii=False)},"
         f"speed:{f.get('speed', 0.055)},"
         f"wardHp:{int(f.get('wardHp', 5))},"
         f"spawnMs:{int(f.get('spawnMs', 5200))},"
         f"spawnRamp:{int(f.get('spawnRamp', 140))},"
         f"spawnMin:{int(f.get('spawnMin', 1800))},"
         f"advanceMs:{int(f.get('advanceMs', 460))},"
-        f"reading:{reading!r},"
+        f"reading:{json.dumps(reading)},"
         f"fizzleRestarts:{'true' if f.get('fizzleRestarts', True) else 'false'},"
         f"hitodamaGain:{int(f.get('hitodamaGain', 1))},"
         f"cleanBonus:{int(f.get('cleanBonus', 1))},"
@@ -692,4 +857,4 @@ def config(pack):
         f"holdMs:{int(f.get('holdMs', 1500))},"
         f"tidyStrays:{'true' if f.get('tidyStrays', True) else 'false'}"
         "};</script>"
-    ).replace("'", '"')
+    )

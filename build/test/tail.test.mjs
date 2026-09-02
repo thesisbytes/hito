@@ -24,7 +24,7 @@ const book    = JSON.parse(s.match(/const DEFAULT_BOOK=(\{.*?\});\nlet TEACHER/s
 const letters = book.fonts[Object.keys(book.fonts)[0]].letters;
 const BASE_F  = num(/const BASE_F=([\d.]+);/);
 const FLOOR   = num(/Math\.max\(([\d.]+),BASE_F\*Math\.pow/);
-const R_ON0   = num(/const R_ON0=([\d.]+)/);
+const R_ON0   = num(/(?:const|let) R_ON0=([\d.]+)/);
 const MIN_TOL = num(/const R_ON=\(\)=>Math\.max\(([\d.]+)/);
 const SLACK   = num(/END_SLACK=(\d+)/, 4);
 const TAIL    = num(/TAIL_FRAC=([\d.]+)/, null);
