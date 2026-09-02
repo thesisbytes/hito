@@ -94,9 +94,7 @@ STYLE = """
   .credits p.lead{ font-size:15px; color:#e8e0cc; }
   .credits p.lead b{ color:#e9c46a; font-size:22px; margin-right:6px; }
   .credits p.small{ font-size:12px; color:rgba(232,224,204,.6); }
-  .menu-btn{ position:fixed; left:10px; bottom:10px; z-index:9999; background:#1d1a16; color:#e9c46a;
-             border:1px solid #57492f; border-radius:7px; padding:9px 12px;
-             font:13px ui-sans-serif,system-ui; cursor:pointer; opacity:.9; }
+  body.field header .brand{ cursor:pointer; }
 </style>
 """
 
@@ -142,16 +140,25 @@ LAYER = STYLE + r"""
   // The pack bakes in the penalties; the start page chooses between them.
   // The values themselves are read off the engine at boot rather than
   // written here, so a pack that tunes them stays authoritative.
-  const BASE = { R_ON0, DRAIN, FIZZ };
+  const BASE = { R_ON0, DRAIN, FIZZ, COVER_MIN, MAX_TRAVEL };
+  // guided is not easy with the numbers turned down. The objective is the
+  // light: drag it to the end of every stroke and the glyph is yours. So the
+  // pen leaves no ink, nothing zaps, the light is big enough to be the thing
+  // you are holding, and the only test at the end is that the light got
+  // there — coverage and travel are not asked, because the light cannot
+  // reach the end without the pen having gone the whole way with it.
   const DIFF = {
-    guided: { kana:'導', blurb:'drag the light. nothing can go wrong.',
+    guided: { kana:'導', blurb:'follow the light. no ink, no zaps — just take it to the end of each stroke.',
               R_ON0: BASE.R_ON0*2, DRAIN: 0, FIZZ: Infinity,
+              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 2.4, ink:false,
               guide:true, numbers:true, shadow:'none' },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ,
+              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true,
               guide:true, numbers:true, shadow:'none' },
-    medium: { kana:'中', blurb:'the shape only. where each stroke starts, and in what order, is on you.',
+    medium: { kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ,
+              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true,
               guide:false, numbers:false, shadow:'strokes' },
     hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
               locked:true },
@@ -174,6 +181,7 @@ LAYER = STYLE + r"""
     if (!d || d.locked) return false;
     difficulty = name;
     R_ON0 = d.R_ON0; DRAIN = d.DRAIN; FIZZ = d.FIZZ;
+    COVER_MIN = d.COVER_MIN; MAX_TRAVEL = d.MAX_TRAVEL; DOT_SCALE = d.dot;
     GUIDE_ON = d.guide; GUIDE_NUMBERS = d.numbers; SHADOW_MODE = d.shadow;
     saveStart();
     return true;
@@ -209,7 +217,17 @@ LAYER = STYLE + r"""
   // conjure() does not say how it went; zap() is the only global that does.
   let zapped = 0;
   const _zap = window.zap;
-  window.zap = function(){ zapped++; return _zap.apply(this, arguments); };
+  window.zap = function(){
+    if (DIFF[difficulty] && DIFF[difficulty].ink === false) return;   // guided: the light just stops
+    zapped++; return _zap.apply(this, arguments);
+  };
+  // In guided the pen leaves no mark. redrawInk() is looked up by name on
+  // every pointer move, so this wrapper does catch the engine's own calls.
+  const _redrawInk = window.redrawInk;
+  window.redrawInk = function(){
+    if (DIFF[difficulty] && DIFF[difficulty].ink === false){ ink.clearRect(0,0,W,H); return; }
+    return _redrawInk.apply(this, arguments);
+  };
 
   // A lit character throws its own wisp. One at a time, on a cooldown, so a
   // swarm of three ぬ is answered visibly rather than vanishing in a frame.
@@ -355,6 +373,7 @@ LAYER = STYLE + r"""
   // is untouched. Returns how many runs were erased.
   function tidy(){
     if (!CFG.tidyStrays || mode !== 'practice' || !PATH.length || !strokes.length) return 0;
+    if (DIFF[difficulty] && DIFF[difficulty].ink === false){ strokes.length = 0; return 0; }
     const s = strokes[strokes.length - 1];
     const keep = [], gone = [];
     let run = [];
@@ -742,20 +761,24 @@ LAYER = STYLE + r"""
     const go = start.querySelector('.start-go');
     if (go) go.onclick = begin;
   }
-  function openStart(){ paused = true; view = 'start'; renderStart(); start.hidden = false; }
-  function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; }
+  // The redo button belongs to a run, not to the page over it.
+  let redoShown = false;
+  function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
+  function openStart(){ paused = true; view = 'start'; renderStart(); start.hidden = false; showRedo(false); }
+  function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; showRedo(false); }
   function begin(){
     start.hidden = true;
     if (over) restart(); else paused = false;
     tPrev = 0;
+    showRedo(true);
   }
   addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(start);
-    const menu = document.createElement('button');
-    menu.className = 'menu-btn'; menu.textContent = '☰';
-    menu.title = 'Difficulty and the sign';
-    menu.onclick = openStart;
-    document.body.appendChild(menu);
+    showRedo(!paused);
+    // No menu button — it sat under the pen's hand. The name in the header
+    // is the way back to the page.
+    const brand = document.querySelector && document.querySelector('header .brand');
+    if (brand){ brand.title = 'Difficulty and the sign'; brand.onclick = openStart; }
   });
   fc.addEventListener('pointerdown', e => {
     if (over){ openStart(); return; }
@@ -779,7 +802,7 @@ LAYER = STYLE + r"""
     get difficulty(){ return difficulty; },
     get sign(){ return CFG.sign; },
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
-    get view(){ return view; }, get startHtml(){ return markup; },
+    get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     charge, kindle, quench, autocast, tidy,
     touch(){ penAt = performance.now(); },

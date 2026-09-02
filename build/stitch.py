@@ -187,7 +187,7 @@ def main():
             sys.exit("cannot find BASE_F to anchor the shadow scale on.")
         s.sub("shadow mode", r"const BASE_F=[\d.]+;",
               f"const BASE_F={m.group(1)};"
-              f"const SHADOW_SCALE={pack.get('shadowScale', 2.4)};"
+              f"const SHADOW_SCALE={pack.get('shadowScale', 2.4)};let DOT_SCALE=1;"
               f"let SHADOW_MODE='{pack.get('shadow', 'none')}';")
         s.sub("shadow from strokes",
               r"g\.save\(\); g\.font=glyphFont\(size\); g\.textAlign='center'; "
@@ -201,10 +201,17 @@ def main():
               "    // stroke already made. A thick shadow bulges on the outside\n"
               "    // of curves, so the thin trail down its centreline cannot\n"
               "    // cover it, and the stacked glows read as blur.\n"
-              "    if(SHADOW_MODE==='strokes'||done){\n"
-              "      paintPath(g,0,PATH.length-1,{alpha:done?.5:.13,blur:done?28:7,"
-              "scale:SHADOW_SCALE,nocore:true,"
-              "color:done?'rgba(255,241,184,.95)':'#e9c46a'});\n"
+              "    if(done){\n"
+              "      paintPath(g,0,PATH.length-1,{alpha:.5,blur:28,"
+              "scale:SHADOW_SCALE,nocore:true,color:'rgba(255,241,184,.95)'});\n"
+              "    } else if(SHADOW_MODE==='strokes'){\n"
+              "      // The shape, drawn flat at exactly the tolerance width. What\n"
+              "      // you see is the band you are judged in — no glow, no blur,\n"
+              "      // nothing wider than the scorer will forgive. The earlier\n"
+              "      // 2.4x glowing shadow read as a huge blur and hid where the\n"
+              "      // centreline actually was.\n"
+              "      paintPath(g,0,PATH.length-1,{alpha:.17,flat:true,nocore:true,"
+              "width:2*R_ON()*W,color:'#e9c46a'});\n"
               "    }\n"
               "  } else {\n"
               "    g.save(); g.font=glyphFont(size); g.textAlign='center'; "
@@ -233,7 +240,7 @@ def main():
               "let PATH=[],SEGEND=new Set(),prog=0,offCount=0;\n"
               "let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;"
               "let SEGLEN=[],SEGSLACK=[];"
-              f"const COVER_MIN={pack.get('coverThreshold', 0.85)},END_SLACK=4,"
+              f"let COVER_MIN={pack.get('coverThreshold', 0.85)},END_SLACK=4,"
               f"MAX_TRAVEL={pack.get('maxTravel', 2.5)},TRAVEL_EPS=0.006,"
               f"TAIL_FRAC={pack.get('tailFraction', 0.12)},"
               f"END_MIN={pack.get('minEndTolerance', 0.02)};")
@@ -666,6 +673,9 @@ def main():
         "</script>\n"
     )
     s.sub("storage shim", r"<body>", "<body>\n" + shim, count=1)
+
+    s.sub("dot scale", r"fx\.arc\(s0\.x,s0\.y,4\+3\*pulse,0,7\)",
+          "fx.arc(s0.x,s0.y,(4+3*pulse)*DOT_SCALE,0,7)")
 
     # ---- the penalties are state, not constants
     #

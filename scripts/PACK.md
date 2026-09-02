@@ -43,7 +43,7 @@ which a kana-only subset does not contain, so every font reported as blocked.
 | key | default | meaning |
 |---|---|---|
 | `shadow` | `none` | How the target is shown. `none` — only the trail, which is what the follow dot rides on. `strokes` — a thick faint path beneath it. `font` — the glyph in the trace font. |
-| `shadowScale` | `2.4` | Width multiplier when `shadow` is `strokes`. |
+| `shadowScale` | `2.4` | Width multiplier for the glow when a glyph is done. The `strokes` shadow itself is drawn flat at exactly the tolerance width, so the shape shown is the band the scorer forgives. |
 | `strictFollow` | `false` | Enforce stroke order, require a pen lift between strokes, and require the path actually be traced. Off means the original permissive scoring. |
 | `coverThreshold` | `0.85` | Fraction of path points the pen must pass near. Guards against reaching the end without tracing the middle. |
 | `maxTravel` | `2.5` | Cap on pen distance ÷ path length. An honest trace runs about 1.0×; scribbles run 30–120×. This is what stops a scribble on single-stroke glyphs, which have no lift barrier. |
@@ -77,7 +77,7 @@ to judge length or position against.
 
 | key | default | meaning |
 |---|---|---|
-| `mode` | *(unset)* | `guided` — easy with the drain and the fizzle off and the tolerance doubled: drag the light, nothing can go wrong. `easy` — path, dots, comet, numbered stroke badge. `medium` — the shape only; start points and order are on you. `hard` — nothing shown; **needs a scorer that does not exist yet**, see `CLAUDE.md`. In the `field` shell this is only the default the start page opens on; the player switches at runtime. |
+| `mode` | *(unset)* | `guided` — follow the light. No ink, no zaps, a light big enough to hold, tolerance doubled, and the only test is that the light reached the end of every stroke. `easy` — path, dots, comet, numbered stroke badge. `medium` — the shape only; start points and order are on you. `hard` — nothing shown; **needs a scorer that does not exist yet**, see `CLAUDE.md`. In the `field` shell this is only the default the start page opens on; the player switches at runtime. |
 
 Unset leaves whatever `shadow` specifies and the guide always on.
 
@@ -135,9 +135,11 @@ tap on the field returns to the page rather than restarting blind.
 Difficulty is a runtime switch because the penalties are engine state: the
 tolerance, drain and fizzle threshold are reassigned by the shell, and the
 values it restores for `easy` are read off the engine at boot, so a pack that
-tunes them stays authoritative. `guided` is the same easy guide with the
-penalties off; the coverage and travel checks at the end of a glyph still
-apply, so a scribble still fails there.
+tunes them stays authoritative. `guided` is a different objective rather
+than easy turned down: the light is the thing you hold, the pen leaves no
+mark, nothing zaps, and the coverage and travel checks are off because the
+light cannot reach the end of a stroke without the pen having gone the whole
+way with it.
 
 ### Hitodama
 

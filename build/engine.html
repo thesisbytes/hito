@@ -219,9 +219,9 @@ const widthFor=p=>(3+p*13)*inkK();
 function paintStroke(ctx,s,opt={}){ // s in canvas coords
   if(!s.length) return; const col=opt.color||'#e9c46a', core=opt.core||'rgba(255,241,184,.9)';
   ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.globalAlpha=opt.alpha??1;
-  if(!opt.cover){ctx.shadowColor=col;ctx.shadowBlur=(opt.blur??14)*inkK();} ctx.strokeStyle=opt.cover?'#fff':col;
+  if(!opt.cover&&!opt.flat){ctx.shadowColor=col;ctx.shadowBlur=(opt.blur??14)*inkK();} ctx.strokeStyle=opt.cover?'#fff':col;
   if(s.length===1){ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(s[0].x,s[0].y,widthFor(s[0].p||.5)/2,0,7);ctx.fill();ctx.restore();return;}
-  for(let i=1;i<s.length;i++){const a=s[i-1],b=s[i];ctx.lineWidth=opt.cover?22:widthFor(((a.p||.5)+(b.p||.5))/2)*(opt.scale||1);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+  for(let i=1;i<s.length;i++){const a=s[i-1],b=s[i];ctx.lineWidth=opt.cover?22:(opt.width??widthFor(((a.p||.5)+(b.p||.5))/2)*(opt.scale||1));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
   if(!opt.cover&&!opt.nocore){ctx.shadowBlur=0;ctx.strokeStyle=core;for(let i=1;i<s.length;i++){const a=s[i-1],b=s[i];ctx.lineWidth=Math.max(1,widthFor(((a.p||.5)+(b.p||.5))/2)*.35*(opt.scale||1));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
   ctx.restore();
 }

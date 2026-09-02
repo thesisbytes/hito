@@ -57,7 +57,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
@@ -113,6 +113,14 @@ if (stageCss){
   ok(P.DRAIN === 0 && P.FIZZ === Infinity && P.R_ON0 > B.R_ON0,
      `guided still punishes: drain ${P.DRAIN}, fizz ${P.FIZZ}, tolerance ${P.R_ON0} vs base ${B.R_ON0}`);
   ok(P.GUIDE_ON && P.SHADOW_MODE === 'none', 'guided lost the light it is named for');
+  // the objective is the light: no coverage or travel test at the end, a
+  // light big enough to hold, no zap, no ink
+  ok(P.COVER_MIN === 0 && P.MAX_TRAVEL === Infinity, `guided still tests coverage ${P.COVER_MIN} / travel ${P.MAX_TRAVEL}`);
+  ok(P.DOT_SCALE > 1, 'the light in guided is no bigger than in easy');
+  { const n = P.parts.length; globalThis.zap({x:10,y:10}); ok(P.parts.length === n, 'guided still zaps'); }
+  ok(/window\.redrawInk = function/.test(html), 'the pen still leaves ink in guided (no redrawInk wrapper)');
+  P.strokes.push([{x:1,y:1,on:false},{x:2,y:2,on:false}]);
+  F.tidy(); ok(P.strokes.length === 0, 'guided keeps strokes on the board');
   ok(F.setDifficulty('medium'), 'medium is not selectable');
   ok(!P.GUIDE_ON && P.SHADOW_MODE === 'strokes' && P.DRAIN === B.DRAIN,
      'medium is not shape-only with the pack penalties');
@@ -120,6 +128,13 @@ if (stageCss){
   ok(F.difficulty === 'medium', 'a refused difficulty changed the current one');
   ok(F.setDifficulty('easy') && P.R_ON0 === B.R_ON0 && P.DRAIN === B.DRAIN && P.FIZZ === B.FIZZ
      && P.GUIDE_ON && P.SHADOW_MODE === 'none', 'easy did not restore the pack values');
+  ok(P.COVER_MIN === B.COVER_MIN && P.MAX_TRAVEL === B.MAX_TRAVEL && P.DOT_SCALE === 1,
+     'easy did not restore the end-of-glyph checks or the light');
+  { const n = P.parts.length; globalThis.zap({x:10,y:10}); ok(P.parts.length > n, 'easy no longer zaps'); }
+  // medium's shape is flat and exactly as wide as the tolerance
+  ok(/paintPath\(g,0,PATH\.length-1,\{alpha:\.17,flat:true,nocore:true,width:2\*R_ON\(\)\*W/.test(html),
+     'medium still draws the glowing 2.4x shadow rather than the tolerance band');
+  ok(!/menu-btn/.test(html), 'the ☰ button is back');
   ok(F.setSign('romaji') && F.signOf(F.target) === P.LETTERS[F.target.i][2], 'the sign did not switch to romaji');
   ok(!F.setSign('klingon') && F.sign === 'romaji', 'an unknown sign voice was accepted');
   F.setSign('kana');
@@ -130,6 +145,7 @@ if (stageCss){
   ok(F.target && F.target.d < d1, 'the field is still frozen after begin');
   F.openStart();
   ok(F.paused, 'the menu did not pause the field');
+  ok(!F.redoShown, 'the redo button is showing on the start page');
   F.openCredits();
   ok(F.view === 'credits', 'the credits page did not open');
   ok(/KanjiVG/.test(F.startHtml), 'the credits page does not carry the KanjiVG credit the licence requires');
@@ -137,6 +153,7 @@ if (stageCss){
   F.openStart();
   ok(F.view === 'start', 'back from credits did not return to the start page');
   F.begin();
+  ok(F.redoShown, 'the redo button did not come back for the run');
 }
 
 // ---- the workshop's practice controls and hint are gone from the game
