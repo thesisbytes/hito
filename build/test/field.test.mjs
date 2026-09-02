@@ -57,7 +57,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get curF(){ return curF; } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get curF(){ return curF; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get SEGS(){ return SEGS; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get R(){ return R_ON(); }, setSeg(i){ segIdx=i; prog=SEGS[i][0]; awaitLift=false; }, denorm(q){ return denorm(q); }, follow(q,d){ return follow(q,d); } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
@@ -84,6 +84,11 @@ const advance = (ms, stepMs = 16) => {
 
 ok(F && P, 'the field layer did not initialise');
 if (!F || !P) process.exit(1);
+// The field's tuning, read off the page. The literal carries JSON strings
+// (the credit line has colons in it), so the keys are picked individually.
+const cfgSrc = html.match(/window\.__FIELD_CFG=(\{[\s\S]*?\});<\/script>/)[1];
+const cfg = Object.fromEntries([...cfgSrc.matchAll(/([a-zA-Z]+):(-?[\d.]+|true|false|"[^"]*")/g)]
+  .map(m => [m[1], /^[\d.-]/.test(m[2]) ? Number(m[2]) : m[2] === 'true' ? true : m[2] === 'false' ? false : m[2].slice(1,-1)]));
 
 // ---- the sketchbook stays square
 // Not a style preference. norm() divides x by W and y by H separately, so on a
@@ -119,6 +124,8 @@ if (stageCss){
   ok(P.DOT_SCALE > 1, 'the light in guided is no bigger than in easy');
   ok(P.SIZE_PIN === P.SIZE_MAX && P.curF === P.SIZE_MAX,
      `guided did not pin the size: pin ${P.SIZE_PIN}, glyph at ${P.curF}, largest is ${P.SIZE_MAX}`);
+  ok(P.DRAG_FOLLOW === true && !F.casting(), 'guided is not dragging the light, or is still casting');
+  ok(P.R_ON0 < B.R_ON0*2, 'guided tolerance is still doubled, which is what let a chord cut the curve');
   { const n = P.parts.length; globalThis.zap({x:10,y:10}); ok(P.parts.length === n, 'guided still zaps'); }
   ok(/window\.redrawInk = function/.test(html), 'the pen still leaves ink in guided (no redrawInk wrapper)');
   P.strokes.push([{x:1,y:1,on:false},{x:2,y:2,on:false}]);
@@ -133,6 +140,7 @@ if (stageCss){
   ok(P.COVER_MIN === B.COVER_MIN && P.MAX_TRAVEL === B.MAX_TRAVEL && P.DOT_SCALE === 1,
      'easy did not restore the end-of-glyph checks or the light');
   ok(P.SIZE_PIN === null, 'easy is still pinned to one size');
+  ok(P.DRAG_FOLLOW === false && F.casting(), 'easy inherited guided\'s drag or lost its wisps');
   { const n = P.parts.length; globalThis.zap({x:10,y:10}); ok(P.parts.length > n, 'easy no longer zaps'); }
   // medium's shape is flat and exactly as wide as the tolerance
   ok(/paintPath\(g,0,PATH\.length-1,\{alpha:\.17,flat:true,nocore:true,width:2\*R_ON\(\)\*W/.test(html),
@@ -158,6 +166,72 @@ if (stageCss){
   F.begin();
   ok(F.redoShown, 'the redo button did not come back for the run');
 }
+
+// ---- guided: the light is dragged, not chased
+// Two reports from play, opposite faces of one rule. "I'm passing the stroke
+// by cutting without finishing properly" — the nearest point within a window
+// ahead, inside a doubled tolerance, is reachable from a chord. "The dot
+// thinks I didn't finish and I have to poke it" — a fast pen outruns the
+// window and the light lags until more samples arrive. Dragging: the light
+// moves only while the pen is on it, forward through points the pen is near.
+fresh();
+F.setDifficulty('guided');
+globalThis.resize();   // the harness stubs DOMContentLoaded, so W and H are 0 until this runs
+// の: one long spiral, which bends away from its chord more than any
+// tolerance. Loaded through the lock, since every load lands on the target.
+F.target.i = P.LETTERS.findIndex(l => l[0] === 'の');
+F.retarget(true);
+{
+  const R = P.R, den = P.denorm, fol = P.follow;
+  // a stroke that bends more than R away from its own chord, so the chord
+  // cannot be a legitimate way along it (a straight stroke's chord is the
+  // stroke, and must pass)
+  const offChord = (p, s0, e) => {
+    const dx = e.x-s0.x, dy = e.y-s0.y, L2 = dx*dx+dy*dy || 1e-9;
+    const t = Math.max(0, Math.min(1, ((p.x-s0.x)*dx + (p.y-s0.y)*dy)/L2));
+    return Math.hypot(p.x - (s0.x+dx*t), p.y - (s0.y+dy*t));
+  };
+  let si = -1;
+  for (let k = 0; k < P.SEGS.length; k++){
+    const [a, b] = P.SEGS[k];
+    if (P.PATH.slice(a, b).some(p => offChord(p, P.PATH[a], P.PATH[b]) > R*1.2)){ si = k; break; }
+  }
+  if (si >= 0){
+    const [a, b] = P.SEGS[si];
+    // the light does not move unless the pen is on it
+    P.setSeg(si);
+    let m = a; while (m < b && Math.hypot(P.PATH[m].x-P.PATH[a].x, P.PATH[m].y-P.PATH[a].y) < R*1.1) m++;
+    fol(den(P.PATH[m]), true);
+    ok(P.prog === a, `the light moved to ${P.prog} with the pen ${m-a} points ahead of it and out of reach`);
+    // a chord from start to end does not finish the stroke
+    P.setSeg(si);
+    fol(den(P.PATH[a]), true);
+    for (let t = 0.1; t <= 1.0001; t += 0.1)
+      fol(den({x: P.PATH[a].x + (P.PATH[b].x-P.PATH[a].x)*t, y: P.PATH[a].y + (P.PATH[b].y-P.PATH[a].y)*t}));
+    ok(P.prog < b - 1 && !P.awaitLift && !P.done, `a chord finished the stroke (prog ${P.prog} of ${b})`);
+    // dragging along the path does, with nothing to poke
+    P.setSeg(si);
+    fol(den(P.PATH[a]), true);
+    for (let i = a; i <= b; i += 2) fol(den(P.PATH[i]));
+    fol(den(P.PATH[b]));
+    ok(P.prog === b && (P.awaitLift || P.done), `dragging the light to the end did not finish the stroke (prog ${P.prog} of ${b})`);
+  } else ok(false, 'no stroke on this glyph is long enough to test a chord');
+  // and nothing is cast or kindled here
+  F.quench();
+  fresh(); F.setDifficulty('guided');
+  const drew = P.LETTERS[P.idx][0];
+  globalThis.conjure();
+  ok(F.charge(drew) === 0, 'a guided trace kindled the character');
+  // a lit target is not answered by a wisp here: the charge is not spent
+  // (the wisp itself would have landed and gone by the time it was looked for)
+  F.spawn();
+  const lit = P.LETTERS[F.target.i][0];
+  F.kindle(lit, 3);
+  advance(cfg.castMs * 2);
+  ok(F.charge(lit) === 3 && !F.shots.some(s => s.auto), `a wisp flew in guided (charge ${F.charge(lit)})`);
+  F.quench();
+}
+F.setDifficulty('easy');
 
 // ---- the workshop's practice controls and hint are gone from the game
 ok(/body\.field[^{]*\.only-p[^{]*\{ display:none/.test(html),
@@ -223,8 +297,6 @@ F.quench();   // the conjure kindled the glyph; a twin would draw a second kill
 // the shot flies at t += dt*2.6, so it lands at ~385ms
 advance(420);
 ok(F.killed === before2 + 1, 'the shot had not landed by 420ms');
-const cfg = JSON.parse(html.match(/window\.__FIELD_CFG=(\{[^}]*\})/)[1]
-  .replace(/([a-zA-Z]+):/g, '"$1":'));
 advance(cfg.advanceMs + 120);
 ok(F.target && P.idx === F.target.i,
    `after ${cfg.advanceMs}ms the tracer is on ${P.LETTERS[P.idx][0]} `

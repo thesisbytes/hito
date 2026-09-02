@@ -243,7 +243,8 @@ def main():
               f"let COVER_MIN={pack.get('coverThreshold', 0.85)},END_SLACK=4,"
               f"MAX_TRAVEL={pack.get('maxTravel', 2.5)},TRAVEL_EPS=0.006,"
               f"TAIL_FRAC={pack.get('tailFraction', 0.12)},"
-              f"END_MIN={pack.get('minEndTolerance', 0.02)};")
+              f"END_MIN={pack.get('minEndTolerance', 0.02)};"
+              "let DRAG_FOLLOW=false;")
 
         s.sub("build segments",
               r"if\(rec\)\{ rec\.forEach\(st=>\{ const R=resample\(st,"
@@ -326,6 +327,17 @@ def main():
               "  for(let i=seg[0];i<=seg[1];i++)\n"
               "    if(Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y)<R) hit[i]=1;\n"
               "  let best=-1,bd=R;\n"
+              "  if(DRAG_FOLLOW){\n"
+              "    // Guided: the light is dragged. It moves only while the pen is\n"
+              "    // on it, and only forward through points the pen is near, so a\n"
+              "    // chord across a curve stops it where the path leaves the pen's\n"
+              "    // reach, and a pen that arrives at the end along the path has\n"
+              "    // already brought it there — nothing to poke. The nearest-in-\n"
+              "    // window rule below lets a wide tolerance cut corners and lets a\n"
+              "    // fast pen outrun the window; both were reported from play.\n"
+              "    if(Math.hypot(n.x-PATH[lo].x,n.y-PATH[lo].y)<R){ best=lo;\n"
+              "      while(best<seg[1]&&Math.hypot(n.x-PATH[best+1].x,n.y-PATH[best+1].y)<R) best++; }\n"
+              "  } else\n"
               "  for(let i=lo;i<=hi;i++){ const d=Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y);\n"
               "    if(d<bd){bd=d;best=i;} }\n"
               "  if(best>=0){ q.on=true; prog=Math.max(prog,best); offCount=0;"

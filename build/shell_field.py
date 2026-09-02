@@ -150,17 +150,19 @@ LAYER = STYLE + r"""
   const DIFF = {
     // One size, the largest. Guided teaches the shape and the order; a small
     // glyph tests the hand, and calibrating a hand is not learning hiragana.
+    // The light is dragged rather than chased (DRAG_FOLLOW), and nothing is
+    // kindled or cast: guided is practice, and the wisps are for the game.
     guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
-              R_ON0: BASE.R_ON0*2, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
-              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 2.4, ink:false,
+              R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
+              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 2.4, ink:false, drag:true, cast:false,
               guide:true, numbers:true, shadow:'none' },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
-              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true,
+              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:true, numbers:true, shadow:'none' },
     medium: { kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
-              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true,
+              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:false, numbers:false, shadow:'strokes' },
     hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
               locked:true },
@@ -184,6 +186,7 @@ LAYER = STYLE + r"""
     difficulty = name;
     R_ON0 = d.R_ON0; DRAIN = d.DRAIN; FIZZ = d.FIZZ;
     COVER_MIN = d.COVER_MIN; MAX_TRAVEL = d.MAX_TRAVEL; DOT_SCALE = d.dot; SIZE_PIN = d.size;
+    DRAG_FOLLOW = d.drag;
     GUIDE_ON = d.guide; GUIDE_NUMBERS = d.numbers; SHADOW_MODE = d.shadow;
     saveStart();
     return true;
@@ -236,7 +239,9 @@ LAYER = STYLE + r"""
   // Never at the monster the hand is answering right now: that one is yours.
   let castAt = 0;
   function dash(){ return { x: cx(), y: FH - 14 }; }
+  const casting = () => !DIFF[difficulty] || DIFF[difficulty].cast !== false;
   function autocast(now){
+    if (!casting()) return null;
     if (now - castAt < CFG.castMs) return null;
     let best = null;
     for (const m of monsters){
@@ -300,7 +305,7 @@ LAYER = STYLE + r"""
       if (!best || m.d < best.d) best = m;
       if (charge(LETTERS[m.i][0]) < 1 && (!dark || m.d < dark.d)) dark = m;
     }
-    return dark || best;
+    return casting() ? (dark || best) : best;
   }
   function target(){
     if (locked && monsters.includes(locked)) return locked;
@@ -440,12 +445,14 @@ LAYER = STYLE + r"""
     }
     // And the character is kindled whether or not anything carried it — a
     // trace with nothing to hit is banked, not wasted. Clean pays more.
-    const gain = CFG.hitodamaGain + (zapped ? 0 : CFG.cleanBonus);
-    kindle(drew, gain);
-    const d = dash();
-    for (let k=0;k<14;k++)
-      motes.push({x:d.x, y:d.y, vx:(Math.random()-.5)*1.8, vy:-Math.random()*2.2,
-                  life:1, wisp:true});
+    if (casting()){
+      const gain = CFG.hitodamaGain + (zapped ? 0 : CFG.cleanBonus);
+      kindle(drew, gain);
+      const d = dash();
+      for (let k=0;k<14;k++)
+        motes.push({x:d.x, y:d.y, vx:(Math.random()-.5)*1.8, vy:-Math.random()*2.2,
+                    life:1, wisp:true});
+    }
     const r = _conjure.apply(this, arguments);
     // The engine celebrates for 1.9s before advancing, which is dead time in a
     // game with a clock running — a fast hand finishes the next glyph before
@@ -601,7 +608,7 @@ LAYER = STYLE + r"""
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(label, p.x, by-2);
       // a lit character: its own wisp will answer this one
-      if (charge(LETTERS[m.i][0]) >= 1){
+      if (casting() && charge(LETTERS[m.i][0]) >= 1){
         g.save();
         g.shadowColor = 'rgba(127,209,196,.9)'; g.shadowBlur = 10;
         g.fillStyle = 'rgba(160,230,215,.95)';
@@ -674,7 +681,7 @@ LAYER = STYLE + r"""
     // ---- the hitodama dash: the character in the sketchbook and how many
     // ghost lights it holds. Sits on the seam between field and sketchbook,
     // which is where the wisps set out from.
-    {
+    if (casting()) {
       const ch = LETTERS[idx][0], c = charge(ch), cap = CFG.hitodamaCap;
       const d = dash();
       const pipW = 14, w = 58 + cap*pipW;
@@ -806,7 +813,7 @@ LAYER = STYLE + r"""
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
-    charge, kindle, quench, autocast, tidy,
+    charge, kindle, quench, autocast, tidy, casting,
     touch(){ penAt = performance.now(); },
     bearer,
     spawn, restart, retarget, pick,
