@@ -77,7 +77,7 @@ to judge length or position against.
 
 | key | default | meaning |
 |---|---|---|
-| `mode` | *(unset)* | `guided` — follow the light. No ink, no zaps, a light big enough to hold, tolerance doubled, and the only test is that the light reached the end of every stroke. `easy` — path, dots, comet, numbered stroke badge. `medium` — the shape only; start points and order are on you. `hard` — nothing shown; **needs a scorer that does not exist yet**, see `CLAUDE.md`. In the `field` shell this is only the default the start page opens on; the player switches at runtime. |
+| `mode` | *(unset)* | `guided` — follow the light. No ink, no zaps, a light big enough to hold, tolerance doubled, one size (the top of `sizeRange`), and the only test is that the light reached the end of every stroke. `easy` — path, dots, comet, numbered stroke badge. `medium` — the shape only; start points and order are on you. `hard` — nothing shown; **needs a scorer that does not exist yet**, see `CLAUDE.md`. In the `field` shell this is only the default the start page opens on; the player switches at runtime. |
 
 Unset leaves whatever `shadow` specifies and the guide always on.
 

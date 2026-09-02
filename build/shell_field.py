@@ -148,16 +148,18 @@ LAYER = STYLE + r"""
   // there — coverage and travel are not asked, because the light cannot
   // reach the end without the pen having gone the whole way with it.
   const DIFF = {
-    guided: { kana:'導', blurb:'follow the light. no ink, no zaps — just take it to the end of each stroke.',
-              R_ON0: BASE.R_ON0*2, DRAIN: 0, FIZZ: Infinity,
+    // One size, the largest. Guided teaches the shape and the order; a small
+    // glyph tests the hand, and calibrating a hand is not learning hiragana.
+    guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
+              R_ON0: BASE.R_ON0*2, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 2.4, ink:false,
               guide:true, numbers:true, shadow:'none' },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
-              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ,
+              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true,
               guide:true, numbers:true, shadow:'none' },
     medium: { kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
-              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ,
+              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true,
               guide:false, numbers:false, shadow:'strokes' },
     hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
@@ -181,7 +183,7 @@ LAYER = STYLE + r"""
     if (!d || d.locked) return false;
     difficulty = name;
     R_ON0 = d.R_ON0; DRAIN = d.DRAIN; FIZZ = d.FIZZ;
-    COVER_MIN = d.COVER_MIN; MAX_TRAVEL = d.MAX_TRAVEL; DOT_SCALE = d.dot;
+    COVER_MIN = d.COVER_MIN; MAX_TRAVEL = d.MAX_TRAVEL; DOT_SCALE = d.dot; SIZE_PIN = d.size;
     GUIDE_ON = d.guide; GUIDE_NUMBERS = d.numbers; SHADOW_MODE = d.shadow;
     saveStart();
     return true;
