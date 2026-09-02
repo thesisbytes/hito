@@ -219,6 +219,7 @@ if (other){
 fresh();
 const before2 = F.killed;
 globalThis.conjure();
+F.quench();   // the conjure kindled the glyph; a twin would draw a second kill
 // the shot flies at t += dt*2.6, so it lands at ~385ms
 advance(420);
 ok(F.killed === before2 + 1, 'the shot had not landed by 420ms');
