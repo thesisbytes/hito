@@ -57,7 +57,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
@@ -98,6 +98,11 @@ if (stageCss){
      'the sketchbook is not square: norm() is anisotropic on a rectangular stage');
   ok(!/aspect-ratio:\s*auto/.test(stageCss[1]), 'the square aspect ratio is explicitly disabled');
 }
+
+// ---- the workshop's practice controls and hint are gone from the game
+ok(/body\.field[^{]*\.only-p[^{]*\{ display:none/.test(html),
+   'the practice row (Back/Clear/Next, Watch teacher) is showing in the game');
+ok(/body\.field[^{]*\.hint[^{]*\{ display:none/.test(html), 'the "Easy mode" hint is showing in the game');
 
 // ---- the field starts with something to fight, and the tracer is on it
 ok(F.monsters.length >= 1, 'no monster at boot — there is nothing to answer');
@@ -226,6 +231,34 @@ F.spawn();
   ok(F.pending || P.idx === held, 'no retarget was queued for later');
   globalThis.__probe.setProg(0);
   advance(300);
+}
+
+// ---- a hand that has just touched the pad is still tracing
+// prog > 0 misses the first stroke before it finds the path and a hand that
+// has lifted to think. Both are when a wisp elsewhere, or a breach, would
+// swap the glyph under a pen about to come back down.
+fresh();
+F.spawn();
+{
+  const held = P.idx, victim = F.target;
+  ok(P.prog === 0 && P.strokes.length === 0, 'test setup: nothing traced yet');
+  F.touch();
+  victim.d = 0.07;
+  advance(400);
+  ok(P.idx === held, 'the glyph changed within holdMs of the pen touching the pad');
+  advance(cfg.holdMs + 400);
+  if (F.target) ok(P.idx === F.target.i, 'the deferred retarget never applied once the hand was gone');
+}
+
+// ---- a stroke that never found the path is erased on pen-up
+fresh();
+{
+  ok(P.PATH.length > 0, 'test setup: the tracer has no path loaded');
+  P.strokes.push([{x:5,y:5,on:false},{x:9,y:9,on:false},{x:14,y:12,on:false}]);
+  ok(F.tidy() === 1 && P.strokes.length === 0, 'a wholly stray stroke was left on the board');
+  P.strokes.push([{x:5,y:5,on:false},{x:9,y:9,on:true},{x:14,y:12,on:false}]);
+  ok(F.tidy() === 0 && P.strokes.length === 1, 'a stroke that touched the path was erased');
+  P.strokes.length = 0;
 }
 
 // ---- an emptied field refills, and the tracer wakes up with it

@@ -33,7 +33,7 @@ STYLE = """
      tracer. */
   body.field .tabs, body.field .count, body.field .meta, body.field .power,
   body.field .only-p, body.field .only-r, body.field #fontRow,
-  body.field .grid { display:none !important; }
+  body.field .grid, body.field .hint { display:none !important; }
 
   body.field { height:100dvh; overflow:hidden; justify-content:flex-start; }
   body.field header { padding:6px 0 2px; }
@@ -237,7 +237,46 @@ LAYER = STYLE + r"""
   // stroke, so without that clause tracing() stayed true forever: the deferred
   // retarget never ran, and when the field emptied and refilled the tracer was
   // left frozen on the celebration of a glyph nothing was carrying any more.
-  function tracing(){ return !done && (activeId !== null || prog > 0); }
+  // "In progress" has to mean what the hand means by it. prog > 0 misses
+  // the first stroke before it finds the path, and misses a hand that has
+  // just lifted to think — both of which is when a wisp elsewhere would swap
+  // the glyph under a pen that is about to come back down. So: ink on the
+  // board counts, and so does any contact with the pad in the last holdMs.
+  let penAt = -1e9;
+  function tracing(){
+    return !done && (activeId !== null || prog > 0 || strokes.length > 0 || !!cur
+                     || performance.now() - penAt < CFG.holdMs);
+  }
+  const inkEl = document.getElementById('ink');
+  for (const ev of ['pointerdown', 'pointermove', 'pointerup'])
+    inkEl.addEventListener(ev, e => {
+      if (ev === 'pointermove' && !e.buttons) return;   // a hovering pen is not a hand at work
+      penAt = performance.now();
+    }, true);
+
+  // A stroke that never found the path is a smudge, not an attempt. It is
+  // erased when the pen lifts, so the board does not fill with the orange
+  // runs of every miss while the guide is still waiting at the dot. Purely
+  // cosmetic: travel and coverage are accumulated live in follow(), not read
+  // back from the stroke list, so the scribble guard is untouched.
+  function tidy(){
+    if (!CFG.tidyStrays || mode !== 'practice' || !PATH.length || !strokes.length) return 0;
+    const s = strokes[strokes.length - 1];
+    if (s.some(q => q.on)) return 0;
+    strokes.pop(); redrawInk();
+    const m = s[Math.floor(s.length / 2)];
+    for (let k = 0; k < 10; k++){
+      const a = Math.random()*6.283, v = .5 + Math.random()*1.5;
+      parts.push({x:m.x, y:m.y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, life:.6,
+                  r:1 + Math.random()*1.5, c:'200,132,47'});
+    }
+    loop();
+    return 1;
+  }
+  // Registered after the engine's own pointerup, so endStroke has already
+  // pushed the stroke by the time this runs.
+  inkEl.addEventListener('pointerup', () => tidy());
+  inkEl.addEventListener('pointercancel', () => tidy());
   let pendingRetarget = false;
   function retarget(force){
     if (locked && !monsters.includes(locked)) locked = null;
@@ -571,7 +610,8 @@ LAYER = STYLE + r"""
     get pending(){ return pendingRetarget; },
     get readings(){ return readings; },
     get hitodama(){ return HITODAMA; },
-    charge, kindle, quench, autocast,
+    charge, kindle, quench, autocast, tidy,
+    touch(){ penAt = performance.now(); },
     bearer,
     spawn, restart, retarget, pick,
     posOf: px,
@@ -637,6 +677,8 @@ def config(pack):
         f"hitodamaGain:{int(f.get('hitodamaGain', 1))},"
         f"cleanBonus:{int(f.get('cleanBonus', 1))},"
         f"hitodamaCap:{int(f.get('hitodamaCap', 6))},"
-        f"castMs:{int(f.get('castMs', 900))}"
+        f"castMs:{int(f.get('castMs', 900))},"
+        f"holdMs:{int(f.get('holdMs', 1500))},"
+        f"tidyStrays:{'true' if f.get('tidyStrays', True) else 'false'}"
         "};</script>"
     ).replace("'", '"')

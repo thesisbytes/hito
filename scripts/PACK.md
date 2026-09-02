@@ -96,6 +96,8 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 | `field.cleanBonus` | `1` | Extra ghost lights for a trace with no zaps. Clean pays more, as the economy design says it should. |
 | `field.hitodamaCap` | `6` | The most a character can hold. Tracing past it is not wasted (mastery still counts), it just does not bank. |
 | `field.castMs` | `900` | Cooldown between wisps. One at a time, so a swarm of three ぬ is answered visibly rather than vanishing in a frame. |
+| `field.holdMs` | `1500` | How long after the pen last touched the pad the tracer still counts as busy. A retarget queued in that window waits, so a wisp or a breach elsewhere cannot swap the glyph under a hand that has lifted to think, or that has started a stroke which has not yet found the path. |
+| `field.tidyStrays` | `true` | Erase a stroke that never touched the path when the pen lifts. Cosmetic only: travel and coverage are accumulated live, so the scribble guard is unaffected. Stops the board filling with orange runs of every miss. |
 | `field.fizzleRestarts` | `true` | Put the glyph back to the start after a fizzle. `fizzle()` already clears the ink but only rewinds progress halfway, leaving an empty canvas with credit for a path that is no longer visible — and under a clock there is no time to work out where the middle was. |
 
 Both shells build from the same pack directory — pass a `.json` file to
