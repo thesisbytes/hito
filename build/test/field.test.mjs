@@ -255,10 +255,26 @@ fresh();
 {
   ok(P.PATH.length > 0, 'test setup: the tracer has no path loaded');
   P.strokes.push([{x:5,y:5,on:false},{x:9,y:9,on:false},{x:14,y:12,on:false}]);
-  ok(F.tidy() === 1 && P.strokes.length === 0, 'a wholly stray stroke was left on the board');
-  P.strokes.push([{x:5,y:5,on:false},{x:9,y:9,on:true},{x:14,y:12,on:false}]);
-  ok(F.tidy() === 0 && P.strokes.length === 1, 'a stroke that touched the path was erased');
+  ok(F.tidy() > 0 && P.strokes.length === 0, 'a wholly stray stroke was left on the board');
+  // an overdrawn line: on the path for a while, then wandering. The wander
+  // goes, the good run stays, and nothing joins across the gap.
+  P.strokes.push([{x:1,y:1,on:false},{x:5,y:5,on:true},{x:9,y:9,on:true},{x:14,y:12,on:false},{x:20,y:20,on:false}]);
+  ok(F.tidy() === 3, 'the off-path runs of a mixed stroke were not erased');
+  ok(P.strokes.length === 1 && P.strokes[0].length === 2 && P.strokes[0].every(q => q.on),
+     `after tidy the board holds ${JSON.stringify(P.strokes)}, expected only the on-path run`);
   P.strokes.length = 0;
+  P.strokes.push([{x:5,y:5,on:true},{x:9,y:9,on:true}]);
+  ok(F.tidy() === 0 && P.strokes.length === 1, 'a clean stroke was touched');
+  P.strokes.length = 0;
+}
+
+// ---- ink thins with the glyph
+// A fixed 9px line on a 115px glyph buried the four small strokes of ふ
+// under their own ink. Not observable in a stubbed canvas, so a lint on the
+// built source: the width and the glow both follow the size factor.
+{
+  ok(/const widthFor=p=>\(3\+p\*13\)\*inkK\(\)/.test(html), 'ink width does not follow the glyph size');
+  ok(/ctx\.shadowBlur=\(opt\.blur\?\?14\)\*inkK\(\)/.test(html), 'ink glow does not follow the glyph size');
 }
 
 // ---- an emptied field refills, and the tracer wakes up with it

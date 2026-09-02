@@ -254,24 +254,35 @@ LAYER = STYLE + r"""
       penAt = performance.now();
     }, true);
 
-  // A stroke that never found the path is a smudge, not an attempt. It is
-  // erased when the pen lifts, so the board does not fill with the orange
-  // runs of every miss while the guide is still waiting at the dot. Purely
-  // cosmetic: travel and coverage are accumulated live in follow(), not read
-  // back from the stroke list, so the scribble guard is untouched.
+  // Ink that was off the path is a smudge, not an attempt. When the pen
+  // lifts the finished stroke is cut down to the runs that were on the path;
+  // the orange runs go, with a puff where they were. A stroke that never
+  // found the path goes entirely. Keeping the off-path tails of an otherwise
+  // good stroke was tried first and it is what let an overdrawn line stay
+  // and pile up. Purely cosmetic: travel and coverage are accumulated live
+  // in follow(), not read back from the stroke list, so the scribble guard
+  // is untouched. Returns how many runs were erased.
   function tidy(){
     if (!CFG.tidyStrays || mode !== 'practice' || !PATH.length || !strokes.length) return 0;
     const s = strokes[strokes.length - 1];
-    if (s.some(q => q.on)) return 0;
-    strokes.pop(); redrawInk();
-    const m = s[Math.floor(s.length / 2)];
+    const keep = [], gone = [];
+    let run = [];
+    const flush = () => { if (run.length > 1) keep.push(run); run = []; };
+    for (const q of s){
+      if (q.on) run.push(q);
+      else { flush(); gone.push(q); }
+    }
+    flush();
+    if (!gone.length) return 0;
+    strokes.pop(); strokes.push(...keep); redrawInk();
+    const m = gone[Math.floor(gone.length / 2)];
     for (let k = 0; k < 10; k++){
       const a = Math.random()*6.283, v = .5 + Math.random()*1.5;
       parts.push({x:m.x, y:m.y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, life:.6,
                   r:1 + Math.random()*1.5, c:'200,132,47'});
     }
     loop();
-    return 1;
+    return gone.length;
   }
   // Registered after the engine's own pointerup, so endStroke has already
   // pushed the stroke by the time this runs.
