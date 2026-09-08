@@ -122,6 +122,7 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   ok(V.sections.length === 0 && !V.begin() && V.phase === 'start', 'a round began with no sections chosen');
   V.openStart();
   ok(/pick a section/.test(V.startHtml), 'the begin button does not say why it is disabled');
+  ok(/href="hiragana-game\.html"/.test(V.startHtml), 'the start page has no way into the hiragana game');
   V.toggleSection(first);
   ok(V.begin() && V.phase === 'word' && V.redoShown, 'begin did not start a round');
   ok(V.queue.length === cfg.sections[0].words.length, `round has ${V.queue.length} words, section has ${cfg.sections[0].words.length}`);

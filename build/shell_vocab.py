@@ -98,11 +98,12 @@ STYLE = """
             color:rgba(127,209,196,.8); margin:14px 0 8px; }
   .start-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
   .start-row.secs{ grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
-  .start-row button{ text-align:left; background:#1d1a16; color:#e8e0cc; border:1px solid #57492f;
+  .start-row button, .start-row a{ display:block; text-decoration:none; text-align:left; background:#1d1a16; color:#e8e0cc; border:1px solid #57492f;
                      border-radius:10px; padding:10px 12px; cursor:pointer; font:inherit; min-height:64px; }
-  .start-row button b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
+  .start-row a{ min-height:0; }
+  .start-row button b, .start-row a b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
   .start-row button b i{ font-style:normal; color:#bdf0e6; margin-right:6px; }
-  .start-row button small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
+  .start-row button small, .start-row a small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
   .start-row button[aria-pressed="true"]{ border-color:#7fd1c4; background:#172422;
                      box-shadow:0 0 0 1px rgba(127,209,196,.5), 0 0 22px rgba(127,209,196,.18); }
   .start-row button[disabled]{ opacity:.42; cursor:default; }
@@ -464,6 +465,13 @@ LAYER = STYLE + r"""
   }
   function renderStart(){
     if (view === 'credits') return renderCredits();
+    // Other realms, as links to sibling files. They are other single-file
+    // builds beside this one — on Pages or in the same folder offline — so
+    // the page is only a hop away and nothing here depends on it loading.
+    const realms = () => !(CFG.realms || []).length ? '' :
+      `<div class="start-h">other realms</div><div class="start-row">` +
+      CFG.realms.map(r => `<a href="${esc(r.file)}"><b>${r.kana ? `<i>${esc(r.kana)}</i>` : ''}${esc(r.label)}</b><small>${esc(r.blurb || '')}</small></a>`).join('') +
+      `</div>`;
     const row = (k, table, cur) => Object.entries(table).map(([n, d]) =>
       `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
       + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
@@ -482,6 +490,7 @@ LAYER = STYLE + r"""
       <div class="start-row">${row('diff', DIFF, difficulty)}</div>
       <div class="start-h">what the card asks with</div>
       <div class="start-row">${row('prompt', PROMPTS, prompt)}</div>
+      ${realms()}
       <button class="start-go"${n ? '' : ' disabled'}>${n ? `begin · ${n} words` : 'pick a section'}</button>
       <div class="start-links"><button class="start-credits">who this leans on · export</button></div>
       <div class="start-foot">read the card · write the word below, one kana at a time · peeking counts</div>
@@ -612,6 +621,7 @@ def config(pack, deck):
         f"mode:{json.dumps(pack.get('mode', 'easy'))},"
         f"credit:{json.dumps(pack.get('credit', ''), ensure_ascii=False)},"
         f"credits:{json.dumps(list(pack.get('credits', [])), ensure_ascii=False)},"
+        f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"
         f"advanceMs:{int(v.get('advanceMs', 420))},"
         f"wordPauseMs:{int(v.get('wordPauseMs', 1200))},"
         f"fizzleRestarts:{'true' if v.get('fizzleRestarts', True) else 'false'},"

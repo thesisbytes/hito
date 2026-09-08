@@ -716,6 +716,11 @@ def main():
     # remain the single authority on what counts as a correct glyph — the game
     # cannot disagree with the workshop about that, because it does not have
     # its own copy of it.
+    for r in pack.get("realms", []):
+        if not r.get("label") or not r.get("file"):
+            raise SystemExit(f"a realms entry needs 'label' and 'file': {r!r}")
+        if "/" in r["file"] or "://" in r["file"]:
+            raise SystemExit(f"realms.file is a sibling filename, not a path or URL: {r['file']!r}")
     shell = pack.get("shell", "workshop")
     if shell not in ("workshop", "field", "vocab"):
         raise SystemExit(f"pack shell must be 'workshop', 'field' or 'vocab', not {shell!r}")

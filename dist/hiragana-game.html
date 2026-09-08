@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.28</title>
+<title>hito 人 · hiragana · v0.1.29</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.28';
+const APP_VERSION='0.1.29';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,11,"EN"]];
 
 // ---------- state
@@ -641,7 +641,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.28');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.29');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"",batch:40,cap:500};</script>
@@ -742,7 +742,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   flush();
 })();
 </script>
-<script>window.__FIELD_CFG={sign:"kana",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],speed:0.055,wardHp:5,spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={sign:"kana",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[{"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."}],speed:0.055,wardHp:5,spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -791,11 +791,12 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .start-h{ font-size:11px; letter-spacing:.14em; text-transform:uppercase;
             color:rgba(127,209,196,.8); margin:14px 0 8px; }
   .start-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
-  .start-row button{ text-align:left; background:#1d1a16; color:#e8e0cc; border:1px solid #57492f;
+  .start-row button, .start-row a{ display:block; text-decoration:none; text-align:left; background:#1d1a16; color:#e8e0cc; border:1px solid #57492f;
                      border-radius:10px; padding:10px 12px; cursor:pointer; font:inherit; min-height:74px; }
-  .start-row button b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
+  .start-row a{ min-height:0; }
+  .start-row button b, .start-row a b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
   .start-row button b i{ font-style:normal; color:#bdf0e6; margin-right:6px; }
-  .start-row button small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
+  .start-row button small, .start-row a small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
   .start-row button[aria-pressed="true"]{ border-color:#7fd1c4; background:#172422;
                      box-shadow:0 0 0 1px rgba(127,209,196,.5), 0 0 22px rgba(127,209,196,.18); }
   .start-row button[disabled]{ opacity:.42; cursor:default; }
@@ -1459,6 +1460,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
   function renderStart(){
     if (view === 'credits') return renderCredits();
+    // Other realms, as links to sibling files. They are other single-file
+    // builds beside this one — on Pages or in the same folder offline — so
+    // the page is only a hop away and nothing here depends on it loading.
+    const realms = () => !(CFG.realms || []).length ? '' :
+      `<div class="start-h">other realms</div><div class="start-row">` +
+      CFG.realms.map(r => `<a href="${esc(r.file)}"><b>${r.kana ? `<i>${esc(r.kana)}</i>` : ''}${esc(r.label)}</b><small>${esc(r.blurb || '')}</small></a>`).join('') +
+      `</div>`;
     const row = (k, table, cur) => Object.entries(table).map(([n, d]) =>
       `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
       + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
@@ -1469,6 +1477,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       <div class="start-row">${row('diff', DIFF, difficulty)}</div>
       <div class="start-h">what the sign says</div>
       <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
+      ${realms()}
       <button class="start-go">${over ? 'begin again' : 'begin'}</button>
       <div class="start-links"><button class="start-credits">who this leans on</button></div>
       <div class="start-foot">draw below · the farang come from above · the one you are answering is yours</div>
@@ -1569,6 +1578,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(loop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.28</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.29</div>
 </body>
 </html>

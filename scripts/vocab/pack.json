@@ -1,7 +1,7 @@
 {
   "script": "vocab",
-  "version": "0.1.1",
-  "title": "hito 人 · vocab · v0.1.1",
+  "version": "0.1.2",
+  "title": "hito 人 · vocab · v0.1.2",
   "brand": "hito 人 · vocab",
   "fontDir": "fonts",
   "probeChars": "あかん",
@@ -59,6 +59,14 @@
     "batch": 40,
     "cap": 500
   },
+  "realms": [
+    {
+      "label": "hiragana",
+      "kana": "仮",
+      "file": "hiragana-game.html",
+      "blurb": "the game. draw below, the farang come from above."
+    }
+  ],
   "credits": [
     "Vocabulary from the maintainer's Japanese class, Genki I Lesson 1.",
     "Stroke order recorded and checked by the project's teachers.",
