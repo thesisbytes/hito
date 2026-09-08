@@ -5,6 +5,7 @@ cd "$(dirname "$0")/../.."
 
 fail=0
 ver=$(python3 -c "import json;print(json.load(open('scripts/hiragana/pack.json'))['version'])")
+vver=$(python3 -c "import json;print(json.load(open('scripts/vocab/pack.json'))['version'])")
 
 echo "── scoring ─────────────────────────────────────────"
 node build/test/scoring.test.mjs | sed 's/^/  /' || fail=1
@@ -47,6 +48,10 @@ echo "── field (the game loop runs and the seam holds) ───"
 node build/test/field.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
 
 echo
+echo "── vocab (a word is walked through the seam) ───────"
+node build/test/vocab.test.mjs "dist/vocab-v$vver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── smoke (engine executes, frames run) ─────────────"
 for f in dist/*.html; do
   node build/test/smoke.test.mjs "$f" | sed 's/^/  /' || fail=1
@@ -55,7 +60,7 @@ done
 echo
 echo "── build reproducibility ───────────────────────────"
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
-for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiragana-game-v$ver"; do
+for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiragana-game-v$ver" "scripts/vocab:vocab-v$vver"; do
   src=${pack%%:*}; name=${pack##*:}
   .venv/bin/python build/stitch.py build/engine.html "$src" "$tmp/$name.html" >/dev/null
   if cmp -s "$tmp/$name.html" "dist/$name.html"; then

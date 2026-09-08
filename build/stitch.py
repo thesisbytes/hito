@@ -28,6 +28,7 @@ import sys
 from pathlib import Path
 
 import shell_field
+import shell_vocab
 import sync_layer
 
 VOWELS = "aiueo"          # gojuon column order
@@ -74,7 +75,8 @@ def build_letters(glyphs):
     for g in glyphs:
         rom = g["romaji"]
         standalone = rom == "n"           # ん belongs to no column
-        col = 1 if standalone else VOWELS.index(rom[-1]) + 1
+        # ー has no vowel either; it sits in the first column of its own row.
+        col = VOWELS.index(rom[-1]) + 1 if not standalone and rom[-1] in VOWELS else 1
         row = len(rows) + 1 if standalone else rows.index(g["row"]) + 1
         letters.append([
             g["char"],
@@ -715,11 +717,46 @@ def main():
     # cannot disagree with the workshop about that, because it does not have
     # its own copy of it.
     shell = pack.get("shell", "workshop")
-    if shell not in ("workshop", "field"):
-        raise SystemExit(f"pack shell must be 'workshop' or 'field', not {shell!r}")
+    if shell not in ("workshop", "field", "vocab"):
+        raise SystemExit(f"pack shell must be 'workshop', 'field' or 'vocab', not {shell!r}")
     if shell == "field":
         s.sub("field shell", r"</body>",
               shell_field.config(pack) + shell_field.LAYER + "</body>")
+
+    # ---- the vocab shell
+    #
+    # A flashcard over the tracer. The deck is a separate file — class content
+    # rather than realm data — named by the pack and checked here: every kana
+    # of every word has to have stroke data, or the card would ask for a
+    # character the sketchbook cannot load. That is a build failure, not a
+    # toast at runtime.
+    if shell == "vocab":
+        deck_path = Path(pack.get("deck", ""))
+        if not pack.get("deck") or not deck_path.exists():
+            raise SystemExit(f"a vocab pack needs a 'deck' file; {pack.get('deck')!r} not found")
+        deck = json.loads(deck_path.read_text(encoding="utf-8"))
+        have = {g["char"] for g in glyphs}
+        recorded = {ch for f in book["fonts"].values() for ch in f["letters"]}
+        missing, unrecorded, seen = [], [], set()
+        for sec in deck["sections"]:
+            for w in sec["words"]:
+                for k in ("ja", "romaji", "en"):
+                    if not w.get(k):
+                        raise SystemExit(f"deck word {w!r} in {sec['id']} lacks {k!r}")
+                for ch in w["ja"]:
+                    if ch in seen:
+                        continue
+                    seen.add(ch)
+                    if ch not in have:
+                        missing.append(ch)
+                    elif ch not in recorded:
+                        unrecorded.append(ch)
+        if missing:
+            raise SystemExit(f"deck uses characters the pack has no glyph for: {''.join(missing)}")
+        if unrecorded:
+            raise SystemExit(f"deck uses characters with no stroke data: {''.join(unrecorded)}")
+        s.sub("vocab shell", r"</body>",
+              shell_vocab.config(pack, deck) + shell_vocab.LAYER + "</body>")
 
     s.sub("credit", r"</body>",
           f'<div class="credit">{pack["credit"]}</div>\n</body>')

@@ -13,7 +13,13 @@ with embedded fonts practical at all.
 Variable fonts are pinned to a single weight first; keeping the variation
 axes would carry the whole weight range for no benefit here.
 
-Usage:  make_fonts.py <glyphs.json> <src-dir> <out-dir>
+Usage:  make_fonts.py <glyphs.json> <src-dir> <out-dir> [suffix]
+
+The output names are klee-one-<suffix>.woff2 and noto-sans-jp-<suffix>.woff2,
+with <suffix> defaulting to "kana". A pack with a different character set
+(the vocab realm carries every hiragana and katakana) passes its own suffix so
+it does not overwrite the gojūon subset the hiragana builds are stitched from —
+those rebuild byte-identical from source, and a font swap would break that.
 
 Both fonts are SIL OFL. Their OFL.txt files are copied to the output
 directory — the licence has to travel with the font.
@@ -33,9 +39,9 @@ from fontTools.varLib import instancer
 EXTRA = "人"
 
 FONTS = [
-    # (source filename, output name, pin variable axes to)
-    ("KleeOne-Regular.ttf", "klee-one-kana.woff2", None),
-    ("NotoSansJP-var.ttf", "noto-sans-jp-kana.woff2", {"wght": 400}),
+    # (source filename, output stem, pin variable axes to)
+    ("KleeOne-Regular.ttf", "klee-one", None),
+    ("NotoSansJP-var.ttf", "noto-sans-jp", {"wght": 400}),
 ]
 
 
@@ -72,18 +78,20 @@ def verify(path, chars):
 
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) not in (4, 5):
         sys.exit(__doc__)
-    glyphs_file, src_dir, out_dir = (Path(a) for a in sys.argv[1:])
+    glyphs_file, src_dir, out_dir = (Path(a) for a in sys.argv[1:4])
+    suffix = sys.argv[4] if len(sys.argv) == 5 else "kana"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     glyphs = json.loads(glyphs_file.read_text(encoding="utf-8"))["glyphs"]
     chars = "".join(g["char"] for g in glyphs) + EXTRA
     print(f"subsetting to {len(chars)} characters "
-          f"({len(glyphs)} gojuon + {len(EXTRA)} extra)\n")
+          f"({len(glyphs)} glyphs + {len(EXTRA)} extra)\n")
 
     failed = False
-    for src_name, out_name, pin in FONTS:
+    for src_name, stem, pin in FONTS:
+        out_name = f"{stem}-{suffix}.woff2"
         src, dest = src_dir / src_name, out_dir / out_name
         if not src.exists():
             sys.exit(f"missing source font: {src}")

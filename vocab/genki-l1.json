@@ -1,0 +1,123 @@
+{
+  "deck": "Genki I · Lesson 1",
+  "source": "Genki I, 3rd edition, Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55). Section splits follow the class's three vocabulary quizzes, one per page.",
+  "sections": [
+    {
+      "id": "l1-1",
+      "title": "L1-1 · p.38",
+      "words": [
+        {"ja": "だいがく", "romaji": "daigaku", "en": "college; university"},
+        {"ja": "こうこう", "romaji": "kookoo", "en": "high school"},
+        {"ja": "がくせい", "romaji": "gakusee", "en": "student"},
+        {"ja": "だいがくせい", "romaji": "daigakusee", "en": "college student"},
+        {"ja": "りゅうがくせい", "romaji": "ryuugakusee", "en": "international student"},
+        {"ja": "せんせい", "romaji": "sensee", "en": "teacher; Professor …"},
+        {"ja": "いちねんせい", "romaji": "ichinensee", "en": "first-year student", "note": "〜ねんせい = … year student"},
+        {"ja": "せんこう", "romaji": "senkoo", "en": "major"},
+        {"ja": "わたし", "romaji": "watashi", "en": "I"},
+        {"ja": "ともだち", "romaji": "tomodachi", "en": "friend"},
+        {"ja": "さん", "romaji": "san", "en": "Mr. / Ms. … (suffix)"},
+        {"ja": "にほんじん", "romaji": "nihonjin", "en": "Japanese person", "note": "〜じん = … people"},
+        {"ja": "いま", "romaji": "ima", "en": "now"},
+        {"ja": "ごぜん", "romaji": "gozen", "en": "A.M."},
+        {"ja": "ごご", "romaji": "gogo", "en": "P.M."},
+        {"ja": "いちじ", "romaji": "ichiji", "en": "one o'clock", "note": "〜じ = o'clock"},
+        {"ja": "はん", "romaji": "han", "en": "half (past)"},
+        {"ja": "にじはん", "romaji": "nijihan", "en": "half past two"},
+        {"ja": "にほん", "romaji": "nihon", "en": "Japan"},
+        {"ja": "アメリカ", "romaji": "amerika", "en": "U.S.A."},
+        {"ja": "にほんご", "romaji": "nihongo", "en": "Japanese language", "note": "〜ご = … language"},
+        {"ja": "さい", "romaji": "sai", "en": "… years old (suffix)"},
+        {"ja": "でんわ", "romaji": "denwa", "en": "telephone"},
+        {"ja": "ばん", "romaji": "ban", "en": "number … (suffix)"},
+        {"ja": "ばんごう", "romaji": "bangoo", "en": "number"},
+        {"ja": "なまえ", "romaji": "namae", "en": "name"},
+        {"ja": "なん", "romaji": "nan", "en": "what", "note": "なに before a particle"}
+      ]
+    },
+    {
+      "id": "l1-2",
+      "title": "L1-2 · p.39",
+      "words": [
+        {"ja": "あのう", "romaji": "anoo", "en": "um…"},
+        {"ja": "はい", "romaji": "hai", "en": "yes"},
+        {"ja": "そうです", "romaji": "soo desu", "en": "That's right."},
+        {"ja": "そうですか", "romaji": "soo desu ka", "en": "I see. / Is that so?"},
+        {"ja": "くに", "romaji": "kuni", "en": "country"},
+        {"ja": "イギリス", "romaji": "igirisu", "en": "Britain"},
+        {"ja": "オーストラリア", "romaji": "oosutoraria", "en": "Australia"},
+        {"ja": "かんこく", "romaji": "kankoku", "en": "Korea"},
+        {"ja": "カナダ", "romaji": "kanada", "en": "Canada"},
+        {"ja": "ちゅうごく", "romaji": "chuugoku", "en": "China"},
+        {"ja": "インド", "romaji": "indo", "en": "India"},
+        {"ja": "エジプト", "romaji": "ejiputo", "en": "Egypt"},
+        {"ja": "フィリピン", "romaji": "firipin", "en": "Philippines"},
+        {"ja": "アジアけんきゅう", "romaji": "ajia kenkyuu", "en": "Asian studies"},
+        {"ja": "けいざい", "romaji": "keezai", "en": "economics"},
+        {"ja": "こうがく", "romaji": "koogaku", "en": "engineering"},
+        {"ja": "こくさいかんけい", "romaji": "kokusai kankee", "en": "international relations"},
+        {"ja": "コンピューター", "romaji": "konpyuutaa", "en": "computer"},
+        {"ja": "せいじ", "romaji": "seeji", "en": "politics"},
+        {"ja": "せいぶつがく", "romaji": "seebutsugaku", "en": "biology"},
+        {"ja": "ビジネス", "romaji": "bijinesu", "en": "business"},
+        {"ja": "ぶんがく", "romaji": "bungaku", "en": "literature"},
+        {"ja": "れきし", "romaji": "rekishi", "en": "history"},
+        {"ja": "しごと", "romaji": "shigoto", "en": "job; occupation"},
+        {"ja": "いしゃ", "romaji": "isha", "en": "doctor"},
+        {"ja": "かいしゃいん", "romaji": "kaishain", "en": "office worker"}
+      ]
+    },
+    {
+      "id": "l1-3",
+      "title": "L1-3 · p.40",
+      "words": [
+        {"ja": "かんごし", "romaji": "kangoshi", "en": "nurse"},
+        {"ja": "こうこうせい", "romaji": "kookoosee", "en": "high school student"},
+        {"ja": "しゅふ", "romaji": "shufu", "en": "housewife"},
+        {"ja": "だいがくいんせい", "romaji": "daigakuinsee", "en": "graduate student"},
+        {"ja": "べんごし", "romaji": "bengoshi", "en": "lawyer"},
+        {"ja": "かぞく", "romaji": "kazoku", "en": "family"},
+        {"ja": "おかあさん", "romaji": "okaasan", "en": "mother"},
+        {"ja": "おとうさん", "romaji": "otoosan", "en": "father"},
+        {"ja": "おねえさん", "romaji": "oneesan", "en": "older sister"},
+        {"ja": "おにいさん", "romaji": "oniisan", "en": "older brother"},
+        {"ja": "いもうと", "romaji": "imooto", "en": "younger sister"},
+        {"ja": "おとうと", "romaji": "otooto", "en": "younger brother"}
+      ]
+    },
+    {
+      "id": "hours",
+      "title": "Hours · p.55",
+      "words": [
+        {"ja": "いちじ", "romaji": "ichiji", "en": "1 o'clock"},
+        {"ja": "にじ", "romaji": "niji", "en": "2 o'clock"},
+        {"ja": "さんじ", "romaji": "sanji", "en": "3 o'clock"},
+        {"ja": "よじ", "romaji": "yoji", "en": "4 o'clock", "note": "not よんじ"},
+        {"ja": "ごじ", "romaji": "goji", "en": "5 o'clock"},
+        {"ja": "ろくじ", "romaji": "rokuji", "en": "6 o'clock"},
+        {"ja": "しちじ", "romaji": "shichiji", "en": "7 o'clock", "note": "not ななじ"},
+        {"ja": "はちじ", "romaji": "hachiji", "en": "8 o'clock"},
+        {"ja": "くじ", "romaji": "kuji", "en": "9 o'clock", "note": "not きゅうじ"},
+        {"ja": "じゅうじ", "romaji": "juuji", "en": "10 o'clock"},
+        {"ja": "じゅういちじ", "romaji": "juuichiji", "en": "11 o'clock"},
+        {"ja": "じゅうにじ", "romaji": "juuniji", "en": "12 o'clock"}
+      ]
+    },
+    {
+      "id": "minutes",
+      "title": "Minutes · p.55",
+      "words": [
+        {"ja": "いっぷん", "romaji": "ippun", "en": "1 minute"},
+        {"ja": "にふん", "romaji": "nifun", "en": "2 minutes"},
+        {"ja": "さんぷん", "romaji": "sanpun", "en": "3 minutes"},
+        {"ja": "よんぷん", "romaji": "yonpun", "en": "4 minutes"},
+        {"ja": "ごふん", "romaji": "gofun", "en": "5 minutes"},
+        {"ja": "ろっぷん", "romaji": "roppun", "en": "6 minutes"},
+        {"ja": "ななふん", "romaji": "nanafun", "en": "7 minutes"},
+        {"ja": "はっぷん", "romaji": "happun", "en": "8 minutes", "note": "also はちふん"},
+        {"ja": "きゅうふん", "romaji": "kyuufun", "en": "9 minutes"},
+        {"ja": "じゅっぷん", "romaji": "juppun", "en": "10 minutes", "note": "also じっぷん"}
+      ]
+    }
+  ]
+}

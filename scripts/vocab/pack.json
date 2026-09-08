@@ -1,0 +1,67 @@
+{
+  "script": "vocab",
+  "version": "0.1.0",
+  "title": "hito 人 · vocab · v0.1.0",
+  "brand": "hito 人 · vocab",
+  "fontDir": "fonts",
+  "probeChars": "あかん",
+  "exportName": "hito-kana-strokes.json",
+  "fonts": [
+    {
+      "id": "klee-one",
+      "key": "klee",
+      "label": "Klee One (textbook)",
+      "family": "HT-KleeOne",
+      "file": "klee-one-kana-all.woff2",
+      "role": "trace"
+    },
+    {
+      "id": "noto-sans-jp",
+      "key": "noto",
+      "label": "Noto Sans JP (print)",
+      "family": "HT-NotoSansJP",
+      "file": "noto-sans-jp-kana-all.woff2",
+      "role": "print"
+    }
+  ],
+  "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Vocabulary follows Genki I (3rd ed.), Lesson 1.",
+  "shadow": "none",
+  "shadowScale": 2.4,
+  "strictFollow": true,
+  "coverThreshold": 0.85,
+  "maxTravel": 2.5,
+  "tailFraction": 0.12,
+  "minEndTolerance": 0.02,
+  "sequentialReveal": true,
+  "difficulty": {
+    "shrinkPerLevel": 0.93,
+    "minGlyph": 0.32,
+    "minTolerance": 0.045
+  },
+  "sizeMode": "random",
+  "sizeRange": [
+    0.46,
+    0.62
+  ],
+  "mode": "easy",
+  "grid": "cross",
+  "shell": "vocab",
+  "deck": "vocab/genki-l1.json",
+  "vocab": {
+    "prompt": "en",
+    "advanceMs": 420,
+    "wordPauseMs": 1200,
+    "fizzleRestarts": true,
+    "tidyStrays": true
+  },
+  "sync": {
+    "endpoint": "",
+    "batch": 40,
+    "cap": 500
+  },
+  "credits": [
+    "Vocabulary from the maintainer's Japanese class, Genki I Lesson 1.",
+    "Stroke order recorded and checked by the project's teachers.",
+    "Built by the maintainer, one version at a time."
+  ]
+}

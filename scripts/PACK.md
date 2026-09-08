@@ -85,7 +85,7 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 
 | key | default | meaning |
 |---|---|---|
-| `shell` | `workshop` | `workshop` — the gojūon chart, stroke controls and everything else this project uses on itself. `field` — the game: sketchbook in the bottom third, battle in the top two thirds. |
+| `shell` | `workshop` | `workshop` — the gojūon chart, stroke controls and everything else this project uses on itself. `field` — the game: sketchbook in the bottom third, battle in the top two thirds. `vocab` — a flashcard above the sketchbook: the card asks for a word, the tracer walks its kana one at a time. |
 | `field.sign` | `kana` | What a monster's speech bubble shows. `kana` tests recall of the shape; `romaji` tests the reading → shape mapping, which is harder and only bites once the guide is off; `gaijin` asks in the learner's own broken accent. |
 | `field.speed` | `0.055` | How fast a monster closes on the ward, in field-radii per second. |
 | `field.wardHp` | `5` | How many monsters can reach the centre before the run ends. |
@@ -100,8 +100,22 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 | `field.holdMs` | `1500` | How long after the pen last touched the pad the tracer still counts as busy. A retarget queued in that window waits, so a wisp or a breach elsewhere cannot swap the glyph under a hand that has lifted to think, or that has started a stroke which has not yet found the path. |
 | `field.tidyStrays` | `true` | Erase a stroke that never touched the path when the pen lifts. Cosmetic only: travel and coverage are accumulated live, so the scribble guard is unaffected. Stops the board filling with orange runs of every miss. |
 | `field.fizzleRestarts` | `true` | Put the glyph back to the start after a fizzle. `fizzle()` already clears the ink but only rewinds progress halfway, leaving an empty canvas with credit for a path that is no longer visible — and under a clock there is no time to work out where the middle was. |
+| `deck` | *(required by `vocab`)* | Path to the deck file, relative to the repo root. A deck is class content rather than realm data, so it lives outside `scripts/` (`vocab/genki-l1.json`). `{deck, source, sections:[{id, title, words:[{ja, romaji, en, note?}]}]}`. The stitch refuses a deck that uses a character the pack has no glyph or no stroke data for — that is a build failure, not a runtime toast. |
+| `vocab.prompt` | `en` | What the card asks with, as the default the start page opens on. `en` is the quiz (meaning → word → kana). `romaji` is the reading without the meaning. `kana` is copying, which is handwriting practice rather than vocabulary. |
+| `vocab.advanceMs` | `420` | Delay before the next kana of the word loads after one is finished. |
+| `vocab.wordPauseMs` | `1200` | How long the finished word blooms — reading and meaning together — before the next card. |
+| `vocab.fizzleRestarts` | `true` | As `field.fizzleRestarts`. |
+| `vocab.tidyStrays` | `true` | As `field.tidyStrays`. |
 
-Both shells build from the same pack directory — pass a `.json` file to
+The vocab shell is not a variant of the hiragana pack: it needs every kana a
+deck might use, so `scripts/vocab/` carries its own glyph list — all 164
+hiragana and katakana, written by `build/kana_glyphs.py` — and its own
+stroke book and font subsets (`*-kana-all.woff2`). Peeking counts: the
+reading button, the kana button and skip are all recorded against the word,
+and a peeked word comes up sooner in the next round. Progress is a per-word
+ledger in localStorage with export/import on the credits page.
+
+The workshop and the field build from the same pack directory — pass a `.json` file to
 `stitch.py` instead of a directory to use a variant. `scripts/hiragana/game.json`
 is `pack.json` plus a shell, sharing one 400KB stroke book, because duplicating
 the data to change one key is how two builds silently drift apart.

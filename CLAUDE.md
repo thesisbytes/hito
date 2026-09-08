@@ -28,6 +28,7 @@ hito/
     PACK.md            the pack format — read before adding a realm
     thai/              glyph list (stub; strokes not yet recorded)
     hiragana/          glyph list, KanjiVG-derived strokes, pack settings
+    vocab/             every hiragana and katakana, strokes, pack settings
   fonts/               subset .woff2 files, embedded as base64 at build time
   glyph-forge/         handwriting capture tool (separate app, same aesthetic)
   build/
@@ -46,6 +47,10 @@ hito/
     shell_field.py          the game shell, appended as a layer
     sync_layer.py           offline outbox, appended as a layer
     test/sync.test.mjs      offline stays offline and nothing is lost
+    shell_vocab.py          the flashcard shell, appended as a layer
+    kana_glyphs.py          writes the 164-kana glyph list the vocab realm traces
+    test/vocab.test.mjs     a word is walked through the seam
+  vocab/                 decks: class content, not realm data (genki-l1.json)
   dist/                built single-file outputs, one per script, versioned
 ```
 
@@ -190,6 +195,30 @@ difference, not a misalignment. Deriving the target from the same data as the
 guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
+
+### Vocab — `dist/vocab-v0.1.0.html`
+
+The first word-level realm, and the "layout step" the economy plan always
+said words would be: a word is a sequence of glyph recordings, no new stroke
+format. A flashcard sits above the sketchbook. It shows the prompt (the
+English by default), a strip of blank slots the length of the word, and the
+tracer is walked through the word's kana one at a time. Finish a kana and
+its slot lights; finish the word and the reading and meaning bloom together.
+
+Decks are class content rather than realm data, so they live in `vocab/`
+outside `scripts/`. The first is Genki I Lesson 1 in five sections, one per
+quiz page. The pack's glyph list is every hiragana and katakana (164, from
+`build/kana_glyphs.py`) so a new lesson is only ever a JSON edit, and the
+stitch refuses a deck that uses a character with no stroke data.
+
+The recall test is honest only as far as the tracer lets it be: on easy the
+guide reveals each kana's shape once the pen is down. What the card measures
+is whether the hand needed to *peek* before starting — reading, kana and
+skip all count against the word, and peeked words come first next round.
+Real free recall waits on the hard-mode scorer, like everything else.
+
+The shell carries a copy of the field's difficulty table. See `NOTES.md`
+(2026-09-08) for why that is a known drift risk rather than an oversight.
 
 ---
 
