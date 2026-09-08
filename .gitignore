@@ -24,3 +24,7 @@ hito-seed.zip
 # OS
 .DS_Store
 Thumbs.db
+
+# Personal command-line study tool and its log, local only
+vocab/study.py
+vocab/attempts.jsonl
