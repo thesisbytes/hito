@@ -147,6 +147,11 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
        `at kana ${k} of ${w.ja}: ci ${V.ci}, tracer on ${P.LETTERS[P.idx][0]}, phase ${V.phase}`);
     globalThis.conjure();
     ok(P.done, 'conjure did not finish the glyph');
+    // The engine's own 1.9s advance from an earlier kana can fire while this
+    // one is finished and waiting on the shell. It must not reload it.
+    const at = P.idx;
+    globalThis.load(P.idx + 1);
+    ok(P.idx === at && P.done, `a stale engine advance reloaded finished kana ${k} of ${w.ja}`);
     advance(nums.advanceMs + 20);
   }
   ok(V.phase === 'bloom', `after the last kana the phase is ${V.phase}, expected bloom`);

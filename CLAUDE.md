@@ -130,7 +130,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.27.html`
+### Hiragana — `dist/hiragana-v0.1.28.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -196,7 +196,7 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
-### Vocab — `dist/vocab-v0.1.0.html`
+### Vocab — `dist/vocab-v0.1.1.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -516,8 +516,13 @@ per-character ledger. Save data must have export/import from day one.
 ## Conventions
 
 - **Versioning:** `dist/<script>-vX.Y.Z.html`. Bump on *every* change, even
-  one-liners. Stamp the version in `<title>`, the header, and the boot toast
-  so a cached build is obvious.
+  one-liners. Stamp the version in `<title>`, the header, the footer and the
+  boot toast so a cached build is obvious.
+- **Stable links:** `dist/<script>.html` (`vocab.html`, `hiragana.html`,
+  `hiragana-game.html`) is a byte-identical copy of the current versioned
+  build, so the Pages URL never changes between releases. Copy it on every
+  bump — `run.sh` fails if it is stale. Git stores identical content once,
+  so the copy costs nothing.
 - **Nothing lives only in browser storage.** Fonts, stroke data, and defaults
   are embedded in the HTML. User progress has export/import.
 - **Performance:** no per-frame shadow blur. Cache trails offscreen.

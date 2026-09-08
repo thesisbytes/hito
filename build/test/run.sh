@@ -12,14 +12,14 @@ node build/test/scoring.test.mjs | sed 's/^/  /' || fail=1
 
 echo
 echo "── alignment (strokes, glyph and grid agree) ───────"
-for f in dist/hiragana-*.html; do
+for f in dist/hiragana-*-v*.html dist/hiragana-v*.html; do
   case "$f" in *-debug.html) continue;; esac
   node build/test/alignment.test.mjs "$f" | sed 's/^/  /' || fail=1
 done
 
 echo
 echo "── state (an attempt restart clears everything) ────"
-for f in dist/hiragana-*.html; do
+for f in dist/hiragana-*-v*.html dist/hiragana-v*.html; do
   case "$f" in *-debug.html) continue;; esac
   node build/test/state.test.mjs "$f" | sed 's/^/  /' || fail=1
 done
@@ -53,7 +53,7 @@ node build/test/vocab.test.mjs "dist/vocab-v$vver.html" | sed 's/^/  /' || fail=
 
 echo
 echo "── smoke (engine executes, frames run) ─────────────"
-for f in dist/*.html; do
+for f in dist/*-v*.html; do
   node build/test/smoke.test.mjs "$f" | sed 's/^/  /' || fail=1
 done
 
@@ -67,6 +67,20 @@ for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiraga
     echo "  $name rebuilds byte-identical"
   else
     echo "  MISMATCH: dist/$name.html differs from a fresh build"
+    fail=1
+  fi
+done
+
+echo
+echo "── stable links (dist/<script>.html is the current build) ──"
+# The public links carry no version, so the page has to: the unversioned
+# file is a byte-for-byte copy of the current versioned build, nothing else.
+for pair in "hiragana:hiragana-v$ver" "hiragana-game:hiragana-game-v$ver" "vocab:vocab-v$vver"; do
+  alias=${pair%%:*}; name=${pair##*:}
+  if cmp -s "dist/$alias.html" "dist/$name.html"; then
+    echo "  dist/$alias.html is $name"
+  else
+    echo "  STALE: dist/$alias.html is not $name — cp dist/$name.html dist/$alias.html"
     fail=1
   fi
 done

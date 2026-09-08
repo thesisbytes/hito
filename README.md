@@ -17,9 +17,9 @@ a font by hand, kids finding bugs — all lean on each other, and so will you.
 Each realm ships as a single HTML file. No install, no server, no
 dependencies. Open it on a tablet and start tracing:
 
-**[Play](https://thesisbytes.github.io/hito/dist/hiragana-game-v0.1.27.html)** — the game: draw below, farang advance above.  
-**[Vocab](https://thesisbytes.github.io/hito/dist/vocab-v0.1.0.html)** — Genki I Lesson 1 as flashcards, written one kana at a time.  
-**[Workshop](https://thesisbytes.github.io/hito/dist/hiragana-v0.1.27.html)** — the full gojūon chart and every control, which is what this project uses on itself.
+**[Play](https://thesisbytes.github.io/hito/dist/hiragana-game.html)** — the game: draw below, farang advance above.  
+**[Vocab](https://thesisbytes.github.io/hito/dist/vocab.html)** — Genki I Lesson 1 as flashcards, written one kana at a time.  
+**[Workshop](https://thesisbytes.github.io/hito/dist/hiragana.html)** — the full gojūon chart and every control, which is what this project uses on itself.
 
 ## How the tracing works
 
@@ -48,7 +48,7 @@ master it. A hand that can only trace す at one size has not learned much.
 - `fonts/` — source woff2 files, embedded at build time
 - `glyph-forge/` — companion tool for capturing handwritten letterforms into a font
 - `build/` — stitches engine + script pack into a single file
-- `dist/` — built, versioned outputs
+- `dist/` — built outputs, one versioned file per script plus an unversioned copy (`vocab.html`) that the links above point at
 
 `build/` holds the engine and the stitch script that combines it with a
 script pack. `CLAUDE.md` has the full brief; `NOTES.md` is the running log.

@@ -293,7 +293,14 @@ LAYER = STYLE + r"""
   window.load = function(i){
     if (loading) return _load.apply(this, arguments);
     if (phase === 'word' && word){
+      // A finished kana is waiting on the shell's own advance. The engine's
+      // 1.9s timer from an *earlier* kana can land in that wait when the
+      // hand is quick, and redirecting it would reload the finished glyph
+      // out from under its celebration. Nothing else needs a load while
+      // that kana is done — the shell is about to do one. A stray glyph
+      // that finished is a different matter: it comes back to the card.
       const t = AT[chars[ci]];
+      if (done && idx === t) return;
       return _load.call(this, t === undefined ? i : t);
     }
     if (phase === 'bloom' || phase === 'summary') return;

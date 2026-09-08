@@ -758,8 +758,11 @@ def main():
         s.sub("vocab shell", r"</body>",
               shell_vocab.config(pack, deck) + shell_vocab.LAYER + "</body>")
 
+    # The version rides in the footer as well as the title, header and boot
+    # toast: the public links are unversioned (dist/vocab.html), so the page
+    # itself has to say which build it is.
     s.sub("credit", r"</body>",
-          f'<div class="credit">{pack["credit"]}</div>\n</body>')
+          f'<div class="credit">{pack["credit"]} · v{version}</div>\n</body>')
     s.sub("credit style", r"</style>",
           ".credit{max-width:min(92vw,520px);margin:0 auto 26px;font-size:11px;"
           "line-height:1.5;color:var(--ash);opacity:.65;text-align:center}\n</style>")
