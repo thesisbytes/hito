@@ -276,7 +276,7 @@ def main():
               r"  if\(best>=0\)\{ q\.on=true; prog=Math\.max\(prog,best\); offCount=0;"
               r" smudge=Math\.max\(0,smudge-2\); spark\(q\.x,q\.y,q\.p\);\n"
               r"    if\(SEGEND\.has\(prog\)&&prog<PATH\.length-1\) prog\+\+;\n"
-              r"    runeUI\(\); drawGuide\(\); if\(prog>=PATH\.length-2\) conjure\(\); return; \}",
+              r"    runeUI\(\); if\(prog>=PATH\.length-2\)\{ drawGuide\(\); conjure\(\); \} else paintLater\(\); return; \}",
               "function covered(){ if(!hit) return 0; let c=0;"
               " for(let i=0;i<hit.length;i++) c+=hit[i]; return c/hit.length; }\n"
               "// How near the end of a stroke counts as having reached it.\n"
@@ -369,7 +369,7 @@ def main():
               "      }\n"
               "      awaitLift=true;   // hooks are separate strokes, so prove it\n"
               "    }\n"
-              "    runeUI(); drawGuide(); return; }")
+              "    runeUI(); paintLater(); return; }")
         s.sub("advance on pen down",
               r"if\(PATH\.length&&mode==='practice'\)\{ const q=pos\(e\);"
               r" if\(PATH\.length\) follow\(q,true\); \}",
@@ -462,15 +462,11 @@ def main():
     # drawn by the pen, and the ones after it have not caught light yet.
     if pack.get("sequentialReveal") and pack.get("strictFollow"):
         s.sub("trail: current stroke only",
-              r"  paintPath\(tr,prog,PATH\.length-1,"
-              r"\{alpha:\.38,blur:10,nocore:true,scale:\.75\}\);[^\n]*\n"
-              r"  for\(let i=prog;i<PATH\.length;i\+=4\)\{ const q=denorm\(PATH\[i\]\);[^\n]*\n",
+              r"  const _ss=prog, _se=PATH\.length-1, _s0=0;[^\n]*\n",
               "  const _si=(awaitLift&&segIdx<SEGS.length-1)?segIdx+1:segIdx;\n"
               "  const _sg=SEGS[_si]||[0,PATH.length-1];\n"
-              "  const _ss=Math.max(prog,_sg[0]), _se=_sg[1];\n"
-              "  paintPath(tr,_ss,_se,{alpha:.38,blur:10,nocore:true,scale:.75});"
-              "   // road, this stroke only\n"
-              "  for(let i=_ss;i<=_se;i+=4){ const q=denorm(PATH[i]);\n")
+              "  const _ss=Math.max(prog,_sg[0]), _se=_sg[1], _s0=_sg[0];"
+              "   // road, this stroke only\n")
 
         s.sub("ghost demonstrates this stroke",
               r"  const rem=PATH\.length-1-prog, dur=2200\+rem\*17,"
@@ -499,13 +495,11 @@ def main():
 
         # the shine: a finished stroke throws light along its whole length
         s.sub("trail cache tracks the segment too",
-              r"  if\(trailProg!==prog\) renderTrail\(\);",
-              "  // Declared here because the cache check below is the first use;\n"
+              r"  renderTrail\(\);   // cached; repaints only what the pen moved",
+              "  // Declared here because the comet below is the first use;\n"
               "  // declaring it further down put it in the temporal dead zone.\n"
               "  const _gi=(awaitLift&&segIdx<SEGS.length-1)?segIdx+1:segIdx;\n"
-              "  if(trailProg!==prog||trailSeg!==_gi) { trailSeg=_gi; renderTrail(); }")
-        s.sub("trail cache state", r"let SEGS=\[\],segIdx=0,",
-              "let trailSeg=-1;\nlet SEGS=[],segIdx=0,")
+              "  renderTrail();   // cached per stroke; repaints only what the pen moved")
 
         s.sub("shine on stroke completion",
               r"function fizzle\(\)\{",
@@ -541,7 +535,7 @@ def main():
         # the trail, comet and start dot are the guide; the shape is not
         s.sub("guide can be hidden",
               r"  fx\.save\(\); fx\.globalAlpha=\.85\+\.15\*Math\.sin\(now/600\);"
-              r" fx\.drawImage\(trail,0,0,W,H\); fx\.restore\(\);\n"
+              r" fx\.drawImage\(trail,0,0,W,H\); fx\.drawImage\(trailLive,0,0,W,H\); fx\.restore\(\);\n"
               r"  const n=_a\+Math\.max\(2,Math\.floor\(ph\*\(end-_a\)\)\);"
               r" paintPath\(fx,Math\.max\(_a,n-16\),n,\{alpha:\.9,blur:18,scale:\.8\}\);[^\n]*\n"
               r"  const s0=denorm\(PATH\[\(awaitLift&&segIdx<SEGS\.length-1\)"
@@ -551,7 +545,7 @@ def main():
               r"  fx\.beginPath\(\); fx\.arc\(s0\.x,s0\.y,4\+3\*pulse,0,7\); fx\.fill\(\); fx\.restore\(\);",
               "  if(GUIDE_ON){\n"
               "    fx.save(); fx.globalAlpha=.85+.15*Math.sin(now/600);"
-              " fx.drawImage(trail,0,0,W,H); fx.restore();\n"
+              " fx.drawImage(trail,0,0,W,H); fx.drawImage(trailLive,0,0,W,H); fx.restore();\n"
               "    const n=_a+Math.max(2,Math.floor(ph*(end-_a)));"
               " paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); // comet\n"
               "    const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)"
@@ -565,8 +559,8 @@ def main():
         # order is the thing a learner is actually trying to recall, so on
         # easy the number of the stroke you are about to draw is shown.
         s.sub("stroke numbers on the guide",
-              r"  if\(rec&&!done&&prog>1\) paintPath\(g,0,prog,\{alpha:\.9\}\);",
-              "  if(rec&&!done&&prog>1) paintPath(g,0,prog,{alpha:.9});\n"
+              r"  if\(rec&&!done&&prog>1\) paintLit\(g,\{alpha:\.9\}\);",
+              "  if(rec&&!done&&prog>1) paintLit(g,{alpha:.9});\n"
               "  if(GUIDE_NUMBERS&&rec&&!done&&SEGS.length>1){\n"
               "    const _ni=(awaitLift&&segIdx<SEGS.length-1)?segIdx+1:segIdx;\n"
               "    const _ns=SEGS[_ni];\n"

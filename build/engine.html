@@ -177,6 +177,38 @@ let PATH=[],SEGEND=new Set(),prog=0,offCount=0; // practice: teacher path (dense
 let lit=[];
 let ghostAnim=null;                       // guide animation handle
 const trail=document.createElement('canvas'); const tr=trail.getContext('2d'); let trailProg=-1;
+// ---------- offscreen caches
+// Every blurred stroke() is its own offscreen blur pass, and the engine was
+// repainting hundreds of them per pen sample: the whole lit path from its
+// first point, every stroke of ink, and the whole road ahead — that was the
+// easy-mode lag. Each of these caches makes the same stroke() calls in the
+// same order; it just remembers them, so a pen sample only ever adds.
+// Ink and the lit path each keep two layers so the current stroke can be
+// appended a piece at a time: finished strokes and the current stroke's
+// glow on one, the current stroke's white core on the other. Glow and core
+// painted together per piece would put each glow over the previous core and
+// tint it gold at every joint; layered, the core stays on top the way a
+// single repaint ordered it. When a stroke ends its core is folded into the
+// first layer, so the next stroke's glow crosses over it as it always did.
+// The lit path grows from where it was last painted; a rewind (fizzle) or a
+// new glyph starts it over.
+const litA=document.createElement('canvas'); const la=litA.getContext('2d');
+const litB=document.createElement('canvas'); const lb=litB.getContext('2d'); let litProg=-1,litKey='';
+const inkA=document.createElement('canvas'); const ia=inkA.getContext('2d');
+const inkB=document.createElement('canvas'); const ib=inkB.getContext('2d');
+let inkRef=[],inkCur=null,inkN=0,inkKey='';
+// The road ahead: cached from a checkpoint a little in front of the pen to
+// the end of the stroke, and only the stretch between the pen and the
+// checkpoint is painted live. When the pen passes the checkpoint the cache
+// moves on.
+const TRAIL_AHEAD=24;
+const trailLive=document.createElement('canvas'); const tl=trailLive.getContext('2d'); let trailKey='',trailFrom=-1,liveFrom=-1;
+// Pen samples arrive several to a frame and the screen shows one, so the
+// guide and the ink are composited once per frame from whatever state the
+// samples left, rather than once per sample.
+let paintQueued=false;
+function paintLater(){ if(paintQueued) return; paintQueued=true; requestAnimationFrame(()=>{ paintQueued=false; drawGuide(); redrawInk(); }); }
+function fit(c,x){ if(c.width!==W*DPR||c.height!==H*DPR){ c.width=W*DPR; c.height=H*DPR; } x.setTransform(DPR,0,0,DPR,0,0); x.clearRect(0,0,W,H); }   // size once, clear otherwise
 
 // ---------- geometry helpers
 const glyphFont=s=>`600 ${s}px ${FONT()}`;
@@ -220,18 +252,36 @@ function paintStroke(ctx,s,opt={}){ // s in canvas coords
   if(!s.length) return; const col=opt.color||'#e9c46a', core=opt.core||'rgba(255,241,184,.9)';
   ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.globalAlpha=opt.alpha??1;
   if(!opt.cover&&!opt.flat){ctx.shadowColor=col;ctx.shadowBlur=(opt.blur??14)*inkK();} ctx.strokeStyle=opt.cover?'#fff':col;
-  if(s.length===1){ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(s[0].x,s[0].y,widthFor(s[0].p||.5)/2,0,7);ctx.fill();ctx.restore();return;}
-  for(let i=1;i<s.length;i++){const a=s[i-1],b=s[i];ctx.lineWidth=opt.cover?22:(opt.width??widthFor(((a.p||.5)+(b.p||.5))/2)*(opt.scale||1));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+  if(s.length===1){if(!opt.onlycore){ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(s[0].x,s[0].y,widthFor(s[0].p||.5)/2,0,7);ctx.fill();}ctx.restore();return;}
+  if(!opt.onlycore) for(let i=1;i<s.length;i++){const a=s[i-1],b=s[i];ctx.lineWidth=opt.cover?22:(opt.width??widthFor(((a.p||.5)+(b.p||.5))/2)*(opt.scale||1));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
   if(!opt.cover&&!opt.nocore){ctx.shadowBlur=0;ctx.strokeStyle=core;for(let i=1;i<s.length;i++){const a=s[i-1],b=s[i];ctx.lineWidth=Math.max(1,widthFor(((a.p||.5)+(b.p||.5))/2)*.35*(opt.scale||1));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
   ctx.restore();
 }
-function redrawInk(){ ink.clearRect(0,0,W,H);
-  if(mode==='record'){ strokes.forEach((s,i)=>{ paintStroke(ink,s,{color:'#7fd1c4',core:'#e6fffa'}); if(strokes.length>1) label(ink,s[0],i+1); });
+const judgedOpt=on=>on?{}:{color:'#c8842f',alpha:.45,blur:6,nocore:true,scale:.7};
+function paintJudged(ctx,s){ let run=[],on=null;   // on-path runs lit, off-path runs a dim orange
+  const flush=()=>{ if(run.length>1) paintStroke(ctx,run,judgedOpt(on)); run=[]; };
+  for(const q of s){ const o=q.on===undefined?true:!!q.on; if(on===null) on=o; if(o!==on){ run.push(q); flush(); on=o; run=[q]; } else run.push(q); } flush(); }
+function redrawInk(){
+  if(mode==='record'){ ink.clearRect(0,0,W,H); inkKey='';
+    strokes.forEach((s,i)=>{ paintStroke(ink,s,{color:'#7fd1c4',core:'#e6fffa'}); if(strokes.length>1) label(ink,s[0],i+1); });
     if(cur) paintStroke(ink,cur,{color:'#7fd1c4',core:'#e6fffa'}); return; }
-  const paintJudged=s=>{ let run=[],on=null;
-    const flush=()=>{ if(run.length>1) paintStroke(ink,run,on?{}:{color:'#c8842f',alpha:.45,blur:6,nocore:true,scale:.7}); run=[]; };
-    for(const q of s){ const o=q.on===undefined?true:!!q.on; if(on===null) on=o; if(o!==on){ run.push(q); flush(); on=o; run=[q]; } else run.push(q); } flush(); };
-  strokes.forEach(paintJudged); if(cur) paintJudged(cur); }
+  // Finished strokes are repainted only when the list itself changed — a
+  // stroke landed, tidy() trimmed one, fizzle or load() emptied it — and a
+  // live stroke that was never committed is dropped with them.
+  const key=[W,H,DPR].join('/');
+  let full=key!==inkKey||inkRef.length!==strokes.length||(cur!==inkCur&&inkN>0)||(cur&&cur.length<inkN);
+  for(let i=0;!full&&i<strokes.length;i++) if(inkRef[i]!==strokes[i]) full=true;
+  if(full){ inkKey=key; inkRef=strokes.slice(); fit(inkA,ia); fit(inkB,ib); strokes.forEach(s=>paintJudged(ia,s)); inkCur=null; inkN=0; }
+  // The current stroke only ever grows, so only its new segments are
+  // painted. A segment takes the style of the point it leaves, which is
+  // where paintJudged's run-splitting puts the boundary.
+  if(cur){ if(cur!==inkCur){ inkCur=cur; inkN=0; }
+    for(let i=Math.max(1,inkN);i<cur.length;i++){ const a=cur[i-1],seg=[a,cur[i]];
+      if(a.on===undefined||a.on){ paintStroke(ia,seg,{nocore:true}); paintStroke(ib,seg,{onlycore:true}); } else paintStroke(ia,seg,judgedOpt(false)); }
+    inkN=cur.length; }
+  // Whole-canvas copies on purpose: a sub-rectangle copy makes the software
+  // rasterizer snapshot the entire source first, and costs twenty times more.
+  ink.clearRect(0,0,W,H); ink.drawImage(inkA,0,0,W,H); if(inkN>1) ink.drawImage(inkB,0,0,W,H); }
 function label(ctx,p,n){ ctx.save(); ctx.font='bold 13px system-ui'; ctx.fillStyle='#15100d'; ctx.strokeStyle='#7fd1c4'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.arc(p.x-14,p.y-14,10,0,7); ctx.fillStyle='#7fd1c4'; ctx.fill(); ctx.fillStyle='#15100d'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(n,p.x-14,p.y-14); ctx.restore(); }
 
@@ -246,24 +296,40 @@ function drawGuide(){
   g.fillStyle=done?'rgba(255,241,184,.9)':(rec?'rgba(233,196,106,.09)':(mode==='record'?'rgba(127,209,196,.13)':'rgba(233,196,106,.16)'));
   if(done){g.shadowColor='rgba(233,196,106,.9)';g.shadowBlur=40;}
   g.fillText(L,W/2,H/2+size*.06); g.restore();
-  if(rec&&!done&&prog>1) paintPath(g,0,prog,{alpha:.9});
+  if(rec&&!done&&prog>1) paintLit(g,{alpha:.9});
 }
 function paintPath(ctx,a,b,opt){ // draw PATH[a..b] respecting segment breaks
   let run=[]; for(let i=a;i<=b&&i<PATH.length;i++){ run.push(denorm(PATH[i])); if(SEGEND.has(i)){ paintStroke(ctx,run,opt); run=[]; } } if(run.length) paintStroke(ctx,run,opt); }
-function renderTrail(){ if(!PATH.length){trailProg=-1;return;} trailProg=prog;
-  trail.width=W*DPR; trail.height=H*DPR; tr.setTransform(DPR,0,0,DPR,0,0); tr.clearRect(0,0,W,H);
-  paintPath(tr,prog,PATH.length-1,{alpha:.38,blur:10,nocore:true,scale:.75});          // road, end to end
-  for(let i=prog;i<PATH.length;i+=4){ const q=denorm(PATH[i]);                        // dotted embers
-    tr.fillStyle='rgba(240,210,130,.85)'; tr.shadowColor='rgba(233,196,106,.9)'; tr.shadowBlur=10;
-    tr.beginPath(); tr.arc(q.x,q.y,2.4,0,7); tr.fill(); } }
+function paintLit(ctx,opt){ // PATH[0..prog] as paintPath would draw it, grown from the last call
+  const key=[W,H,DPR,idx,curF].join('/');
+  if(litKey!==key||litProg>prog){ fit(litA,la); fit(litB,lb); litKey=key; litProg=-1; }
+  if(litProg<prog){ let a=Math.max(0,litProg),run=[],last=litProg; if(a>0&&SEGEND.has(a)) a++;   // a segment end was flushed whole
+    const put=(run,end)=>{ paintStroke(la,run,{...opt,nocore:true}); paintStroke(lb,run,{...opt,onlycore:true});
+      if(end){ la.drawImage(litB,0,0,W,H); lb.clearRect(0,0,W,H); } };
+    for(let i=a;i<=prog;i++){ run.push(denorm(PATH[i])); if(SEGEND.has(i)){ put(run,true); last=i; run=[]; } }
+    if(run.length>1){ put(run,false); last=prog; }   // a lone point waits for its segment
+    litProg=last; }
+  ctx.drawImage(litA,0,0,W,H); ctx.drawImage(litB,0,0,W,H); }
+function trailBit(ctx,a,b,s0,open){ // road PATH[a..b] and the embers on it; embers sit every 4th point from s0
+  if(b>a) paintPath(ctx,a,b,{alpha:.38,blur:10,nocore:true,scale:.75});
+  for(let i=a+(((s0-a)%4)+4)%4;open?i<b:i<=b;i+=4){ const q=denorm(PATH[i]);                 // dotted embers
+    ctx.fillStyle='rgba(240,210,130,.85)'; ctx.shadowColor='rgba(233,196,106,.9)'; ctx.shadowBlur=10;
+    ctx.beginPath(); ctx.arc(q.x,q.y,2.4,0,7); ctx.fill(); } }
+function renderTrail(){ if(!PATH.length){trailProg=-1;return;}
+  const _ss=prog, _se=PATH.length-1, _s0=0;                                           // road, end to end
+  const key=[W,H,DPR,_se].join('/');
+  let moved=trailProg<0||trailKey!==key;
+  if(moved||_ss>trailFrom||trailFrom-_ss>2*TRAIL_AHEAD){ trailFrom=Math.min(_se,_ss+TRAIL_AHEAD); fit(trail,tr); trailBit(tr,trailFrom,_se,_s0,false); trailKey=key; moved=true; }
+  if(moved||liveFrom!==_ss){ fit(trailLive,tl); trailBit(tl,_ss,trailFrom,_s0,true); liveFrom=_ss; }
+  trailProg=prog; }
 // ghost: animated comet along the current teacher stroke + start dot
 function startGhost(){ stopGhost(); const rec=teacherStrokes(); if(!rec||mode!=='practice') return; ghostAnim={t:performance.now()}; ghostTick(); }
 function stopGhost(){ if(ghostAnim){ghostAnim=null; if(parts.length) loop();} }
 function ghostTick(){ if(!ghostAnim) return; if(!PATH.length||done||prog>=PATH.length-1){fx.clearRect(0,0,W,H);return;}
-  if(trailProg!==prog) renderTrail();
+  renderTrail();   // cached; repaints only what the pen moved
   const rem=PATH.length-1-prog, dur=2200+rem*17, now=performance.now(), ph=((now-ghostAnim.t)%dur)/dur, end=PATH.length-1;
   fx.clearRect(0,0,W,H);
-  fx.save(); fx.globalAlpha=.85+.15*Math.sin(now/600); fx.drawImage(trail,0,0,W,H); fx.restore();
+  fx.save(); fx.globalAlpha=.85+.15*Math.sin(now/600); fx.drawImage(trail,0,0,W,H); fx.drawImage(trailLive,0,0,W,H); fx.restore();
   const n=prog+Math.max(2,Math.floor(ph*(end-prog))); paintPath(fx,Math.max(prog,n-16),n,{alpha:.9,blur:18,scale:.8}); // comet
   const s0=denorm(PATH[prog]), pulse=.5+.5*Math.sin(now/260); fx.save(); fx.fillStyle=`rgba(255,241,184,${.5+.4*pulse})`; fx.shadowColor='#fff1b8'; fx.shadowBlur=16+10*pulse;
   fx.beginPath(); fx.arc(s0.x,s0.y,4+3*pulse,0,7); fx.fill(); fx.restore();
@@ -279,7 +345,7 @@ iC.addEventListener('pointermove',e=>{ if(done||!drawing||e.pointerId!==activeId
   for(const ev of (e.getCoalescedEvents?e.getCoalescedEvents():[e])){const q=pos(ev);cur.push(q);
     if(mode==='practice'){ if(PATH.length) follow(q);
       else { if(outsideGlyph(q)){ q.on=false; outCount++; if(outCount===1||outCount%14===0) zap(q); } else { q.on=true; outCount=0; spark(q.x,q.y,q.p); } } } }
-  redrawInk(); if(mode==='practice'&&!teacherStrokes()) throttleCoverage(); e.preventDefault(); });
+  paintLater(); if(mode==='practice'&&!teacherStrokes()) throttleCoverage(); e.preventDefault(); });
 function endStroke(e){ if(e.pointerId!==activeId) return; const s=cur; cur=null; drawing=false; activeId=null;
   if(s&&s.length){ if(mode==='practice'&&PATH.length){ strokes.push(s); redrawInk(); } else { strokes.push(s); redrawInk(); if(mode==='practice') updateCoverage(); else updateRecordUI(); } } }
 iC.addEventListener('pointerup',endStroke); iC.addEventListener('pointercancel',endStroke); iC.addEventListener('contextmenu',e=>e.preventDefault());
@@ -292,11 +358,11 @@ function follow(q,down){ const n=norm(q); let best=-1,bd=R_ON();
   for(let i=prog;i<=Math.min(PATH.length-1,prog+LOOK);i++){ const d=Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y); if(d<bd){bd=d;best=i;} }
   if(best>=0){ q.on=true; prog=Math.max(prog,best); offCount=0; smudge=Math.max(0,smudge-2); spark(q.x,q.y,q.p);
     if(SEGEND.has(prog)&&prog<PATH.length-1) prog++;
-    runeUI(); drawGuide(); if(prog>=PATH.length-2) conjure(); return; }
+    runeUI(); if(prog>=PATH.length-2){ drawGuide(); conjure(); } else paintLater(); return; }
   // off the path: the spell leaks — bzzt!
   q.on=false; offCount++; smudge++;
   if(offCount===1||offCount%14===0) zap(q);
-  prog=Math.max(0,Math.round(prog-DRAIN)); runeUI(); drawGuide();
+  prog=Math.max(0,Math.round(prog-DRAIN)); runeUI(); paintLater();
   if(smudge>=FIZZ){ fizzle(); return; }
   if(down||offCount===20){ const d0=Math.hypot(n.x-PATH[prog].x,n.y-PATH[prog].y); toast(d0>0.2?'come back to the glowing dot':'stay on the path — you are leaking magic'); }
 }
