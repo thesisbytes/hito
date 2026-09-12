@@ -143,9 +143,12 @@ if (stageCss){
   ok(P.SIZE_PIN === null, 'easy is still pinned to one size');
   ok(P.DRAG_FOLLOW === false && F.casting(), 'easy inherited guided\'s drag or lost its wisps');
   { const n = P.parts.length; globalThis.zap({x:10,y:10}); ok(P.parts.length > n, 'easy no longer zaps'); }
-  // medium's shape is flat and exactly as wide as the tolerance
-  ok(/paintPath\(g,0,PATH\.length-1,\{alpha:\.17,flat:true,nocore:true,width:2\*R_ON\(\)\*W/.test(html),
-     'medium still draws the glowing 2.4x shadow rather than the tolerance band');
+  // medium's shape is a flat centreline at the ink width, one path per
+  // stroke — not the glowing shadow, and not the tolerance band, which was
+  // a fifth of the glyph wide and unreadable as a shape
+  ok(/SHADOW_MODE==='strokes'\)\{[^]*?g\.lineWidth=widthFor\(\.5\);[^]*?if\(SEGEND\.has\(i\)\)\{ g\.stroke\(\); open=false; \}/.test(html)
+     && !/width:2\*R_ON\(\)\*W/.test(html),
+     'medium does not draw the shape as a flat centreline, one path per stroke');
   ok(!/menu-btn/.test(html), 'the ☰ button is back');
   ok(F.setSign('romaji') && F.signOf(F.target) === P.LETTERS[F.target.i][2], 'the sign did not switch to romaji');
   ok(!F.setSign('klingon') && F.sign === 'romaji', 'an unknown sign voice was accepted');

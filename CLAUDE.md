@@ -421,8 +421,10 @@ every stroke. The light rests on the nearest reachable point, so it sits
 under the pen and the stroke closes only when the hand arrives (v0.1.31 —
 before that it rested on the farthest, a full tolerance ahead). The comet
 that loops the rest of the stroke is off in guided (v0.1.32): it set a
-pace, and the hand chased it instead of dragging at its own. Medium draws the shape flat at exactly the tolerance width, so
-what is shown is the band the scorer forgives. The field holds still while
+pace, and the hand chased it instead of dragging at its own. Medium draws
+the shape as a flat centreline at the ink width, one path per stroke
+(v0.1.33 — the tolerance-width band before it was a fifth of the glyph wide
+and unreadable as a shape). The field holds still while
 the page is up, and the name in the header reopens it.
 
 **The current single-canvas screen is the workshop, not the game.** Everything
