@@ -151,8 +151,8 @@ LAYER = STYLE + r"""
   const DIFF = {
     guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size, and the kana are shown — practice.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
-              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1.5, ink:false, drag:true, reveal:true,
-              guide:true, numbers:true, shadow:'none' },
+              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, reveal:true,
+              guide:true, numbers:true, comet:false, shadow:'none' },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, reveal:false,
@@ -195,6 +195,7 @@ LAYER = STYLE + r"""
     COVER_MIN = d.COVER_MIN; MAX_TRAVEL = d.MAX_TRAVEL; DOT_SCALE = d.dot; SIZE_PIN = d.size;
     DRAG_FOLLOW = d.drag;
     GUIDE_ON = d.guide; GUIDE_NUMBERS = d.numbers; SHADOW_MODE = d.shadow;
+    COMET_ON = d.comet !== false;   // the looping demonstration; guided turns it off
     saveStart();
     return true;
   }

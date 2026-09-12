@@ -57,7 +57,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get curF(){ return curF; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get SEGS(){ return SEGS; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get R(){ return R_ON(); }, setSeg(i){ segIdx=i; prog=SEGS[i][0]; awaitLift=false; }, denorm(q){ return denorm(q); }, follow(q,d){ return follow(q,d); } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get COMET_ON(){ return COMET_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get curF(){ return curF; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get SEGS(){ return SEGS; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get R(){ return R_ON(); }, setSeg(i){ segIdx=i; prog=SEGS[i][0]; awaitLift=false; }, denorm(q){ return denorm(q); }, follow(q,d){ return follow(q,d); } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
@@ -121,7 +121,8 @@ if (stageCss){
   // the objective is the light: no coverage or travel test at the end, a
   // light big enough to hold, no zap, no ink
   ok(P.COVER_MIN === 0 && P.MAX_TRAVEL === Infinity, `guided still tests coverage ${P.COVER_MIN} / travel ${P.MAX_TRAVEL}`);
-  ok(P.DOT_SCALE > 1, 'the light in guided is no bigger than in easy');
+  ok(P.DOT_SCALE === 1, `the light in guided is ${P.DOT_SCALE}x — 'a giant circle', twice reported`);
+  ok(!P.COMET_ON, 'the comet still loops in guided, setting a pace for the hand to chase');
   ok(P.SIZE_PIN === P.SIZE_MAX && P.curF === P.SIZE_MAX,
      `guided did not pin the size: pin ${P.SIZE_PIN}, glyph at ${P.curF}, largest is ${P.SIZE_MAX}`);
   ok(P.DRAG_FOLLOW === true && !F.casting(), 'guided is not dragging the light, or is still casting');
@@ -136,7 +137,7 @@ if (stageCss){
   ok(!F.setDifficulty('hard'), 'hard is selectable, and there is no scorer for it');
   ok(F.difficulty === 'medium', 'a refused difficulty changed the current one');
   ok(F.setDifficulty('easy') && P.R_ON0 === B.R_ON0 && P.DRAIN === B.DRAIN && P.FIZZ === B.FIZZ
-     && P.GUIDE_ON && P.SHADOW_MODE === 'none', 'easy did not restore the pack values');
+     && P.GUIDE_ON && P.COMET_ON && P.SHADOW_MODE === 'none', 'easy did not restore the pack values');
   ok(P.COVER_MIN === B.COVER_MIN && P.MAX_TRAVEL === B.MAX_TRAVEL && P.DOT_SCALE === 1,
      'easy did not restore the end-of-glyph checks or the light');
   ok(P.SIZE_PIN === null, 'easy is still pinned to one size');

@@ -539,7 +539,7 @@ def main():
              "medium": ("'strokes'", "false", "false"),
              "hard":   ("'none'",    "false", "false")}[pack["mode"]]
         s.sub("mode state", r"let SHADOW_MODE='[a-z]+';",
-              f"let SHADOW_MODE={m[0]};let GUIDE_ON={m[1]},GUIDE_NUMBERS={m[2]};")
+              f"let SHADOW_MODE={m[0]};let GUIDE_ON={m[1]},GUIDE_NUMBERS={m[2]},COMET_ON=true;")
 
         # the trail, comet and start dot are the guide; the shape is not
         s.sub("guide can be hidden",
@@ -555,8 +555,12 @@ def main():
               "  if(GUIDE_ON){\n"
               "    fx.save(); fx.globalAlpha=.85+.15*Math.sin(now/600);"
               " fx.drawImage(trail,0,0,W,H); fx.drawImage(trailLive,0,0,W,H); fx.restore();\n"
-              "    const n=_a+Math.max(2,Math.floor(ph*(end-_a)));"
-              " paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); // comet\n"
+              "    // The comet runs the rest of the stroke on a loop. It is a\n"
+              "    // demonstration, and in guided it is switched off: a light that\n"
+              "    // keeps racing to the end of the stroke sets a pace, and the\n"
+              "    // hand starts chasing it instead of dragging its own.\n"
+              "    if(COMET_ON){ const n=_a+Math.max(2,Math.floor(ph*(end-_a)));"
+              " paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); } // comet\n"
               "    const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)"
               "?SEGS[segIdx+1][0]:prog]), pulse=.5+.5*Math.sin(now/260);\n"
               "    fx.save(); fx.fillStyle=`rgba(255,241,184,${.5+.4*pulse})`;"

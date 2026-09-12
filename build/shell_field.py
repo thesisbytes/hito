@@ -153,12 +153,15 @@ LAYER = STYLE + r"""
     // glyph tests the hand, and calibrating a hand is not learning hiragana.
     // The light is dragged rather than chased (DRAG_FOLLOW), and nothing is
     // kindled or cast: guided is practice, and the wisps are for the game.
-    // The dot is bigger than easy's but not by much: at 2.4x it hid the path
-    // under the pen, and a light you cannot see past is not a guide.
+    // The light is easy's light, no bigger: at 2.4x, then 1.5x, it was still
+    // 'a giant circle'. And no comet: the looping run to the end of the
+    // stroke sets a pace, and the hand starts following its speed instead
+    // of dragging the light at its own. The road ahead already shows where
+    // to go; guided does not need to be shown how fast.
     guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
-              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1.5, ink:false, drag:true, cast:false,
-              guide:true, numbers:true, shadow:'none' },
+              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false,
+              guide:true, numbers:true, comet:false, shadow:'none' },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
@@ -191,6 +194,7 @@ LAYER = STYLE + r"""
     COVER_MIN = d.COVER_MIN; MAX_TRAVEL = d.MAX_TRAVEL; DOT_SCALE = d.dot; SIZE_PIN = d.size;
     DRAG_FOLLOW = d.drag;
     GUIDE_ON = d.guide; GUIDE_NUMBERS = d.numbers; SHADOW_MODE = d.shadow;
+    COMET_ON = d.comet !== false;   // the looping demonstration; guided turns it off
     saveStart();
     return true;
   }

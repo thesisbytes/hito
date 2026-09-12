@@ -51,7 +51,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get done(){ return done; }, get prog(){ return prog; }, get strokes(){ return strokes; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get parts(){ return parts; }, get MASTERY(){ return MASTERY; }, get PATH(){ return PATH; }, setIdx(v){ idx=v; } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get done(){ return done; }, get prog(){ return prog; }, get strokes(){ return strokes; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get COMET_ON(){ return COMET_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get parts(){ return parts; }, get MASTERY(){ return MASTERY; }, get PATH(){ return PATH; }, setIdx(v){ idx=v; } };`;
 // In a browser the engine's delayed load(idx+1) after a conjure resolves to
 // window.load — the shell's wrapper. Inside one Function it would bind to the
 // engine's own declaration and bypass the wrapper, which is exactly the seam
@@ -103,11 +103,11 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   const B = V.base;
   ok(B.R_ON0 > 0 && B.DRAIN > 0 && B.FIZZ > 0, 'the base penalties were not read off the engine');
   ok(V.setDifficulty('guided') && P.DRAIN === 0 && P.FIZZ === Infinity && P.DRAG_FOLLOW === true
-     && P.SIZE_PIN === P.SIZE_MAX, 'guided did not switch the engine');
+     && P.SIZE_PIN === P.SIZE_MAX && !P.COMET_ON, 'guided did not switch the engine');
   ok(V.setDifficulty('medium') && !P.GUIDE_ON && P.SHADOW_MODE === 'strokes' && P.SIZE_PIN === null,
      'medium did not switch the engine');
   ok(!V.setDifficulty('hard') && V.difficulty === 'medium', 'hard was accepted, and there is no scorer for it');
-  ok(V.setDifficulty('easy') && P.R_ON0 === B.R_ON0 && P.GUIDE_ON && P.SHADOW_MODE === 'none',
+  ok(V.setDifficulty('easy') && P.R_ON0 === B.R_ON0 && P.GUIDE_ON && P.COMET_ON && P.SHADOW_MODE === 'none',
      'easy did not restore the pack values');
   ok(V.setPrompt('romaji') && V.prompt === 'romaji' && !V.setPrompt('klingon') && V.prompt === 'romaji',
      'the prompt axis misbehaves');
