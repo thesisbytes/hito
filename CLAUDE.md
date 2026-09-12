@@ -130,7 +130,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.34.html`
+### Hiragana — `dist/hiragana-v0.1.35.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -154,6 +154,11 @@ What the tracing enforces, all of it learned by finding it broken:
   fraction of the stroke (`startSlack`). Found on the handakuten circle,
   which is smaller than the tolerance: from its start every point was in
   reach and its end is its start, so a tap finished it.
+- **A stroke begins where it begins.** Travel only counts once the pen has
+  been within `startSlack` of the stroke's length from its first point
+  (floored like the end tolerance). Found on ふ's ticks, which are shorter
+  than a jab's skid: a wiggle at the end was more travel than the tick is
+  long. The stroke's end and its start are now judged the same way.
 
 Presentation: one stroke lit at a time. Finished strokes stay shining, the
 current one is drawn by the pen, later ones have not caught light yet.
@@ -201,7 +206,7 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
-### Vocab — `dist/vocab-v0.1.7.html`
+### Vocab — `dist/vocab-v0.1.8.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke

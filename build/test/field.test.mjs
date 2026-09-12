@@ -57,7 +57,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get COMET_ON(){ return COMET_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get curF(){ return curF; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get SEGS(){ return SEGS; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get R(){ return R_ON(); }, setSeg(i){ segIdx=i; prog=SEGS[i][0]; awaitLift=false; segTravel=0; segBase=prog; }, denorm(q){ return denorm(q); }, follow(q,d){ return follow(q,d); } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get COMET_ON(){ return COMET_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get curF(){ return curF; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get SEGS(){ return SEGS; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get R(){ return R_ON(); }, setSeg(i){ segIdx=i; prog=SEGS[i][0]; awaitLift=false; segTravel=0; segBase=prog; segStarted=false; segNagged=false; }, denorm(q){ return denorm(q); }, follow(q,d){ return follow(q,d); }, get toast(){ return toast; }, setToast(f){ toast=f; } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
@@ -240,6 +240,54 @@ F.retarget(true);
     fol(den(P.PATH[short]));
     ok(P.prog <= short + 1 && !P.awaitLift && !P.done, `the stroke closed with the pen ${b - short} points short of the end (prog ${P.prog} of ${b})`);
   } else ok(false, 'no stroke on this glyph is long enough to test a chord');
+}
+
+// ---- a stroke begins where it begins
+// "Fu is cheatable. I can poke my stylus at the end of the tiny hooks and it
+// completes them." ふ's ticks are 0.16 long at full size and half that at
+// the smallest; the travel cap asks for 58% of that, and a jab with a wiggle
+// covers it. So travel counts only once the pen has been near the stroke's
+// start — a stroke has a start the way it has an end.
+fresh(); F.setDifficulty('easy'); globalThis.resize();
+F.target.i = P.LETTERS.findIndex(l => l[0] === 'ふ');
+F.retarget(true);
+ok(P.LETTERS[P.idx][0] === 'ふ' && !P.done, 'could not load ふ');
+{
+  const den = P.denorm, fol = P.follow, R = P.R;
+  // the shortest stroke that is not the last (the last one ends the glyph
+  // and drags coverage of the whole glyph into the question)
+  let si = 0;
+  for (let k = 1; k < P.SEGS.length - 1; k++) if (P.SEGS[k][1]-P.SEGS[k][0] < P.SEGS[si][1]-P.SEGS[si][0]) si = k;
+  const [a, b] = P.SEGS[si], e = P.PATH[b];
+  const notDone = (m) => ok(!P.awaitLift && !P.done && P.prog < b - 4, `${m} (prog ${P.prog} of ${a}..${b})`);
+  // a jab at the end that skids back along the stroke
+  P.setSeg(si);
+  fol(den(e), true);
+  for (let i = b - 1; i >= a && Math.hypot(P.PATH[i].x-e.x, P.PATH[i].y-e.y) < 0.05; i--) fol(den(P.PATH[i]));
+  notDone('a jab at the end of a tick, skidding back along it, finished the stroke');
+  // a jab at the end with a wiggle, which is more travel than the tick is long
+  // the engine calls toast by its own name, so it is rebound from inside
+  const _t = P.toast; let said = ''; P.setToast(m => { said = m; return _t(m); });
+  P.setSeg(si);
+  fol(den(e), true);
+  for (let k = 0; k < 12; k++) fol(den({x: e.x + (k%2 ? .012 : -.012), y: e.y + (k%4 < 2 ? .012 : -.012)}));
+  P.setToast(_t);
+  notDone('a wiggle at the end of a tick finished the stroke');
+  ok(/starts at the other end/.test(said), 'the pen at the end of an unbegun stroke was not told where it starts');
+  // begun a little late, within the start tolerance, the stroke still finishes
+  P.setSeg(si);
+  let late = a; while (late < b && Math.hypot(P.PATH[late+1].x-P.PATH[a].x, P.PATH[late+1].y-P.PATH[a].y) < 0.018) late++;
+  fol(den(P.PATH[late]), true);
+  for (let i = late; i <= b; i++) fol(den(P.PATH[i]));
+  ok(P.awaitLift, `a stroke begun ${late-a} points late did not finish (prog ${P.prog} of ${b})`);
+  // and the glyph drawn honestly finishes
+  for (let k = 0; k < P.SEGS.length; k++){
+    const [sa, sb] = P.SEGS[k]; P.setSeg(k); fol(den(P.PATH[sa]), true);
+    for (let i = sa; i <= sb; i++) fol(den(P.PATH[i]));
+  }
+  ok(P.done, `ふ drawn honestly did not finish (prog ${P.prog} of ${P.PATH.length-1})`);
+}
+{
   // and nothing is cast or kindled here. A lit monster that is not the
   // target, so the check is on the charge (a wisp would spend one) rather
   // than on a shot that would have landed and gone, and nothing else on the

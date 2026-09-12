@@ -256,7 +256,7 @@ def main():
               f"MAX_TRAVEL={pack.get('maxTravel', 2.5)},TRAVEL_EPS=0.006,"
               f"TAIL_FRAC={pack.get('tailFraction', 0.12)},"
               f"END_MIN={pack.get('minEndTolerance', 0.02)};"
-              f"let SEG_FREE={pack.get('startSlack', 0.3)},segTravel=0,segBase=0;"
+              f"let SEG_FREE={pack.get('startSlack', 0.3)},segTravel=0,segBase=0,segStarted=false,segNagged=false;"
               "let DRAG_FOLLOW=false;")
 
         s.sub("build segments",
@@ -267,7 +267,7 @@ def main():
               "  if(rec){ rec.forEach(st=>{ const a=PATH.length;"
               " const R=resample(st,Math.max(6,Math.round((resample(st).len||.05)/0.008)));"
               " PATH.push(...R); SEGEND.add(PATH.length-1); SEGS.push([a,PATH.length-1]); }); }\n"
-              "  hit=new Uint8Array(PATH.length); travel=0; lastN=null; segTravel=0; segBase=0;\n"
+              "  hit=new Uint8Array(PATH.length); travel=0; lastN=null; segTravel=0; segBase=0; segStarted=false; segNagged=false;\n"
               "  PATHLEN=0; for(const g of SEGS) for(let i=g[0];i<g[1];i++)\n"
               "    PATHLEN+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y);\n"
               "  // Each stroke's own length, because endpoint forgiveness has to be\n"
@@ -307,6 +307,16 @@ def main():
               "  const L=SEGLEN[i]; if(!L) return R_ON();\n"
               "  return Math.max(END_MIN, Math.min(R_ON(), TAIL_FRAC*L));\n"
               "}\n"
+              "// A stroke has a start the way it has an end. The pen may begin up\n"
+              "// to startSlack of the stroke's length in — the same fraction that\n"
+              "// is free of the travel cap — never more than the tolerance, and\n"
+              "// never less than the same floor as the end. Until the pen has been\n"
+              "// there, travel within the stroke does not count, so a stroke\n"
+              "// shorter than a jab's skid cannot be finished from its far end.\n"
+              "function startTol(i){\n"
+              "  const L=SEGLEN[i]; if(!L) return R_ON();\n"
+              "  return Math.max(END_MIN, Math.min(R_ON(), SEG_FREE*L));\n"
+              "}\n"
               "function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];\n"
               "  if(!seg) return;\n"
               "  // How far the pen has actually travelled. A correct trace runs\n"
@@ -315,12 +325,13 @@ def main():
               "  // stroke glyphs have no lift barrier, so without this they let\n"
               "  // a dense scribble through on coverage alone.\n"
               "  if(down) lastN=null;\n"
+              "  if(!segStarted&&Math.hypot(n.x-PATH[seg[0]].x,n.y-PATH[seg[0]].y)<startTol(segIdx)) segStarted=true;\n"
               "  if(!lastN){ lastN={x:n.x,y:n.y}; }\n"
               "  else { const step=Math.hypot(n.x-lastN.x,n.y-lastN.y);\n"
               "    // Sub-threshold movement is digitizer noise, not travel.\n"
               "    // Summing every raw sample would let a jittery pen inflate\n"
               "    // the ratio and fail an honest trace.\n"
-              "    if(step>=TRAVEL_EPS){ travel+=step; segTravel+=step; lastN={x:n.x,y:n.y}; } }\n"
+              "    if(step>=TRAVEL_EPS){ travel+=step; if(segStarted) segTravel+=step; lastN={x:n.x,y:n.y}; } }\n"
               "  if(awaitLift){   // stroke finished — the pen must come up first\n"
               "    // Overshooting the end slightly is just finishing the stroke,\n"
               "    // not an error. Only complain once the pen leaves the end and\n"
@@ -381,6 +392,10 @@ def main():
               "    { const _n=Math.max(1,seg[1]-seg[0]), _sp=SEGLEN[segIdx]/_n||0.008;\n"
               "      prog=Math.min(prog,segBase+Math.round(segTravel/_sp)"
               "+Math.max(SEGSLACK[segIdx],Math.round(SEG_FREE*_n))); }\n"
+              "    // At the end without ever having been at the start: say so once,\n"
+              "    // because otherwise the stroke simply refuses to finish.\n"
+              "    if(!segStarted&&!segNagged&&Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y)<endTol(segIdx)){\n"
+              "      segNagged=true; toast('that is where the stroke ends — it starts at the other end'); }\n"
               "    // Two conditions, and they answer different questions.\n"
               "    // The index slack says the stroke was traversed and tolerates\n"
               "    // a sparse sample landing a point short. The distance test\n"
@@ -414,7 +429,7 @@ def main():
               "    // A lift is what separates one stroke from the next, so the\n"
               "    // pen coming down is what advances to it.\n"
               "    if(awaitLift&&segIdx<SEGS.length-1){"
-              " segIdx++; prog=SEGS[segIdx][0]; awaitLift=false; offCount=0; segTravel=0; segBase=prog; }\n"
+              " segIdx++; prog=SEGS[segIdx][0]; awaitLift=false; offCount=0; segTravel=0; segBase=prog; segStarted=false; segNagged=false; }\n"
               "    follow(pos(e),true); }")
 
         # fizzle rewinds prog; the segment cursor and coverage have to follow it
@@ -431,7 +446,8 @@ def main():
               "  // attempt pushed travel/PATHLEN past MAX_TRAVEL and every later\n"
               "  // attempt was rejected for wandering it had not done. The glyph\n"
               "  // became unpassable until something reloaded it.\n"
-              "  travel=0; lastN=null; segTravel=0; segBase=prog;")
+              "  // the rewound point was reached from the start, so the stroke stays begun\n"
+              "  travel=0; lastN=null; segTravel=0; segBase=prog; segStarted=true; segNagged=false;")
 
     # ---- difficulty curve
     #
