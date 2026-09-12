@@ -256,6 +256,7 @@ def main():
               f"MAX_TRAVEL={pack.get('maxTravel', 2.5)},TRAVEL_EPS=0.006,"
               f"TAIL_FRAC={pack.get('tailFraction', 0.12)},"
               f"END_MIN={pack.get('minEndTolerance', 0.02)};"
+              f"let SEG_FREE={pack.get('startSlack', 0.3)},segTravel=0,segBase=0;"
               "let DRAG_FOLLOW=false;")
 
         s.sub("build segments",
@@ -266,7 +267,7 @@ def main():
               "  if(rec){ rec.forEach(st=>{ const a=PATH.length;"
               " const R=resample(st,Math.max(6,Math.round((resample(st).len||.05)/0.008)));"
               " PATH.push(...R); SEGEND.add(PATH.length-1); SEGS.push([a,PATH.length-1]); }); }\n"
-              "  hit=new Uint8Array(PATH.length); travel=0; lastN=null;\n"
+              "  hit=new Uint8Array(PATH.length); travel=0; lastN=null; segTravel=0; segBase=0;\n"
               "  PATHLEN=0; for(const g of SEGS) for(let i=g[0];i<g[1];i++)\n"
               "    PATHLEN+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y);\n"
               "  // Each stroke's own length, because endpoint forgiveness has to be\n"
@@ -319,7 +320,7 @@ def main():
               "    // Sub-threshold movement is digitizer noise, not travel.\n"
               "    // Summing every raw sample would let a jittery pen inflate\n"
               "    // the ratio and fail an honest trace.\n"
-              "    if(step>=TRAVEL_EPS){ travel+=step; lastN={x:n.x,y:n.y}; } }\n"
+              "    if(step>=TRAVEL_EPS){ travel+=step; segTravel+=step; lastN={x:n.x,y:n.y}; } }\n"
               "  if(awaitLift){   // stroke finished — the pen must come up first\n"
               "    // Overshooting the end slightly is just finishing the stroke,\n"
               "    // not an error. Only complain once the pen leaves the end and\n"
@@ -363,6 +364,23 @@ def main():
               "    if(d<bd){bd=d;best=i;} }\n"
               "  if(best>=0){ q.on=true; prog=Math.max(prog,best); offCount=0;"
               " smudge=Math.max(0,smudge-2); spark(q.x,q.y,q.p);\n"
+              "    // A stroke has to be travelled, not touched. The window lets\n"
+              "    // prog jump LOOK points in one sample and the drag walk runs\n"
+              "    // as far as the pen can reach, so a stroke smaller than the\n"
+              "    // tolerance — the handakuten circle, 0.081 across against\n"
+              "    // 0.07 (easy) or 0.105 (guided) — was finished by a tap on its\n"
+              "    // start: the far side is within reach, the end is the start,\n"
+              "    // and the end test only asks that prog be near the end and\n"
+              "    // the pen within endTol of it. Progress is now capped by how\n"
+              "    // far the pen has actually moved in this stroke, plus a free\n"
+              "    // allowance that is a fraction of the stroke rather than a\n"
+              "    // point count, so it is the same slack on a circle and on a\n"
+              "    // long sweep. Travel is the pen's own path, so an honest\n"
+              "    // trace always has at least the arc it covered and the cap\n"
+              "    // never binds on it.\n"
+              "    { const _n=Math.max(1,seg[1]-seg[0]), _sp=SEGLEN[segIdx]/_n||0.008;\n"
+              "      prog=Math.min(prog,segBase+Math.round(segTravel/_sp)"
+              "+Math.max(SEGSLACK[segIdx],Math.round(SEG_FREE*_n))); }\n"
               "    // Two conditions, and they answer different questions.\n"
               "    // The index slack says the stroke was traversed and tolerates\n"
               "    // a sparse sample landing a point short. The distance test\n"
@@ -396,7 +414,7 @@ def main():
               "    // A lift is what separates one stroke from the next, so the\n"
               "    // pen coming down is what advances to it.\n"
               "    if(awaitLift&&segIdx<SEGS.length-1){"
-              " segIdx++; prog=SEGS[segIdx][0]; awaitLift=false; offCount=0; }\n"
+              " segIdx++; prog=SEGS[segIdx][0]; awaitLift=false; offCount=0; segTravel=0; segBase=prog; }\n"
               "    follow(pos(e),true); }")
 
         # fizzle rewinds prog; the segment cursor and coverage have to follow it
@@ -413,7 +431,7 @@ def main():
               "  // attempt pushed travel/PATHLEN past MAX_TRAVEL and every later\n"
               "  // attempt was rejected for wandering it had not done. The glyph\n"
               "  // became unpassable until something reloaded it.\n"
-              "  travel=0; lastN=null;")
+              "  travel=0; lastN=null; segTravel=0; segBase=prog;")
 
     # ---- difficulty curve
     #

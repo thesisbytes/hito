@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.33';
+const APP_VERSION='0.1.34';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,11,"EN"]];
 
 // ---------- state
@@ -194,7 +194,7 @@ let TEACHER={version:2,activeFont:'klee-one',fonts:JSON.parse(JSON.stringify(DEF
 let strokes=[],cur=null,drawing=false,activeId=null,t0=0;
 let glyphPts=[],endPts=[],fullMask=null;  // fallback (no recording) scoring + outline mask
 let PATH=[],SEGEND=new Set(),prog=0,offCount=0;
-let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;let SEGLEN=[],SEGSLACK=[];let COVER_MIN=0.85,END_SLACK=4,MAX_TRAVEL=2.5,TRAVEL_EPS=0.006,TAIL_FRAC=0.12,END_MIN=0.02;let DRAG_FOLLOW=false; // practice: teacher path (dense, normalized), progress index
+let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;let SEGLEN=[],SEGSLACK=[];let COVER_MIN=0.85,END_SLACK=4,MAX_TRAVEL=2.5,TRAVEL_EPS=0.006,TAIL_FRAC=0.12,END_MIN=0.02;let SEG_FREE=0.3,segTravel=0,segBase=0;let DRAG_FOLLOW=false; // practice: teacher path (dense, normalized), progress index
 let lit=[];
 let ghostAnim=null;                       // guide animation handle
 const trail=document.createElement('canvas'); const tr=trail.getContext('2d'); let trailProg=-1;
@@ -436,7 +436,7 @@ function accept(e){ if(done) return false; if(penOnly) return e.pointerType==='p
 iC.addEventListener('pointerdown',e=>{ if(!accept(e)||activeId!==null) return; if(PATH.length&&mode==='practice'){
     // A lift is what separates one stroke from the next, so the
     // pen coming down is what advances to it.
-    if(awaitLift&&segIdx<SEGS.length-1){ segIdx++; prog=SEGS[segIdx][0]; awaitLift=false; offCount=0; }
+    if(awaitLift&&segIdx<SEGS.length-1){ segIdx++; prog=SEGS[segIdx][0]; awaitLift=false; offCount=0; segTravel=0; segBase=prog; }
     follow(pos(e),true); } activeId=e.pointerId; iC.setPointerCapture(e.pointerId);
   if(!strokes.length) t0=performance.now(); cur=[pos(e)]; drawing=true; e.preventDefault(); });
 iC.addEventListener('pointermove',e=>{ if(done||!drawing||e.pointerId!==activeId) return;
@@ -483,7 +483,7 @@ function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];
     // Sub-threshold movement is digitizer noise, not travel.
     // Summing every raw sample would let a jittery pen inflate
     // the ratio and fail an honest trace.
-    if(step>=TRAVEL_EPS){ travel+=step; lastN={x:n.x,y:n.y}; } }
+    if(step>=TRAVEL_EPS){ travel+=step; segTravel+=step; lastN={x:n.x,y:n.y}; } }
   if(awaitLift){   // stroke finished — the pen must come up first
     // Overshooting the end slightly is just finishing the stroke,
     // not an error. Only complain once the pen leaves the end and
@@ -526,6 +526,22 @@ function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];
   for(let i=lo;i<=hi;i++){ const d=Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y);
     if(d<bd){bd=d;best=i;} }
   if(best>=0){ q.on=true; prog=Math.max(prog,best); offCount=0; smudge=Math.max(0,smudge-2); spark(q.x,q.y,q.p);
+    // A stroke has to be travelled, not touched. The window lets
+    // prog jump LOOK points in one sample and the drag walk runs
+    // as far as the pen can reach, so a stroke smaller than the
+    // tolerance — the handakuten circle, 0.081 across against
+    // 0.07 (easy) or 0.105 (guided) — was finished by a tap on its
+    // start: the far side is within reach, the end is the start,
+    // and the end test only asks that prog be near the end and
+    // the pen within endTol of it. Progress is now capped by how
+    // far the pen has actually moved in this stroke, plus a free
+    // allowance that is a fraction of the stroke rather than a
+    // point count, so it is the same slack on a circle and on a
+    // long sweep. Travel is the pen's own path, so an honest
+    // trace always has at least the arc it covered and the cap
+    // never binds on it.
+    { const _n=Math.max(1,seg[1]-seg[0]), _sp=SEGLEN[segIdx]/_n||0.008;
+      prog=Math.min(prog,segBase+Math.round(segTravel/_sp)+Math.max(SEGSLACK[segIdx],Math.round(SEG_FREE*_n))); }
     // Two conditions, and they answer different questions.
     // The index slack says the stroke was traversed and tolerates
     // a sparse sample landing a point short. The distance test
@@ -586,7 +602,7 @@ function fizzle(){ smudge=0; offCount=0; prog=Math.max(0,Math.round(prog*0.5));
   // attempt pushed travel/PATHLEN past MAX_TRAVEL and every later
   // attempt was rejected for wandering it had not done. The glyph
   // became unpassable until something reloaded it.
-  travel=0; lastN=null;
+  travel=0; lastN=null; segTravel=0; segBase=prog;
   dropPen(); strokes=[]; redrawInk(); runeUI(); drawGuide();
   stage.style.animation='none'; void stage.offsetWidth; stage.style.animation='shake .4s';
   for(let i=0;i<40;i++){const a=Math.random()*Math.PI*2,v=1+Math.random()*3;parts.push({x:W/2,y:H/2,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,r:1+Math.random()*2.5,c:'200,132,47'});} loop();
@@ -698,7 +714,7 @@ function load(i){ idx=(i+LETTERS.length)%LETTERS.length; dropPen(); done=false; 
   lit=[]; PATH=[]; SEGEND=new Set(); prog=0; offCount=0; smudge=0; outCount=0; trailProg=-1;
   SEGS=[];segIdx=0;awaitLift=false;
   if(rec){ rec.forEach(st=>{ const a=PATH.length; const R=resample(st,Math.max(6,Math.round((resample(st).len||.05)/0.008))); PATH.push(...R); SEGEND.add(PATH.length-1); SEGS.push([a,PATH.length-1]); }); }
-  hit=new Uint8Array(PATH.length); travel=0; lastN=null;
+  hit=new Uint8Array(PATH.length); travel=0; lastN=null; segTravel=0; segBase=0;
   PATHLEN=0; for(const g of SEGS) for(let i=g[0];i<g[1];i++)
     PATHLEN+=Math.hypot(PATH[i+1].x-PATH[i].x,PATH[i+1].y-PATH[i].y);
   // Each stroke's own length, because endpoint forgiveness has to be
@@ -729,7 +745,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.33');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.34');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"",batch:40,cap:500};</script>
@@ -1672,6 +1688,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(loop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.33</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.34</div>
 </body>
 </html>

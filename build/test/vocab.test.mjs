@@ -51,7 +51,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get done(){ return done; }, get prog(){ return prog; }, get strokes(){ return strokes; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get COMET_ON(){ return COMET_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get parts(){ return parts; }, get MASTERY(){ return MASTERY; }, get PATH(){ return PATH; }, setIdx(v){ idx=v; } };`;
+const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get done(){ return done; }, get prog(){ return prog; }, get strokes(){ return strokes; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get COMET_ON(){ return COMET_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get parts(){ return parts; }, get MASTERY(){ return MASTERY; }, get PATH(){ return PATH; }, setIdx(v){ idx=v; }, get SEGS(){ return SEGS; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get R(){ return R_ON(); }, setSeg(i){ segIdx=i; prog=SEGS[i][0]; awaitLift=false; segTravel=0; segBase=prog; }, denorm(q){ return denorm(q); }, follow(q,d){ return follow(q,d); } };`;
 // In a browser the engine's delayed load(idx+1) after a conjure resolves to
 // window.load — the shell's wrapper. Inside one Function it would bind to the
 // engine's own declaration and bypass the wrapper, which is exactly the seam
@@ -253,6 +253,54 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   const ja = Object.keys(led)[0];
   V.importProgress(JSON.stringify({hito:'vocab', ledger: {[ja]: {n:0, clean:0, peek:0, last:0}}}));
   ok(V.ledger[ja].n === led[ja].n, 'an import with lower counts lowered the ledger');
+}
+
+// ---- a stroke has to be travelled, not touched
+// "The circle for the p sound is too sensitive. Just tapping on the initial
+// point passes without doing the stroke." The handakuten circle is 0.081
+// across and the tolerance is 0.07 (easy) or 0.105 (guided): from its start
+// most or all of it is within reach, and its end is its start. In guided the
+// drag walk ran round to the end from a tap; in easy a backward flick of a
+// few points put the window onto the tail. Progress is now capped by the
+// pen's own travel within the stroke.
+{
+  if (V.phase !== 'word'){ V.openStart(); if (!V.sections.length) V.toggleSection(cfg.sections[0].id); V.begin(); }
+  ok(V.phase === 'word', `no round to put プ on (phase ${V.phase})`);
+  const pu = {...cfg.sections[0].words[0], ja:'プ', romaji:'pu', en:'pu (test)'};
+  V.queue.splice(V.qi + 1, 0, pu); V.nextWord();
+  ok(P.LETTERS[P.idx][0] === 'プ' && P.PATH.length > 0, `could not put プ on the card (tracer on ${P.LETTERS[P.idx][0]})`);
+  globalThis.resize();
+  const den = P.denorm, fol = P.follow;
+  for (const mode of ['guided', 'easy']){
+    V.setDifficulty(mode);
+    ok(P.LETTERS[P.idx][0] === 'プ' && !P.done, `${mode}: プ was not reloaded live`);
+    // the segment is found after the reload: a new size resamples the path
+    // and moves every index
+    const si = P.SEGS.findIndex(([a, b]) => b - a > 4 && Math.hypot(P.PATH[a].x-P.PATH[b].x, P.PATH[a].y-P.PATH[b].y) < 0.01);
+    ok(si >= 0, `${mode}: プ has no closed stroke to be the circle`);
+    if (si < 0) continue;
+    const [a, b] = P.SEGS[si];
+    // a tap just short of the end, which is also the start, with digitizer jitter
+    P.setSeg(si);
+    fol(den(P.PATH[b-1]), true);
+    for (let k = 0; k < 6; k++) fol(den({x: P.PATH[b-1].x + (k%2 ? .002 : -.002), y: P.PATH[b-1].y + (k%3 ? .002 : -.002)}));
+    ok(!P.awaitLift && !P.done && P.prog < b - 4, `${mode}: a tap on the circle's start finished it (prog ${P.prog} of ${a}..${b})`);
+    // a backward flick of a few points from the start
+    P.setSeg(si);
+    fol(den(P.PATH[a]), true);
+    for (const i of [b-5, b-4, b-3, b-2]) fol(den(P.PATH[i]));
+    ok(!P.awaitLift && !P.done && P.prog < b - 4, `${mode}: a backward flick finished the circle (prog ${P.prog} of ${a}..${b})`);
+    // and the glyph actually drawn, circle included, still finishes (every
+    // stroke, since coverage is judged over the whole glyph at the end)
+    for (let k = 0; k < P.SEGS.length; k++){
+      const [sa, sb] = P.SEGS[k];
+      P.setSeg(k);
+      fol(den(P.PATH[sa]), true);
+      for (let i = sa; i <= sb; i++) fol(den(P.PATH[i]));
+    }
+    ok(P.done, `${mode}: drawing プ with its circle did not finish it (prog ${P.prog} of ${P.PATH.length-1})`);
+  }
+  V.setDifficulty('easy');
 }
 
 // ---- the workshop's furniture is hidden

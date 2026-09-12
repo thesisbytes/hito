@@ -49,6 +49,7 @@ which a kana-only subset does not contain, so every font reported as blocked.
 | `maxTravel` | `2.5` | Cap on pen distance ÷ path length. An honest trace runs about 1.0×; scribbles run 30–120×. This is what stops a scribble on single-stroke glyphs, which have no lift barrier. |
 | `tailFraction` | `0.12` | How much of a stroke's own length counts as "at the end". Endpoint forgiveness is a fraction of the stroke it belongs to, never a fixed radius. |
 | `minEndTolerance` | `0.02` | Absolute floor under `tailFraction`, as a fraction of canvas. A hand cannot land inside a few pixels, and shrinking the target and the tolerance together is what made level 4 unpassable in v0.1.5. |
+| `startSlack` | `0.3` | Fraction of a stroke the pen may skip at its start without having travelled it. Progress into a stroke is otherwise capped by the pen's own travel, so a stroke smaller than the tolerance (the handakuten circle) cannot be finished by a tap on its start. A fraction rather than a point count, so a circle and a long sweep get the same slack. |
 | `sequentialReveal` | `false` | Light one stroke at a time. Requires `strictFollow`. |
 
 A stroke's tail is where its hook is, and forgiving hooks is the reason this
