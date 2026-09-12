@@ -216,6 +216,25 @@ F.retarget(true);
     for (let i = a; i <= b; i += 2) fol(den(P.PATH[i]));
     fol(den(P.PATH[b]));
     ok(P.prog === b && (P.awaitLift || P.done), `dragging the light to the end did not finish the stroke (prog ${P.prog} of ${b})`);
+    // the light rests under the pen, not at the far edge of the tolerance.
+    // Dragged to the middle of the stroke, it is at the middle — not a
+    // radius ahead — and a pen that stops a radius short of the end has
+    // not finished the stroke. Reported from play: "the circle is way ahead
+    // of my stylus and completes the strokes before I can".
+    // (a fresh の: the drag above conjured it, and follow() does not check done)
+    F.target.i = P.LETTERS.findIndex(l => l[0] === 'の');
+    F.retarget(true);
+    ok(!P.done && P.LETTERS[P.idx][0] === 'の', 'could not reload の for the resting-light check');
+    P.setSeg(si);
+    fol(den(P.PATH[a]), true);
+    const mid = Math.floor((a+b)/2);
+    for (let i = a; i <= mid; i += 2) fol(den(P.PATH[i]));
+    fol(den(P.PATH[mid]));
+    ok(Math.abs(P.prog - mid) <= 1, `the light ran ${P.prog - mid} points ahead of a pen resting at ${mid}`);
+    let short = b; while (short > a && Math.hypot(P.PATH[short].x-P.PATH[b].x, P.PATH[short].y-P.PATH[b].y) < R) short--;
+    for (let i = mid; i <= short; i += 2) fol(den(P.PATH[i]));
+    fol(den(P.PATH[short]));
+    ok(P.prog <= short + 1 && !P.awaitLift && !P.done, `the stroke closed with the pen ${b - short} points short of the end (prog ${P.prog} of ${b})`);
   } else ok(false, 'no stroke on this glyph is long enough to test a chord');
   // and nothing is cast or kindled here. A lit monster that is not the
   // target, so the check is on the charge (a wisp would spend one) rather

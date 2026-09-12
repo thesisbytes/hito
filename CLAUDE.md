@@ -130,7 +130,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.30.html`
+### Hiragana — `dist/hiragana-v0.1.31.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -196,7 +196,7 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
-### Vocab — `dist/vocab-v0.1.3.html`
+### Vocab — `dist/vocab-v0.1.4.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -416,8 +416,10 @@ exists) and what the sign says (`kana`, `romaji`, `gaijin`). Difficulty is
 a runtime switch — the penalties became engine state so the shell can
 reassign them. `guided` is the "drag the circle" mode a player asked for,
 and it is a different objective rather than easy turned down: no ink, no
-zaps, a big light, and the only test is that the light reached the end of
-every stroke. Medium draws the shape flat at exactly the tolerance width, so
+zaps, a bigger light, and the only test is that the light reached the end
+of every stroke. The light rests on the nearest reachable point, so it sits
+under the pen and the stroke closes only when the hand arrives (v0.1.31 —
+before that it rested on the farthest, a full tolerance ahead). Medium draws the shape flat at exactly the tolerance width, so
 what is shown is the band the scorer forgives. The field holds still while
 the page is up, and the name in the header reopens it.
 

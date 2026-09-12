@@ -153,9 +153,11 @@ LAYER = STYLE + r"""
     // glyph tests the hand, and calibrating a hand is not learning hiragana.
     // The light is dragged rather than chased (DRAG_FOLLOW), and nothing is
     // kindled or cast: guided is practice, and the wisps are for the game.
+    // The dot is bigger than easy's but not by much: at 2.4x it hid the path
+    // under the pen, and a light you cannot see past is not a guide.
     guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
-              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 2.4, ink:false, drag:true, cast:false,
+              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1.5, ink:false, drag:true, cast:false,
               guide:true, numbers:true, shadow:'none' },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
