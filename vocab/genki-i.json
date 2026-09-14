@@ -1,6 +1,6 @@
 {
-  "deck": "Genki I · Lesson 1",
-  "source": "Genki I, 3rd edition, Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55). Section splits follow the class's three vocabulary quizzes, one per page.",
+  "deck": "Genki I",
+  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59). Section splits follow the class's vocabulary quizzes, one per page. The L2 page break is placed after じてんしゃ from the page density of L1 (about 27 entries a page), not from the printed page — move a word across if the book disagrees.",
   "sections": [
     {
       "id": "l1-1",
@@ -117,6 +117,71 @@
         {"ja": "はっぷん", "romaji": "happun", "en": "8 minutes", "note": "also はちふん"},
         {"ja": "きゅうふん", "romaji": "kyuufun", "en": "9 minutes"},
         {"ja": "じゅっぷん", "romaji": "juppun", "en": "10 minutes", "note": "also じっぷん"}
+      ]
+    },
+    {
+      "id": "l2-1",
+      "title": "L2-1 · p.58",
+      "words": [
+        {"ja": "これ", "romaji": "kore", "en": "this one"},
+        {"ja": "それ", "romaji": "sore", "en": "that one"},
+        {"ja": "あれ", "romaji": "are", "en": "that one (over there)"},
+        {"ja": "どれ", "romaji": "dore", "en": "which one"},
+        {"ja": "この", "romaji": "kono", "en": "this …", "note": "この + noun"},
+        {"ja": "その", "romaji": "sono", "en": "that …", "note": "その + noun"},
+        {"ja": "あの", "romaji": "ano", "en": "that … (over there)", "note": "あの + noun"},
+        {"ja": "どの", "romaji": "dono", "en": "which …", "note": "どの + noun"},
+        {"ja": "ここ", "romaji": "koko", "en": "here"},
+        {"ja": "そこ", "romaji": "soko", "en": "there"},
+        {"ja": "あそこ", "romaji": "asoko", "en": "over there"},
+        {"ja": "どこ", "romaji": "doko", "en": "where"},
+        {"ja": "だれ", "romaji": "dare", "en": "who"},
+        {"ja": "おいしい", "romaji": "oishii", "en": "delicious"},
+        {"ja": "さかな", "romaji": "sakana", "en": "fish"},
+        {"ja": "とんかつ", "romaji": "tonkatsu", "en": "pork cutlet"},
+        {"ja": "にく", "romaji": "niku", "en": "meat"},
+        {"ja": "メニュー", "romaji": "menyuu", "en": "menu"},
+        {"ja": "やさい", "romaji": "yasai", "en": "vegetable"},
+        {"ja": "えんぴつ", "romaji": "enpitsu", "en": "pencil"},
+        {"ja": "かさ", "romaji": "kasa", "en": "umbrella"},
+        {"ja": "かばん", "romaji": "kaban", "en": "bag"},
+        {"ja": "くつ", "romaji": "kutsu", "en": "shoes"},
+        {"ja": "さいふ", "romaji": "saifu", "en": "wallet"},
+        {"ja": "ジーンズ", "romaji": "jiinzu", "en": "jeans"},
+        {"ja": "じしょ", "romaji": "jisho", "en": "dictionary"},
+        {"ja": "じてんしゃ", "romaji": "jitensha", "en": "bicycle"}
+      ]
+    },
+    {
+      "id": "l2-2",
+      "title": "L2-2 · p.59",
+      "words": [
+        {"ja": "しんぶん", "romaji": "shinbun", "en": "newspaper"},
+        {"ja": "ティーシャツ", "romaji": "tiishatsu", "en": "T-shirt", "note": "the book writes Tシャツ"},
+        {"ja": "とけい", "romaji": "tokee", "en": "watch; clock"},
+        {"ja": "ノート", "romaji": "nooto", "en": "notebook"},
+        {"ja": "ペン", "romaji": "pen", "en": "pen"},
+        {"ja": "ぼうし", "romaji": "booshi", "en": "hat; cap"},
+        {"ja": "ほん", "romaji": "hon", "en": "book"},
+        {"ja": "カフェ", "romaji": "kafe", "en": "cafe"},
+        {"ja": "トイレ", "romaji": "toire", "en": "toilet; restroom"},
+        {"ja": "ほんや", "romaji": "hon'ya", "en": "bookstore"},
+        {"ja": "レストラン", "romaji": "resutoran", "en": "restaurant"},
+        {"ja": "イギリス", "romaji": "Igirisu", "en": "Britain", "note": "also on p.39"},
+        {"ja": "かんこく", "romaji": "Kankoku", "en": "Korea", "note": "also on p.39"},
+        {"ja": "ちゅうごく", "romaji": "Chuugoku", "en": "China", "note": "also on p.39"},
+        {"ja": "けいざい", "romaji": "keezai", "en": "economics", "note": "also on p.39"},
+        {"ja": "おかあさん", "romaji": "okaasan", "en": "mother", "note": "also on p.40"},
+        {"ja": "おとうさん", "romaji": "otoosan", "en": "father", "note": "also on p.40"},
+        {"ja": "いくら", "romaji": "ikura", "en": "how much"},
+        {"ja": "えん", "romaji": "en", "en": "… yen", "note": "〜えん, after a number"},
+        {"ja": "たかい", "romaji": "takai", "en": "expensive; high"},
+        {"ja": "いらっしゃいませ", "romaji": "irasshaimase", "en": "Welcome (to our store)"},
+        {"ja": "おねがいします", "romaji": "onegaishimasu", "en": "…, please.", "note": "(〜を)おねがいします"},
+        {"ja": "ください", "romaji": "kudasai", "en": "Please give me …", "note": "(〜を)ください"},
+        {"ja": "じゃあ", "romaji": "jaa", "en": "then …; if that is the case, …"},
+        {"ja": "どうぞ", "romaji": "doozo", "en": "Please.; Here it is."},
+        {"ja": "どうも", "romaji": "doomo", "en": "Thank you."}
       ]
     }
   ]

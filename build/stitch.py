@@ -126,7 +126,11 @@ def main():
 
     s = Stitch(engine)
 
-    s.sub("title", r"<title>[^<]*</title>", f"<title>{pack['title']}</title>")
+    # The pack's title carries a version by convention, and a hand-typed one
+    # drifts: every pack had gone stale within a few bumps. The version is
+    # the pack's; the title only wears it.
+    title = re.sub(r"v\d+\.\d+\.\d+", f"v{version}", pack["title"])
+    s.sub("title", r"<title>[^<]*</title>", f"<title>{title}</title>")
     s.sub("brand", r'<div class="brand">.*?</div>',
           f'<div class="brand">{pack["brand"]} <span id="ver"></span></div>',
           flags=re.S)

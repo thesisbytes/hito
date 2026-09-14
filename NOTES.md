@@ -349,3 +349,37 @@ Running log. Append at the bottom, don't rewrite history.
   covers it for now; if it turns out to matter, the honest fix is a
   `home` pack key that names a bare filename in the same folder, which
   means moving `index.html` into `dist/` — decide then, not now.
+
+## 2026-09-14 — Lesson 2 in the deck (vocab v0.1.9, hiragana v0.1.36)
+
+- "We also need to update the vocabulary list for my current schedule." The
+  Canvas modules show two Lesson 2 quizzes, L2-1 on p.58 and L2-2 on p.59,
+  so the deck gains two sections named the way the L1 ones are. The deck
+  file is now `vocab/genki-i.json`: it holds the class's running list, not
+  one lesson, and the name was about to lie. Everything that pointed at
+  `genki-l1.json` (pack, PACK.md, CLAUDE.md, the local study script) follows.
+- The L1 pages are in Drive ("L1 Pages from Genki Textbook - 3E.pdf") and
+  confirm the existing deck; the L2 pages are not, so Lesson 2 is written
+  from the 3rd edition list and the page break is inferred. L1 runs about
+  27 entries a printed page (p.38: 27, p.39: 26, p.40: 12), and L2 has 53,
+  so p.58 is taken to end after じてんしゃ and p.59 to open with しんぶん.
+  If the book disagrees, a word moves across a section boundary and
+  nothing else changes. The deck's `source` string says the same.
+- Tシャツ is written ティーシャツ, with a note, because the sketchbook
+  traces kana and the stitch refuses a Latin letter — the right refusal,
+  and this is the one word in two lessons that trips it. Suffix and
+  particle entries (～えん, (～を)ください) follow L1's pattern: the bare
+  word traced, the frame in the note. Six p.59 words (イギリス, かんこく,
+  ちゅうごく, けいざい, おかあさん, おとうさん) were additional vocabulary
+  on pp.39–40 and are kept in L2-2 with a note, since that is the page the
+  quiz names.
+- A returning player's saved section choice is honoured, so the new
+  sections arrive unticked on the start page rather than silently joining
+  the round. Tick them there.
+- Found on the way: the page `<title>` was hand-typed in every pack and had
+  drifted in all three (hiragana's said v0.1.29 at v0.1.35, vocab's said
+  v0.1.2). The convention puts the version in the title precisely so a
+  cached build is obvious, and the one place it was wrong was the tab. The
+  stitch now stamps whatever `vX.Y.Z` the title carries with the pack's
+  version, and `run.sh` checks the three current builds. That is the whole
+  reason for hiragana v0.1.36: a title, nothing in the tracer.

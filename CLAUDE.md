@@ -50,7 +50,7 @@ hito/
     shell_vocab.py          the flashcard shell, appended as a layer
     kana_glyphs.py          writes the 164-kana glyph list the vocab realm traces
     test/vocab.test.mjs     a word is walked through the seam
-  vocab/                 decks: class content, not realm data (genki-l1.json)
+  vocab/                 decks: class content, not realm data (genki-i.json)
   dist/                built single-file outputs, one per script, versioned
 ```
 
@@ -130,7 +130,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.35.html`
+### Hiragana — `dist/hiragana-v0.1.36.html`
 
 Playable, and traced end to end without a break. 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -206,7 +206,7 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
-### Vocab — `dist/vocab-v0.1.8.html`
+### Vocab — `dist/vocab-v0.1.9.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -216,7 +216,7 @@ tracer is walked through the word's kana one at a time. Finish a kana and
 its slot lights; finish the word and the reading and meaning bloom together.
 
 Decks are class content rather than realm data, so they live in `vocab/`
-outside `scripts/`. The first is Genki I Lesson 1 in five sections, one per
+outside `scripts/`. The first is Genki I, Lessons 1 and 2, sectioned one per
 quiz page. The pack's glyph list is every hiragana and katakana (164, from
 `build/kana_glyphs.py`) so a new lesson is only ever a JSON edit, and the
 stitch refuses a deck that uses a character with no stroke data.

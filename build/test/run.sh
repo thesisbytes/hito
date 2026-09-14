@@ -86,6 +86,21 @@ for pair in "hiragana:hiragana-v$ver" "hiragana-game:hiragana-game-v$ver" "vocab
 done
 
 echo
+echo "── title (the page title wears the pack's version) ─"
+# A cached build is spotted by its version, and the tab is the first place
+# anyone looks. The title was hand-typed in each pack and had drifted in all
+# three, so the stitch now stamps it — and this makes sure it stays stamped.
+for pair in "hiragana-v$ver:$ver" "hiragana-game-v$ver:$ver" "vocab-v$vver:$vver"; do
+  name=${pair%%:*}; want=${pair##*:}
+  if grep -q "<title>[^<]*v$want</title>" "dist/$name.html"; then
+    echo "  $name: title says v$want"
+  else
+    echo "  STALE TITLE: $(grep -o '<title>[^<]*</title>' "dist/$name.html") in $name"
+    fail=1
+  fi
+done
+
+echo
 echo "── homepage (every local link on index.html resolves) ──"
 # The Pages root is index.html, and it links to the stable names above. A
 # link to a file that is not there is a 404 on the one page a visitor is

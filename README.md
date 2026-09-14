@@ -11,7 +11,7 @@ a font by hand, kids finding bugs — all lean on each other, and so will you.
 | realm | state |
 |---|---|
 | **Hiragana** — 46 gojūon | playable. Stroke order from KanjiVG, textbook letterforms, one stroke revealed at a time. |
-| **Vocab** — Genki I Lesson 1 | playable. A flashcard above the sketchbook: read the meaning, write the word one kana at a time. Peeking counts. |
+| **Vocab** — Genki I, Lessons 1–2 | playable. A flashcard above the sketchbook: read the meaning, write the word one kana at a time. Peeking counts. |
 | **Thai** — 44 consonants | engine works; no stroke data yet. Waiting on a recording session — see [KhienThai](https://github.com/thesisbytes/khienthai). |
 
 Each realm ships as a single HTML file. No install, no server, no
@@ -20,7 +20,7 @@ dependencies. Open it on a tablet and start tracing. The front door is
 straight in:
 
 **[Play](https://thesisbytes.github.io/hito/dist/hiragana-game.html)** — the game: draw below, farang advance above.  
-**[Vocab](https://thesisbytes.github.io/hito/dist/vocab.html)** — Genki I Lesson 1 as flashcards, written one kana at a time.  
+**[Vocab](https://thesisbytes.github.io/hito/dist/vocab.html)** — Genki I vocabulary, Lessons 1 and 2, as flashcards written one kana at a time.  
 **[Workshop](https://thesisbytes.github.io/hito/dist/hiragana.html)** — the full gojūon chart and every control, which is what this project uses on itself.
 
 ## How the tracing works

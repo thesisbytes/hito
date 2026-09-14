@@ -1,6 +1,6 @@
 {
   "script": "vocab",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "title": "hito 人 · vocab · v0.1.2",
   "brand": "hito 人 · vocab",
   "fontDir": "fonts",
@@ -24,7 +24,7 @@
       "role": "print"
     }
   ],
-  "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Vocabulary follows Genki I (3rd ed.), Lesson 1.",
+  "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Vocabulary follows Genki I (3rd ed.), Lessons 1 and 2.",
   "shadow": "none",
   "shadowScale": 2.4,
   "strictFollow": true,
@@ -46,7 +46,7 @@
   "mode": "easy",
   "grid": "cross",
   "shell": "vocab",
-  "deck": "vocab/genki-l1.json",
+  "deck": "vocab/genki-i.json",
   "vocab": {
     "prompt": "en",
     "advanceMs": 420,
@@ -68,7 +68,7 @@
     }
   ],
   "credits": [
-    "Vocabulary from the maintainer's Japanese class, Genki I Lesson 1.",
+    "Vocabulary from the maintainer's Japanese class, Genki I, Lessons 1 and 2.",
     "Stroke order recorded and checked by the project's teachers.",
     "Built by the maintainer, one version at a time."
   ]
