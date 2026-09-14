@@ -13,10 +13,15 @@ A word is a sequence of glyphs, so no new stroke format is needed — this is
 the "layout step" the economy plan always said words would be. The recall
 test is honest only as far as the tracer lets it be: on easy the guide draws
 the path and so reveals each kana's shape once the pen is down. What the
-card measures instead is whether the hand needed to *peek* before starting —
-the reading button, the kana button, and skip all count against the word,
-and words that were peeked come back sooner in the next round. Real
-free-recall waits on the hard-mode scorer, like everything else.
+card measures instead is what happened *before* the pen touched: how long
+the hand took to commit (card shown → first pen-down), and whether it
+needed help first. The help is graded the way the maintainer described
+their own recall — "if I see the first hiragana I'll get most words" — so
+the hint is the first kana, the next one is the whole word, and after an
+unhinted word the card asks which of the three it was: knew it, needed the
+first kana, no idea. A hinted word grades itself. Words not known come
+first next round, and slow ones sooner. Real free-recall waits on the
+hard-mode scorer, like everything else.
 
 Applied as an appended layer, the way the field is. It reaches the engine
 only through globals it already exposes (load, conjure, LETTERS, idx), so
@@ -79,8 +84,24 @@ STYLE = """
   .vrow button[hidden]{ display:none; }
   .vcard.bloom .vstrip .slot{ color:var(--gold-hot); border-color:rgba(233,196,106,.5);
     text-shadow:0 0 12px rgba(233,196,106,.8); }
+  .vrow.grade button{ flex:1; padding:11px 6px; font-size:13px; line-height:1.25; }
+  .vrow.grade button.g2{ color:var(--gold-hot); border-color:rgba(233,196,106,.5); }
+  .vrow.grade button.g1{ color:var(--teal); border-color:rgba(127,209,196,.4); }
+  .vrow.grade button.g0{ color:#e8a0a0; border-color:rgba(232,160,160,.4); }
+  .vtime{ font-size:13px; color:var(--ash); min-height:18px; font-variant-numeric:tabular-nums; }
+  .vtime b{ color:var(--paper); font-weight:600; }
   .vsummary{ font-size:15px; line-height:1.7; color:var(--paper); }
   .vsummary b{ color:var(--gold); font-size:22px; }
+  .vsummary small{ display:block; font-size:13px; color:var(--ash); line-height:1.5; }
+  .vwords{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin:8px 0 4px;
+           max-height:22dvh; overflow:auto; width:min(94vw,520px); }
+  .vwords span{ font-family:"HT-KleeOne",ui-sans-serif,system-ui; font-size:14px; padding:3px 8px;
+                border-radius:7px; border:1px solid rgba(240,227,196,.16); color:rgba(240,227,196,.8);
+                font-variant-numeric:tabular-nums; }
+  .vwords span small{ font-family:ui-sans-serif,system-ui; color:var(--ash); margin-left:5px; }
+  .vwords span.g2{ border-color:rgba(233,196,106,.45); color:var(--gold-hot); }
+  .vwords span.g1{ border-color:rgba(127,209,196,.45); color:#bdf0e6; }
+  .vwords span.g0{ border-color:rgba(232,160,160,.45); color:#e8a0a0; }
 
   /* The start page, same sheet as the field's. */
   .start{ position:fixed; inset:0; z-index:9998; display:flex; align-items:center;
@@ -215,21 +236,39 @@ LAYER = STYLE + r"""
   applyDifficulty(difficulty);
 
   // ---- the ledger: one entry per word, keyed by the word itself
-  // n: times completed. clean: completed with no peek, no skip, no zap.
-  // peek: times the hand needed help (reading, kana, or skip).
-  const LKEY = 'hito-vocab';
+  // n: times completed. clean: completed with no hint, no skip, no zap.
+  // peek: times the hand needed help (first kana, whole word, or skip).
+  // g: the last few grades, newest last — 2 knew it, 1 needed the first
+  //    kana, 0 no idea. rt: the last few recall times in ms, card shown to
+  //    first pen-down, kept only for words graded 2 (a hinted word was not
+  //    recalled, so its time is not a recall time).
+  const LKEY = 'hito-vocab', KEEP = 8;
   let LEDGER = {};
   try { LEDGER = JSON.parse(localStorage.getItem(LKEY) || '{}') || {}; } catch(_){ LEDGER = {}; }
   function saveLedger(){ try { localStorage.setItem(LKEY, JSON.stringify(LEDGER)); } catch(_){} }
-  const entry = ja => LEDGER[ja] || { n:0, clean:0, peek:0, last:0 };
+  const entry = ja => LEDGER[ja] || { n:0, clean:0, peek:0, last:0, g:[], rt:[] };
+  const median = a => { if (!a || !a.length) return null; const s = [...a].sort((x, y) => x - y);
+                        return s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1] + s[s.length/2]) / 2; };
+  const known = e => !!(e && e.g && e.g.length && e.g[e.g.length-1] === 2);
+  const recall = e => e && e.rt ? median(e.rt) : null;
+  const secs = ms => ms == null ? '' : (ms/1000).toFixed(ms < 9950 ? 1 : 0) + ' s';
+  const GRADE = { 2:'knew it', 1:'needed the first kana', 0:'no idea' };
 
   // ---- the queue: every chosen word once, the shaky ones first
-  // Weight favours words never seen and words that needed a peek. A word
-  // is never left out of a round; the order is what the ledger changes.
+  // Weight favours words never seen, words not known last time, and words
+  // recalled slowly. A word is never left out of a round; the order is
+  // what the ledger changes.
   function weight(w){
     const e = LEDGER[w.ja];
     if (!e || !e.n) return 2.5;
-    return 1 + 2*(e.peek/(e.n + e.peek)) + (e.clean === 0 ? 0.8 : 0);
+    let k = 1;
+    if (e.g && e.g.length){
+      const g = e.g.slice(-3);
+      k += 2 - g.reduce((a, b) => a + b, 0) / g.length;        // 0 (all knew) .. 2 (all no idea)
+    } else k += 2*(e.peek/(e.n + e.peek)) + (e.clean === 0 ? 0.8 : 0);   // a ledger from before grades
+    const r = recall(e);
+    if (r) k += Math.min(1, r / 8000);                           // eight seconds of thinking weighs like a miss
+    return k;
   }
   function weightedShuffle(words){
     const pool = words.map(w => ({ w, k: weight(w) }));
@@ -258,9 +297,11 @@ LAYER = STYLE + r"""
   // ---- state
   let queue = [], qi = -1, word = null, chars = [], ci = 0;
   let peek = 0, zapped = 0, skipped = false, wordAt = 0;
+  let firstAct = null;   // ms from card shown to the first pen-down or hint tap
   let phase = 'start';   // start | word | bloom | summary
   let cmarkup = '';      // what the card shows, kept so a test can read it
-  let round = { words:0, clean:0, peeked:0, skipped:0 };
+  const newRound = () => ({ words:0, clean:0, peeked:0, skipped:0, knew:0, first:0, none:0, list:[] });
+  let round = newRound();
   let timers = [];
   function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
   function cancelTimers(){ for (const t of timers) clearTimeout(t); timers = []; }
@@ -268,14 +309,14 @@ LAYER = STYLE + r"""
   function startRound(){
     cancelTimers();
     queue = weightedShuffle(selected());
-    qi = -1; round = { words:0, clean:0, peeked:0, skipped:0 };
+    qi = -1; round = newRound();
     nextWord();
   }
   function nextWord(){
     qi++;
     if (qi >= queue.length){ word = null; chars = []; phase = 'summary'; render(); return; }
     word = queue[qi]; chars = [...word.ja]; ci = 0;
-    peek = 0; zapped = 0; skipped = false; wordAt = performance.now();
+    peek = 0; zapped = 0; skipped = false; wordAt = performance.now(); firstAct = null; graded = false;
     phase = 'word';
     render();
     loadChar();
@@ -330,28 +371,57 @@ LAYER = STYLE + r"""
     }, CFG.advanceMs);
     return r;
   };
+  // The word is written. A hinted word has graded itself — the first kana
+  // is grade 1, the whole word grade 0 — and blooms for wordPauseMs. An
+  // unhinted word blooms until the hand says which it was, because the
+  // guide drew every shape once the pen was down and only the hand knows
+  // whether it needed that.
   function wordDone(){
-    const e = entry(word.ja);
-    const clean = !peek && !zapped && !skipped;
-    e.n++; if (clean) e.clean++; if (peek) e.peek++; e.last = Date.now();
-    LEDGER[word.ja] = e; saveLedger();
-    round.words++; if (clean) round.clean++; if (peek) round.peeked++;
-    try { window.__sync && window.__sync.record('word', {
-      word: word.ja, deck: DECK.deck, section: word.secId, prompt, difficulty,
-      peek, zaps: zapped, ms: Math.round(performance.now() - wordAt),
-    }); } catch(_){}
     phase = 'bloom';
     render();
     if (navigator.vibrate) navigator.vibrate([20,40,60]);
-    later(nextWord, CFG.wordPauseMs);
+    if (peek >= 1){ grade(peek >= 2 ? 0 : 1); later(nextWord, CFG.wordPauseMs); }
   }
-  // Help, and it counts. Reading shows the romaji; kana fills every slot;
-  // skip gives up on the word, which goes to the back of the queue once.
-  function showReading(){ if (phase !== 'word') return; peek = Math.max(peek, 1); render(); }
-  function showKana(){ if (phase !== 'word') return; peek = 2; render(); }
+  let graded = false;
+  function grade(g){
+    if (phase !== 'bloom' || !word || graded) return false;
+    g = Math.max(0, Math.min(2, g|0));
+    if (peek >= 2 && g > 0) g = 0;            // the word was shown: nothing was recalled
+    if (peek === 1 && g > 1) g = 1;           // the first kana was given
+    graded = true;
+    const e = entry(word.ja);
+    const clean = !peek && !zapped && !skipped;
+    e.n++; if (clean) e.clean++; if (peek) e.peek++; e.last = Date.now();
+    e.g = (e.g || []).concat(g).slice(-KEEP);
+    e.rt = e.rt || [];
+    const think = firstAct == null ? null : Math.round(firstAct);
+    if (g === 2 && think != null) e.rt = e.rt.concat(think).slice(-KEEP);
+    LEDGER[word.ja] = e; saveLedger();
+    round.words++; if (clean) round.clean++; if (peek) round.peeked++;
+    round[['none', 'first', 'knew'][g]]++;
+    round.list.push({ ja: word.ja, en: word.en, g, ms: think });
+    try { window.__sync && window.__sync.record('word', {
+      word: word.ja, deck: DECK.deck, section: word.secId, prompt, difficulty,
+      peek, grade: g, zaps: zapped, thinkMs: think, ms: Math.round(performance.now() - wordAt),
+    }); } catch(_){}
+    render();
+    return true;
+  }
+  function gradeAndGo(g){ if (grade(g)){ cancelTimers(); nextWord(); } }
+  // The clock stops at the first thing the hand does: a pen-down on the
+  // sketchbook, or a hint. Only the first counts; a redo does not restart it.
+  function touched(){ if (phase === 'word' && word && firstAct == null) firstAct = performance.now() - wordAt; }
+  // Help, and it counts. The first kana lights its slot; the whole word
+  // fills every slot and shows the reading; skip gives up on the word,
+  // which goes to the back of the queue once.
+  function showFirst(){ if (phase !== 'word') return; touched(); peek = Math.max(peek, 1); render(); }
+  function showKana(){ if (phase !== 'word') return; touched(); peek = 2; render(); }
   function skip(){
     if (phase !== 'word' || !word) return;
-    const e = entry(word.ja); e.peek++; e.last = Date.now(); LEDGER[word.ja] = e; saveLedger();
+    touched();
+    const e = entry(word.ja); e.peek++; e.last = Date.now();
+    e.g = (e.g || []).concat(0).slice(-KEEP); e.rt = e.rt || [];
+    LEDGER[word.ja] = e; saveLedger();
     round.skipped++;
     if (!word.requeued){ queue.push({ ...word, requeued:true }); }
     cancelTimers();
@@ -392,6 +462,7 @@ LAYER = STYLE + r"""
     return gone.length;
   }
   const inkEl = $('ink');
+  inkEl.addEventListener('pointerdown', () => touched());
   inkEl.addEventListener('pointerup', () => tidy());
   inkEl.addEventListener('pointercancel', () => tidy());
   const _fizzle = window.fizzle;
@@ -404,16 +475,24 @@ LAYER = STYLE + r"""
   // ---- the card
   function slotText(i){
     const d = DIFF[difficulty] || {};
-    const show = phase === 'bloom' || peek >= 2 || prompt === 'kana' || d.reveal || i < ci;
+    const show = phase === 'bloom' || peek >= 2 || (peek >= 1 && i === 0) || prompt === 'kana' || d.reveal || i < ci;
     return show ? chars[i] : '＿';
   }
   function render(){
     if (phase === 'summary'){
       card.className = 'vcard';
+      const rts = round.list.filter(x => x.g === 2 && x.ms != null).map(x => x.ms);
+      const med = median(rts);
+      const slow = rts.length ? Math.max(...rts) : null;
+      const order = [...round.list].sort((a, b) => a.g - b.g || (b.ms || 0) - (a.ms || 0));
+      const chips = order.map(x => `<span class="g${x.g}" title="${esc(x.en)} · ${GRADE[x.g]}">${esc(x.ja)}`
+        + `<small>${x.g === 2 && x.ms != null ? secs(x.ms) : x.g === 1 ? '1st' : '✗'}</small></span>`).join('');
       card.innerHTML = cmarkup = `<div class="vsec">round done</div>
-        <div class="vsummary"><b>${round.words}</b> words · <b>${round.clean}</b> clean ·
-        <b>${round.peeked}</b> peeked · <b>${round.skipped}</b> skipped</div>
-        <div class="vnote">the ones you peeked at come first next time</div>
+        <div class="vsummary"><b>${round.words}</b> words · <b>${round.knew}</b> knew ·
+        <b>${round.first}</b> first kana · <b>${round.none}</b> no idea${round.skipped ? ` · <b>${round.skipped}</b> skipped` : ''}
+        <small>${med != null ? `recalled in <b>${secs(med)}</b> typically, <b>${secs(slow)}</b> at the slowest` : 'nothing recalled unhinted this round'}</small></div>
+        <div class="vwords">${chips}</div>
+        <div class="vnote">the ones you did not know come first next time, and the slow ones sooner</div>
         <div class="vrow"><button class="primary" id="vAgain">again</button><button id="vMenu">menu</button></div>`;
       $('vAgain').onclick = startRound;
       $('vMenu').onclick = openStart;
@@ -431,21 +510,43 @@ LAYER = STYLE + r"""
     }).join('');
     let hint = '';
     if (phase === 'bloom') hint = `<b>${esc(word.romaji)}</b> · ${esc(word.en)}`;
-    else if (peek >= 1 && prompt !== 'romaji') hint = `<b>${esc(word.romaji)}</b>`;
-    else if (peek >= 1) hint = `${esc(word.en)}`;
+    else if (peek >= 2 && prompt !== 'romaji') hint = `<b>${esc(word.romaji)}</b>`;
+    // the clock: what the hand did first, and when
+    let time = '';
+    if (firstAct != null){
+      const t = secs(firstAct);
+      time = peek >= 2 ? `shown after <b>${t}</b>` : peek === 1 ? `first kana after <b>${t}</b>` : `pen down after <b>${t}</b>`;
+    }
+    // after the word: a hinted one has graded itself; an unhinted one asks
+    let row;
+    if (phase === 'bloom' && !graded)
+      row = `<div class="vrow grade">
+        <button class="g2" data-g="2">knew it</button>
+        <button class="g1" data-g="1">needed the first kana</button>
+        <button class="g0" data-g="0">no idea</button></div>`;
+    else if (phase === 'bloom'){
+      const g = round.list.length ? round.list[round.list.length-1].g : 0;
+      row = `<div class="vrow grade"><button class="g${g}" disabled>${GRADE[g]}</button></div>`;
+    } else
+      row = `<div class="vrow">
+        <button class="teal" id="vFirst"${peek >= 1 || prompt === 'kana' ? ' disabled' : ''}>first kana</button>
+        <button class="teal" id="vKana"${peek >= 2 || prompt === 'kana' ? ' disabled' : ''}>show word</button>
+        <button id="vSkip">skip ›</button>
+      </div>`;
     card.innerHTML = cmarkup = `<div class="vsec">${esc(word.sec)}<span>${qi+1} / ${queue.length}</span></div>
       <div class="vprompt${prompt === 'kana' ? ' kana' : ''}">${esc(p)}</div>
       <div class="vnote">${esc(word.note || '')}</div>
       <div class="vstrip">${slots}</div>
       <div class="vhint">${hint}</div>
-      <div class="vrow">
-        <button class="teal" id="vReading"${peek >= 1 || phase === 'bloom' ? ' disabled' : ''}>${prompt === 'romaji' ? 'meaning' : 'reading'}</button>
-        <button class="teal" id="vKana"${peek >= 2 || phase === 'bloom' || prompt === 'kana' ? ' disabled' : ''}>show kana</button>
-        <button id="vSkip"${phase === 'bloom' ? ' disabled' : ''}>skip ›</button>
-      </div>`;
-    $('vReading').onclick = showReading;
-    $('vKana').onclick = showKana;
-    $('vSkip').onclick = skip;
+      <div class="vtime">${time}</div>
+      ${row}`;
+    if (phase === 'bloom'){
+      for (const b of card.querySelectorAll('button[data-g]')) b.onclick = () => gradeAndGo(Number(b.dataset.g));
+    } else {
+      $('vFirst').onclick = showFirst;
+      $('vKana').onclick = showKana;
+      $('vSkip').onclick = skip;
+    }
   }
 
   // ---- the start page
@@ -483,9 +584,10 @@ LAYER = STYLE + r"""
       `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
       + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
     const secs = DECK.sections.map(s => {
-      const seen = s.words.filter(w => entry(w.ja).n).length;
+      const knew = s.words.filter(w => known(LEDGER[w.ja])).length;
+      const med = median(s.words.map(w => recall(LEDGER[w.ja])).filter(x => x != null));
       return `<button data-k="sec" data-v="${esc(s.id)}" aria-pressed="${chosen.has(s.id)}">`
-        + `<b>${esc(s.title)}</b><small>${s.words.length} words · ${seen} seen</small></button>`;
+        + `<b>${esc(s.title)}</b><small>${s.words.length} words · ${knew} known${med != null ? ` · ${secs(med)}` : ''}</small></button>`;
     }).join('');
     const n = selected().length;
     start.innerHTML = markup = `<div class="start-card">
@@ -546,11 +648,18 @@ LAYER = STYLE + r"""
     try {
       const o = JSON.parse(src);
       if (!o || o.hito !== 'vocab' || typeof o.ledger !== 'object') throw 0;
-      // merge, never replace: a count only ever goes up
+      // merge, never replace: a count only ever goes up, and the grade and
+      // recall history come from whichever side wrote last
       for (const ja in o.ledger){
         const a = entry(ja), b = o.ledger[ja] || {};
+        // (a millisecond timestamp does not survive |0 — that dropped every
+        // imported `last` to zero until the grade history depended on it)
+        const bl = Number(b.last) || 0;
+        const newer = bl > (Number(a.last) || 0) ? b : a;
         LEDGER[ja] = { n: Math.max(a.n, b.n|0), clean: Math.max(a.clean, b.clean|0),
-                       peek: Math.max(a.peek, b.peek|0), last: Math.max(a.last, b.last|0) };
+                       peek: Math.max(a.peek, b.peek|0), last: Math.max(a.last, bl),
+                       g: Array.isArray(newer.g) ? newer.g.slice(-KEEP) : [],
+                       rt: Array.isArray(newer.rt) ? newer.rt.slice(-KEEP) : [] };
       }
       saveLedger();
       if (o.mastery) { for (const k in o.mastery) MASTERY[k] = Math.max(MASTERY[k]||0, o.mastery[k]|0); persistM(); }
@@ -585,6 +694,7 @@ LAYER = STYLE + r"""
     get queue(){ return queue; }, get qi(){ return qi; },
     get word(){ return word; }, get chars(){ return chars; }, get ci(){ return ci; },
     get phase(){ return phase; }, get peek(){ return peek; }, get zapped(){ return zapped; },
+    get firstAct(){ return firstAct; }, get graded(){ return graded; },
     get round(){ return round; }, get ledger(){ return LEDGER; },
     get difficulty(){ return difficulty; }, get prompt(){ return prompt; },
     get sections(){ return [...chosen]; },
@@ -592,7 +702,8 @@ LAYER = STYLE + r"""
     get redoShown(){ return redoShown; },
     base: BASE, at: AT,
     setDifficulty, setPrompt, toggleSection, begin, openStart, openCredits,
-    startRound, nextWord, skip, showReading, showKana, tidy,
+    startRound, nextWord, skip, showFirst, showKana, touched, grade: gradeAndGo, tidy,
+    median, recall, known,
     exportProgress, importProgress,
     weight, selected,
     clearLedger(){ LEDGER = {}; saveLedger(); },

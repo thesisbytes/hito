@@ -112,10 +112,16 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 The vocab shell is not a variant of the hiragana pack: it needs every kana a
 deck might use, so `scripts/vocab/` carries its own glyph list — all 164
 hiragana and katakana, written by `build/kana_glyphs.py` — and its own
-stroke book and font subsets (`*-kana-all.woff2`). Peeking counts: the
-reading button, the kana button and skip are all recorded against the word,
-and a peeked word comes up sooner in the next round. Progress is a per-word
-ledger in localStorage with export/import on the credits page.
+stroke book and font subsets (`*-kana-all.woff2`). The card keeps a clock
+from the moment it is shown to the first pen-down, and every word ends with
+a grade: *knew it*, *needed the first kana*, or *no idea*. A hinted word
+grades itself (the first-kana button is grade 1, the show-word button and
+skip are grade 0); an unhinted word asks, because on easy the guide draws
+each shape once the pen is down and only the hand knows whether it needed
+that. The round's summary lists every word by grade and recall time, and
+the next round puts the words not known first and the slow ones sooner.
+Progress is a per-word ledger in localStorage with export/import on the
+credits page.
 
 The workshop and the field build from the same pack directory — pass a `.json` file to
 `stitch.py` instead of a directory to use a variant. `scripts/hiragana/game.json`

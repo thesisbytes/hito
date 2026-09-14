@@ -11,7 +11,7 @@ a font by hand, kids finding bugs — all lean on each other, and so will you.
 | realm | state |
 |---|---|
 | **Hiragana** — 46 gojūon | playable. Stroke order from KanjiVG, textbook letterforms, one stroke revealed at a time. |
-| **Vocab** — Genki I, Lessons 1–2 | playable. A flashcard above the sketchbook: read the meaning, write the word one kana at a time. Peeking counts. |
+| **Vocab** — Genki I, Lessons 1–2 | playable. A flashcard above the sketchbook: read the meaning, write the word one kana at a time. It times the recall and asks how it went. |
 | **Thai** — 44 consonants | engine works; no stroke data yet. Waiting on a recording session — see [KhienThai](https://github.com/thesisbytes/khienthai). |
 
 Each realm ships as a single HTML file. No install, no server, no

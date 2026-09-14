@@ -4,8 +4,9 @@
  * A word is a sequence of glyphs and the card walks the tracer through it.
  * What is being defended is the seam: every load the engine initiates on its
  * own has to land on the kana the card is asking for, a finished kana has to
- * advance to the next one, a finished word has to bloom and move on, and a
- * peek has to count against the word so the next round asks it sooner.
+ * advance to the next one, a finished word has to bloom and move on, the
+ * clock has to stop at the first pen-down, and a hint has to grade the word
+ * so the next round asks it sooner.
  *
  *   node build/test/vocab.test.mjs dist/vocab-vX.Y.Z.html
  */
@@ -156,6 +157,11 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
 // ---- a finished kana lights its slot and moves on; a finished word blooms
 {
   const w = V.word, n = [...w.ja].length;
+  // the hand thinks for 2.3 s, then the pen touches the pad
+  advance(2300); V.touched();
+  ok(Math.abs(V.firstAct - 2300) < 20, `the clock read ${V.firstAct} after 2300 ms of thinking`);
+  advance(500); V.touched();
+  ok(Math.abs(V.firstAct - 2300) < 20, 'a second pen-down restarted the clock');
   for (let k = 0; k < n; k++){
     ok(V.ci === k && P.LETTERS[P.idx][0] === w.ja[k] && V.phase === 'word',
        `at kana ${k} of ${w.ja}: ci ${V.ci}, tracer on ${P.LETTERS[P.idx][0]}, phase ${V.phase}`);
@@ -175,10 +181,20 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   const idxBloom = P.idx;
   globalThis.load(idxBloom + 3);
   ok(P.idx === idxBloom && P.done, 'a load during the bloom reloaded the finished glyph');
+  // an unhinted word waits for the hand's own grade; the pause does not move it on
+  ok(/knew it/.test(V.cardHtml) && /needed the first kana/.test(V.cardHtml) && /no idea/.test(V.cardHtml),
+     'the bloom does not ask how the recall went');
+  ok(/pen down after <b>2\.3 s/.test(V.cardHtml), `the bloom does not show the recall time: ${V.cardHtml.match(/vtime">([^<]*<[^<]*<\/b>[^<]*)/)?.[1]}`);
+  ok(!V.ledger[w.ja], 'the ledger was written before the hand graded the word');
+  advance(nums.wordPauseMs + 20);
+  ok(V.phase === 'bloom', 'an ungraded word moved on by itself');
+  V.grade(2);
   const e = V.ledger[w.ja];
   ok(e && e.n === 1 && e.clean === 1 && e.peek === 0, `ledger after a clean word: ${JSON.stringify(e)}`);
-  advance(nums.wordPauseMs + 20);
-  ok(V.phase === 'word' && V.qi === 1 && V.word !== w, 'the bloom did not move to the next word');
+  ok(e && e.g.length === 1 && e.g[0] === 2 && e.rt.length === 1 && Math.abs(e.rt[0] - 2300) < 20,
+     `ledger did not keep the grade and recall time: ${JSON.stringify(e)}`);
+  ok(V.round.knew === 1 && V.round.list.length === 1 && V.round.list[0].ja === w.ja, 'the round did not record the word');
+  ok(V.phase === 'word' && V.qi === 1 && V.word !== w, 'the grade did not move to the next word');
   ok(P.LETTERS[P.idx][0] === V.word.ja[0] && !P.done, 'the next word\'s first kana is not loaded');
 }
 
@@ -197,18 +213,41 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   ok(P.LETTERS[P.idx][0] === w.ja[ci] && !P.done, 'the tracer did not come back to the card\'s kana');
 }
 
-// ---- peeking counts, and comes back sooner
+// ---- a hint grades the word itself, stops the clock, and comes back sooner
 {
-  const w = V.word;
-  V.showReading();
-  ok(V.peek === 1 && new RegExp(w.romaji).test(V.cardHtml), 'the reading did not show');
-  V.showKana();
-  ok(V.peek === 2 && !/＿/.test(V.cardHtml), 'show kana left blanks in the strip');
+  // the first kana: grade 1, the slot lights, the rest stay blank
+  let w = V.word;
+  advance(4000); V.showFirst();   // the stray-conjure block above already spent advanceMs on this card
+  const took = V.firstAct;
+  ok(V.peek === 1 && took >= 4000 && took < 4000 + nums.advanceMs + 40, `the first-kana hint did not stop the clock (${took})`);
+  ok(new RegExp(`class="slot cur">${w.ja[0]}<`).test(V.cardHtml), 'the first kana did not light its slot');
+  ok([...w.ja].length < 2 || /＿/.test(V.cardHtml), 'the first-kana hint showed the whole word');
+  ok(!new RegExp(w.romaji).test(V.cardHtml), 'the first-kana hint gave away the reading');
   for (let k = 0; k < [...w.ja].length; k++){ globalThis.conjure(); advance(nums.advanceMs + 20); }
-  const e = V.ledger[w.ja];
-  ok(e && e.n === 1 && e.clean === 0 && e.peek === 1, `ledger after a peeked word: ${JSON.stringify(e)}`);
-  ok(V.weight(w) > V.weight(V.queue[0]), 'a peeked word does not outweigh a clean one');
+  ok(V.phase === 'bloom' && V.graded && !/knew it/.test(V.cardHtml), 'a hinted word asked for a grade');
+  ok(new RegExp(`first kana after <b>${(took/1000).toFixed(1)} s`).test(V.cardHtml), 'the bloom does not say when the hint was taken');
+  let e = V.ledger[w.ja];
+  ok(e && e.n === 1 && e.clean === 0 && e.peek === 1 && e.g[0] === 1 && e.rt.length === 0,
+     `ledger after a first-kana word: ${JSON.stringify(e)}`);
+  ok(V.weight(w) > V.weight(V.queue[0]), 'a hinted word does not outweigh a known one');
   advance(nums.wordPauseMs + 20);
+  ok(V.phase === 'word' && V.word !== w, 'a hinted word did not move on by itself');
+  // the whole word: grade 0, every slot filled, and the grade cannot be talked up
+  w = V.word;
+  V.showKana();
+  ok(V.peek === 2 && !/＿/.test(V.cardHtml) && new RegExp(w.romaji).test(V.cardHtml), 'show word left blanks or hid the reading');
+  for (let k = 0; k < [...w.ja].length; k++){ globalThis.conjure(); advance(nums.advanceMs + 20); }
+  ok(V.phase === 'bloom' && V.graded, 'a shown word asked for a grade');
+  ok(!V.grade(2), 'a shown word could be graded twice');
+  e = V.ledger[w.ja];
+  ok(e && e.g[0] === 0 && V.round.none === 1, `ledger after a shown word: ${JSON.stringify(e)}`);
+  advance(nums.wordPauseMs + 20);
+  // a slow recall weighs more than a quick one
+  const quick = { ja:'q', n:1, clean:1, peek:0, last:1, g:[2], rt:[900] };
+  const slow  = { ja:'s', n:1, clean:1, peek:0, last:1, g:[2], rt:[7000] };
+  V.ledger.q = quick; V.ledger.s = slow;
+  ok(V.weight({ja:'s'}) > V.weight({ja:'q'}), 'a slow recall does not outweigh a quick one');
+  delete V.ledger.q; delete V.ledger.s;
 }
 
 // ---- skip goes to the back of the queue, once
@@ -218,6 +257,7 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   ok(V.queue.length === len + 1 && V.queue[V.queue.length-1].ja === w.ja, 'a skipped word was not requeued');
   ok(V.word !== w && V.phase === 'word', 'skip did not move on');
   ok(V.round.skipped === 1, 'skip was not counted');
+  ok(V.ledger[w.ja] && V.ledger[w.ja].g.slice(-1)[0] === 0, 'a skip was not recorded as a miss');
   // skipping it again at the end must not requeue it forever
   while (V.phase === 'word' && V.word.ja !== w.ja) V.skip();
   ok(V.phase === 'word' && V.word.ja === w.ja, 'the requeued word never came round');
@@ -230,10 +270,16 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   let guard = 0;
   while (V.phase === 'word' && guard++ < 500){
     for (let k = 0; k < [...V.word.ja].length && V.phase === 'word'; k++){ globalThis.conjure(); advance(nums.advanceMs + 20); }
-    if (V.phase === 'bloom') advance(nums.wordPauseMs + 20);
+    if (V.phase === 'bloom'){ advance(nums.wordPauseMs + 20); if (V.phase === 'bloom') V.grade(guard % 3); }
   }
   ok(V.phase === 'summary', `the round did not end: phase ${V.phase} after ${guard} words`);
   ok(/round done/.test(V.cardHtml) && /again/.test(V.cardHtml), 'the summary is missing');
+  ok(/recalled in <b>/.test(V.cardHtml) && /at the slowest/.test(V.cardHtml), 'the summary has no recall time');
+  const chips = V.cardHtml.match(/<div class="vwords">([\s\S]*?)<\/div>/);
+  ok(chips && (chips[1].match(/<span class="g\d"/g) || []).length === V.round.words,
+     `the summary does not list every word of the round`);
+  ok(chips && /<span class="g0"[\s\S]*<span class="g2"/.test(chips[1]) && !/<span class="g2"[\s\S]*<span class="g0"/.test(chips[1]),
+     'the summary does not put the words not known first');
   const idxS = P.idx;
   globalThis.load(idxS + 2);
   ok(P.idx === idxS, 'a load during the summary moved the tracer');
@@ -266,6 +312,13 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   const ja = Object.keys(led)[0];
   V.importProgress(JSON.stringify({hito:'vocab', ledger: {[ja]: {n:0, clean:0, peek:0, last:0}}}));
   ok(V.ledger[ja].n === led[ja].n, 'an import with lower counts lowered the ledger');
+  ok(V.ledger[ja].last === led[ja].last, `an import lost the timestamp (${V.ledger[ja].last} for ${led[ja].last})`);
+  ok(JSON.stringify(V.ledger[ja].g) === JSON.stringify(led[ja].g), 'an older import replaced the grade history');
+  const later = { ...led[ja], last: led[ja].last + 1, g:[0,0], rt:[] };
+  V.importProgress(JSON.stringify({hito:'vocab', ledger: {[ja]: later}}));
+  ok(JSON.stringify(V.ledger[ja].g) === '[0,0]', 'a newer import did not bring its grade history');
+  ok(V.importProgress(JSON.stringify({hito:'vocab', ledger: {zz: {n:2, clean:1, peek:1, last:5}}})) && V.ledger.zz.g.length === 0,
+     'a ledger from before grades was refused or given a bad history');
 }
 
 // ---- a stroke has to be travelled, not touched
@@ -321,5 +374,5 @@ ok(/body\.vocab[^{]*\.only-p[^{]*\{ display:none/.test(html), 'the practice row 
 ok(/body\.vocab[^{]*\.grid[^{]*\{ display:none/.test(html), 'the kana grid is showing');
 
 if (fail) { console.log(`  ${fail} vocab check(s) failed`); process.exit(1); }
-console.log(`  a word is walked kana by kana through the seam, blooms, peeks count, `
-  + `skips requeue once, the round ends, and progress exports and imports`);
+console.log(`  a word is walked kana by kana through the seam, the clock stops at the pen, `
+  + `hints grade the word, skips requeue once, the round ends in a graded list, and progress exports and imports`);

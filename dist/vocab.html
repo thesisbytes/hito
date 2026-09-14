@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · vocab · v0.1.10</title>
+<title>hito 人 · vocab · v0.1.11</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.10';
+const APP_VERSION='0.1.11';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"A"],["い","あ行","i","","a-row",2,1,"I"],["う","あ行","u","","a-row",3,1,"U"],["え","あ行","e","","a-row",4,1,"E"],["お","あ行","o","","a-row",5,1,"O"],["か","か行","ka","","ka-row",1,2,"KA"],["き","か行","ki","","ka-row",2,2,"KI"],["く","か行","ku","","ka-row",3,2,"KU"],["け","か行","ke","","ka-row",4,2,"KE"],["こ","か行","ko","","ka-row",5,2,"KO"],["さ","さ行","sa","","sa-row",1,3,"SA"],["し","さ行","shi","","sa-row",2,3,"SHI"],["す","さ行","su","","sa-row",3,3,"SU"],["せ","さ行","se","","sa-row",4,3,"SE"],["そ","さ行","so","","sa-row",5,3,"SO"],["た","た行","ta","","ta-row",1,4,"TA"],["ち","た行","chi","","ta-row",2,4,"CHI"],["つ","た行","tsu","","ta-row",3,4,"TSU"],["て","た行","te","","ta-row",4,4,"TE"],["と","た行","to","","ta-row",5,4,"TO"],["な","な行","na","","na-row",1,5,"NA"],["に","な行","ni","","na-row",2,5,"NI"],["ぬ","な行","nu","","na-row",3,5,"NU"],["ね","な行","ne","","na-row",4,5,"NE"],["の","な行","no","","na-row",5,5,"NO"],["は","は行","ha","","ha-row",1,6,"HA"],["ひ","は行","hi","","ha-row",2,6,"HI"],["ふ","は行","fu","","ha-row",3,6,"FU"],["へ","は行","he","","ha-row",4,6,"HE"],["ほ","は行","ho","","ha-row",5,6,"HO"],["ま","ま行","ma","","ma-row",1,7,"MA"],["み","ま行","mi","","ma-row",2,7,"MI"],["む","ま行","mu","","ma-row",3,7,"MU"],["め","ま行","me","","ma-row",4,7,"ME"],["も","ま行","mo","","ma-row",5,7,"MO"],["や","や行","ya","","ya-row",1,8,"YA"],["ゆ","や行","yu","","ya-row",3,8,"YU"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RA"],["り","ら行","ri","","ra-row",2,9,"RI"],["る","ら行","ru","","ra-row",3,9,"RU"],["れ","ら行","re","","ra-row",4,9,"RE"],["ろ","ら行","ro","","ra-row",5,9,"RO"],["わ","わ行","wa","","wa-row",1,10,"WA"],["を","わ行","wo","","wa-row",5,10,"WO"],["ん","","n","","",1,37,"N"],["が","が行","ga","","ga-row",1,12,"GA"],["ぎ","が行","gi","","ga-row",2,12,"GI"],["ぐ","が行","gu","","ga-row",3,12,"GU"],["げ","が行","ge","","ga-row",4,12,"GE"],["ご","が行","go","","ga-row",5,12,"GO"],["ざ","ざ行","za","","za-row",1,13,"ZA"],["じ","ざ行","ji","","za-row",2,13,"JI"],["ず","ざ行","zu","","za-row",3,13,"ZU"],["ぜ","ざ行","ze","","za-row",4,13,"ZE"],["ぞ","ざ行","zo","","za-row",5,13,"ZO"],["だ","だ行","da","","da-row",1,14,"DA"],["ぢ","だ行","ji","","da-row",2,14,"JI"],["づ","だ行","zu","","da-row",3,14,"ZU"],["で","だ行","de","","da-row",4,14,"DE"],["ど","だ行","do","","da-row",5,14,"DO"],["ば","ば行","ba","","ba-row",1,15,"BA"],["び","ば行","bi","","ba-row",2,15,"BI"],["ぶ","ば行","bu","","ba-row",3,15,"BU"],["べ","ば行","be","","ba-row",4,15,"BE"],["ぼ","ば行","bo","","ba-row",5,15,"BO"],["ぱ","ぱ行","pa","","pa-row",1,16,"PA"],["ぴ","ぱ行","pi","","pa-row",2,16,"PI"],["ぷ","ぱ行","pu","","pa-row",3,16,"PU"],["ぺ","ぱ行","pe","","pa-row",4,16,"PE"],["ぽ","ぱ行","po","","pa-row",5,16,"PO"],["ぁ","ぁ行","xa","","small-row",1,17,"XA"],["ぃ","ぁ行","xi","","small-row",2,17,"XI"],["ぅ","ぁ行","xu","","small-row",3,17,"XU"],["ぇ","ぁ行","xe","","small-row",4,17,"XE"],["ぉ","ぁ行","xo","","small-row",5,17,"XO"],["ゃ","ぁ行","xya","","small-row",1,17,"XYA"],["ゅ","ぁ行","xyu","","small-row",3,17,"XYU"],["ょ","ぁ行","xyo","","small-row",5,17,"XYO"],["っ","ぁ行","xtsu","","small-row",3,17,"XTSU"],["ゎ","ぁ行","xwa","","small-row",1,17,"XWA"],["ア","ア行","a","","Ka-row",1,18,"A"],["イ","ア行","i","","Ka-row",2,18,"I"],["ウ","ア行","u","","Ka-row",3,18,"U"],["エ","ア行","e","","Ka-row",4,18,"E"],["オ","ア行","o","","Ka-row",5,18,"O"],["カ","カ行","ka","","Kka-row",1,19,"KA"],["キ","カ行","ki","","Kka-row",2,19,"KI"],["ク","カ行","ku","","Kka-row",3,19,"KU"],["ケ","カ行","ke","","Kka-row",4,19,"KE"],["コ","カ行","ko","","Kka-row",5,19,"KO"],["サ","サ行","sa","","Ksa-row",1,20,"SA"],["シ","サ行","shi","","Ksa-row",2,20,"SHI"],["ス","サ行","su","","Ksa-row",3,20,"SU"],["セ","サ行","se","","Ksa-row",4,20,"SE"],["ソ","サ行","so","","Ksa-row",5,20,"SO"],["タ","タ行","ta","","Kta-row",1,21,"TA"],["チ","タ行","chi","","Kta-row",2,21,"CHI"],["ツ","タ行","tsu","","Kta-row",3,21,"TSU"],["テ","タ行","te","","Kta-row",4,21,"TE"],["ト","タ行","to","","Kta-row",5,21,"TO"],["ナ","ナ行","na","","Kna-row",1,22,"NA"],["ニ","ナ行","ni","","Kna-row",2,22,"NI"],["ヌ","ナ行","nu","","Kna-row",3,22,"NU"],["ネ","ナ行","ne","","Kna-row",4,22,"NE"],["ノ","ナ行","no","","Kna-row",5,22,"NO"],["ハ","ハ行","ha","","Kha-row",1,23,"HA"],["ヒ","ハ行","hi","","Kha-row",2,23,"HI"],["フ","ハ行","fu","","Kha-row",3,23,"FU"],["ヘ","ハ行","he","","Kha-row",4,23,"HE"],["ホ","ハ行","ho","","Kha-row",5,23,"HO"],["マ","マ行","ma","","Kma-row",1,24,"MA"],["ミ","マ行","mi","","Kma-row",2,24,"MI"],["ム","マ行","mu","","Kma-row",3,24,"MU"],["メ","マ行","me","","Kma-row",4,24,"ME"],["モ","マ行","mo","","Kma-row",5,24,"MO"],["ヤ","ヤ行","ya","","Kya-row",1,25,"YA"],["ユ","ヤ行","yu","","Kya-row",3,25,"YU"],["ヨ","ヤ行","yo","","Kya-row",5,25,"YO"],["ラ","ラ行","ra","","Kra-row",1,26,"RA"],["リ","ラ行","ri","","Kra-row",2,26,"RI"],["ル","ラ行","ru","","Kra-row",3,26,"RU"],["レ","ラ行","re","","Kra-row",4,26,"RE"],["ロ","ラ行","ro","","Kra-row",5,26,"RO"],["ワ","ワ行","wa","","Kwa-row",1,27,"WA"],["ヲ","ワ行","wo","","Kwa-row",5,27,"WO"],["ン","","n","","",1,37,"N"],["ガ","ガ行","ga","","Kga-row",1,29,"GA"],["ギ","ガ行","gi","","Kga-row",2,29,"GI"],["グ","ガ行","gu","","Kga-row",3,29,"GU"],["ゲ","ガ行","ge","","Kga-row",4,29,"GE"],["ゴ","ガ行","go","","Kga-row",5,29,"GO"],["ザ","ザ行","za","","Kza-row",1,30,"ZA"],["ジ","ザ行","ji","","Kza-row",2,30,"JI"],["ズ","ザ行","zu","","Kza-row",3,30,"ZU"],["ゼ","ザ行","ze","","Kza-row",4,30,"ZE"],["ゾ","ザ行","zo","","Kza-row",5,30,"ZO"],["ダ","ダ行","da","","Kda-row",1,31,"DA"],["ヂ","ダ行","ji","","Kda-row",2,31,"JI"],["ヅ","ダ行","zu","","Kda-row",3,31,"ZU"],["デ","ダ行","de","","Kda-row",4,31,"DE"],["ド","ダ行","do","","Kda-row",5,31,"DO"],["バ","バ行","ba","","Kba-row",1,32,"BA"],["ビ","バ行","bi","","Kba-row",2,32,"BI"],["ブ","バ行","bu","","Kba-row",3,32,"BU"],["ベ","バ行","be","","Kba-row",4,32,"BE"],["ボ","バ行","bo","","Kba-row",5,32,"BO"],["パ","パ行","pa","","Kpa-row",1,33,"PA"],["ピ","パ行","pi","","Kpa-row",2,33,"PI"],["プ","パ行","pu","","Kpa-row",3,33,"PU"],["ペ","パ行","pe","","Kpa-row",4,33,"PE"],["ポ","パ行","po","","Kpa-row",5,33,"PO"],["ァ","ァ行","xa","","Ksmall-row",1,34,"XA"],["ィ","ァ行","xi","","Ksmall-row",2,34,"XI"],["ゥ","ァ行","xu","","Ksmall-row",3,34,"XU"],["ェ","ァ行","xe","","Ksmall-row",4,34,"XE"],["ォ","ァ行","xo","","Ksmall-row",5,34,"XO"],["ャ","ァ行","xya","","Ksmall-row",1,34,"XYA"],["ュ","ァ行","xyu","","Ksmall-row",3,34,"XYU"],["ョ","ァ行","xyo","","Ksmall-row",5,34,"XYO"],["ッ","ァ行","xtsu","","Ksmall-row",3,34,"XTSU"],["ヮ","ァ行","xwa","","Ksmall-row",1,34,"XWA"],["ヴ","ヴ行","vu","","Kvu-row",3,35,"VU"],["ー","ー行","-","","long-row",1,36,"-"]];
 
 // ---------- state
@@ -761,7 +761,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.10');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.11');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"",batch:40,cap:500};</script>
@@ -913,8 +913,24 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .vrow button[hidden]{ display:none; }
   .vcard.bloom .vstrip .slot{ color:var(--gold-hot); border-color:rgba(233,196,106,.5);
     text-shadow:0 0 12px rgba(233,196,106,.8); }
+  .vrow.grade button{ flex:1; padding:11px 6px; font-size:13px; line-height:1.25; }
+  .vrow.grade button.g2{ color:var(--gold-hot); border-color:rgba(233,196,106,.5); }
+  .vrow.grade button.g1{ color:var(--teal); border-color:rgba(127,209,196,.4); }
+  .vrow.grade button.g0{ color:#e8a0a0; border-color:rgba(232,160,160,.4); }
+  .vtime{ font-size:13px; color:var(--ash); min-height:18px; font-variant-numeric:tabular-nums; }
+  .vtime b{ color:var(--paper); font-weight:600; }
   .vsummary{ font-size:15px; line-height:1.7; color:var(--paper); }
   .vsummary b{ color:var(--gold); font-size:22px; }
+  .vsummary small{ display:block; font-size:13px; color:var(--ash); line-height:1.5; }
+  .vwords{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin:8px 0 4px;
+           max-height:22dvh; overflow:auto; width:min(94vw,520px); }
+  .vwords span{ font-family:"HT-KleeOne",ui-sans-serif,system-ui; font-size:14px; padding:3px 8px;
+                border-radius:7px; border:1px solid rgba(240,227,196,.16); color:rgba(240,227,196,.8);
+                font-variant-numeric:tabular-nums; }
+  .vwords span small{ font-family:ui-sans-serif,system-ui; color:var(--ash); margin-left:5px; }
+  .vwords span.g2{ border-color:rgba(233,196,106,.45); color:var(--gold-hot); }
+  .vwords span.g1{ border-color:rgba(127,209,196,.45); color:#bdf0e6; }
+  .vwords span.g0{ border-color:rgba(232,160,160,.45); color:#e8a0a0; }
 
   /* The start page, same sheet as the field's. */
   .start{ position:fixed; inset:0; z-index:9998; display:flex; align-items:center;
@@ -1047,21 +1063,39 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   applyDifficulty(difficulty);
 
   // ---- the ledger: one entry per word, keyed by the word itself
-  // n: times completed. clean: completed with no peek, no skip, no zap.
-  // peek: times the hand needed help (reading, kana, or skip).
-  const LKEY = 'hito-vocab';
+  // n: times completed. clean: completed with no hint, no skip, no zap.
+  // peek: times the hand needed help (first kana, whole word, or skip).
+  // g: the last few grades, newest last — 2 knew it, 1 needed the first
+  //    kana, 0 no idea. rt: the last few recall times in ms, card shown to
+  //    first pen-down, kept only for words graded 2 (a hinted word was not
+  //    recalled, so its time is not a recall time).
+  const LKEY = 'hito-vocab', KEEP = 8;
   let LEDGER = {};
   try { LEDGER = JSON.parse(localStorage.getItem(LKEY) || '{}') || {}; } catch(_){ LEDGER = {}; }
   function saveLedger(){ try { localStorage.setItem(LKEY, JSON.stringify(LEDGER)); } catch(_){} }
-  const entry = ja => LEDGER[ja] || { n:0, clean:0, peek:0, last:0 };
+  const entry = ja => LEDGER[ja] || { n:0, clean:0, peek:0, last:0, g:[], rt:[] };
+  const median = a => { if (!a || !a.length) return null; const s = [...a].sort((x, y) => x - y);
+                        return s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1] + s[s.length/2]) / 2; };
+  const known = e => !!(e && e.g && e.g.length && e.g[e.g.length-1] === 2);
+  const recall = e => e && e.rt ? median(e.rt) : null;
+  const secs = ms => ms == null ? '' : (ms/1000).toFixed(ms < 9950 ? 1 : 0) + ' s';
+  const GRADE = { 2:'knew it', 1:'needed the first kana', 0:'no idea' };
 
   // ---- the queue: every chosen word once, the shaky ones first
-  // Weight favours words never seen and words that needed a peek. A word
-  // is never left out of a round; the order is what the ledger changes.
+  // Weight favours words never seen, words not known last time, and words
+  // recalled slowly. A word is never left out of a round; the order is
+  // what the ledger changes.
   function weight(w){
     const e = LEDGER[w.ja];
     if (!e || !e.n) return 2.5;
-    return 1 + 2*(e.peek/(e.n + e.peek)) + (e.clean === 0 ? 0.8 : 0);
+    let k = 1;
+    if (e.g && e.g.length){
+      const g = e.g.slice(-3);
+      k += 2 - g.reduce((a, b) => a + b, 0) / g.length;        // 0 (all knew) .. 2 (all no idea)
+    } else k += 2*(e.peek/(e.n + e.peek)) + (e.clean === 0 ? 0.8 : 0);   // a ledger from before grades
+    const r = recall(e);
+    if (r) k += Math.min(1, r / 8000);                           // eight seconds of thinking weighs like a miss
+    return k;
   }
   function weightedShuffle(words){
     const pool = words.map(w => ({ w, k: weight(w) }));
@@ -1090,9 +1124,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // ---- state
   let queue = [], qi = -1, word = null, chars = [], ci = 0;
   let peek = 0, zapped = 0, skipped = false, wordAt = 0;
+  let firstAct = null;   // ms from card shown to the first pen-down or hint tap
   let phase = 'start';   // start | word | bloom | summary
   let cmarkup = '';      // what the card shows, kept so a test can read it
-  let round = { words:0, clean:0, peeked:0, skipped:0 };
+  const newRound = () => ({ words:0, clean:0, peeked:0, skipped:0, knew:0, first:0, none:0, list:[] });
+  let round = newRound();
   let timers = [];
   function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
   function cancelTimers(){ for (const t of timers) clearTimeout(t); timers = []; }
@@ -1100,14 +1136,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   function startRound(){
     cancelTimers();
     queue = weightedShuffle(selected());
-    qi = -1; round = { words:0, clean:0, peeked:0, skipped:0 };
+    qi = -1; round = newRound();
     nextWord();
   }
   function nextWord(){
     qi++;
     if (qi >= queue.length){ word = null; chars = []; phase = 'summary'; render(); return; }
     word = queue[qi]; chars = [...word.ja]; ci = 0;
-    peek = 0; zapped = 0; skipped = false; wordAt = performance.now();
+    peek = 0; zapped = 0; skipped = false; wordAt = performance.now(); firstAct = null; graded = false;
     phase = 'word';
     render();
     loadChar();
@@ -1162,28 +1198,57 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     }, CFG.advanceMs);
     return r;
   };
+  // The word is written. A hinted word has graded itself — the first kana
+  // is grade 1, the whole word grade 0 — and blooms for wordPauseMs. An
+  // unhinted word blooms until the hand says which it was, because the
+  // guide drew every shape once the pen was down and only the hand knows
+  // whether it needed that.
   function wordDone(){
-    const e = entry(word.ja);
-    const clean = !peek && !zapped && !skipped;
-    e.n++; if (clean) e.clean++; if (peek) e.peek++; e.last = Date.now();
-    LEDGER[word.ja] = e; saveLedger();
-    round.words++; if (clean) round.clean++; if (peek) round.peeked++;
-    try { window.__sync && window.__sync.record('word', {
-      word: word.ja, deck: DECK.deck, section: word.secId, prompt, difficulty,
-      peek, zaps: zapped, ms: Math.round(performance.now() - wordAt),
-    }); } catch(_){}
     phase = 'bloom';
     render();
     if (navigator.vibrate) navigator.vibrate([20,40,60]);
-    later(nextWord, CFG.wordPauseMs);
+    if (peek >= 1){ grade(peek >= 2 ? 0 : 1); later(nextWord, CFG.wordPauseMs); }
   }
-  // Help, and it counts. Reading shows the romaji; kana fills every slot;
-  // skip gives up on the word, which goes to the back of the queue once.
-  function showReading(){ if (phase !== 'word') return; peek = Math.max(peek, 1); render(); }
-  function showKana(){ if (phase !== 'word') return; peek = 2; render(); }
+  let graded = false;
+  function grade(g){
+    if (phase !== 'bloom' || !word || graded) return false;
+    g = Math.max(0, Math.min(2, g|0));
+    if (peek >= 2 && g > 0) g = 0;            // the word was shown: nothing was recalled
+    if (peek === 1 && g > 1) g = 1;           // the first kana was given
+    graded = true;
+    const e = entry(word.ja);
+    const clean = !peek && !zapped && !skipped;
+    e.n++; if (clean) e.clean++; if (peek) e.peek++; e.last = Date.now();
+    e.g = (e.g || []).concat(g).slice(-KEEP);
+    e.rt = e.rt || [];
+    const think = firstAct == null ? null : Math.round(firstAct);
+    if (g === 2 && think != null) e.rt = e.rt.concat(think).slice(-KEEP);
+    LEDGER[word.ja] = e; saveLedger();
+    round.words++; if (clean) round.clean++; if (peek) round.peeked++;
+    round[['none', 'first', 'knew'][g]]++;
+    round.list.push({ ja: word.ja, en: word.en, g, ms: think });
+    try { window.__sync && window.__sync.record('word', {
+      word: word.ja, deck: DECK.deck, section: word.secId, prompt, difficulty,
+      peek, grade: g, zaps: zapped, thinkMs: think, ms: Math.round(performance.now() - wordAt),
+    }); } catch(_){}
+    render();
+    return true;
+  }
+  function gradeAndGo(g){ if (grade(g)){ cancelTimers(); nextWord(); } }
+  // The clock stops at the first thing the hand does: a pen-down on the
+  // sketchbook, or a hint. Only the first counts; a redo does not restart it.
+  function touched(){ if (phase === 'word' && word && firstAct == null) firstAct = performance.now() - wordAt; }
+  // Help, and it counts. The first kana lights its slot; the whole word
+  // fills every slot and shows the reading; skip gives up on the word,
+  // which goes to the back of the queue once.
+  function showFirst(){ if (phase !== 'word') return; touched(); peek = Math.max(peek, 1); render(); }
+  function showKana(){ if (phase !== 'word') return; touched(); peek = 2; render(); }
   function skip(){
     if (phase !== 'word' || !word) return;
-    const e = entry(word.ja); e.peek++; e.last = Date.now(); LEDGER[word.ja] = e; saveLedger();
+    touched();
+    const e = entry(word.ja); e.peek++; e.last = Date.now();
+    e.g = (e.g || []).concat(0).slice(-KEEP); e.rt = e.rt || [];
+    LEDGER[word.ja] = e; saveLedger();
     round.skipped++;
     if (!word.requeued){ queue.push({ ...word, requeued:true }); }
     cancelTimers();
@@ -1224,6 +1289,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     return gone.length;
   }
   const inkEl = $('ink');
+  inkEl.addEventListener('pointerdown', () => touched());
   inkEl.addEventListener('pointerup', () => tidy());
   inkEl.addEventListener('pointercancel', () => tidy());
   const _fizzle = window.fizzle;
@@ -1236,16 +1302,24 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // ---- the card
   function slotText(i){
     const d = DIFF[difficulty] || {};
-    const show = phase === 'bloom' || peek >= 2 || prompt === 'kana' || d.reveal || i < ci;
+    const show = phase === 'bloom' || peek >= 2 || (peek >= 1 && i === 0) || prompt === 'kana' || d.reveal || i < ci;
     return show ? chars[i] : '＿';
   }
   function render(){
     if (phase === 'summary'){
       card.className = 'vcard';
+      const rts = round.list.filter(x => x.g === 2 && x.ms != null).map(x => x.ms);
+      const med = median(rts);
+      const slow = rts.length ? Math.max(...rts) : null;
+      const order = [...round.list].sort((a, b) => a.g - b.g || (b.ms || 0) - (a.ms || 0));
+      const chips = order.map(x => `<span class="g${x.g}" title="${esc(x.en)} · ${GRADE[x.g]}">${esc(x.ja)}`
+        + `<small>${x.g === 2 && x.ms != null ? secs(x.ms) : x.g === 1 ? '1st' : '✗'}</small></span>`).join('');
       card.innerHTML = cmarkup = `<div class="vsec">round done</div>
-        <div class="vsummary"><b>${round.words}</b> words · <b>${round.clean}</b> clean ·
-        <b>${round.peeked}</b> peeked · <b>${round.skipped}</b> skipped</div>
-        <div class="vnote">the ones you peeked at come first next time</div>
+        <div class="vsummary"><b>${round.words}</b> words · <b>${round.knew}</b> knew ·
+        <b>${round.first}</b> first kana · <b>${round.none}</b> no idea${round.skipped ? ` · <b>${round.skipped}</b> skipped` : ''}
+        <small>${med != null ? `recalled in <b>${secs(med)}</b> typically, <b>${secs(slow)}</b> at the slowest` : 'nothing recalled unhinted this round'}</small></div>
+        <div class="vwords">${chips}</div>
+        <div class="vnote">the ones you did not know come first next time, and the slow ones sooner</div>
         <div class="vrow"><button class="primary" id="vAgain">again</button><button id="vMenu">menu</button></div>`;
       $('vAgain').onclick = startRound;
       $('vMenu').onclick = openStart;
@@ -1263,21 +1337,43 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     }).join('');
     let hint = '';
     if (phase === 'bloom') hint = `<b>${esc(word.romaji)}</b> · ${esc(word.en)}`;
-    else if (peek >= 1 && prompt !== 'romaji') hint = `<b>${esc(word.romaji)}</b>`;
-    else if (peek >= 1) hint = `${esc(word.en)}`;
+    else if (peek >= 2 && prompt !== 'romaji') hint = `<b>${esc(word.romaji)}</b>`;
+    // the clock: what the hand did first, and when
+    let time = '';
+    if (firstAct != null){
+      const t = secs(firstAct);
+      time = peek >= 2 ? `shown after <b>${t}</b>` : peek === 1 ? `first kana after <b>${t}</b>` : `pen down after <b>${t}</b>`;
+    }
+    // after the word: a hinted one has graded itself; an unhinted one asks
+    let row;
+    if (phase === 'bloom' && !graded)
+      row = `<div class="vrow grade">
+        <button class="g2" data-g="2">knew it</button>
+        <button class="g1" data-g="1">needed the first kana</button>
+        <button class="g0" data-g="0">no idea</button></div>`;
+    else if (phase === 'bloom'){
+      const g = round.list.length ? round.list[round.list.length-1].g : 0;
+      row = `<div class="vrow grade"><button class="g${g}" disabled>${GRADE[g]}</button></div>`;
+    } else
+      row = `<div class="vrow">
+        <button class="teal" id="vFirst"${peek >= 1 || prompt === 'kana' ? ' disabled' : ''}>first kana</button>
+        <button class="teal" id="vKana"${peek >= 2 || prompt === 'kana' ? ' disabled' : ''}>show word</button>
+        <button id="vSkip">skip ›</button>
+      </div>`;
     card.innerHTML = cmarkup = `<div class="vsec">${esc(word.sec)}<span>${qi+1} / ${queue.length}</span></div>
       <div class="vprompt${prompt === 'kana' ? ' kana' : ''}">${esc(p)}</div>
       <div class="vnote">${esc(word.note || '')}</div>
       <div class="vstrip">${slots}</div>
       <div class="vhint">${hint}</div>
-      <div class="vrow">
-        <button class="teal" id="vReading"${peek >= 1 || phase === 'bloom' ? ' disabled' : ''}>${prompt === 'romaji' ? 'meaning' : 'reading'}</button>
-        <button class="teal" id="vKana"${peek >= 2 || phase === 'bloom' || prompt === 'kana' ? ' disabled' : ''}>show kana</button>
-        <button id="vSkip"${phase === 'bloom' ? ' disabled' : ''}>skip ›</button>
-      </div>`;
-    $('vReading').onclick = showReading;
-    $('vKana').onclick = showKana;
-    $('vSkip').onclick = skip;
+      <div class="vtime">${time}</div>
+      ${row}`;
+    if (phase === 'bloom'){
+      for (const b of card.querySelectorAll('button[data-g]')) b.onclick = () => gradeAndGo(Number(b.dataset.g));
+    } else {
+      $('vFirst').onclick = showFirst;
+      $('vKana').onclick = showKana;
+      $('vSkip').onclick = skip;
+    }
   }
 
   // ---- the start page
@@ -1315,9 +1411,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
       + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
     const secs = DECK.sections.map(s => {
-      const seen = s.words.filter(w => entry(w.ja).n).length;
+      const knew = s.words.filter(w => known(LEDGER[w.ja])).length;
+      const med = median(s.words.map(w => recall(LEDGER[w.ja])).filter(x => x != null));
       return `<button data-k="sec" data-v="${esc(s.id)}" aria-pressed="${chosen.has(s.id)}">`
-        + `<b>${esc(s.title)}</b><small>${s.words.length} words · ${seen} seen</small></button>`;
+        + `<b>${esc(s.title)}</b><small>${s.words.length} words · ${knew} known${med != null ? ` · ${secs(med)}` : ''}</small></button>`;
     }).join('');
     const n = selected().length;
     start.innerHTML = markup = `<div class="start-card">
@@ -1378,11 +1475,18 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     try {
       const o = JSON.parse(src);
       if (!o || o.hito !== 'vocab' || typeof o.ledger !== 'object') throw 0;
-      // merge, never replace: a count only ever goes up
+      // merge, never replace: a count only ever goes up, and the grade and
+      // recall history come from whichever side wrote last
       for (const ja in o.ledger){
         const a = entry(ja), b = o.ledger[ja] || {};
+        // (a millisecond timestamp does not survive |0 — that dropped every
+        // imported `last` to zero until the grade history depended on it)
+        const bl = Number(b.last) || 0;
+        const newer = bl > (Number(a.last) || 0) ? b : a;
         LEDGER[ja] = { n: Math.max(a.n, b.n|0), clean: Math.max(a.clean, b.clean|0),
-                       peek: Math.max(a.peek, b.peek|0), last: Math.max(a.last, b.last|0) };
+                       peek: Math.max(a.peek, b.peek|0), last: Math.max(a.last, bl),
+                       g: Array.isArray(newer.g) ? newer.g.slice(-KEEP) : [],
+                       rt: Array.isArray(newer.rt) ? newer.rt.slice(-KEEP) : [] };
       }
       saveLedger();
       if (o.mastery) { for (const k in o.mastery) MASTERY[k] = Math.max(MASTERY[k]||0, o.mastery[k]|0); persistM(); }
@@ -1417,6 +1521,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get queue(){ return queue; }, get qi(){ return qi; },
     get word(){ return word; }, get chars(){ return chars; }, get ci(){ return ci; },
     get phase(){ return phase; }, get peek(){ return peek; }, get zapped(){ return zapped; },
+    get firstAct(){ return firstAct; }, get graded(){ return graded; },
     get round(){ return round; }, get ledger(){ return LEDGER; },
     get difficulty(){ return difficulty; }, get prompt(){ return prompt; },
     get sections(){ return [...chosen]; },
@@ -1424,7 +1529,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get redoShown(){ return redoShown; },
     base: BASE, at: AT,
     setDifficulty, setPrompt, toggleSection, begin, openStart, openCredits,
-    startRound, nextWord, skip, showReading, showKana, tidy,
+    startRound, nextWord, skip, showFirst, showKana, touched, grade: gradeAndGo, tidy,
+    median, recall, known,
     exportProgress, importProgress,
     weight, selected,
     clearLedger(){ LEDGER = {}; saveLedger(); },
@@ -1433,6 +1539,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   openStart();
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Vocabulary follows Genki I (3rd ed.), Lessons 1 and 2. · v0.1.10</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Vocabulary follows Genki I (3rd ed.), Lessons 1 and 2. · v0.1.11</div>
 </body>
 </html>

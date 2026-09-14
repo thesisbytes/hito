@@ -206,7 +206,7 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
-### Vocab — `dist/vocab-v0.1.10.html`
+### Vocab — `dist/vocab-v0.1.11.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -222,10 +222,15 @@ quiz page. The pack's glyph list is every hiragana and katakana (164, from
 stitch refuses a deck that uses a character with no stroke data.
 
 The recall test is honest only as far as the tracer lets it be: on easy the
-guide reveals each kana's shape once the pen is down. What the card measures
-is whether the hand needed to *peek* before starting — reading, kana and
-skip all count against the word, and peeked words come first next round.
-Real free recall waits on the hard-mode scorer, like everything else.
+guide reveals each kana's shape once the pen is down. So the card measures
+what happens *before* the pen touches (v0.1.11): a clock from card shown to
+first pen-down, and a grade per word — knew it, needed the first kana, no
+idea — which the maintainer named from their own recall ("if I see the
+first hiragana I'll get most words"). A hint grades the word itself; an
+unhinted word asks, since only the hand knows whether it needed the guide.
+The summary lists the round by grade and time, and the next round puts
+the words not known first and the slow ones sooner. Real free recall
+waits on the hard-mode scorer, like everything else.
 
 The shell carries a copy of the field's difficulty table. See `NOTES.md`
 (2026-09-08) for why that is a known drift risk rather than an oversight.

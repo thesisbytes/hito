@@ -399,3 +399,43 @@ Running log. Append at the bottom, don't rewrite history.
 - The test selects every section and expects the round to be the number of
   distinct words, and asserts the deck still has a repeat so the check
   cannot go quietly vacuous if someone dedupes the JSON instead.
+
+## 2026-09-14 — The card times the recall and asks how it went (vocab v0.1.11)
+
+- "A helpful metric would be how long it takes me to recall. I notice if
+  I see the first hiragana I'll be able to get most words. Maybe after I
+  trace, we have a button for I knew how to write this. Or if I needed
+  the first letter. Or I had no idea what the word was." Built as said.
+- The clock runs from the card being shown to the first thing the hand
+  does — a pen-down on the sketchbook or a hint tap — and only the first
+  counts, so a redo or a fizzle does not restart it. It is shown on the
+  bloom ("pen down after 2.3 s"), kept per word in the ledger (`rt`, the
+  last eight, only for words graded *knew it* — a hinted word was not
+  recalled, so its time is not a recall time), summarised as the median
+  and the slowest for the round, and shown per section on the start page.
+- The hints are now the maintainer's own tiers. *first kana* lights the
+  first slot and nothing else; *show word* fills every slot and shows the
+  reading. The romaji *reading* button is gone: with the meaning as the
+  prompt it was the whole answer in another alphabet, and it fit none of
+  the three grades. The reading still blooms when the word is done.
+- Grades: 2 knew it, 1 needed the first kana, 0 no idea. A hinted word
+  grades itself and blooms for `wordPauseMs` as before. An unhinted word
+  blooms until one of the three buttons is tapped — one more tap per
+  word, deliberately, because the guide drew every shape once the pen was
+  down and only the hand knows whether it needed that. The grade cannot
+  be talked up past what the hints imply. Skip records a 0 straight away
+  and still requeues the word once.
+- Ordering next round: weight is 1 plus how far the last three grades sit
+  below *knew it*, plus up to 1 for a slow recall (eight seconds weighs
+  like a miss). A ledger from before grades falls back to the old
+  peek-ratio weight, and imports without `g`/`rt` are accepted.
+- Found on the way: the import merge wrote `b.last|0`, and a millisecond
+  timestamp does not survive a 32-bit truncation, so every imported
+  `last` had been landing as 0. Harmless while nothing read it; the grade
+  history now comes from whichever side wrote last, so it is fixed and
+  tested.
+- "Don't really care for the categories to play with." The section
+  picker on the start page is left as it is — it costs nothing and the
+  class quizzes are per page — but nothing new was spent on it. If it is
+  in the way, the honest change is a single "everything" round with the
+  picker folded behind it.
