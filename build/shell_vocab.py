@@ -242,10 +242,16 @@ LAYER = STYLE + r"""
     }
     return out;
   }
+  // A word the book prints on two pages (p.59 repeats six from pp.39-40)
+  // is in the deck twice, so a quiz on either page alone still asks it.
+  // A round over both asks it once, from the first page it appears on.
   function selected(){
-    const out = [];
+    const out = [], seen = new Set();
     for (const s of DECK.sections)
-      if (chosen.has(s.id)) for (const w of s.words) out.push({ ...w, sec: s.title, secId: s.id });
+      if (chosen.has(s.id)) for (const w of s.words){
+        if (seen.has(w.ja)) continue;
+        seen.add(w.ja); out.push({ ...w, sec: s.title, secId: s.id });
+      }
     return out;
   }
 

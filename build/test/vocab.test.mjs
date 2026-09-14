@@ -126,6 +126,19 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   V.toggleSection(first);
   ok(V.begin() && V.phase === 'word' && V.redoShown, 'begin did not start a round');
   ok(V.queue.length === cfg.sections[0].words.length, `round has ${V.queue.length} words, section has ${cfg.sections[0].words.length}`);
+  // the book prints some words on two pages; a round over both asks each once
+  V.openStart();
+  for (const s of cfg.sections) if (!V.sections.includes(s.id)) V.toggleSection(s.id);
+  const distinct = new Set(cfg.sections.flatMap(s => s.words.map(w => w.ja)));
+  const listed = cfg.sections.reduce((n, s) => n + s.words.length, 0);
+  ok(listed > distinct.size, 'the deck no longer repeats any word, so this check tests nothing');
+  V.openStart();   // the button re-renders on a tap, not on the programmatic toggle
+  ok(new RegExp(`begin · ${distinct.size} words`).test(V.startHtml), 'the begin button counts a repeated word twice');
+  ok(V.begin() && V.queue.length === distinct.size,
+     `round over every section has ${V.queue.length} words, deck has ${distinct.size} distinct`);
+  V.openStart();
+  for (const s of cfg.sections.slice(1)) if (V.sections.includes(s.id)) V.toggleSection(s.id);
+  V.begin();
 }
 
 // ---- the seam: the tracer is on the word's first kana, and stays there

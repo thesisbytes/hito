@@ -383,3 +383,19 @@ Running log. Append at the bottom, don't rewrite history.
   stitch now stamps whatever `vX.Y.Z` the title carries with the pack's
   version, and `run.sh` checks the three current builds. That is the whole
   reason for hiragana v0.1.36: a title, nothing in the tracer.
+
+## 2026-09-14 — A word the book prints twice is asked once (vocab v0.1.10)
+
+- "Some words seem they repeat." They did: p.59 re-lists six words from
+  pp.39–40 (イギリス, かんこく, ちゅうごく, けいざい, おかあさん,
+  おとうさん), and いちじ is on both p.38 and the hours page. The deck keeps
+  each on every page the book prints it, because a quiz on p.59 alone has
+  to ask them — so a round over both pages asked each twice.
+- The fix is where the round is assembled, not in the deck: `selected()`
+  in the shell and the quiz in `vocab/study.py` both keep the first page a
+  word appears on and drop the rest. The begin button's count follows.
+  The ledger was never the problem — it is keyed by the word, so both
+  copies already shared one entry.
+- The test selects every section and expects the round to be the number of
+  distinct words, and asserts the deck still has a repeat so the check
+  cannot go quietly vacuous if someone dedupes the JSON instead.
