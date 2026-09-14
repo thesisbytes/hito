@@ -86,4 +86,18 @@ for pair in "hiragana:hiragana-v$ver" "hiragana-game:hiragana-game-v$ver" "vocab
 done
 
 echo
+echo "── homepage (every local link on index.html resolves) ──"
+# The Pages root is index.html, and it links to the stable names above. A
+# link to a file that is not there is a 404 on the one page a visitor is
+# handed, so it is a failure here rather than a surprise on a phone.
+for href in $(grep -o 'href="[^"]*"' index.html | sed 's/href="//;s/"$//' | grep -v '^[a-z]*:'); do
+  if [ -f "$href" ]; then
+    echo "  $href"
+  else
+    echo "  MISSING: index.html links to $href, which does not exist"
+    fail=1
+  fi
+done
+
+echo
 [ "$fail" = 0 ] && echo "all checks passed" || { echo "FAILURES above"; exit 1; }

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>hito 人</title>
+<meta name="description" content="A stylus-first tracing game for learning to write. Draw below, the farang come from above.">
+<style>
+  /* The same lacquer the builds are painted on, so stepping from here into a
+     realm does not feel like changing rooms. Nothing external: this page has
+     to open from a double-click like everything else in dist/. */
+  :root{
+    --lacquer:#15100d; --lacquer-2:#211812; --card:#1d1a16; --line:#57492f;
+    --gold:#e9c46a; --gold-hot:#fff1b8; --paper:#e8e0cc; --wisp:#7fd1c4;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; }
+  body{
+    font:15px/1.5 -apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans JP","Hiragino Sans","Klee One",sans-serif;
+    color:var(--paper);
+    background:
+      radial-gradient(60% 50% at 50% 30%,rgba(90,160,150,.10),transparent 70%),
+      radial-gradient(1200px 700px at 50% 30%,var(--lacquer-2),var(--lacquer) 70%);
+    padding:max(24px,env(safe-area-inset-top)) 16px max(32px,env(safe-area-inset-bottom));
+    -webkit-tap-highlight-color:transparent;
+  }
+  main{ width:min(100%,560px); margin:0 auto; }
+  h1{ margin:8px 0 0; font-size:38px; font-weight:700; letter-spacing:.02em; color:var(--gold); line-height:1.1; }
+  h1 span{ font-size:46px; margin-left:10px; text-shadow:0 0 22px rgba(127,209,196,.45); }
+  .sub{ margin:6px 0 26px; color:rgba(232,224,204,.6); font-size:13px; }
+  .h{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:rgba(233,196,106,.7); margin:22px 0 8px; }
+  .row{ display:grid; grid-template-columns:1fr; gap:10px; }
+  .row a{
+    display:block; text-decoration:none; text-align:left; background:var(--card); color:var(--paper);
+    border:1px solid var(--line); border-radius:12px; padding:14px 16px;
+    transition:border-color .15s, background .15s, transform .05s;
+  }
+  .row a:hover, .row a:focus-visible{ border-color:var(--wisp); background:#172422; outline:none; }
+  .row a:active{ transform:translateY(1px); }
+  .row a b{ display:block; font-size:17px; color:var(--gold); margin-bottom:3px; }
+  .row a b i{ font-style:normal; color:#bdf0e6; margin-right:8px; }
+  .row a small{ display:block; color:rgba(232,224,204,.72); line-height:1.4; font-size:13px; }
+  .row a.play{ border-color:rgba(233,196,106,.55); box-shadow:0 0 0 1px rgba(233,196,106,.12), 0 14px 40px rgba(0,0,0,.35); }
+  .row a.play b{ font-size:20px; }
+  .note{ margin-top:22px; font-size:13px; color:rgba(232,224,204,.55); line-height:1.5; }
+  .note a{ color:rgba(233,196,106,.85); }
+  footer{ margin-top:34px; font-size:11px; color:rgba(232,224,204,.4); line-height:1.6; }
+  footer a{ color:inherit; }
+</style>
+</head>
+<body>
+<main>
+  <h1>hito<span>人</span></h1>
+  <div class="sub">a tracing game for learning to write. draw below · the farang come from above.</div>
+
+  <div class="h">play</div>
+  <div class="row">
+    <a class="play" href="dist/hiragana-game.html"><b><i>仮</i>hiragana</b><small>the game. monsters carry the characters you are forgetting; trace one cleanly and it goes home. a stylus helps, a finger works.</small></a>
+    <a href="dist/vocab.html"><b><i>語</i>vocab</b><small>Genki I Lesson 1 as flashcards. read the meaning, write the word one kana at a time. peeking counts.</small></a>
+  </div>
+
+  <div class="h">behind the curtain</div>
+  <div class="row">
+    <a href="dist/hiragana.html"><b><i>工</i>workshop</b><small>the full gojūon chart and every control. this is the instrument the project uses on itself, not the game.</small></a>
+  </div>
+
+  <p class="note">Every realm is one HTML file with nothing to install. Save it and it opens offline, on a tablet, from a double-click. Your progress lives in the browser you play in, so keep to one.</p>
+
+  <footer>
+    人 is two strokes, and neither stands on its own.<br>
+    Stroke order from <a href="https://kanjivg.tagaini.net/">KanjiVG</a> (CC BY-SA 3.0). Klee One and Noto Sans JP under the SIL Open Font License.<br>
+    <a href="https://github.com/thesisbytes/hito">source</a>
+  </footer>
+</main>
+</body>
+</html>

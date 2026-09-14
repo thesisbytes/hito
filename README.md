@@ -15,7 +15,9 @@ a font by hand, kids finding bugs — all lean on each other, and so will you.
 | **Thai** — 44 consonants | engine works; no stroke data yet. Waiting on a recording session — see [KhienThai](https://github.com/thesisbytes/khienthai). |
 
 Each realm ships as a single HTML file. No install, no server, no
-dependencies. Open it on a tablet and start tracing:
+dependencies. Open it on a tablet and start tracing. The front door is
+**[thesisbytes.github.io/hito](https://thesisbytes.github.io/hito/)**, or go
+straight in:
 
 **[Play](https://thesisbytes.github.io/hito/dist/hiragana-game.html)** — the game: draw below, farang advance above.  
 **[Vocab](https://thesisbytes.github.io/hito/dist/vocab.html)** — Genki I Lesson 1 as flashcards, written one kana at a time.  

@@ -328,3 +328,24 @@ Running log. Append at the bottom, don't rewrite history.
 - Now a stroke has a start the way it has an end. `startTol` is `startSlack` (30%) of the stroke's length, capped at the tolerance and floored at `minEndTolerance`, exactly endTol's shape. Until the pen has been within it of the first point, travel within the stroke does not count, so the cap holds prog at the free allowance and the stroke will not finish from its far end. A pen at the end of an unbegun stroke is told once that it starts at the other end, because a stroke that silently refuses to finish is a bug report, not a lesson. A fizzle keeps the stroke begun: the rewound point was reached from the start.
 - For long strokes this tightens the forgiven late start from 30% of the stroke to the tolerance (0.07 of the canvas, about 14% of a 0.5 stroke). Medium tests where strokes start, so that is the point there; on easy the badge and the start dot show where, and 0.07 is the same distance the pen has to keep to the path anyway. If a young hand finds it tight, `startSlack` and `minEndTolerance` are the dials and this note is the reason.
 - Tested on the game build, which has ふ: a jab skidding back along a tick and a wiggle at its end both fail on v0.1.34 and are refused on v0.1.35; a start a couple of points late still finishes, and ふ drawn honestly still finishes. The toast is checked by rebinding the engine's own `toast` from the probe — the engine calls it by name inside the rig's Function scope, so wrapping the window copy sees nothing.
+
+## 2026-09-14 — a front door
+
+- The Pages root was a 404. `.nojekyll` (2025) stops Jekyll rendering
+  README.md as the index, and nothing was ever put at `/` in its place, so
+  the only working links were the three deep ones in the README and "open
+  the game" meant "know the filename". `index.html` at the repo root now
+  serves https://thesisbytes.github.io/hito/ as a landing page: play
+  (hiragana game, vocab), workshop, the offline note and the credits, on
+  the same lacquer as the builds. Static, no dependencies, so it also opens
+  from a double-click beside `dist/` like everything else.
+- It links the stable names (`dist/hiragana-game.html` etc.), never a
+  versioned file, so a bump does not touch it. `run.sh` now checks that
+  every local href on the page exists — a dead link on the one page a
+  visitor is handed is a shipping failure, not a surprise on a phone.
+- Not done: a way back *from* a build to the homepage. The realms row links
+  siblings by bare filename and the stitch refuses paths on purpose (see
+  2026-09-08), and `../index.html` is a path. The browser's back button
+  covers it for now; if it turns out to matter, the honest fix is a
+  `home` pack key that names a bare filename in the same folder, which
+  means moving `index.html` into `dist/` — decide then, not now.
