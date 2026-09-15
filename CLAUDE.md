@@ -206,7 +206,7 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
-### Vocab — `dist/vocab-v0.1.11.html`
+### Vocab — `dist/vocab-v0.1.12.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke

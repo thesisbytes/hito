@@ -1,6 +1,6 @@
 {
   "deck": "Genki I",
-  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59). Section splits follow the class's vocabulary quizzes, one per page. The L2 page break is placed after じてんしゃ from the page density of L1 (about 27 entries a page), not from the printed page — move a word across if the book disagrees.",
+  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59). Section splits follow the class's vocabulary quizzes, one per page. The L2 page break is placed after じてんしゃ from the page density of L1 (about 27 entries a page), not from the printed page — move a word across if the book disagrees. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here.",
   "sections": [
     {
       "id": "l1-1",
@@ -117,6 +117,38 @@
         {"ja": "はっぷん", "romaji": "happun", "en": "8 minutes", "note": "also はちふん"},
         {"ja": "きゅうふん", "romaji": "kyuufun", "en": "9 minutes"},
         {"ja": "じゅっぷん", "romaji": "juppun", "en": "10 minutes", "note": "also じっぷん"}
+      ]
+    },
+    {
+      "id": "l1-quiz-time",
+      "title": "L1 quiz · II time",
+      "words": [
+        {"ja": "ごごよじです", "romaji": "gogo yoji desu", "en": "4:00 PM", "note": "いまなんじですか"},
+        {"ja": "ごぜんごじはんです", "romaji": "gozen goji han desu", "en": "5:30 AM", "note": "いまなんじですか"},
+        {"ja": "ごごくじはんです", "romaji": "gogo kuji han desu", "en": "9:30 PM", "note": "いまなんじですか"},
+        {"ja": "ごぜんじゅうにじです", "romaji": "gozen juuniji desu", "en": "12:00 AM", "note": "いまなんじですか · midnight"}
+      ]
+    },
+    {
+      "id": "l1-quiz-say",
+      "title": "L1 quiz · III sentences",
+      "words": [
+        {"ja": "おがわさんはにほんじんです", "romaji": "Ogawa-san wa nihonjin desu", "en": "Ms. Ogawa is Japanese."},
+        {"ja": "たなかさんはにほんごのせんせいです", "romaji": "Tanaka-san wa nihongo no sensee desu", "en": "Mr. Tanaka is a Japanese-language teacher."},
+        {"ja": "はるなさんはいちねんせいです", "romaji": "Haruna-san wa ichinensee desu", "en": "Haruna is a first-year student.", "note": "さん, even without Ms."},
+        {"ja": "わたしのせんこうはにほんごです", "romaji": "watashi no senkoo wa nihongo desu", "en": "My major is Japanese.", "note": "translate “my”"},
+        {"ja": "やまもとさんはにじゅうごさいです", "romaji": "Yamamoto-san wa nijuugosai desu", "en": "Ms. Yamamoto is 25 years old.", "note": "write 25 in Japanese"},
+        {"ja": "やまもとさんはわたしのともだちです", "romaji": "Yamamoto-san wa watashi no tomodachi desu", "en": "Mr. Yamamoto is my friend.", "note": "translate “my”"}
+      ]
+    },
+    {
+      "id": "l1-quiz-ask",
+      "title": "L1 quiz · IV questions",
+      "words": [
+        {"ja": "きむらさんはなんねんせいですか", "romaji": "Kimura-san wa nannensee desu ka", "en": "You: …？  Kimura: Yonensee desu.", "note": "ask the WH question, with きむらさん"},
+        {"ja": "きむらさんのせんこうはなんですか", "romaji": "Kimura-san no senkoo wa nan desu ka", "en": "You: …？  Kimura: Rekishi desu.", "note": "ask the WH question, with きむらさん"},
+        {"ja": "きむらさんはなんさいですか", "romaji": "Kimura-san wa nansai desu ka", "en": "You: …？  Kimura: Hatachi desu.", "note": "ask the WH question, with きむらさん"},
+        {"ja": "きむらさんのでんわばんごうはなんですか", "romaji": "Kimura-san no denwa bangoo wa nan desu ka", "en": "You: …？  Kimura: Zero-san no ni-ni-san no roku-go-nana-ichi desu.", "note": "ask the WH question, with きむらさん"}
       ]
     },
     {

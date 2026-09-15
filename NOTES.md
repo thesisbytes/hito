@@ -439,3 +439,24 @@ Running log. Append at the bottom, don't rewrite history.
   class quizzes are per page — but nothing new was spent on it. If it is
   in the way, the honest change is a single "everything" round with the
   picker folded behind it.
+
+## 2026-09-14 — The Lesson 1 quiz as cards (vocab v0.1.12)
+
+- "I also put in a grammar quiz in google drive." It is the class's
+  にほんご101 レッスンクイズ（1か）, in Drive as "Lesson Quiz_L.1". Four
+  parts: I listening (phone numbers), II clock times, III six sentences
+  to translate, IV four WH questions to ask きむらさん.
+- Parts II–IV are in the deck as three sections after the L1 pages:
+  `l1-quiz-time`, `l1-quiz-say`, `l1-quiz-ask`. A sentence is a longer
+  run of kana and the shell walks it the same way — this is the
+  words → sentences tier the economy plan named, and it cost a JSON
+  edit. The answers are the maintainer's model answers in Lesson 1
+  grammar (XはYです, の, か, なん/なんさい/なんねんせい), written without
+  the 。 the tracer has no stroke for. The quiz's own instructions
+  ("translate my", "write 25 in Japanese", "include Kimura-san") ride in
+  the note field so the card asks the same thing the paper does. Part IV
+  prompts with the exchange, blank on your side, since the reply is
+  what the question has to fit.
+- Part I is listening and needs audio the build does not have. Not here.
+- As with Lesson 2, a returning player finds the new sections unticked on
+  the start page. Tick them there.
