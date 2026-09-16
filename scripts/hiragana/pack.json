@@ -1,10 +1,10 @@
 {
   "script": "hiragana",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "title": "hito 人 · hiragana trace · v0.1.29",
   "brand": "hito 人 · hiragana",
   "fontDir": "fonts",
-  "probeChars": "あかん",
+  "probeChars": "あがっ",
   "exportName": "hito-hiragana-strokes.json",
   "fonts": [
     {
@@ -12,7 +12,7 @@
       "key": "klee",
       "label": "Klee One (textbook)",
       "family": "HT-KleeOne",
-      "file": "klee-one-kana.woff2",
+      "file": "klee-one-kana-all.woff2",
       "role": "trace"
     },
     {
@@ -20,7 +20,7 @@
       "key": "noto",
       "label": "Noto Sans JP (print)",
       "family": "HT-NotoSansJP",
-      "file": "noto-sans-jp-kana.woff2",
+      "file": "noto-sans-jp-kana-all.woff2",
       "role": "print"
     }
   ],

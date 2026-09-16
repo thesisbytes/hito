@@ -526,7 +526,7 @@ fresh();
   advance(500);
   ok(F.readings.length > before, 'no reading shown on a kill — the sound never arrives');
   const r = F.readings[F.readings.length-1];
-  ok(r && /^[a-z]+$/.test(r.text),
+  ok(r && /^[a-z ]+$/.test(r.text),
      `reading is ${r ? JSON.stringify(r.text) : 'absent'}, expected romaji`);
   // and the way you probably said it, underneath
   ok(r && typeof r.sub === 'string' && /^[A-Z-]+$/.test(r.sub),

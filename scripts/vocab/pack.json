@@ -1,6 +1,6 @@
 {
   "script": "vocab",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "title": "hito 人 · vocab · v0.1.2",
   "brand": "hito 人 · vocab",
   "fontDir": "fonts",
@@ -65,6 +65,12 @@
       "kana": "仮",
       "file": "hiragana-game.html",
       "blurb": "the game. draw below, the farang come from above."
+    },
+    {
+      "label": "katakana",
+      "kana": "片",
+      "file": "katakana-game.html",
+      "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."
     }
   ],
   "credits": [

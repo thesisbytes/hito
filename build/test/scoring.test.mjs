@@ -124,7 +124,8 @@ for (const keep of [1,2,4,8,16]){
   console.log(`  ${r.conjured?'CONJURED':'rejected'}  cover ${(r.cover*100).toFixed(0)}%   every ${keep}${keep===1?'st':'th'} path point`);
 }
 
-console.log('\n--- all 46: does a correct trace conjure? ---');
+const N = Object.keys(letters).length;
+console.log(`\n--- all ${N}: does a correct trace conjure? ---`);
 let ok=0, bad=[];
 for (const ch of Object.keys(letters)){
   const raw = letters[ch].strokes.map(st=>st.map(q=>({x:q.x,y:q.y})));
@@ -133,10 +134,10 @@ for (const ch of Object.keys(letters)){
   const r = simFor(ch, pen);
   if (r.conjured) ok++; else bad.push(`${ch} ${(r.cover*100).toFixed(0)}%`);
 }
-console.log(`  ${ok}/46 conjure with a correct, slightly wobbly trace`);
+console.log(`  ${ok}/${N} conjure with a correct, slightly wobbly trace`);
 if (bad.length) console.log('  failures:', bad.join('  '));
 
-console.log('\n--- all 46: does a scribble ever get through? ---');
+console.log(`\n--- all ${N}: does a scribble ever get through? ---`);
 let leaked=[];
 for (const ch of Object.keys(letters)){
   const scribble=[Array.from({length:1500},(_,i)=>({
@@ -144,4 +145,4 @@ for (const ch of Object.keys(letters)){
     y:0.5+0.24*Math.sin(i*0.29)+0.08*Math.sin(i*2.3)}))];
   if (simFor(ch, scribble).conjured) leaked.push(ch);
 }
-console.log(leaked.length ? `  LEAKED: ${leaked.join(' ')}` : '  0/46 — no scribble conjured');
+console.log(leaked.length ? `  LEAKED: ${leaked.join(' ')}` : `  0/${N} — no scribble conjured`);

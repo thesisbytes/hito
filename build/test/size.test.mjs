@@ -234,7 +234,7 @@ for (const f of SIZES){
   const tag = g.bad.length
     ? `${String(g.bad.length).padStart(2)} fail ${g.bad.slice(0,5).map(x=>x[0]).join(' ')}`
       + (g.bad.length>5 ? ' …' : '')
-    : 'all 46 pass';
+    : `all ${CHARS.length} pass`;
   if (!BRIEF) console.log(`  ${f.toFixed(2)} lv${String(lvOf(f)).padStart(2)}`
     + `  ${String(px(f)).padStart(3)}px`
     + `  ${tol.toFixed(0).padStart(3)}px`

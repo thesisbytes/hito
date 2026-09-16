@@ -1,7 +1,7 @@
 {
   "script": "hiragana",
-  "name": "Hiragana (gojūon)",
-  "count": 46,
+  "name": "Hiragana (gojūon, voiced rows, small kana)",
+  "count": 75,
   "traceFont": "klee-one",
   "printFont": "noto-sans-jp",
   "strokeSource": "kanjivg",
@@ -380,6 +380,244 @@
       "row": "wa",
       "order": 46,
       "gaijin": "EN"
+    },
+    {
+      "cp": "U+304C",
+      "char": "が",
+      "romaji": "ga",
+      "row": "ga",
+      "order": 47,
+      "gaijin": "GAH"
+    },
+    {
+      "cp": "U+304E",
+      "char": "ぎ",
+      "romaji": "gi",
+      "row": "ga",
+      "order": 48,
+      "gaijin": "GHEE"
+    },
+    {
+      "cp": "U+3050",
+      "char": "ぐ",
+      "romaji": "gu",
+      "row": "ga",
+      "order": 49,
+      "gaijin": "GOO"
+    },
+    {
+      "cp": "U+3052",
+      "char": "げ",
+      "romaji": "ge",
+      "row": "ga",
+      "order": 50,
+      "gaijin": "GEH"
+    },
+    {
+      "cp": "U+3054",
+      "char": "ご",
+      "romaji": "go",
+      "row": "ga",
+      "order": 51,
+      "gaijin": "GO"
+    },
+    {
+      "cp": "U+3056",
+      "char": "ざ",
+      "romaji": "za",
+      "row": "za",
+      "order": 52,
+      "gaijin": "ZAH"
+    },
+    {
+      "cp": "U+3058",
+      "char": "じ",
+      "romaji": "ji",
+      "row": "za",
+      "order": 53,
+      "gaijin": "JEE"
+    },
+    {
+      "cp": "U+305A",
+      "char": "ず",
+      "romaji": "zu",
+      "row": "za",
+      "order": 54,
+      "gaijin": "ZOO"
+    },
+    {
+      "cp": "U+305C",
+      "char": "ぜ",
+      "romaji": "ze",
+      "row": "za",
+      "order": 55,
+      "gaijin": "ZEH"
+    },
+    {
+      "cp": "U+305E",
+      "char": "ぞ",
+      "romaji": "zo",
+      "row": "za",
+      "order": 56,
+      "gaijin": "ZOH"
+    },
+    {
+      "cp": "U+3060",
+      "char": "だ",
+      "romaji": "da",
+      "row": "da",
+      "order": 57,
+      "gaijin": "DAH"
+    },
+    {
+      "cp": "U+3062",
+      "char": "ぢ",
+      "romaji": "ji",
+      "row": "da",
+      "order": 58,
+      "hookNote": "the ji of はなぢ; Genki writes it ji, same as じ",
+      "gaijin": "DJEE"
+    },
+    {
+      "cp": "U+3065",
+      "char": "づ",
+      "romaji": "zu",
+      "row": "da",
+      "order": 59,
+      "hookNote": "the zu of つづく; Genki writes it zu, same as ず",
+      "gaijin": "DZOO"
+    },
+    {
+      "cp": "U+3067",
+      "char": "で",
+      "romaji": "de",
+      "row": "da",
+      "order": 60,
+      "gaijin": "DEH"
+    },
+    {
+      "cp": "U+3069",
+      "char": "ど",
+      "romaji": "do",
+      "row": "da",
+      "order": 61,
+      "gaijin": "DOH"
+    },
+    {
+      "cp": "U+3070",
+      "char": "ば",
+      "romaji": "ba",
+      "row": "ba",
+      "order": 62,
+      "gaijin": "BAH"
+    },
+    {
+      "cp": "U+3073",
+      "char": "び",
+      "romaji": "bi",
+      "row": "ba",
+      "order": 63,
+      "gaijin": "BEE"
+    },
+    {
+      "cp": "U+3076",
+      "char": "ぶ",
+      "romaji": "bu",
+      "row": "ba",
+      "order": 64,
+      "gaijin": "BOO"
+    },
+    {
+      "cp": "U+3079",
+      "char": "べ",
+      "romaji": "be",
+      "row": "ba",
+      "order": 65,
+      "gaijin": "BEH"
+    },
+    {
+      "cp": "U+307C",
+      "char": "ぼ",
+      "romaji": "bo",
+      "row": "ba",
+      "order": 66,
+      "gaijin": "BOH"
+    },
+    {
+      "cp": "U+3071",
+      "char": "ぱ",
+      "romaji": "pa",
+      "row": "pa",
+      "order": 67,
+      "gaijin": "PAH"
+    },
+    {
+      "cp": "U+3074",
+      "char": "ぴ",
+      "romaji": "pi",
+      "row": "pa",
+      "order": 68,
+      "gaijin": "PEE"
+    },
+    {
+      "cp": "U+3077",
+      "char": "ぷ",
+      "romaji": "pu",
+      "row": "pa",
+      "order": 69,
+      "gaijin": "POO"
+    },
+    {
+      "cp": "U+307A",
+      "char": "ぺ",
+      "romaji": "pe",
+      "row": "pa",
+      "order": 70,
+      "gaijin": "PEH"
+    },
+    {
+      "cp": "U+307D",
+      "char": "ぽ",
+      "romaji": "po",
+      "row": "pa",
+      "order": 71,
+      "gaijin": "POH"
+    },
+    {
+      "cp": "U+3083",
+      "char": "ゃ",
+      "romaji": "small ya",
+      "row": "small",
+      "order": 72,
+      "hookNote": "small: きゃ is one syllable, きや is two",
+      "gaijin": "LIL-YAH"
+    },
+    {
+      "cp": "U+3085",
+      "char": "ゅ",
+      "romaji": "small yu",
+      "row": "small",
+      "order": 73,
+      "hookNote": "small: きゅ is one syllable",
+      "gaijin": "LIL-YOO"
+    },
+    {
+      "cp": "U+3087",
+      "char": "ょ",
+      "romaji": "small yo",
+      "row": "small",
+      "order": 74,
+      "hookNote": "small: きょ is one syllable",
+      "gaijin": "LIL-YO"
+    },
+    {
+      "cp": "U+3063",
+      "char": "っ",
+      "romaji": "small tsu",
+      "row": "sokuon",
+      "order": 75,
+      "hookNote": "small: a held consonant. きって has a pause, きて does not",
+      "gaijin": "LIL-SOO"
     }
   ]
 }

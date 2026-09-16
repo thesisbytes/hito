@@ -40,7 +40,7 @@ hito/
     instrument.py           add attempt telemetry to a build, for debugging
     fix_persistence.py      repair the window.storage bug in an old build
     test/run.sh             every check that does not need a browser
-    test/size.test.mjs      46 glyphs x 16 sizes, offline
+    test/size.test.mjs      every glyph x 16 sizes, offline
     test/harness.test.mjs   the debug controls actually reach the engine
     test/tail.test.mjs      a stroke's end cannot be skipped, at any size
     test/field.test.mjs     the game loop runs and the tracer seam holds
@@ -50,7 +50,8 @@ hito/
     shell_vocab.py          the flashcard shell, appended as a layer
     kana_glyphs.py          writes the 164-kana glyph list the vocab realm traces
     test/vocab.test.mjs     a word is walked through the seam
-  vocab/                 decks: class content, not realm data (genki-i.json)
+    test/words.test.mjs     the farang carry words (the katakana game)
+  vocab/                 decks: class content, not realm data (genki-i.json, katakana.json)
   dist/                built single-file outputs, one per script, versioned
 ```
 
@@ -130,12 +131,18 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.36.html`
+### Hiragana — `dist/hiragana-v0.1.37.html`
 
-Playable, and traced end to end without a break. 46 gojūon with KanjiVG
+Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
 proper gojūon chart with the ya and wa rows keeping their gaps and ん on its
-own row.
+own row. As of v0.1.37 the five voiced rows (が ざ だ ば ぱ) and the small
+kana that matter (ゃ ゅ ょ っ) are in too: 75 glyphs, the strokes lifted from
+the vocab pack's book (same converter, same source; the gojūon were
+byte-identical), the chart gaining seven rows, and っ sitting under つ. The
+other small kana (ぁぃぅぇぉ ゎ) are left out of the chart on purpose: they
+hardly occur in hiragana, and the vocab realm already has them for the words
+that need them.
 
 What the tracing enforces, all of it learned by finding it broken:
 
@@ -206,7 +213,28 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
-### Vocab — `dist/vocab-v0.1.12.html`
+### Katakana — `dist/katakana-game-v0.1.0.html`
+
+The field shell with a deck: the farang carry katakana loanwords. The
+maintainer's own report was freezing on katakana words "although sometimes I
+know what it sounds like", and the suggestion that followed was the design:
+mix it with the game, with the farang mangling the pronunciation. A loanword
+is exactly that — English said in a Japanese accent — so the sign axis turns
+around: `romaji` is the farang's accent (koohii), `gaijin` is the farang's own
+word (coffee) with the accent left to you, `kana` is copying. The default is
+the accent, since knowing the sound and still freezing on the shapes was the
+complaint.
+
+The pack is `scripts/vocab/katakana.json`: the vocab pack's 164 kana and
+strokes under the field shell, with `vocab/katakana.json` — 101 words in
+three sections by what makes katakana hard (plain, the long-vowel bar, the
+small kana). The tracer walks a word's kana one at a time, the bubble shows a
+slot strip filling in, each landed kana knocks the farang back a step
+(`field.knockback`), the last banishes it and blooms the half the sign kept
+back, and the ghost light is kept by the word. Slower and sparser than the
+hiragana field, because a word is a longer answer.
+
+### Vocab — `dist/vocab-v0.1.13.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -540,7 +568,7 @@ per-character ledger. Save data must have export/import from day one.
   one-liners. Stamp the version in `<title>`, the header, the footer and the
   boot toast so a cached build is obvious.
 - **Stable links:** `dist/<script>.html` (`vocab.html`, `hiragana.html`,
-  `hiragana-game.html`) is a byte-identical copy of the current versioned
+  `hiragana-game.html`, `katakana-game.html`) is a byte-identical copy of the current versioned
   build, so the Pages URL never changes between releases. Copy it on every
   bump — `run.sh` fails if it is stale. Git stores identical content once,
   so the copy costs nothing.

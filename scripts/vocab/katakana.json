@@ -1,11 +1,11 @@
 {
-  "script": "hiragana",
-  "version": "0.1.37",
-  "title": "hito 人 · hiragana · v0.1.29",
+  "script": "vocab",
+  "version": "0.1.0",
+  "title": "hito 人 · katakana · v0.1.0",
   "brand": "hito 人",
   "fontDir": "fonts",
-  "probeChars": "あがっ",
-  "exportName": "hito-hiragana-strokes.json",
+  "probeChars": "あかん",
+  "exportName": "hito-kana-strokes.json",
   "fonts": [
     {
       "id": "klee-one",
@@ -24,7 +24,7 @@
       "role": "print"
     }
   ],
-  "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",
+  "credit": "Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",
   "shadow": "none",
   "shadowScale": 2.4,
   "strictFollow": true,
@@ -40,27 +40,13 @@
   },
   "sizeMode": "random",
   "sizeRange": [
-    0.32,
+    0.46,
     0.62
   ],
   "mode": "easy",
   "grid": "cross",
   "shell": "field",
-  "field": {
-    "sign": "kana",
-    "speed": 0.055,
-    "wardHp": 5,
-    "spawnMs": 5200,
-    "spawnRamp": 140,
-    "spawnMin": 1800,
-    "advanceMs": 460,
-    "reading": "both",
-    "fizzleRestarts": true,
-    "hitodamaGain": 1,
-    "cleanBonus": 1,
-    "hitodamaCap": 6,
-    "castMs": 900
-  },
+  "deck": "vocab/katakana.json",
   "sync": {
     "endpoint": "",
     "batch": 40,
@@ -68,22 +54,37 @@
   },
   "realms": [
     {
+      "label": "hiragana",
+      "kana": "仮",
+      "file": "hiragana-game.html",
+      "blurb": "the game with single characters. the farang carry the ones you are forgetting."
+    },
+    {
       "label": "vocab",
       "kana": "語",
       "file": "vocab.html",
-      "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."
-    },
-    {
-      "label": "katakana",
-      "kana": "片",
-      "file": "katakana-game.html",
-      "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."
+      "blurb": "Genki I vocabulary as flashcards. read the meaning, write the word."
     }
   ],
   "credits": [
+    "Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.",
     "Stroke order recorded and checked by the project's teachers.",
-    "Letterforms drawn by hand by the project's artist.",
-    "Bugs found by the testers, several of them young, all of them right.",
     "Built by the maintainer, one version at a time."
-  ]
+  ],
+  "field": {
+    "sign": "romaji",
+    "speed": 0.03,
+    "wardHp": 5,
+    "spawnMs": 9000,
+    "spawnRamp": 200,
+    "spawnMin": 3600,
+    "advanceMs": 460,
+    "reading": "both",
+    "fizzleRestarts": true,
+    "hitodamaGain": 1,
+    "cleanBonus": 1,
+    "hitodamaCap": 6,
+    "castMs": 900,
+    "knockback": 0.07
+  }
 }

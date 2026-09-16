@@ -6,6 +6,7 @@ cd "$(dirname "$0")/../.."
 fail=0
 ver=$(python3 -c "import json;print(json.load(open('scripts/hiragana/pack.json'))['version'])")
 vver=$(python3 -c "import json;print(json.load(open('scripts/vocab/pack.json'))['version'])")
+kver=$(python3 -c "import json;print(json.load(open('scripts/vocab/katakana.json'))['version'])")
 
 echo "── scoring ─────────────────────────────────────────"
 node build/test/scoring.test.mjs | sed 's/^/  /' || fail=1
@@ -52,6 +53,10 @@ echo "── vocab (a word is walked through the seam) ───────"
 node build/test/vocab.test.mjs "dist/vocab-v$vver.html" | sed 's/^/  /' || fail=1
 
 echo
+echo "── words (the farang carry words, one kana at a time) ──"
+node build/test/words.test.mjs "dist/katakana-game-v$kver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── smoke (engine executes, frames run) ─────────────"
 for f in dist/*-v*.html; do
   node build/test/smoke.test.mjs "$f" | sed 's/^/  /' || fail=1
@@ -60,7 +65,7 @@ done
 echo
 echo "── build reproducibility ───────────────────────────"
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
-for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiragana-game-v$ver" "scripts/vocab:vocab-v$vver"; do
+for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiragana-game-v$ver" "scripts/vocab:vocab-v$vver" "scripts/vocab/katakana.json:katakana-game-v$kver"; do
   src=${pack%%:*}; name=${pack##*:}
   .venv/bin/python build/stitch.py build/engine.html "$src" "$tmp/$name.html" >/dev/null
   if cmp -s "$tmp/$name.html" "dist/$name.html"; then
@@ -75,7 +80,7 @@ echo
 echo "── stable links (dist/<script>.html is the current build) ──"
 # The public links carry no version, so the page has to: the unversioned
 # file is a byte-for-byte copy of the current versioned build, nothing else.
-for pair in "hiragana:hiragana-v$ver" "hiragana-game:hiragana-game-v$ver" "vocab:vocab-v$vver"; do
+for pair in "hiragana:hiragana-v$ver" "hiragana-game:hiragana-game-v$ver" "vocab:vocab-v$vver" "katakana-game:katakana-game-v$kver"; do
   alias=${pair%%:*}; name=${pair##*:}
   if cmp -s "dist/$alias.html" "dist/$name.html"; then
     echo "  dist/$alias.html is $name"
@@ -90,7 +95,7 @@ echo "── title (the page title wears the pack's version) ─"
 # A cached build is spotted by its version, and the tab is the first place
 # anyone looks. The title was hand-typed in each pack and had drifted in all
 # three, so the stitch now stamps it — and this makes sure it stays stamped.
-for pair in "hiragana-v$ver:$ver" "hiragana-game-v$ver:$ver" "vocab-v$vver:$vver"; do
+for pair in "hiragana-v$ver:$ver" "hiragana-game-v$ver:$ver" "vocab-v$vver:$vver" "katakana-game-v$kver:$kver"; do
   name=${pair%%:*}; want=${pair##*:}
   if grep -q "<title>[^<]*v$want</title>" "dist/$name.html"; then
     echo "  $name: title says v$want"

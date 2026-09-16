@@ -10,7 +10,8 @@ a font by hand, kids finding bugs — all lean on each other, and so will you.
 
 | realm | state |
 |---|---|
-| **Hiragana** — 46 gojūon | playable. Stroke order from KanjiVG, textbook letterforms, one stroke revealed at a time. |
+| **Hiragana** — 46 gojūon, the voiced rows, ゃゅょっ | playable. Stroke order from KanjiVG, textbook letterforms, one stroke revealed at a time. |
+| **Katakana** — 101 loanwords | playable. The game with words: the farang say "coffee" in their own accent, you write コーヒー one kana at a time, and each kana knocks them back. |
 | **Vocab** — Genki I, Lessons 1–2 | playable. A flashcard above the sketchbook: read the meaning, write the word one kana at a time. It times the recall and asks how it went. |
 | **Thai** — 44 consonants | engine works; no stroke data yet. Waiting on a recording session — see [KhienThai](https://github.com/thesisbytes/khienthai). |
 
@@ -20,6 +21,7 @@ dependencies. Open it on a tablet and start tracing. The front door is
 straight in:
 
 **[Play](https://thesisbytes.github.io/hito/dist/hiragana-game.html)** — the game: draw below, farang advance above.  
+**[Katakana](https://thesisbytes.github.io/hito/dist/katakana-game.html)** — the game with loanwords: the farang say "coffee" in their accent, you write コーヒー.  
 **[Vocab](https://thesisbytes.github.io/hito/dist/vocab.html)** — Genki I vocabulary, Lessons 1 and 2, as flashcards written one kana at a time.  
 **[Workshop](https://thesisbytes.github.io/hito/dist/hiragana.html)** — the full gojūon chart and every control, which is what this project uses on itself.
 

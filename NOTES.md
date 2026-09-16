@@ -460,3 +460,61 @@ Running log. Append at the bottom, don't rewrite history.
 - Part I is listening and needs audio the build does not have. Not here.
 - As with Lesson 2, a returning player finds the new sections unticked on
   the start page. Tick them there.
+
+## 2026-09-15 — Katakana words in the field, and the hiragana chart fills in (katakana-game v0.1.0, hiragana v0.1.37, vocab v0.1.13)
+
+- "Let's make a katakana practice. I keep freezing on those words although
+  sometimes I know what it sounds like." Then: "you could probably mix it
+  with the hiragana game with the farang messing up the pronunciation."
+  That second line is the design. A katakana loanword *is* English in a
+  Japanese accent, so the farang's speech bubble saying "koohii" is the
+  farang mangling "coffee", and the answer is コーヒー. Built as the field
+  shell with a deck rather than a third shell: `shell_field.py` now takes
+  the deck the vocab shell already took, and with one the farang carry
+  words. The pack is `scripts/vocab/katakana.json` (the vocab pack's kana
+  and strokes under the field shell), the deck `vocab/katakana.json`.
+- How a word rides the seam: a word monster's `i` is always the kana it is
+  waiting for, so `bearer`, `pick`, `retarget` and the tracer's load all
+  work unchanged. `conjure` advances the monster (ci++, i = next kana) at
+  the moment the kana is written, not when the shot lands — the shot's
+  landing time depends on frame rate and the advance timer does not, and
+  advancing on landing could reload the *same* kana under a fast hand. The
+  lock holds on a half-written word so the next kana is its next kana.
+  The loop's "nobody carries this glyph" retarget now waits while `done`
+  is set, because after a word's kana the finished character is indeed
+  carried by nobody, and the advance timer is what should move things.
+- Each landed kana knocks the farang back (`field.knockback`, 0.07 radii);
+  the last one banishes. Without that a six-kana word under the same clock
+  as a single glyph is unfair, and the pack is also slower and sparser
+  (`speed` 0.03, `spawnMs` 9000). Tuning by hand still to come.
+- Ghost lights are kept by the word, not by its first kana, and a word
+  kindles once, when whole, with clean meaning no zap anywhere in it. The
+  sign axis reads for words: `kana` the word, `romaji` the reading (the
+  farang's accent), `gaijin` the farang's own English word. Default is
+  romaji, since knowing the sound and freezing on the shapes was the
+  complaint; the English is one tap away for the fuller test. The kill
+  blooms with whichever half the sign kept back. The start page remembers
+  its sign under its own key (`hito-start-katakana`), because "gaijin"
+  means something different here than in the hiragana game and the two
+  builds share an origin on Pages.
+- 101 words in three sections by what makes katakana hard: plain kana,
+  the long-vowel bar, the small kana. Mostly Genki I's, romaji in the
+  book's style. Tシャツ is ティーシャツ as in the vocab deck. The sections
+  are in the JSON but the field has no picker: the roster is the deck.
+- "Also, we should add the ゛ and the circles and the little hiraganas."
+  The hiragana pack goes from 46 to 75: the five voiced rows and ゃゅょっ.
+  Strokes lifted from the vocab book (the converter and source are the
+  same; the 46 were verified identical first), fonts switched to the
+  `-kana-all` subsets since the source fonts are not in the repo and the
+  full-kana subsets are 12KB larger. っ gets its own chart row under つ's
+  column rather than colliding with ゅ in the small row. ぁぃぅぇぉゎ are
+  left out on purpose — they hardly occur in hiragana. Romaji for the
+  small kana is "small ya" etc., which the field test's reading check now
+  allows a space for. `probeChars` became あがっ so the font probe checks
+  a voiced and a small glyph are really loaded.
+- Found on the way: the tail test's 80% floor failed on every dakuten
+  tick at 79.9997%. A tick is a six-point path with one point of slack,
+  so it finishes at exactly 4/5 of its arc, and 4/5 in floating point sat
+  on the wrong side of 0.80. The test now has an epsilon; nothing in the
+  scorer changed. The scoring and size sweeps had "46" typed in and now
+  count the book.

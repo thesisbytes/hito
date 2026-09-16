@@ -1,0 +1,536 @@
+{
+  "deck": "katakana",
+  "source": "Common katakana loanwords, mostly the ones Genki I (3rd ed.) introduces across Lessons 1–12, with a few everyday extras. Romaji in the book's style (koohii, not kōhī). Sectioned by what makes katakana hard: plain kana, the long-vowel bar, and the small kana.",
+  "sections": [
+    {
+      "id": "plain",
+      "title": "plain · no bar, no small kana",
+      "note": "one katakana per beat",
+      "words": [
+        {
+          "ja": "アメリカ",
+          "romaji": "amerika",
+          "en": "U.S.A."
+        },
+        {
+          "ja": "カナダ",
+          "romaji": "kanada",
+          "en": "Canada"
+        },
+        {
+          "ja": "イギリス",
+          "romaji": "igirisu",
+          "en": "Britain"
+        },
+        {
+          "ja": "テレビ",
+          "romaji": "terebi",
+          "en": "TV"
+        },
+        {
+          "ja": "カメラ",
+          "romaji": "kamera",
+          "en": "camera"
+        },
+        {
+          "ja": "テニス",
+          "romaji": "tenisu",
+          "en": "tennis"
+        },
+        {
+          "ja": "パン",
+          "romaji": "pan",
+          "en": "bread"
+        },
+        {
+          "ja": "ピザ",
+          "romaji": "piza",
+          "en": "pizza"
+        },
+        {
+          "ja": "ホテル",
+          "romaji": "hoteru",
+          "en": "hotel"
+        },
+        {
+          "ja": "バス",
+          "romaji": "basu",
+          "en": "bus"
+        },
+        {
+          "ja": "ペン",
+          "romaji": "pen",
+          "en": "pen"
+        },
+        {
+          "ja": "クラス",
+          "romaji": "kurasu",
+          "en": "class"
+        },
+        {
+          "ja": "テスト",
+          "romaji": "tesuto",
+          "en": "test"
+        },
+        {
+          "ja": "ドア",
+          "romaji": "doa",
+          "en": "door"
+        },
+        {
+          "ja": "トイレ",
+          "romaji": "toire",
+          "en": "toilet"
+        },
+        {
+          "ja": "カラオケ",
+          "romaji": "karaoke",
+          "en": "karaoke"
+        },
+        {
+          "ja": "バナナ",
+          "romaji": "banana",
+          "en": "banana"
+        },
+        {
+          "ja": "トマト",
+          "romaji": "tomato",
+          "en": "tomato"
+        },
+        {
+          "ja": "ミルク",
+          "romaji": "miruku",
+          "en": "milk"
+        },
+        {
+          "ja": "ワイン",
+          "romaji": "wain",
+          "en": "wine"
+        },
+        {
+          "ja": "サラダ",
+          "romaji": "sarada",
+          "en": "salad"
+        },
+        {
+          "ja": "ピアノ",
+          "romaji": "piano",
+          "en": "piano"
+        },
+        {
+          "ja": "ハワイ",
+          "romaji": "hawai",
+          "en": "Hawaii"
+        },
+        {
+          "ja": "パリ",
+          "romaji": "pari",
+          "en": "Paris"
+        },
+        {
+          "ja": "タオル",
+          "romaji": "taoru",
+          "en": "towel"
+        },
+        {
+          "ja": "ドラマ",
+          "romaji": "dorama",
+          "en": "drama"
+        },
+        {
+          "ja": "アニメ",
+          "romaji": "anime",
+          "en": "anime"
+        },
+        {
+          "ja": "プレゼント",
+          "romaji": "purezento",
+          "en": "present"
+        },
+        {
+          "ja": "ダンス",
+          "romaji": "dansu",
+          "en": "dance"
+        },
+        {
+          "ja": "ビデオ",
+          "romaji": "bideo",
+          "en": "video"
+        },
+        {
+          "ja": "ラジオ",
+          "romaji": "rajio",
+          "en": "radio"
+        },
+        {
+          "ja": "ズボン",
+          "romaji": "zubon",
+          "en": "trousers"
+        },
+        {
+          "ja": "ネクタイ",
+          "romaji": "nekutai",
+          "en": "necktie"
+        },
+        {
+          "ja": "ガソリン",
+          "romaji": "gasorin",
+          "en": "gasoline"
+        },
+        {
+          "ja": "エアコン",
+          "romaji": "eakon",
+          "en": "air conditioner"
+        },
+        {
+          "ja": "アルバイト",
+          "romaji": "arubaito",
+          "en": "part-time job"
+        },
+        {
+          "ja": "レストラン",
+          "romaji": "resutoran",
+          "en": "restaurant"
+        },
+        {
+          "ja": "クリスマス",
+          "romaji": "kurisumasu",
+          "en": "Christmas"
+        },
+        {
+          "ja": "サングラス",
+          "romaji": "sangurasu",
+          "en": "sunglasses"
+        },
+        {
+          "ja": "スマホ",
+          "romaji": "sumaho",
+          "en": "smartphone"
+        },
+        {
+          "ja": "ロンドン",
+          "romaji": "rondon",
+          "en": "London"
+        },
+        {
+          "ja": "メロン",
+          "romaji": "meron",
+          "en": "melon"
+        },
+        {
+          "ja": "オレンジ",
+          "romaji": "orenji",
+          "en": "orange"
+        }
+      ]
+    },
+    {
+      "id": "long",
+      "title": "long vowels · the bar ー",
+      "note": "ー holds the vowel for a beat",
+      "words": [
+        {
+          "ja": "コーヒー",
+          "romaji": "koohii",
+          "en": "coffee"
+        },
+        {
+          "ja": "デート",
+          "romaji": "deeto",
+          "en": "date (romantic)",
+          "note": "the romantic kind"
+        },
+        {
+          "ja": "ハンバーガー",
+          "romaji": "hanbaagaa",
+          "en": "hamburger"
+        },
+        {
+          "ja": "ビール",
+          "romaji": "biiru",
+          "en": "beer"
+        },
+        {
+          "ja": "スーパー",
+          "romaji": "suupaa",
+          "en": "supermarket"
+        },
+        {
+          "ja": "デパート",
+          "romaji": "depaato",
+          "en": "department store"
+        },
+        {
+          "ja": "タクシー",
+          "romaji": "takushii",
+          "en": "taxi"
+        },
+        {
+          "ja": "ノート",
+          "romaji": "nooto",
+          "en": "notebook"
+        },
+        {
+          "ja": "ボールペン",
+          "romaji": "boorupen",
+          "en": "ballpoint pen"
+        },
+        {
+          "ja": "セーター",
+          "romaji": "seetaa",
+          "en": "sweater"
+        },
+        {
+          "ja": "ゲーム",
+          "romaji": "geemu",
+          "en": "game"
+        },
+        {
+          "ja": "ページ",
+          "romaji": "peeji",
+          "en": "page"
+        },
+        {
+          "ja": "プール",
+          "romaji": "puuru",
+          "en": "swimming pool"
+        },
+        {
+          "ja": "メール",
+          "romaji": "meeru",
+          "en": "e-mail"
+        },
+        {
+          "ja": "アパート",
+          "romaji": "apaato",
+          "en": "apartment"
+        },
+        {
+          "ja": "ケーキ",
+          "romaji": "keeki",
+          "en": "cake"
+        },
+        {
+          "ja": "ラーメン",
+          "romaji": "raamen",
+          "en": "ramen"
+        },
+        {
+          "ja": "コート",
+          "romaji": "kooto",
+          "en": "coat"
+        },
+        {
+          "ja": "スキー",
+          "romaji": "sukii",
+          "en": "skiing"
+        },
+        {
+          "ja": "ギター",
+          "romaji": "gitaa",
+          "en": "guitar"
+        },
+        {
+          "ja": "スープ",
+          "romaji": "suupu",
+          "en": "soup"
+        },
+        {
+          "ja": "ステーキ",
+          "romaji": "suteeki",
+          "en": "steak"
+        },
+        {
+          "ja": "レポート",
+          "romaji": "repooto",
+          "en": "report"
+        },
+        {
+          "ja": "エレベーター",
+          "romaji": "erebeetaa",
+          "en": "elevator"
+        },
+        {
+          "ja": "ジーンズ",
+          "romaji": "jiinzu",
+          "en": "jeans"
+        },
+        {
+          "ja": "スカート",
+          "romaji": "sukaato",
+          "en": "skirt"
+        },
+        {
+          "ja": "アイスクリーム",
+          "romaji": "aisukuriimu",
+          "en": "ice cream"
+        },
+        {
+          "ja": "ホームステイ",
+          "romaji": "hoomusutei",
+          "en": "homestay"
+        },
+        {
+          "ja": "ルームメイト",
+          "romaji": "ruumumeito",
+          "en": "roommate"
+        },
+        {
+          "ja": "カード",
+          "romaji": "kaado",
+          "en": "card"
+        },
+        {
+          "ja": "オーストラリア",
+          "romaji": "oosutoraria",
+          "en": "Australia"
+        }
+      ]
+    },
+    {
+      "id": "small",
+      "title": "small kana · ャュョッ ィェァ",
+      "note": "a small kana joins the one before it; ッ is a held consonant",
+      "words": [
+        {
+          "ja": "スポーツ",
+          "romaji": "supootsu",
+          "en": "sports"
+        },
+        {
+          "ja": "サッカー",
+          "romaji": "sakkaa",
+          "en": "soccer"
+        },
+        {
+          "ja": "ジュース",
+          "romaji": "juusu",
+          "en": "juice"
+        },
+        {
+          "ja": "コンピューター",
+          "romaji": "konpyuutaa",
+          "en": "computer"
+        },
+        {
+          "ja": "シャツ",
+          "romaji": "shatsu",
+          "en": "shirt"
+        },
+        {
+          "ja": "パーティー",
+          "romaji": "paatii",
+          "en": "party"
+        },
+        {
+          "ja": "カフェ",
+          "romaji": "kafe",
+          "en": "cafe"
+        },
+        {
+          "ja": "サンドイッチ",
+          "romaji": "sandoitchi",
+          "en": "sandwich"
+        },
+        {
+          "ja": "チョコレート",
+          "romaji": "chokoreeto",
+          "en": "chocolate"
+        },
+        {
+          "ja": "キャンプ",
+          "romaji": "kyanpu",
+          "en": "camping"
+        },
+        {
+          "ja": "シャワー",
+          "romaji": "shawaa",
+          "en": "shower"
+        },
+        {
+          "ja": "インターネット",
+          "romaji": "intaanetto",
+          "en": "internet"
+        },
+        {
+          "ja": "チケット",
+          "romaji": "chiketto",
+          "en": "ticket"
+        },
+        {
+          "ja": "メニュー",
+          "romaji": "menyuu",
+          "en": "menu"
+        },
+        {
+          "ja": "ニューヨーク",
+          "romaji": "nyuuyooku",
+          "en": "New York"
+        },
+        {
+          "ja": "ソファ",
+          "romaji": "sofa",
+          "en": "sofa"
+        },
+        {
+          "ja": "ジョギング",
+          "romaji": "jogingu",
+          "en": "jogging"
+        },
+        {
+          "ja": "ファックス",
+          "romaji": "fakkusu",
+          "en": "fax"
+        },
+        {
+          "ja": "キャンパス",
+          "romaji": "kyanpasu",
+          "en": "campus"
+        },
+        {
+          "ja": "マッチ",
+          "romaji": "matchi",
+          "en": "match"
+        },
+        {
+          "ja": "クッキー",
+          "romaji": "kukkii",
+          "en": "cookie"
+        },
+        {
+          "ja": "ホッチキス",
+          "romaji": "hotchikisu",
+          "en": "stapler"
+        },
+        {
+          "ja": "ティーシャツ",
+          "romaji": "tiishatsu",
+          "en": "T-shirt",
+          "note": "the book writes Tシャツ; the sketchbook has no strokes for a T"
+        },
+        {
+          "ja": "ミュージカル",
+          "romaji": "myuujikaru",
+          "en": "musical"
+        },
+        {
+          "ja": "チャンス",
+          "romaji": "chansu",
+          "en": "chance"
+        },
+        {
+          "ja": "ラッシュ",
+          "romaji": "rasshu",
+          "en": "rush hour",
+          "note": "ラッシュアワー, rush hour"
+        },
+        {
+          "ja": "ニュース",
+          "romaji": "nyuusu",
+          "en": "news",
+          "note": "ュ is small: nyu, one beat"
+        }
+      ]
+    }
+  ]
+}

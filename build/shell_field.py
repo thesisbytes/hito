@@ -20,6 +20,13 @@ continuously because they never share space with the pen: the drawing surface
 is a fixed rectangle that does not scroll, scale or reflow while the field
 moves above it. "You identify, you do not aim" needs exactly that.
 
+With a deck the farang carry words instead of characters. Katakana loanwords
+are English said in a Japanese accent, so the sign is the farang's own word or
+its mangled reading, and the answer is the katakana, one kana at a time. A
+word monster's `i` is always the kana it is waiting for, so everything that
+asks LETTERS[m.i] works unchanged; each finished kana knocks it back a step
+and the last one banishes it. The ghost light is kept by the word.
+
 This is applied as an appended layer rather than woven into the engine with
 substitutions. It touches the engine only through globals it already exposes
 (load, conjure, LETTERS, idx, stage, toast), so the tracer and its scoring
@@ -109,6 +116,18 @@ LAYER = STYLE + r"""
   const CFG = window.__FIELD_CFG;
   const $ = id => document.getElementById(id);
 
+  // ---- words
+  // A deck turns the roster from characters into words. The word is shared
+  // deck data; how far a given farang has been written is on the monster
+  // (ci, zaps), and its `i` is kept pointed at the kana it is waiting for.
+  const WORDS = CFG.deck ? CFG.deck.words : null;
+  if (WORDS) for (const w of WORDS) w.chars = [...w.ja];
+  const AT = {};
+  LETTERS.forEach((L, i) => { AT[L[0]] = i; });
+  // What the hitodama is kept by: the word for a word monster, else the character.
+  const key = m => m.w ? m.w.ja : LETTERS[m.i][0];
+  const REALM = WORDS ? CFG.deck.deck : 'hiragana';
+
   document.body.classList.add('field');
   const wrap = document.createElement('div');
   wrap.className = 'field-wrap';
@@ -160,7 +179,7 @@ LAYER = STYLE + r"""
     // to go; guided does not need to be shown how fast.
     guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
-              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false,
+              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
               guide:true, numbers:true, comet:false, shadow:'none' },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
@@ -173,12 +192,20 @@ LAYER = STYLE + r"""
     hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
               locked:true },
   };
-  const SIGNS = {
+  // With words the joke turns around: the loanword is already English in a
+  // Japanese accent, so the farang either says it that way (romaji) or says
+  // its own word and leaves the accent to you (gaijin).
+  const SIGNS = WORDS ? {
+    kana:   { blurb:'コーヒー — the word, by copying it' },
+    romaji: { blurb:'koohii — the farang\'s accent. you know what it sounds like; write it' },
+    gaijin: { blurb:'coffee — the farang\'s own word. the accent is on you' },
+  } : {
     kana:   { blurb:'ぬ — the shape, by copying it' },
     romaji: { blurb:'nu — the reading, which is the direction that matters' },
     gaijin: { blurb:'NEW — the way you probably say it' },
   };
-  const SKEY = 'hito-start';
+  // A word realm remembers its own sign: what "gaijin" means differs.
+  const SKEY = WORDS ? 'hito-start-' + CFG.deck.deck : 'hito-start';
   let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'easy';
   try {
     const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {};
@@ -252,13 +279,13 @@ LAYER = STYLE + r"""
     if (now - castAt < CFG.castMs) return null;
     let best = null;
     for (const m of monsters){
-      if (charge(LETTERS[m.i][0]) < 1) continue;
+      if (charge(key(m)) < 1) continue;
       if (m === locked && tracing()) continue;
       if (shots.some(s => s.to === m)) continue;
       if (!best || m.d < best.d) best = m;
     }
     if (!best) return null;
-    const ch = LETTERS[best.i][0];
+    const ch = key(best);
     HITODAMA[ch] = charge(ch) - 1; saveH();
     shots.push({ from: dash(), to: best, t: 0, ch, auto: true });
     castAt = now;
@@ -270,21 +297,30 @@ LAYER = STYLE + r"""
   // the reading, which is the direction that actually matters; gaijin asks in
   // the learner's own broken accent, which is the same joke as the hero who
   // cannot read — the player is the foreigner here.
-  const label = (i, which) =>
-    which === 'romaji' ? LETTERS[i][2] :
-    which === 'gaijin' ? (LETTERS[i][7] || LETTERS[i][2].toUpperCase()) :
-    LETTERS[i][0];
-  const sign = m => label(m.i, CFG.sign);
+  const label = (m, which) => m.w
+    ? (which === 'romaji' ? m.w.romaji : which === 'gaijin' ? m.w.en : m.w.ja)
+    : which === 'romaji' ? LETTERS[m.i][2] :
+      which === 'gaijin' ? (LETTERS[m.i][7] || LETTERS[m.i][2].toUpperCase()) :
+      LETTERS[m.i][0];
+  const sign = m => label(m, CFG.sign);
 
   function spawn(){
     // Bias toward glyphs whose flame has gone out: a monster is a character
     // you are forgetting, so the roster is the gojuon and the encounter rate
     // follows what actually needs review.
-    let i, tries = 0;
-    do { i = Math.floor(Math.random()*LETTERS.length); tries++; }
-    while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && Math.random() < 0.7);
+    let i, w = null, tries = 0;
+    if (WORDS){
+      // the same rule at word level: a word whose every kana is mastered is
+      // usually passed over for one that still has a dark character in it
+      do { w = WORDS[Math.floor(Math.random()*WORDS.length)]; tries++; }
+      while (tries < 8 && w.chars.every(c => (MASTERY[c]||0) > 2) && Math.random() < 0.7);
+      i = AT[w.chars[0]];
+    } else {
+      do { i = Math.floor(Math.random()*LETTERS.length); tries++; }
+      while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && Math.random() < 0.7);
+    }
     monsters.push({
-      i, a: Math.random()*Math.PI*2, d: 1.05,
+      i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
       speed: CFG.speed * (0.8 + Math.random()*0.5),
       hp: 1, wob: Math.random()*6.28, born: performance.now(),
     });
@@ -310,7 +346,7 @@ LAYER = STYLE + r"""
     let best = null, dark = null;
     for (const m of monsters){
       if (!best || m.d < best.d) best = m;
-      if (charge(LETTERS[m.i][0]) < 1 && (!dark || m.d < dark.d)) dark = m;
+      if (charge(key(m)) < 1 && (!dark || m.d < dark.d)) dark = m;
     }
     return casting() ? (dark || best) : best;
   }
@@ -445,16 +481,27 @@ LAYER = STYLE + r"""
   const _conjure = window.conjure;
   window.conjure = function(){
     const drew = LETTERS[idx][0];
-    const t = bearer(drew) || (monsters.includes(locked) ? locked : null);
+    // A word is only ever advanced by its own next kana, so there is no
+    // falling back to the locked monster: a stray character hits nothing.
+    const t = bearer(drew) || (!WORDS && monsters.includes(locked) ? locked : null);
+    let whole = true;   // did this finish what the monster carries
+    if (t && t.w){
+      // one kana of the word is written; the farang now waits for the next
+      t.ci++; t.zaps += zapped;
+      whole = t.ci >= t.w.chars.length;
+      if (!whole) t.i = AT[t.w.chars[t.ci]];
+    }
     if (t){
-      shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:drew});
+      shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:drew, partial: !whole});
       if (navigator.vibrate) navigator.vibrate([12,30,40]);
     }
     // And the character is kindled whether or not anything carried it — a
     // trace with nothing to hit is banked, not wasted. Clean pays more.
-    if (casting()){
-      const gain = CFG.hitodamaGain + (zapped ? 0 : CFG.cleanBonus);
-      kindle(drew, gain);
+    // A word kindles once, when it is whole, and clean means the whole word.
+    if (casting() && (!WORDS || (t && whole))){
+      const zaps = WORDS ? t.zaps : zapped;
+      const gain = CFG.hitodamaGain + (zaps ? 0 : CFG.cleanBonus);
+      kindle(WORDS ? t.w.ja : drew, gain);
       const d = dash();
       for (let k=0;k<14;k++)
         motes.push({x:d.x, y:d.y, vx:(Math.random()-.5)*1.8, vy:-Math.random()*2.2,
@@ -468,12 +515,24 @@ LAYER = STYLE + r"""
     // The engine's own delayed load(idx+1) needs no cancelling: load() clears
     // `done`, and that callback is guarded by it, so an early advance disarms
     // the late one. Without that it would fire mid-trace and wipe the strokes.
-    setTimeout(() => { locked = null; retarget(true); }, CFG.advanceMs);
+    // A word half written stays yours: the lock holds until its last kana.
+    setTimeout(() => {
+      locked = t && t.w && !whole && monsters.includes(t) ? t : null;
+      retarget(true);
+    }, CFG.advanceMs);
     return r;
   };
 
   let readings = [];
-  function hit(m){
+  function hit(m, partial){
+    const p0 = px(m);
+    if (partial){
+      // a kana landed: the farang staggers back a step and waits for the next
+      m.d = Math.min(1, m.d + CFG.knockback);
+      for (let k=0;k<8;k++)
+        motes.push({x:p0.x, y:p0.y, vx:(Math.random()-.5)*2, vy:(Math.random()-.5)*2, life:.7});
+      return;
+    }
     m.hp--;
     // The sound, attached to the kill. Tracing a shape teaches the shape and
     // nothing else — the hand can learn every stroke of ぬ without the reading
@@ -485,11 +544,18 @@ LAYER = STYLE + r"""
     // recognises the wrong one as theirs.
     if (CFG.reading !== 'off'){
       const p = px(m);
-      readings.push({
-        x:p.x, y:p.y, life:1,
-        text: CFG.reading === 'gaijin' ? label(m.i,'gaijin') : LETTERS[m.i][2],
-        sub:  CFG.reading === 'both'   ? label(m.i,'gaijin') : null,
-      });
+      let text, sub = null;
+      if (m.w){
+        // the word blooms with whichever half the sign kept back: after
+        // "koohii" the news is "coffee", after "coffee" it is "koohii"
+        const flip = CFG.sign === 'romaji';
+        text = CFG.reading === 'gaijin' || (CFG.reading === 'both' && flip) ? m.w.en : m.w.romaji;
+        if (CFG.reading === 'both') sub = flip ? m.w.romaji : m.w.en;
+      } else {
+        text = CFG.reading === 'gaijin' ? label(m,'gaijin') : LETTERS[m.i][2];
+        sub  = CFG.reading === 'both'   ? label(m,'gaijin') : null;
+      }
+      readings.push({ x:p.x, y:p.y, life:1, text, sub });
     }
     for (let k=0;k<18;k++)
       motes.push({x:px(m).x, y:px(m).y, vx:(Math.random()-.5)*2.4,
@@ -502,6 +568,7 @@ LAYER = STYLE + r"""
       // Deliberately not a score — the client does not get to assert totals.
       try { window.__sync && window.__sync.record('banish', {
         glyph: LETTERS[m.i][0], level: MASTERY[LETTERS[m.i][0]] || 0,
+        word: m.w ? m.w.ja : undefined,
         ms: Math.round(performance.now() - m.born), sign: CFG.sign,
       }); } catch(_){}
       retarget();
@@ -530,7 +597,7 @@ LAYER = STYLE + r"""
           if (m === locked) locked = null;
           ward--;
           try { window.__sync && window.__sync.record('breach', {
-            glyph: LETTERS[m.i][0], wardLeft: ward, wave,
+            glyph: LETTERS[m.i][0], word: m.w ? m.w.ja : undefined, wardLeft: ward, wave,
           }); } catch(_){}
           retarget();
           if (navigator.vibrate) navigator.vibrate(90);
@@ -540,7 +607,7 @@ LAYER = STYLE + r"""
       autocast(now);
       for (const s of shots){
         s.t += dt*2.6;
-        if (s.t >= 1){ hit(s.to); }
+        if (s.t >= 1){ hit(s.to, s.partial); }
       }
       shots = shots.filter(s => s.t < 1 && monsters.includes(s.to));
     }
@@ -549,7 +616,7 @@ LAYER = STYLE + r"""
     // tracing a character that can no longer hit anything.
     if (!over && !tracing()){
       if (pendingRetarget) retarget();
-      else if (monsters.length && !bearer(LETTERS[idx][0])) retarget();
+      else if (!done && monsters.length && !bearer(LETTERS[idx][0])) retarget();
     }
     for (const p of motes){ p.x += p.vx; p.y += p.vy; p.life -= dt*1.6; }
     motes = motes.filter(p => p.life > 0);
@@ -596,26 +663,40 @@ LAYER = STYLE + r"""
       g.beginPath(); g.ellipse(p.x, p.y+bob, 17, 21, 0, 0, 6.284); g.fill();
       g.restore();
 
-      // the sign it carries
+      // the sign it carries — and for a word, a strip under it showing how
+      // much of it has been written, blank where it has not
       const label = sign(m);
-      g.font = (CFG.sign === 'romaji' ? '600 15px' : '600 22px')
+      g.font = (m.w ? (CFG.sign === 'kana' ? '600 18px' : '600 14px') : CFG.sign === 'romaji' ? '600 15px' : '600 22px')
         + ' ui-sans-serif,system-ui,"Klee One",sans-serif';
-      const w = g.measureText(label).width + 18;
-      const by = p.y + bob - 36;
+      const SP = 15;
+      const w = Math.max(g.measureText(label).width, m.w ? m.w.chars.length*SP : 0) + 18;
+      const bh = m.w ? 44 : 27;
+      const by = p.y + bob - 36 - (bh - 27);
       g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)';
       g.strokeStyle = isT ? 'rgba(127,209,196,.65)' : 'rgba(180,195,210,.28)';
       g.lineWidth = 1;
       g.beginPath();
-      if (g.roundRect) g.roundRect(p.x-w/2, by-16, w, 27, 8);
-      else g.rect(p.x-w/2, by-16, w, 27);
+      if (g.roundRect) g.roundRect(p.x-w/2, by-16, w, bh, 8);
+      else g.rect(p.x-w/2, by-16, w, bh);
       g.fill(); g.stroke();
-      g.beginPath(); g.moveTo(p.x-5, by+11); g.lineTo(p.x, by+18); g.lineTo(p.x+5, by+11);
+      const bb = by - 16 + bh;
+      g.beginPath(); g.moveTo(p.x-5, bb); g.lineTo(p.x, bb+7); g.lineTo(p.x+5, bb);
       g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)'; g.fill();
       g.fillStyle = isT ? '#bdf0e6' : 'rgba(226,232,240,.8)';
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(label, p.x, by-2);
+      if (m.w){
+        const n = m.w.chars.length, x0 = p.x - (n-1)*SP/2;
+        const reveal = CFG.sign === 'kana' || (DIFF[difficulty] && DIFF[difficulty].reveal);
+        g.font = '600 13px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        for (let k = 0; k < n; k++){
+          const written = k < m.ci, cur = k === m.ci;
+          g.fillStyle = written ? '#ffe9a8' : cur ? (isT ? '#bdf0e6' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
+          g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
+        }
+      }
       // a lit character: its own wisp will answer this one
-      if (casting() && charge(LETTERS[m.i][0]) >= 1){
+      if (casting() && charge(key(m)) >= 1){
         g.save();
         g.shadowColor = 'rgba(127,209,196,.9)'; g.shadowBlur = 10;
         g.fillStyle = 'rgba(160,230,215,.95)';
@@ -644,10 +725,11 @@ LAYER = STYLE + r"""
         g.globalAlpha = 0.95;
         g.shadowColor = 'rgba(127,209,196,.95)'; g.shadowBlur = 22;
         g.fillStyle = 'rgba(190,240,228,.9)';
-        g.beginPath(); g.ellipse(x, y, 11, 13, 0, 0, 6.284); g.fill();
+        g.font = '700 15px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        const rx = Math.max(11, g.measureText(s.ch).width/2 + 7);   // a word needs a longer light
+        g.beginPath(); g.ellipse(x, y, rx, 13, 0, 0, 6.284); g.fill();
         g.shadowBlur = 0;
         g.fillStyle = 'rgba(20,40,40,.9)';
-        g.font = '700 15px ui-sans-serif,system-ui,"Klee One",sans-serif';
         g.textAlign = 'center'; g.textBaseline = 'middle';
         g.fillText(s.ch, x, y+1);
       } else {
@@ -689,9 +771,14 @@ LAYER = STYLE + r"""
     // ghost lights it holds. Sits on the seam between field and sketchbook,
     // which is where the wisps set out from.
     if (casting()) {
-      const ch = LETTERS[idx][0], c = charge(ch), cap = CFG.hitodamaCap;
+      // for a word: the word so far, blank where it is still to come
+      const t = target();
+      const ch = t && t.w ? t.w.chars.map((c, k) => k < t.ci ? c : '＿').join('') : LETTERS[idx][0];
+      const c = charge(t && t.w ? t.w.ja : LETTERS[idx][0]), cap = CFG.hitodamaCap;
       const d = dash();
-      const pipW = 14, w = 58 + cap*pipW;
+      g.font = '700 17px ui-sans-serif,system-ui,"Klee One",sans-serif';
+      const lw = Math.max(17, g.measureText(ch).width);
+      const pipW = 14, w = 41 + lw + cap*pipW;
       const x0 = d.x - w/2;
       g.fillStyle = 'rgba(16,22,24,.78)';
       g.strokeStyle = c >= 1 ? 'rgba(127,209,196,.45)' : 'rgba(233,196,106,.16)';
@@ -706,10 +793,10 @@ LAYER = STYLE + r"""
       g.fillText(ch, x0 + 11, d.y + 1);
       g.font = '10px ui-sans-serif,system-ui';
       g.fillStyle = 'rgba(160,190,185,.7)';
-      g.fillText('人魂', x0 + 32, d.y + 1);
+      g.fillText('人魂', x0 + 15 + lw, d.y + 1);
       const flick = 0.75 + 0.25*Math.sin(performance.now()/160);
       for (let k=0;k<cap;k++){
-        const px = x0 + 58 + k*pipW + 4, lit = k < c;
+        const px = x0 + 41 + lw + k*pipW + 4, lit = k < c;
         g.save();
         if (lit){ g.shadowColor = 'rgba(127,209,196,.95)'; g.shadowBlur = 9*flick; }
         g.fillStyle = lit ? 'rgba(170,236,220,.95)' : 'rgba(127,209,196,.14)';
@@ -764,7 +851,7 @@ LAYER = STYLE + r"""
       + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
     start.innerHTML = markup = `<div class="start-card">
       <div class="start-title">hito<span>人</span></div>
-      <div class="start-sub">hiragana · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
+      <div class="start-sub">${esc(REALM)} · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
       <div class="start-h">how much help</div>
       <div class="start-row">${row('diff', DIFF, difficulty)}</div>
       <div class="start-h">what the sign says</div>
@@ -772,7 +859,7 @@ LAYER = STYLE + r"""
       ${realms()}
       <button class="start-go">${over ? 'begin again' : 'begin'}</button>
       <div class="start-links"><button class="start-credits">who this leans on</button></div>
-      <div class="start-foot">draw below · the farang come from above · the one you are answering is yours</div>
+      <div class="start-foot">${WORDS ? 'draw below · the farang come from above · write what they are saying, one kana at a time' : 'draw below · the farang come from above · the one you are answering is yours'}</div>
     </div>`;
     const cr = start.querySelector('.start-credits');
     if (cr) cr.onclick = () => { view = 'credits'; renderStart(); };
@@ -828,6 +915,7 @@ LAYER = STYLE + r"""
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
+    get words(){ return WORDS; }, at: AT, keyOf: key,
     charge, kindle, quench, autocast, tidy, casting,
     touch(){ penAt = performance.now(); },
     bearer,
@@ -873,10 +961,25 @@ LAYER = STYLE + r"""
 """
 
 
-def config(pack):
+def config(pack, deck=None):
+    """The field's tuning, as a JS object literal written into the page.
+
+    With a deck the roster is its words, flattened and deduplicated (a word
+    printed on two pages is one monster), and the sign axis speaks for words.
+    """
     import json
-    """The field's tuning, as a JS object literal written into the page."""
     f = pack.get("field") or {}
+    js = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    deck_js = "null"
+    if deck is not None:
+        words, seen = [], set()
+        for sec in deck["sections"]:
+            for w in sec["words"]:
+                if w["ja"] in seen:
+                    continue
+                seen.add(w["ja"])
+                words.append({k: w[k] for k in ("ja", "romaji", "en")})
+        deck_js = js({"deck": deck.get("deck", "words"), "words": words})
     sign = f.get("sign", "kana")
     if sign not in ("kana", "romaji", "gaijin"):
         raise SystemExit(f"field.sign must be kana, romaji or gaijin, not {sign!r}")
@@ -885,6 +988,8 @@ def config(pack):
         raise SystemExit(f"field.reading must be romaji, gaijin, both or off, not {reading!r}")
     return (
         "<script>window.__FIELD_CFG={"
+        f"deck:{deck_js},"
+        f"knockback:{float(f.get('knockback', 0.07))},"
         f"sign:{json.dumps(sign)},"
         f"mode:{json.dumps(pack.get('mode', 'easy'))},"
         f"credit:{json.dumps(pack.get('credit', ''), ensure_ascii=False)},"

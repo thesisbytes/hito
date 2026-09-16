@@ -42,6 +42,11 @@ if (FLAT) console.log('  (pre-fix build: flat endpoint radius, measured for comp
 // how much that fraction may move between the largest and smallest glyph — the
 // whole point is that it should barely move at all.
 const MUST_DRAW = 0.80, DRIFT = 0.10;
+// A dakuten tick is a six-point path with one point of slack, so it finishes
+// at exactly 4/5 of its arc — which the resampling puts at 0.79997, a hair
+// on the wrong side of the floor for 21 strokes when the voiced rows arrived.
+// A tenth of a percent is far below anything this test is about.
+const EPS = 1e-3;
 
 function geom(ch, curF){
   const curS = curF/BASE_F, cy0 = .5+BASE_F*.06, cyN = .5+curF*.06;
@@ -96,7 +101,7 @@ for (const ch of CHARS){
     const at = SIZES.map(f => drawnAtCompletion(ch, f, si));
     const lo = Math.min(...at);
     if (lo < worst.v) worst = {v:lo, ch, si, f:SIZES[at.indexOf(lo)]};
-    if (lo < MUST_DRAW){
+    if (lo < MUST_DRAW - EPS){
       if (fail < 8) console.log(`  FAIL: ${ch} stroke ${si+1} counts as finished at `
         + `${(lo*100).toFixed(0)}% drawn (floor is ${MUST_DRAW*100}%)`);
       fail++;

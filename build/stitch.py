@@ -91,6 +91,39 @@ def build_letters(glyphs):
     return letters, len(rows) + 1
 
 
+def load_deck(pack, glyphs, book, required):
+    """The pack's deck, checked against the glyph list and the stroke book."""
+    if not pack.get("deck"):
+        if required:
+            raise SystemExit("a vocab pack needs a 'deck' file")
+        return None
+    deck_path = Path(pack["deck"])
+    if not deck_path.exists():
+        raise SystemExit(f"deck file {pack['deck']!r} not found")
+    deck = json.loads(deck_path.read_text(encoding="utf-8"))
+    have = {g["char"] for g in glyphs}
+    recorded = {ch for f in book["fonts"].values() for ch in f["letters"]}
+    missing, unrecorded, seen = [], [], set()
+    for sec in deck["sections"]:
+        for w in sec["words"]:
+            for k in ("ja", "romaji", "en"):
+                if not w.get(k):
+                    raise SystemExit(f"deck word {w!r} in {sec['id']} lacks {k!r}")
+            for ch in w["ja"]:
+                if ch in seen:
+                    continue
+                seen.add(ch)
+                if ch not in have:
+                    missing.append(ch)
+                elif ch not in recorded:
+                    unrecorded.append(ch)
+    if missing:
+        raise SystemExit(f"deck uses characters the pack has no glyph for: {''.join(missing)}")
+    if unrecorded:
+        raise SystemExit(f"deck uses characters with no stroke data: {''.join(unrecorded)}")
+    return deck
+
+
 def main():
     if len(sys.argv) != 4:
         sys.exit(__doc__)
@@ -779,42 +812,18 @@ def main():
     shell = pack.get("shell", "workshop")
     if shell not in ("workshop", "field", "vocab"):
         raise SystemExit(f"pack shell must be 'workshop', 'field' or 'vocab', not {shell!r}")
+    # A deck is a separate file — class content rather than realm data —
+    # named by the pack and checked here: every kana of every word has to have
+    # stroke data, or the shell would ask for a character the sketchbook
+    # cannot load. That is a build failure, not a toast at runtime. The vocab
+    # shell needs one; the field takes one, and then its farang carry words.
+    deck = load_deck(pack, glyphs, book, required=(shell == "vocab"))
     if shell == "field":
         s.sub("field shell", r"</body>",
-              shell_field.config(pack) + shell_field.LAYER + "</body>")
+              shell_field.config(pack, deck) + shell_field.LAYER + "</body>")
 
-    # ---- the vocab shell
-    #
-    # A flashcard over the tracer. The deck is a separate file — class content
-    # rather than realm data — named by the pack and checked here: every kana
-    # of every word has to have stroke data, or the card would ask for a
-    # character the sketchbook cannot load. That is a build failure, not a
-    # toast at runtime.
+    # ---- the vocab shell: a flashcard over the tracer
     if shell == "vocab":
-        deck_path = Path(pack.get("deck", ""))
-        if not pack.get("deck") or not deck_path.exists():
-            raise SystemExit(f"a vocab pack needs a 'deck' file; {pack.get('deck')!r} not found")
-        deck = json.loads(deck_path.read_text(encoding="utf-8"))
-        have = {g["char"] for g in glyphs}
-        recorded = {ch for f in book["fonts"].values() for ch in f["letters"]}
-        missing, unrecorded, seen = [], [], set()
-        for sec in deck["sections"]:
-            for w in sec["words"]:
-                for k in ("ja", "romaji", "en"):
-                    if not w.get(k):
-                        raise SystemExit(f"deck word {w!r} in {sec['id']} lacks {k!r}")
-                for ch in w["ja"]:
-                    if ch in seen:
-                        continue
-                    seen.add(ch)
-                    if ch not in have:
-                        missing.append(ch)
-                    elif ch not in recorded:
-                        unrecorded.append(ch)
-        if missing:
-            raise SystemExit(f"deck uses characters the pack has no glyph for: {''.join(missing)}")
-        if unrecorded:
-            raise SystemExit(f"deck uses characters with no stroke data: {''.join(unrecorded)}")
         s.sub("vocab shell", r"</body>",
               shell_vocab.config(pack, deck) + shell_vocab.LAYER + "</body>")
 
