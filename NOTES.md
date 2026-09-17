@@ -518,3 +518,22 @@ Running log. Append at the bottom, don't rewrite history.
   on the wrong side of 0.80. The test now has an epsilon; nothing in the
   scorer changed. The scoring and size sweeps had "46" typed in and now
   count the book.
+
+## 2026-09-17 — p.59 from the page itself (vocab v0.1.14)
+
+- "This is on the quiz today", with a photo of p.59. The page and the deck
+  disagreed, and the page wins: L2-2 had been written from memory and a
+  guessed page break, and both were off.
+- The page opens at ペン, so しんぶん, Tシャツ, とけい and ノート move back to
+  L2-1. The break was guessed from L1's density; it is now where the book
+  puts it.
+- Places was wrong outright. The deck had カフェ, ほんや, レストラン — none of
+  which are on the page (they are later lessons) — and was missing ぎんこう,
+  コンビニ, としょかん, ゆうびんきょく. Majors was missing えいご, and the
+  three p.39 re-lists (コンピューター, ビジネス, れきし) the dedupe in
+  `selected()` already knows how to ask once.
+- L2-2 is now the photographed page line for line, 27 entries. **p.58 has
+  still not been checked against the book** — the 3rd edition lists スマホ
+  under Things, and the deck does not have it. A photo settles it.
+- Lesson for the deck: a section is only trusted once it has been read off
+  the page. The `source` field now says which ones have been.

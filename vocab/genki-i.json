@@ -1,6 +1,6 @@
 {
   "deck": "Genki I",
-  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59). Section splits follow the class's vocabulary quizzes, one per page. The L2 page break is placed after じてんしゃ from the page density of L1 (about 27 entries a page), not from the printed page — move a word across if the book disagrees. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here.",
+  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59). Section splits follow the class's vocabulary quizzes, one per page. L2-2 is p.59 as photographed: the page opens at ペン, so everything before it is p.58, which has not been checked against the book. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here.",
   "sections": [
     {
       "id": "l1-1",
@@ -181,28 +181,33 @@
         {"ja": "さいふ", "romaji": "saifu", "en": "wallet"},
         {"ja": "ジーンズ", "romaji": "jiinzu", "en": "jeans"},
         {"ja": "じしょ", "romaji": "jisho", "en": "dictionary"},
-        {"ja": "じてんしゃ", "romaji": "jitensha", "en": "bicycle"}
+        {"ja": "じてんしゃ", "romaji": "jitensha", "en": "bicycle"},
+        {"ja": "しんぶん", "romaji": "shinbun", "en": "newspaper"},
+        {"ja": "ティーシャツ", "romaji": "tiishatsu", "en": "T-shirt", "note": "the book writes Tシャツ"},
+        {"ja": "とけい", "romaji": "tokee", "en": "watch; clock"},
+        {"ja": "ノート", "romaji": "nooto", "en": "notebook"}
       ]
     },
     {
       "id": "l2-2",
       "title": "L2-2 · p.59",
       "words": [
-        {"ja": "しんぶん", "romaji": "shinbun", "en": "newspaper"},
-        {"ja": "ティーシャツ", "romaji": "tiishatsu", "en": "T-shirt", "note": "the book writes Tシャツ"},
-        {"ja": "とけい", "romaji": "tokee", "en": "watch; clock"},
-        {"ja": "ノート", "romaji": "nooto", "en": "notebook"},
         {"ja": "ペン", "romaji": "pen", "en": "pen"},
         {"ja": "ぼうし", "romaji": "booshi", "en": "hat; cap"},
         {"ja": "ほん", "romaji": "hon", "en": "book"},
-        {"ja": "カフェ", "romaji": "kafe", "en": "cafe"},
+        {"ja": "ぎんこう", "romaji": "ginkoo", "en": "bank"},
+        {"ja": "コンビニ", "romaji": "konbini", "en": "convenience store"},
         {"ja": "トイレ", "romaji": "toire", "en": "toilet; restroom"},
-        {"ja": "ほんや", "romaji": "hon'ya", "en": "bookstore"},
-        {"ja": "レストラン", "romaji": "resutoran", "en": "restaurant"},
+        {"ja": "としょかん", "romaji": "toshokan", "en": "library"},
+        {"ja": "ゆうびんきょく", "romaji": "yuubinkyoku", "en": "post office"},
         {"ja": "イギリス", "romaji": "Igirisu", "en": "Britain", "note": "also on p.39"},
         {"ja": "かんこく", "romaji": "Kankoku", "en": "Korea", "note": "also on p.39"},
         {"ja": "ちゅうごく", "romaji": "Chuugoku", "en": "China", "note": "also on p.39"},
+        {"ja": "えいご", "romaji": "eego", "en": "English (language)"},
         {"ja": "けいざい", "romaji": "keezai", "en": "economics", "note": "also on p.39"},
+        {"ja": "コンピューター", "romaji": "konpyuutaa", "en": "computer", "note": "also on p.39"},
+        {"ja": "ビジネス", "romaji": "bijinesu", "en": "business", "note": "also on p.39"},
+        {"ja": "れきし", "romaji": "rekishi", "en": "history", "note": "also on p.39"},
         {"ja": "おかあさん", "romaji": "okaasan", "en": "mother", "note": "also on p.40"},
         {"ja": "おとうさん", "romaji": "otoosan", "en": "father", "note": "also on p.40"},
         {"ja": "いくら", "romaji": "ikura", "en": "how much"},
