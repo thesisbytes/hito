@@ -537,3 +537,17 @@ Running log. Append at the bottom, don't rewrite history.
   under Things, and the deck does not have it. A photo settles it.
 - Lesson for the deck: a section is only trusted once it has been read off
   the page. The `source` field now says which ones have been.
+
+## 2026-09-17 — ろっぴゃく would not come (vocab v0.1.15)
+
+- After the quiz: "couldn't for the life of me recall a number that has
+  piyaku". That is 600 and 800 (ろっぴゃく, はっぴゃく), with 300 the other
+  odd one (さんびゃく), and the thousands repeat the trick at さんぜん and
+  はっせん.
+- New section `l2-numbers`: 100–900, 1,000–9,000 and いちまん, the prompt
+  being the numeral. The regular ones are in on purpose — a card that only
+  ever shows irregulars teaches "this one is odd" before the pen is down,
+  and spotting which ones are odd is the test. Notes name the sound change.
+- Not read off a page, unlike the rest of the deck; the `source` field says
+  so. These are facts of the language rather than of the book, so the
+  2026-09-17 rule above bends rather than breaks.

@@ -1,6 +1,6 @@
 {
   "deck": "Genki I",
-  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59). Section splits follow the class's vocabulary quizzes, one per page. L2-2 is p.59 as photographed: the page opens at ペン, so everything before it is p.58, which has not been checked against the book. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here.",
+  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59). Section splits follow the class's vocabulary quizzes, one per page. L2-2 is p.59 as photographed: the page opens at ペン, so everything before it is p.58, which has not been checked against the book. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here. The hundreds-and-thousands section is not a page of the book: it is the Lesson 2 numbers, written out because ろっぴゃく would not come on quiz day.",
   "sections": [
     {
       "id": "l1-1",
@@ -219,6 +219,31 @@
         {"ja": "じゃあ", "romaji": "jaa", "en": "then …; if that is the case, …"},
         {"ja": "どうぞ", "romaji": "doozo", "en": "Please.; Here it is."},
         {"ja": "どうも", "romaji": "doomo", "en": "Thank you."}
+      ]
+    },
+    {
+      "id": "l2-numbers",
+      "title": "L2 · hundreds and thousands",
+      "words": [
+        {"ja": "ひゃく", "romaji": "hyaku", "en": "100"},
+        {"ja": "にひゃく", "romaji": "nihyaku", "en": "200"},
+        {"ja": "さんびゃく", "romaji": "sanbyaku", "en": "300", "note": "ひ → び"},
+        {"ja": "よんひゃく", "romaji": "yonhyaku", "en": "400"},
+        {"ja": "ごひゃく", "romaji": "gohyaku", "en": "500"},
+        {"ja": "ろっぴゃく", "romaji": "roppyaku", "en": "600", "note": "ろく → ろっ, ひ → ぴ"},
+        {"ja": "ななひゃく", "romaji": "nanahyaku", "en": "700"},
+        {"ja": "はっぴゃく", "romaji": "happyaku", "en": "800", "note": "はち → はっ, ひ → ぴ"},
+        {"ja": "きゅうひゃく", "romaji": "kyuuhyaku", "en": "900"},
+        {"ja": "せん", "romaji": "sen", "en": "1,000"},
+        {"ja": "にせん", "romaji": "nisen", "en": "2,000"},
+        {"ja": "さんぜん", "romaji": "sanzen", "en": "3,000", "note": "せ → ぜ"},
+        {"ja": "よんせん", "romaji": "yonsen", "en": "4,000"},
+        {"ja": "ごせん", "romaji": "gosen", "en": "5,000"},
+        {"ja": "ろくせん", "romaji": "rokusen", "en": "6,000", "note": "no change — only the hundreds double"},
+        {"ja": "ななせん", "romaji": "nanasen", "en": "7,000"},
+        {"ja": "はっせん", "romaji": "hassen", "en": "8,000", "note": "はち → はっ"},
+        {"ja": "きゅうせん", "romaji": "kyuusen", "en": "9,000"},
+        {"ja": "いちまん", "romaji": "ichiman", "en": "10,000", "note": "いち is said, unlike ひゃく and せん"}
       ]
     }
   ]

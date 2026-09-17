@@ -234,7 +234,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.14.html`
+### Vocab — `dist/vocab-v0.1.15.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
