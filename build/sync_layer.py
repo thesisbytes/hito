@@ -28,7 +28,16 @@ LAYER = r"""
    unplugged — it just queues.                                           */
 (function(){
   const CFG = window.__SYNC_CFG || {endpoint:'', batch:40, cap:500};
-  const DEV = 'hito-device', BOX = 'hito-outbox';
+  const DEV = 'hito-device', BOX = 'hito-outbox', SHARE = 'hito-share';
+  // Handwriting made events heavy: a trace is 1-3KB where a banish is 120
+  // bytes, so counting events stopped being a way of counting bytes. Two
+  // budgets, both in characters of JSON. `bytes` is the whole queue, kept
+  // well under the 5MB the origin shares with mastery. `post` is one request,
+  // kept under the 64KB a keepalive fetch is allowed — past that the browser
+  // rejects it before it leaves, which looks exactly like being offline and
+  // would back off forever with a full queue.
+  const BYTES = CFG.bytes || 600000, POST = CFG.post || 48000;
+  const size = e => JSON.stringify(e).length + 1;
 
   function readJSON(k, dflt){
     try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : dflt; }
@@ -55,6 +64,18 @@ LAYER = r"""
   let outbox = readJSON(BOX, []);
   let flushing = false, lastTry = 0, backoff = 0;
 
+  // The player's switch. Off means off: nothing is queued, nothing is sent,
+  // and what was waiting is thrown away rather than kept for a change of
+  // heart. On by default, and said so on the start page.
+  let share = true;
+  try { share = localStorage.getItem(SHARE) !== '0'; } catch(_){}
+  function setShare(v){
+    share = !!v;
+    try { localStorage.setItem(SHARE, share ? '1' : '0'); } catch(_){}
+    if (!share){ outbox = []; writeJSON(BOX, outbox); }
+    return share;
+  }
+
   function eventId(){
     return Date.now().toString(36) + '-'
       + Array.from({length:8}, () => Math.floor(Math.random()*16).toString(16)).join('');
@@ -64,20 +85,35 @@ LAYER = r"""
   // own storage and take the game's mastery down with it. Oldest go first,
   // because the newest observations are the ones still worth having.
   function record(kind, body){
+    if (!share) return outbox.length;
     outbox.push({id:eventId(), kind, at:new Date().toISOString(), body});
     if (outbox.length > CFG.cap) outbox = outbox.slice(-CFG.cap);
-    writeJSON(BOX, outbox);
+    let total = 0; for (const e of outbox) total += size(e);
+    while (total > BYTES && outbox.length > 1) total -= size(outbox.shift());
+    // A write that fails is storage saying it is full. The queue gives way
+    // before mastery does: halve it and try once more.
+    if (!writeJSON(BOX, outbox) && outbox.length > 1){
+      outbox = outbox.slice(-Math.ceil(outbox.length/2)); writeJSON(BOX, outbox);
+    }
     flush();
     return outbox.length;
   }
 
   function flush(){
-    if (flushing || !CFG.endpoint || !outbox.length) return Promise.resolve(false);
+    if (flushing || !share || !CFG.endpoint || !outbox.length) return Promise.resolve(false);
     if (typeof navigator !== 'undefined' && navigator.onLine === false) return Promise.resolve(false);
     const now = Date.now();
     if (now < lastTry + backoff) return Promise.resolve(false);
     flushing = true; lastTry = now;
-    const batch = outbox.slice(0, CFG.batch);
+    // Oldest first, until the count or the request is full. Always at least
+    // one, or an event bigger than a request would sit at the head for good.
+    const batch = []; let bytes = 0;
+    for (const e of outbox){
+      if (batch.length >= CFG.batch) break;
+      const n = size(e);
+      if (batch.length && bytes + n > POST) break;
+      batch.push(e); bytes += n;
+    }
     const ids = batch.map(e => e.id);
     return fetch(CFG.endpoint, {
       method:'POST',
@@ -94,6 +130,12 @@ LAYER = r"""
       outbox = outbox.filter(e => !done.has(e.id));
       writeJSON(BOX, outbox);
       backoff = 0;
+      // A request only carries so much. If there is more, keep going rather
+      // than waiting for the next thing to happen — but only when the server
+      // took everything it was handed. If it declined any, asking again at
+      // once is a hot loop against a server that is already saying no.
+      const sent = new Set(ids);
+      if (outbox.length && !outbox.some(e => sent.has(e.id))) setTimeout(flush, 0);
       return true;
     })
     .catch(() => {
@@ -113,6 +155,7 @@ LAYER = r"""
     record, flush,
     get pending(){ return outbox.length; },
     get enabled(){ return !!CFG.endpoint; },
+    get share(){ return share; }, set share(v){ setShare(v); }, setShare,
     clear(){ outbox = []; writeJSON(BOX, outbox); },
   };
   flush();
@@ -135,6 +178,8 @@ def config(pack):
         "<script>window.__SYNC_CFG={"
         f'endpoint:"{endpoint}",'
         f"batch:{int(s.get('batch', 40))},"
-        f"cap:{int(s.get('cap', 500))}"
+        f"cap:{int(s.get('cap', 500))},"
+        f"bytes:{int(s.get('bytes', 600000))},"
+        f"post:{int(s.get('post', 48000))}"
         "};</script>"
     )

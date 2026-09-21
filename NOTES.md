@@ -578,3 +578,51 @@ Running log. Append at the bottom, don't rewrite history.
 - Static hosting only. The sync endpoint is still undeployed and
   `server/README.md` still describes Vercel + Atlas; whether Appwrite's
   functions and tables replace that is a design question, not decided here.
+
+## 2026-09-20 — The hand: finger input, handwriting, stats, and a real endpoint (hiragana v0.1.38, vocab v0.1.16, katakana-game v0.1.1)
+
+- The maintainer: "since appwrite handles databases and auth, lets go ahead
+  and make our game log handwriting and cool stats to improve the user play.
+  also, add in touch stroking instead of just stylus. maybe a toggle". That
+  settles the question the entry above left open: the endpoint is an Appwrite
+  function over an Appwrite table. The Vercel + Atlas draft in `server/` was
+  never deployed and is gone; `server/README.md` is rewritten.
+- **Touch was already in the engine.** `penOnly` has been a workshop button
+  since the Thai tracer. What was missing was everything around it: the games
+  hide the workshop, it defaulted to on, and nothing remembered it — so on a
+  phone the public link opened a sketchbook that ignored the only input the
+  device has. The work was a switch, a memory, a first guess and a nudge, not
+  a second input path. Scoring is untouched.
+- **The server draft had a bug that deploying it would have found the hard
+  way.** It validated per batch and knew four kinds; the client was already
+  sending `kindle`, `cast` and `word`. One of those answered 400 for the whole
+  batch, and a 400 acknowledges every id (so poison cannot block the queue),
+  so every batch with a kindle in it — most of them — would have been thrown
+  away and reported as delivered. Refusal is now per event, and
+  `server.test.mjs` scans `build/` for every kind the client records.
+- **A keepalive fetch is capped at 64KB.** Forty traces is ~100KB. The browser
+  rejects that before it leaves, which is indistinguishable from offline, so
+  the outbox would have backed off forever with a full queue. It now batches
+  by bytes as well as count, and keeps draining while the server takes
+  everything it is handed.
+- The old "partial acceptance" sync check had been passing for the wrong
+  reason: `record()` flushes at once, so its two events never shared a request
+  and the second simply sat there. It now queues offline first.
+- **Tidy eats the evidence.** The field removes off-path ink from `strokes` at
+  pen-up. Found by driving a real browser: a deliberately wandering finger
+  produced an empty log. The hand keeps its own copy, taken between the
+  engine's `endStroke` and the field's `tidy()` — listener order, which holds
+  because the hand is appended before the shells.
+- **Auth is deliberately not switched on.** A random device id asks nothing of
+  the player. The first thing that needs an account is merging two devices;
+  until then it is a login screen in front of a game that opens from a
+  double-click. Sharing is on by default, said plainly on the ✋ page, and one
+  tap turns it off. **That default is the maintainer's to overrule** — the
+  testers include children, and the data is handwriting.
+- Checked end to end: the built outbox flushed 31 real events to the live
+  function in 2 requests and 31 rows came back out of the table; then a finger
+  traced て in headless Chrome and the engine's own scorer landed it, logged
+  as `input: touch` with the 3 zaps the wander earned. Test rows deleted.
+- Not done: nothing reads the traces yet. They are there for hard mode's
+  thresholds and for finding the strokes everyone gets wrong; both are a
+  notebook and an afternoon, not an engine change.

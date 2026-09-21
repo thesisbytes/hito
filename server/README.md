@@ -1,14 +1,14 @@
 # hito sync
 
-A write-only endpoint for play observations. Not deployed — this is the code
-and the steps; the credentials are yours and do not belong in this repo.
+A write-only endpoint for play observations, on Appwrite: one function
+(`server/sync/`) in front of one table (`hito.events`). Deployed at
+`https://hito-sync.sfo.appwrite.run`. The schema and the function's settings
+are in `appwrite.config.json` at the repo root, so a fresh clone can see what
+exists and `appwrite push` can recreate it.
 
-## Why there is a server at all
-
-MongoDB's Atlas Data API and HTTPS Endpoints reached end-of-life on
-**30 September 2025**, along with App Services auth, Device Sync and GraphQL.
-A static page can no longer reach Atlas directly, so a small function has to
-hold the connection string. That is the whole reason this directory exists.
+This directory used to hold a Vercel function over MongoDB Atlas. It was never
+deployed; git history has it. Appwrite replaced it because the project already
+hosts there and it removed the one secret the old design needed — see below.
 
 ## The rule everything follows
 
@@ -18,72 +18,78 @@ A client sends **observations**, never **totals**.
 `{"score":9000}` is a claim, and a claim from a client is worth nothing —
 anyone with devtools can send it. Totals get derived here, from events.
 
-That is not caution for its own sake. It is what makes the two unbuilt
-features possible later:
-
 | feature | why it needs this |
 |---|---|
 | leaderboards | a board built on client-reported scores ranks whoever edited hardest |
 | the idle economy | "I earned 400 while away" is unverifiable; elapsed time computed server-side is not |
 
-## Merge rules, decided now
+## What is stored
 
-Writing these down before the code exists, because each field wants different
-treatment and getting it wrong is discovered late:
+One row per event in `hito.events`:
+
+| column | |
+|---|---|
+| `$id` | sha256 of `device:eventId`, so a retried batch overwrites itself |
+| `device` | the random per-browser id the outbox makes up. Not an account, not a name. |
+| `kind` | `trace`, `banish`, `breach`, `kindle`, `cast`, `word`, `flag`, `attempt` |
+| `at` | when the client says it happened |
+| `glyph` | the character (or word) the row is about, so "every つ anyone drew" is an index lookup |
+| `body` | the event, as JSON text |
+
+The table has no permissions at all: nothing reads or writes it except the
+function, through the key Appwrite mints for each execution (scopes
+`rows.read`, `rows.write`). **There is no secret in this repo or in the
+function's variables**, which is the improvement over a Mongo connection
+string behind `0.0.0.0/0`.
+
+A `trace` is the handwriting: see `scripts/PACK.md`, "The hand".
+
+## Merge rules, decided now
 
 | data | rule | why |
 |---|---|---|
-| telemetry (`flag`, `banish`, `breach`) | append-only, dedupe by `_id` | events are facts; two devices never disagree about one |
+| telemetry and traces | append-only, dedupe by `$id` | events are facts; two devices never disagree about one |
 | mastery | `max()` per glyph | a counter that only rises is conflict-free, so a device offline for a week merges without asking anyone |
 | economy | server-authoritative | the client never asserts a balance; the server holds `lastTick` and computes forward |
 
-Mastery is the interesting one: because `max()` merges cleanly, the client can
-keep owning it and stay fully playable offline. That is not true of the
-economy, which is why the economy is last.
+## What the endpoint refuses
+
+Public URL, treated as one: request and per-event size caps, a fixed set of
+kinds, event-id and device-id shape checks, timestamps more than a week from
+now, and a per-device rate limit counted **in the table** rather than in
+memory — executions do not share memory, so an in-process counter would be
+theatre.
+
+**Refusal is per event.** A refused event is dropped and the rest of the batch
+is stored. Every id comes back in `accepted` either way, because the outbox
+drops what is accepted and a permanently invalid event must not block the
+queue behind it; the reasons come back in `refused`. Only genuinely retryable
+failures (`503`, `429`, network) leave events queued.
+
+`build/test/server.test.mjs` checks all of that offline, and also that every
+kind the client records is a kind the server keeps.
 
 ## Deploy
 
-1. **Atlas**: create a free **M0** cluster. It is free forever and will hold
-   far more than this project can generate — the $50 of credits are not what
-   makes this work, and picking a paid tier to spend them would be backwards.
-2. **Database user**: one user, `readWrite` on the `hito` database only.
-3. **Network access**: serverless functions have no stable egress IP on a free
-   plan, so this needs `0.0.0.0/0`. That makes the database password the only
-   thing standing between the internet and the data — generate a long random
-   one and never commit it.
-4. **Deploy** `server/` to Vercel (`vercel --prod` from this directory).
-5. **Env var**: set `MONGODB_URI` in the Vercel project. Optionally `SYNC_DB`.
-6. **Index**, once, in the Atlas shell — the rate limiter counts recent events
-   per device on every request and is a collection scan without it:
+```
+appwrite login
+appwrite push function --function-id sync --activate --force
+```
 
-   ```js
-   db.events.createIndex({ device: 1, received: -1 })
-   db.events.createIndex({ received: -1 })
-   ```
+No install step and no dependencies: the function is three REST calls.
+`appwrite push table` applies schema changes made in `appwrite.config.json`.
 
-7. Point a build at it: set `sync.endpoint` in `scripts/hiragana/game.json` to
-   the deployed URL (`https://…/api/sync`) and rebuild. It must be `https` —
-   `stitch.py` refuses anything else, because a mixed-content POST from the
-   GitHub Pages page fails silently, which is the worst way for this to break.
+## Reading the data
 
-## What the endpoint refuses
-
-Public URL, treated as one: batch and body size caps, a fixed set of event
-kinds, event-id and device-id shape checks, timestamps more than a week from
-now, and a per-device rate limit counted **in the database** rather than in
-process memory — serverless instances do not share memory, so an in-process
-counter would be theatre.
-
-Writes are idempotent: `_id` is `device:eventId`, so a retried batch is a
-no-op rather than a duplicate.
-
-Malformed events are answered `400` **with their ids in `accepted`**. That is
-deliberate. The outbox drops whatever the server accepts, so a permanently
-invalid event has to be acknowledged or it blocks the queue behind it forever.
-Only genuinely retryable failures (`503`, network) leave events queued.
+```
+appwrite tablesdb list-rows --database-id hito --table-id events \
+  --filter kind=trace --filter glyph=つ --limit 100 --json
+```
 
 ## Not built yet
 
 Accounts and device linking, the mastery merge, the economy tick, and
-leaderboards. The client half is done: `window.__sync.record(kind, body)`
-queues offline and flushes when it can.
+leaderboards. Appwrite has auth, and it is deliberately not switched on here:
+a device id asks nothing of the player, and the first thing that genuinely
+needs an account is merging two devices. Until then an account would be a
+login screen in front of a game that opens from a double-click.

@@ -28,3 +28,9 @@ Thumbs.db
 # Personal command-line study tool and its log, local only
 vocab/study.py
 vocab/attempts.jsonl
+
+# Dropped in by `appwrite init project`: an agent skill for the Appwrite CLI
+# and the symlink Claude Code reads it through. Useful locally, not ours to
+# publish.
+.agents/
+.claude/skills/

@@ -304,6 +304,10 @@ LAYER = STYLE + r"""
       LETTERS[m.i][0];
   const sign = m => label(m, CFG.sign);
 
+  // Mastery says a character was learned; the hand's ledger says whether it
+  // still bites. One that does keeps coming back however high its level —
+  // conjured six times with a fizzle each time is not a character to skip.
+  const shaky = c => { try { return !!(window.__hand && window.__hand.shaky(c)); } catch(_){ return false; } };
   function spawn(){
     // Bias toward glyphs whose flame has gone out: a monster is a character
     // you are forgetting, so the roster is the gojuon and the encounter rate
@@ -313,11 +317,11 @@ LAYER = STYLE + r"""
       // the same rule at word level: a word whose every kana is mastered is
       // usually passed over for one that still has a dark character in it
       do { w = WORDS[Math.floor(Math.random()*WORDS.length)]; tries++; }
-      while (tries < 8 && w.chars.every(c => (MASTERY[c]||0) > 2) && Math.random() < 0.7);
+      while (tries < 8 && w.chars.every(c => (MASTERY[c]||0) > 2 && !shaky(c)) && Math.random() < 0.7);
       i = AT[w.chars[0]];
     } else {
       do { i = Math.floor(Math.random()*LETTERS.length); tries++; }
-      while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && Math.random() < 0.7);
+      while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && !shaky(LETTERS[i][0]) && Math.random() < 0.7);
     }
     monsters.push({
       i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
@@ -831,7 +835,7 @@ LAYER = STYLE + r"""
       <p>That is the project. One person records the strokes, another draws the letterforms, testers find the bugs, someone builds it, and every learner leans on all of them.</p>
       ${lines}
       <p class="small">${esc(CFG.credit || '')}</p>
-      <p class="small">Single file, no network, opens from a double-click. Your progress lives on this device.</p>
+      <p class="small">Single file, opens from a double-click, and needs no network to play. Your progress lives on this device.${window.__sync && window.__sync.enabled ? ' When there is a network, notes on how the tracing went are sent to the workshop under a made-up device name; ✋ hand, up top, turns that off.' : ''}</p>
       <button class="start-go">back</button>
     </div>`;
     const go = start.querySelector('.start-go');
@@ -846,6 +850,11 @@ LAYER = STYLE + r"""
       `<div class="start-h">other realms</div><div class="start-row">` +
       CFG.realms.map(r => `<a href="${esc(r.file)}"><b>${r.kana ? `<i>${esc(r.kana)}</i>` : ''}${esc(r.label)}</b><small>${esc(r.blurb || '')}</small></a>`).join('') +
       `</div>`;
+    // What draws belongs to the hand layer; the page only shows its switch,
+    // because on a phone it is the difference between a game and a picture.
+    const hand = window.__hand;
+    const INPUTS = { pen: { kana:'✎', blurb:'fingers and palms are ignored, so the hand can rest on the glass.' },
+                     finger: { kana:'☝', blurb:'anything that touches draws. one finger at a time.' } };
     const row = (k, table, cur) => Object.entries(table).map(([n, d]) =>
       `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
       + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
@@ -856,16 +865,21 @@ LAYER = STYLE + r"""
       <div class="start-row">${row('diff', DIFF, difficulty)}</div>
       <div class="start-h">what the sign says</div>
       <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
+      ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
       ${realms()}
       <button class="start-go">${over ? 'begin again' : 'begin'}</button>
-      <div class="start-links"><button class="start-credits">who this leans on</button></div>
+      <div class="start-links">${hand ? '<button class="start-hand">how the hand is doing</button>' : ''}<button class="start-credits">who this leans on</button></div>
       <div class="start-foot">${WORDS ? 'draw below · the farang come from above · write what they are saying, one kana at a time' : 'draw below · the farang come from above · the one you are answering is yours'}</div>
     </div>`;
     const cr = start.querySelector('.start-credits');
     if (cr) cr.onclick = () => { view = 'credits'; renderStart(); };
+    const hb = start.querySelector('.start-hand');
+    if (hb) hb.onclick = () => hand.show();
     for (const b of start.querySelectorAll('button[data-k]')){
       b.onclick = () => {
-        if (b.dataset.k === 'diff') setDifficulty(b.dataset.v); else setSign(b.dataset.v);
+        if (b.dataset.k === 'diff') setDifficulty(b.dataset.v);
+        else if (b.dataset.k === 'input') hand.setInput(b.dataset.v);
+        else setSign(b.dataset.v);
         renderStart();
       };
     }

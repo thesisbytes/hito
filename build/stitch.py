@@ -27,6 +27,7 @@ import re
 import sys
 from pathlib import Path
 
+import hand_layer
 import shell_field
 import shell_vocab
 import sync_layer
@@ -796,6 +797,12 @@ def main():
     # behaviours that drift apart between releases.
     s.sub("sync layer", r"</body>",
           sync_layer.config(pack) + sync_layer.LAYER + "</body>")
+
+    # The hand goes in before the shells: they wrap conjure() after it, so a
+    # glyph is written down on the way into the engine, whoever asked for it,
+    # and the start page finds window.__hand already there.
+    s.sub("hand layer", r"</body>",
+          hand_layer.config(pack) + hand_layer.LAYER + "</body>")
 
     # ---- the game shell
     #

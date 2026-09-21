@@ -254,6 +254,63 @@ and a hand's precision does not shrink with it. At 12% per level with
 proportional tolerance, level 4 became unpassable — a finger covers the glyph
 it is meant to trace.
 
+### Sync
+
+```json
+"sync": { "endpoint": "https://hito-sync.sfo.appwrite.run", "batch": 40, "cap": 500,
+          "bytes": 600000, "post": 48000 }
+```
+
+| key | default | what it does |
+|---|---|---|
+| `endpoint` | `""` | where the outbox flushes. Empty means the build makes no network calls at all. Must be `https` — the stitch refuses anything else. |
+| `batch` | 40 | most events in one request |
+| `cap` | 500 | most events kept while offline; the oldest go first |
+| `bytes` | 600000 | most characters of JSON the whole queue may hold. Handwriting made events heavy, so counting them stopped being a way of weighing them. |
+| `post` | 48000 | most characters in one request. A `keepalive` fetch over 64KB is rejected by the browser before it leaves, which looks exactly like being offline. |
+
+The player can switch all of it off from **✋ hand** in the header
+(`hito-share` in localStorage). Off means nothing is queued and nothing is
+sent; the stats on that page are local and keep working. See
+`server/README.md` for what the endpoint does with what it is sent.
+
+### The hand
+
+```json
+"hand": { "maxPoints": 64, "keep": 24, "minStep": 4 }
+```
+
+`build/hand_layer.py`, appended to every build. It owns three things: the
+pen/finger switch, the handwriting, and the ledger.
+
+| key | default | what it does |
+|---|---|---|
+| `maxPoints` | 64 | most points kept per stroke in a stored trace. Ends are always kept. |
+| `keep` | 24 | how many recent traces stay on the device, for the thumbnails |
+| `minStep` | 4 | points closer than this (thousandths of the stroke book's box) to the last kept one are dropped, so a slow stroke is not all samples from its first centimetre |
+
+**Pen or finger.** `pen` is the engine's `penOnly`: fingers, palms and mice
+are ignored so a hand can rest on the glass. `finger` takes whatever touches,
+one pointer at a time. The choice is kept in `hito-input`. With no choice
+made, a screen with no touch points starts on `finger` (there is no palm to
+reject, and a pen still draws), a phone starts on `finger`, and everything
+else starts on `pen`. A finger on a pen-only sketchbook that has never seen a
+pen gets a nudge toward the switch.
+
+**A trace** is one attempt — landed or fizzled — as `{glyph, ok, ms, zaps,
+tries, strokes, size, input, level, diff, v, s}`. `s` is one flat
+`[x,y,t, x,y,t, …]` per stroke: `x,y` in thousandths of the **stroke book's
+own space** (size and position undone, so it lays straight over
+`strokes.json`), `t` in ms from the first pen-down. It is the hand's own copy
+taken at pen-up, before the field tidies strays out of the engine's ink.
+
+**The ledger** (`hito-ledger`) is keyed by character: conjures, clean ones,
+zaps, fizzles, time, and `tr` — trouble, smoothed, a zap counting one and a
+fizzle three. A character with `tr >= 1.5` over at least three attempts is
+*shaky*, and the field stops passing it over however high its mastery. Two
+clean traces clear it. Export and import are on the ✋ page; import merges,
+and the fuller record wins.
+
 ## Adding a realm
 
 1. `scripts/<name>/glyphs.json` — `cp`, `char`, plus whatever the engine's

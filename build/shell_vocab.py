@@ -562,7 +562,7 @@ LAYER = STYLE + r"""
       <p>That is the project. One person records the strokes, another draws the letterforms, testers find the bugs, someone builds it, and every learner leans on all of them.</p>
       ${lines}
       <p class="small">${esc(CFG.credit || '')}</p>
-      <p class="small">Single file, no network, opens from a double-click. Your progress lives on this device — export it below to keep it.</p>
+      <p class="small">Single file, opens from a double-click, and needs no network to play. Your progress lives on this device — export it below to keep it.${window.__sync && window.__sync.enabled ? ' When there is a network, notes on how the tracing went are sent to the workshop under a made-up device name; ✋ hand, up top, turns that off.' : ''}</p>
       <div class="start-links"><button id="vExport">export progress</button><button id="vImport">import</button></div>
       <textarea id="vIO" spellcheck="false" hidden placeholder="Paste exported progress here, then tap import again."></textarea>
       <button class="start-go">back</button>

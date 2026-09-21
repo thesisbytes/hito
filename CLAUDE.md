@@ -47,12 +47,17 @@ hito/
     shell_field.py          the game shell, appended as a layer
     sync_layer.py           offline outbox, appended as a layer
     test/sync.test.mjs      offline stays offline and nothing is lost
+    hand_layer.py           pen or finger, the handwriting, the stats ledger
+    test/hand.test.mjs      the switch reaches the engine; a note never costs a glyph
+    test/server.test.mjs    what the endpoint refuses, checked without deploying
     shell_vocab.py          the flashcard shell, appended as a layer
     kana_glyphs.py          writes the 164-kana glyph list the vocab realm traces
     test/vocab.test.mjs     a word is walked through the seam
     test/words.test.mjs     the farang carry words (the katakana game)
   vocab/                 decks: class content, not realm data (genki-i.json, katakana.json)
   dist/                built single-file outputs, one per script, versioned
+  server/sync/         the Appwrite function behind sync.endpoint (see server/README.md)
+  appwrite.config.json the Appwrite project: table schema and function settings, no secrets
 ```
 
 Run `build/test/run.sh` before shipping. It checks the scoring against
@@ -68,6 +73,12 @@ opportunistically, a build with no `sync.endpoint` makes no network calls at
 all, and a failed or impossible request is the normal case rather than an
 error. Nothing in the game ever waits on a response. If a network call ever
 becomes load-bearing, the constraint above is gone — so it must not.
+
+As of 2026-09-20 the builds ship with an endpoint (an Appwrite function, see
+`server/README.md`), so they do talk to the network when there is one. The
+paragraph above is what keeps that honest, and the player can switch it off
+from **✋ hand** in the header. The stats on that page are computed on the
+device from a ledger kept on the device; they never read from the server.
 
 The one thing that will need a real exception is the idle economy, which
 cannot be client-authoritative without being editable by anyone with devtools.
@@ -131,7 +142,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.37.html`
+### Hiragana — `dist/hiragana-v0.1.38.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -213,7 +224,37 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
-### Katakana — `dist/katakana-game-v0.1.0.html`
+### The hand — every build, as of hiragana v0.1.38
+
+`build/hand_layer.py`, appended like the field and for the same reason: it
+reaches the engine through `conjure`, `fizzle` and `zap`, calls every one of
+them through, and scores nothing. Three things that are all about the hand
+rather than the glyph:
+
+- **Pen or finger.** `penOnly` had been a workshop button since the Thai
+  tracer — on by default, remembered by nothing, and hidden in the games, so a
+  phone met a sketchbook that ignored it. It is now a remembered switch on the
+  start page and the ✋ page, with a first guess that only has to avoid a dead
+  sketchbook. Scoring is identical for both; a finger hides more of the target
+  than a pen does, and no model here can see that either.
+- **The handwriting.** Every attempt, landed or fizzled, kept in the stroke
+  book's own space so it lays straight over `strokes.json` at any size. It is
+  the hand's copy taken at pen-up: the field tidies strays out of the engine's
+  ink a moment later, and a log with the mistakes swept out is a log of the
+  stroke book. This is the data hard mode's `compare()` thresholds have been
+  waiting for — what genuine freehand looks like.
+- **The ledger.** Per character, on the device, with export and import. A
+  character that still bites (`shaky`) is not passed over by the field however
+  high its mastery, which is the first time the game has steered by how the
+  tracing went rather than by whether it was done.
+
+Checked in a real browser as well as the stub, because the stub cannot see
+whether a second script can reassign the engine's `penOnly` (it can). Headless
+Chrome driven with synthetic pointer events needs two allowances that are
+about the fakery and not the game: `setPointerCapture` refuses a synthetic
+pointer, and `getCoalescedEvents()` is empty for one.
+
+### Katakana — `dist/katakana-game-v0.1.1.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -234,7 +275,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.15.html`
+### Vocab — `dist/vocab-v0.1.16.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -588,7 +629,8 @@ per-character ledger. Save data must have export/import from day one.
 - **Builds are made here and committed here.** A build that exists only as a
   download is not a build yet — `dist/` is the only place one counts. This
   has already cost the project a tracer and two recording sessions.
-- **Testing:** GitHub Pages serves `dist/` over HTTPS at
+- **Testing:** the repo is served over HTTPS at https://hito.appwrite.network/
+  (Appwrite Sites, redeployed on every push to `main`) and by GitHub Pages at
   https://thesisbytes.github.io/hito/ — open a build there to test on a
   phone or tablet. Secure context matters: `navigator.clipboard` and the
   File System Access API both need it.

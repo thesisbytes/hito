@@ -45,6 +45,15 @@ echo "── sync (offline stays offline, nothing is lost) ───"
 node build/test/sync.test.mjs "dist/hiragana-v$ver.html" | sed 's/^/  /' || fail=1
 
 echo
+echo "── server (observations only, refused per event) ───"
+node build/test/server.test.mjs | sed 's/^/  /' || fail=1
+
+echo
+echo "── hand (pen or finger, and what it drew) ──────────"
+node build/test/hand.test.mjs "dist/hiragana-v$ver.html" "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
+node build/test/hand.test.mjs "dist/vocab-v$vver.html" "dist/katakana-game-v$kver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── field (the game loop runs and the seam holds) ───"
 node build/test/field.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
 

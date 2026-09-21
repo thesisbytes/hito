@@ -1,0 +1,166 @@
+{
+    "organizationId": "6ab0552d2da0fa287aed",
+    "projectId": "6ab079700020b092b857",
+    "projectName": "nira-hito",
+    "endpoint": "https://sfo.cloud.appwrite.io/v1",
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": true,
+            "health": true,
+            "storage": true,
+            "teams": true,
+            "users": true,
+            "sites": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "protocols": {
+            "rest": true,
+            "graphql": true,
+            "websocket": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": true,
+                "phone": true,
+                "invites": true,
+                "anonymous": true,
+                "email-otp": true,
+                "magic-url": true,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": null,
+                "sessionsLimit": 10,
+                "passwordHistory": null,
+                "passwordDictionary": false,
+                "personalDataCheck": false,
+                "sessionAlerts": false,
+                "mockNumbers": []
+            }
+        }
+    },
+    "functions": [
+        {
+            "$id": "sync",
+            "name": "sync",
+            "runtime": "node-22",
+            "buildSpecification": "s-2vcpu-2gb",
+            "runtimeSpecification": "s-0.5vcpu-512mb",
+            "execute": [
+                "any"
+            ],
+            "events": [],
+            "scopes": [
+                "rows.read",
+                "rows.write"
+            ],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/main.js",
+            "commands": "",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "deploymentRetention": 0,
+            "path": "server/sync",
+            "previewDomainTarget": "region",
+            "previewDomainLabel": "hito-sync"
+        }
+    ],
+    "tablesDB": [
+        {
+            "$id": "hito",
+            "name": "hito",
+            "enabled": true
+        }
+    ],
+    "tables": [
+        {
+            "$id": "events",
+            "$permissions": [],
+            "databaseId": "hito",
+            "name": "events",
+            "enabled": true,
+            "rowSecurity": false,
+            "columns": [
+                {
+                    "key": "device",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 17,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "kind",
+                    "type": "varchar",
+                    "required": true,
+                    "array": false,
+                    "size": 16,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "at",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "default": null,
+                    "format": ""
+                },
+                {
+                    "key": "glyph",
+                    "type": "varchar",
+                    "required": false,
+                    "array": false,
+                    "size": 32,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "body",
+                    "type": "text",
+                    "required": false,
+                    "array": false,
+                    "default": null,
+                    "encrypt": false
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "device_recent",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "device",
+                        "$createdAt"
+                    ],
+                    "orders": [
+                        "ASC",
+                        "DESC"
+                    ]
+                },
+                {
+                    "key": "kind_glyph",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "kind",
+                        "glyph"
+                    ],
+                    "orders": []
+                }
+            ]
+        }
+    ]
+}

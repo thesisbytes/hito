@@ -1,6 +1,6 @@
 {
   "script": "vocab",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "title": "hito 人 · vocab · v0.1.2",
   "brand": "hito 人 · vocab",
   "fontDir": "fonts",
@@ -55,7 +55,7 @@
     "tidyStrays": true
   },
   "sync": {
-    "endpoint": "",
+    "endpoint": "https://hito-sync.sfo.appwrite.run",
     "batch": 40,
     "cap": 500
   },

@@ -25,7 +25,7 @@ ok(layer, 'no sync layer in this build');
 if (!layer) process.exit(1);
 
 // Run the layer alone against a controllable environment.
-function boot({ endpoint = '', storage = true, online = true, fetchImpl } = {}){
+function boot({ endpoint = '', storage = true, online = true, fetchImpl, cfg = {} } = {}){
   const store = {};
   const env = {
     localStorage: storage ? {
@@ -41,7 +41,7 @@ function boot({ endpoint = '', storage = true, online = true, fetchImpl } = {}){
     navigator: { onLine: online },
     addEventListener(){},
     document: { addEventListener(){}, hidden: false },
-    __SYNC_CFG: { endpoint, batch: 40, cap: 500 },
+    __SYNC_CFG: { endpoint, batch: 40, cap: 500, ...cfg },
     calls: [],
   };
   env.window = env;
@@ -105,8 +105,71 @@ const partial = boot({endpoint:'https://x/y', fetchImpl: (url, opt) => {
   const ids = JSON.parse(opt.body).events.map(e => e.id);
   return Promise.resolve({ok:true, json: () => Promise.resolve({accepted: ids.slice(0,1)})});
 }});
+// Both have to be in ONE request for this to be partial acceptance at all.
+// record() flushes at once, so the first event used to leave alone and the
+// second sat there until something else happened — which passed this check
+// for a reason that had nothing to do with it. Queue offline, then go online.
+partial.env.navigator.onLine = false;
 partial.sync.record('flag', {glyph:'ぬ'});
 partial.sync.record('flag', {glyph:'き'});
+partial.env.navigator.onLine = true;
+partial.sync.flush();
+
+// ---- a queue longer than one request drains by itself
+const drain = boot({endpoint:'https://x/y', online:false, cfg:{post: 900}});
+for (let i = 0; i < 12; i++) drain.sync.record('trace', {glyph:'つ', s:[Array(40).fill(500)]});
+drain.env.navigator.onLine = true;
+drain.sync.flush();
+
+// ---- handwriting is heavy: a request stays under what keepalive allows
+{
+  const big = boot({endpoint:'https://x/y', online:false});
+  for (let i = 0; i < 60; i++) big.sync.record('trace', {glyph:'つ', s:[Array(700).fill(500)]});
+  big.env.navigator.onLine = true;
+  big.sync.flush();
+  const sent = JSON.stringify(big.env.calls[0].body).length;
+  ok(big.env.calls.length === 1, 'flush did not send exactly one request at a time');
+  ok(sent < 60000, `one request was ${sent} characters; a keepalive fetch over 64KB never leaves the page`);
+  ok(big.env.calls[0].body.events.length > 1, 'byte batching sent a single event where several fit');
+}
+
+// ---- and the whole queue stays inside its byte budget
+{
+  const fat = boot({cfg:{bytes: 50000}});
+  for (let i = 0; i < 100; i++) fat.sync.record('trace', {n:i, s:[Array(700).fill(500)]});
+  const len = fat.store['hito-outbox'].length;
+  ok(len <= 52000, `outbox is ${len} characters against a 50000 budget`);
+  const kept = JSON.parse(fat.store['hito-outbox']);
+  ok(kept[kept.length-1].body.n === 99, 'the byte budget dropped the newest event instead of the oldest');
+}
+
+// ---- one oversized event still goes, alone, rather than blocking the head
+{
+  const one = boot({endpoint:'https://x/y', online:false, cfg:{post: 500}});
+  one.sync.record('trace', {s:[Array(700).fill(500)]});
+  one.sync.record('flag', {glyph:'ぬ'});
+  one.env.navigator.onLine = true;
+  one.sync.flush();
+  ok(one.env.calls.length === 1 && one.env.calls[0].body.events.length === 1,
+     'an event bigger than a request was not sent on its own');
+}
+
+// ---- the player's switch: off means nothing is kept and nothing is sent
+{
+  const shy = boot({endpoint:'https://x/y', online:false});
+  shy.sync.record('flag', {glyph:'ぬ'});
+  ok(shy.sync.share === true, 'sharing is not on by default');
+  shy.sync.setShare(false);
+  ok(shy.sync.pending === 0, 'switching sharing off kept what was already queued');
+  shy.sync.record('trace', {glyph:'つ'});
+  shy.env.navigator.onLine = true;
+  shy.sync.flush();
+  ok(shy.sync.pending === 0 && shy.env.calls.length === 0, 'an event was queued or sent with sharing off');
+  ok(shy.store['hito-share'] === '0', 'the switch was not remembered');
+  shy.sync.setShare(true);
+  shy.sync.record('flag', {glyph:'ぬ'});
+  ok(shy.sync.pending === 1 || shy.env.calls.length === 1, 'switching sharing back on did not resume');
+}
 
 // ---- private mode: storage throws on every access, and nothing breaks
 let denied = null;
@@ -132,12 +195,15 @@ if (denied){
   ok(kept[0].body.n === 120, `oldest kept is ${kept[0].body.n}, expected 120`);
 }
 
-await new Promise(r => setTimeout(r, 20));
+await new Promise(r => setTimeout(r, 120));
 ok(failing.sync.pending === 1,
    `a failed flush dropped the event (pending ${failing.sync.pending})`);
+ok(drain.sync.pending === 0 && drain.env.calls.length > 1,
+   `a long queue stopped after ${drain.env.calls.length} request(s) with ${drain.sync.pending} left`);
 ok(partial.sync.pending === 1,
    `partial acceptance left ${partial.sync.pending} queued, expected 1 to remain`);
 
 if (fail) { console.log(`  ${fail} sync check(s) failed`); process.exit(1); }
 console.log('  no endpoint means no network, events survive reload and failure, '
-  + 'storage denial is harmless, queue capped');
+  + 'storage denial is harmless, queue capped by count and by bytes, a request fits in a keepalive, '
+  + 'a long queue drains, and the share switch means it');
