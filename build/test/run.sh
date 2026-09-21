@@ -49,6 +49,10 @@ echo "── sync (offline stays offline, nothing is lost) ───"
 node build/test/sync.test.mjs "dist/hiragana-v$ver.html" | sed 's/^/  /' || fail=1
 
 echo
+echo "── shadow (no layer hides an engine name) ──────────"
+node build/test/shadow.test.mjs dist/*-v*.html | sed 's/^/  /' || fail=1
+
+echo
 echo "── server (observations only, refused per event) ───"
 node build/test/server.test.mjs | sed 's/^/  /' || fail=1
 

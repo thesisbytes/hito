@@ -694,6 +694,18 @@ ok(F.ward <= 0, `run ended with ward ${F.ward}`);
 F.restart();
 ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new run');
 
+// ---- guided can repaint
+// It wipes the pen's mark with the engine's `ink` context on every pointer
+// move. v0.1.39 hid that name behind the run's currency and guided threw on
+// each one. The stub's contexts answer to anything, so call it and see.
+{
+  fresh(); F.setDifficulty('guided');
+  let threw = null;
+  try { globalThis.redrawInk(); } catch (e) { threw = e; }
+  ok(!threw, `guided cannot repaint: ${threw && threw.message}`);
+  F.setDifficulty('easy');
+}
+
 // ---- the run: ink, the workshop strip, and farang that take more than one hit
 //
 // The rule being defended is the one The Tower does not have: nothing here

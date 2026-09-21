@@ -244,10 +244,10 @@ LAYER = r"""
   const _conjure = window.conjure;
   window.conjure = function(){ try { note(true); } catch(_){} return _conjure.apply(this, arguments); };
 
-  const ink = document.getElementById('ink');
-  if (ink && ink.addEventListener){
+  const inkEl = document.getElementById('ink');   // not `ink`: that is the engine's context
+  if (inkEl && inkEl.addEventListener){
     // Registered after the engine's own listener, so by now it has decided.
-    ink.addEventListener('pointerdown', e => {
+    inkEl.addEventListener('pointerdown', e => {
       if (e.pointerType === 'pen') seenPen = true;
       if (typeof activeId !== 'undefined' && activeId === e.pointerId){
         lastType = e.pointerType || '';
@@ -264,7 +264,7 @@ LAYER = r"""
   }
   // After the engine's endStroke and before the field's tidy(): listeners run
   // in the order they were added, and this layer sits between the two.
-  if (ink && ink.addEventListener) for (const ev of ['pointerup', 'pointercancel']) ink.addEventListener(ev, e => {
+  if (inkEl && inkEl.addEventListener) for (const ev of ['pointerup', 'pointercancel']) inkEl.addEventListener(ev, e => {
     if (e.pointerId !== down) return;
     down = null;
     const s = strokes[strokes.length - 1];

@@ -677,3 +677,44 @@ Running log. Append at the bottom, don't rewrite history.
 - Not done, in order: characters-as-charges for words (the `key()` change),
   in-order slot filling by wisps, named farang, then sentences with particles
   by hand. After that the persistent half: workshop upgrades, research, tiers.
+
+## 2026-09-20 — "the japanese trace-ables are not showing up" (hiragana v0.1.40, katakana-game v0.1.3, vocab v0.1.18)
+
+- Reported by the maintainer from a real device. A clean desktop profile drew
+  the guide in every build at every density, so the first three guesses —
+  hosting, screen density, the main page — were all wrong. What found it was
+  the production table: one real device, five breaches in eighteen seconds,
+  not one trace. Somebody had a field and nothing to trace. Then replaying
+  saved state (a difficulty, high mastery, full lights) reproduced it.
+- **Two bugs, one mine.**
+  - *Mine, v0.1.39:* the run's currency was a variable called `ink` inside the
+    field. `ink` is the engine's drawing context, and guided mode wipes the
+    pen's mark with it on every pointer move. Guided threw on each one.
+  - *Older, present in v0.1.37:* `drawImage` throws on a source canvas that is
+    0 wide. If the stage has no layout box when the page boots — a race —
+    `resize()` fits the offscreen canvases to 0 and throws halfway, and
+    `ghostTick()` throws and takes the animation loop with it, because the
+    loop re-arms on its last line. Nothing called `resize()` again until the
+    window itself changed size. Sketchbook 0 pixels wide, nothing to trace,
+    for the whole session. Now: nothing draws into no box, the loop waits
+    rather than dies, and a ResizeObserver watches the stage and the field.
+- **The class of the first bug, found by writing a lint for it:** the field
+  also hid the engine's `loop`. `tidy()` calls `loop()` for the engine's
+  particle loop and had been getting the field's game loop — so every tidied
+  stray started another permanent game loop, and the puff it was for never
+  animated. Shipped for months, passed every test. `shadow.test.mjs` now
+  fails the build on any such name; the field's `hit`, `label`, `loop` and the
+  currency are renamed, the hand's `ink`, and the telemetry layer's private
+  `cur`, `strokes`, `t0` (not bugs — the same trap, not yet sprung).
+- Both new checks were run against the live v0.1.39 build first and failed it.
+- **Also in this release — the arsenal, step one of the farang growing up:**
+  lights are kept by character in the word game too (they were kept by word).
+  Every kana written lights that kana; a lit kana writes the slot a farang is
+  waiting on, in order, and stops at a dark one; the pen is sent to the hole;
+  a light does not knock a word back (or a lit arsenal holds it at the edge
+  for ever and there is no clock); a teal slot in the bubble is one you hold.
+  Lights kept by word before this are dropped on load — nothing could spend
+  them — and only those: the store is shared with the other realms.
+- Three word tests leaned on the random roster and broke the moment a light
+  could write a doubled kana. They use a fixed three-kana word now. One was
+  already flaky: "piano" is piano in both voices.

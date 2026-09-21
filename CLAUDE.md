@@ -51,6 +51,7 @@ hito/
     test/hand.test.mjs      the switch reaches the engine; a note never costs a glyph
     test/server.test.mjs    what the endpoint refuses, checked without deploying
     test/offline.mjs        preloaded by run.sh: no test ever reaches the live endpoint
+    test/shadow.test.mjs    no layer reuses one of the engine's names
     shell_vocab.py          the flashcard shell, appended as a layer
     kana_glyphs.py          writes the 164-kana glyph list the vocab realm traces
     test/vocab.test.mjs     a word is walked through the seam
@@ -143,7 +144,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.39.html`
+### Hiragana — `dist/hiragana-v0.1.40.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -255,7 +256,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.2.html`
+### Katakana — `dist/katakana-game-v0.1.3.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -276,7 +277,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.17.html`
+### Vocab — `dist/vocab-v0.1.18.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -537,10 +538,10 @@ sentences. How that plays, as far as it has been thought through:
   for the kana that are dark. So a sentence is mostly dissolved by what you
   already know, and what is left for the pen is exactly the characters you are
   forgetting — the spaced-repetition design, scaled up rather than replaced.
-  This needs charges keyed by **character** for words too. Today the word game
-  keys them by word (`key()` in the field), which was right for a flashcard
-  and is wrong for this.
-- *In order.* The wisp for slot 3 waits for slots 1 and 2. A dark kana at the
+  **Built in katakana-game v0.1.3:** lights are kept by character everywhere,
+  every kana written in a word lights that kana, and a teal slot in the bubble
+  is one your own light will write.
+- *In order (built).* The wisp for slot 3 waits for slots 1 and 2. A dark kana at the
   front of a word holds up everything lit behind it, which is the right
   pressure, and it keeps "writing the word" meaning writing it.
 - *Common kana drain first.* ん い う ー are in everything, so their charges go
@@ -682,6 +683,13 @@ per-character ledger. Save data must have export/import from day one.
 - **Builds are made here and committed here.** A build that exists only as a
   download is not a build yet — `dist/` is the only place one counts. This
   has already cost the project a tracer and two recording sessions.
+- **A layer must not reuse an engine name.** Inside a layer's function,
+  `let ink` does not replace the engine's `ink`, it hides it from that layer,
+  silently, and the stubbed DOM cannot tell. `shadow.test.mjs` reads the
+  source for it. It has been a shipped bug twice.
+- **Look at a running build before shipping UI.** Headless Chrome is on this
+  machine (`google-chrome --headless=new --screenshot`). Switch sharing off
+  first (`hito-share` = `0`) or the run lands in the production table.
 - **Testing:** the repo is served over HTTPS at https://hito.appwrite.network/
   (Appwrite Sites, redeployed on every push to `main`) and by GitHub Pages at
   https://thesisbytes.github.io/hito/ — open a build there to test on a

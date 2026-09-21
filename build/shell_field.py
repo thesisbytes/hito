@@ -140,8 +140,12 @@ LAYER = STYLE + r"""
   if (WORDS) for (const w of WORDS) w.chars = [...w.ja];
   const AT = {};
   LETTERS.forEach((L, i) => { AT[L[0]] = i; });
-  // What the hitodama is kept by: the word for a word monster, else the character.
-  const key = m => m.w ? m.w.ja : LETTERS[m.i][0];
+  // What the hitodama is kept by: always the character. A word farang is
+  // waiting on exactly one kana at a time (`i`), and that kana's light is what
+  // can answer it. Until v0.1.40 a word kept its own light, whole — right for
+  // a flashcard, wrong for a game where the farang grow into sentences: you
+  // cannot have traced every sentence, but you can have lit every kana in one.
+  const key = m => LETTERS[m.i][0];
   const REALM = WORDS ? CFG.deck.deck : 'hiragana';
 
   document.body.classList.add('field');
@@ -182,16 +186,19 @@ LAYER = STYLE + r"""
     shove: { kana:'押', name:'shove', blurb:'every hit pushes them back',     max:5 },
     mend:  { kana:'守', name:'mend',  blurb:'the ward gains a heart',          max:5 },
   };
-  let ink = 0, upg = { quick:0, bright:0, shove:0, mend:0 };
+  // `sumi`, not `ink`: `ink` is the engine's drawing context, and this layer
+  // uses it (guided mode wipes the pen's mark with it). Calling the currency
+  // `ink` shadowed it, and guided threw on every repaint in v0.1.39.
+  let sumi = 0, upg = { quick:0, bright:0, shove:0, mend:0 };
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
   const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
   const wardMax = () => CFG.wardHp + upg.mend;
-  function earn(n){ if (n > 0){ ink += n; renderUpg(); } return ink; }
+  function earn(n){ if (n > 0){ sumi += n; renderUpg(); } return sumi; }
   function buy(id){
     if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
     const c = costOf(id);
-    if (ink < c) return false;
-    ink -= c; upg[id]++;
+    if (sumi < c) return false;
+    sumi -= c; upg[id]++;
     if (id === 'mend') ward = Math.min(wardMax(), ward + 1);
     try { window.__sync && window.__sync.record('upgrade', { id, level: upg[id], wave }); } catch(_){}
     renderUpg();
@@ -296,6 +303,10 @@ LAYER = STYLE + r"""
   const HKEY = 'hito-hitodama';
   let HITODAMA = {};
   try { HITODAMA = JSON.parse(localStorage.getItem(HKEY) || '{}') || {}; } catch(_){ HITODAMA = {}; }
+  // Lights the word game kept by word before v0.1.40. Nothing can spend them
+  // now. Only keys longer than a character go: this store is shared with the
+  // other realms on the same origin, and their characters are not ours to bin.
+  for (const k of Object.keys(HITODAMA)) if ([...k].length > 1) delete HITODAMA[k];
   function saveH(){ try { localStorage.setItem(HKEY, JSON.stringify(HITODAMA)); } catch(_){} }
   const charge = ch => HITODAMA[ch] || 0;
   function kindle(ch, n){
@@ -340,8 +351,25 @@ LAYER = STYLE + r"""
     if (!best) return null;
     const ch = key(best);
     HITODAMA[ch] = charge(ch) - 1; saveH();
-    shots.push({ from: dash(), to: best, t: 0, ch, auto: true });
+    // A word is answered one slot at a time, in order: this light writes the
+    // kana the farang is waiting on and no other. A dark kana at the front of
+    // a word holds up everything lit behind it, which is the right pressure —
+    // and it is what keeps writing a word meaning writing it.
+    let partial = false;
+    if (best.w){
+      best.ci++;
+      partial = best.ci < best.w.chars.length;
+      if (partial) best.i = AT[best.w.chars[best.ci]];
+    }
+    shots.push({ from: dash(), to: best, t: 0, ch, auto: true, partial });
     castAt = now;
+    // The pen goes to the holes. If that was the word the tracer was pointed
+    // at, it is now waiting on a different kana; and if that one is lit too,
+    // the hand has no business here and is let go to find a dark one.
+    if (best === locked && partial){
+      if (charge(key(best)) >= 1) locked = null;
+      retarget();
+    }
     try { window.__sync && window.__sync.record('cast', { glyph: ch, left: HITODAMA[ch] }); } catch(_){}
     return best;
   }
@@ -350,12 +378,12 @@ LAYER = STYLE + r"""
   // the reading, which is the direction that actually matters; gaijin asks in
   // the learner's own broken accent, which is the same joke as the hero who
   // cannot read — the player is the foreigner here.
-  const label = (m, which) => m.w
+  const labelOf = (m, which) => m.w
     ? (which === 'romaji' ? m.w.romaji : which === 'gaijin' ? m.w.en : m.w.ja)
     : which === 'romaji' ? LETTERS[m.i][2] :
       which === 'gaijin' ? (LETTERS[m.i][7] || LETTERS[m.i][2].toUpperCase()) :
       LETTERS[m.i][0];
-  const sign = m => label(m, CFG.sign);
+  const sign = m => labelOf(m, CFG.sign);
 
   // Mastery says a character was learned; the hand's ledger says whether it
   // still bites. One that does keeps coming back however high its level —
@@ -529,6 +557,10 @@ LAYER = STYLE + r"""
   // still correct and still finds a mark; if nothing on the field carries it,
   // the shot has nowhere to go and dissipates.
   function bearer(ch){
+    // The one the tracer is pointed at, if it is waiting on this. Two words can
+    // be waiting on the same kana (ー is in everything), and the nearer one
+    // taking a stroke meant for the other is the ぬ-for-あ bug in a new coat.
+    if (locked && monsters.includes(locked) && LETTERS[locked.i][0] === ch) return locked;
     let best = null;
     for (const m of monsters)
       if (LETTERS[m.i][0] === ch && (!best || m.d < best.d)) best = m;
@@ -554,11 +586,11 @@ LAYER = STYLE + r"""
     }
     // And the character is kindled whether or not anything carried it — a
     // trace with nothing to hit is banked, not wasted. Clean pays more.
-    // A word kindles once, when it is whole, and clean means the whole word.
-    if (casting() && (!WORDS || (t && whole))){
-      const zaps = WORDS ? t.zaps : zapped;
-      const gain = CFG.hitodamaGain + upg.bright + (zaps ? 0 : CFG.cleanBonus);
-      kindle(WORDS ? t.w.ja : drew, gain);
+    // In a word too: every kana written lights that kana, and clean means
+    // this kana. The light belongs to the character, whatever it was part of.
+    if (casting()){
+      const gain = CFG.hitodamaGain + upg.bright + (zapped ? 0 : CFG.cleanBonus);
+      kindle(drew, gain);
       const d = dash();
       for (let k=0;k<14;k++)
         motes.push({x:d.x, y:d.y, vx:(Math.random()-.5)*1.8, vy:-Math.random()*2.2,
@@ -578,19 +610,23 @@ LAYER = STYLE + r"""
     // the late one. Without that it would fire mid-trace and wipe the strokes.
     // A word half written stays yours: the lock holds until its last kana.
     setTimeout(() => {
-      locked = t && t.w && !whole && monsters.includes(t) ? t : null;
+      // …unless the kana it now waits on is lit. Then its own light will
+      // write it, and the hand is better spent on a farang with a dark one.
+      locked = t && t.w && !whole && monsters.includes(t) && !(casting() && charge(key(t)) >= 1) ? t : null;
       retarget(true);
     }, CFG.advanceMs);
     return r;
   };
 
   let readings = [];
-  function hit(m, partial, auto){
+  function strike(m, partial, auto){
     const p0 = px(m);
     if (upg.shove) m.d = Math.min(1, m.d + upg.shove * CFG.shoveStep);
     if (partial){
-      // a kana landed: the farang staggers back a step and waits for the next
-      m.d = Math.min(1, m.d + CFG.knockback);
+      // a kana landed: the farang staggers back a step and waits for the next.
+      // Only for the hand. A lit arsenal that also shoved would hold a word
+      // at the edge for ever, and then there is no clock.
+      if (!auto) m.d = Math.min(1, m.d + CFG.knockback);
       for (let k=0;k<8;k++)
         motes.push({x:p0.x, y:p0.y, vx:(Math.random()-.5)*2, vy:(Math.random()-.5)*2, life:.7});
       return;
@@ -616,8 +652,8 @@ LAYER = STYLE + r"""
         text = CFG.reading === 'gaijin' || (CFG.reading === 'both' && flip) ? m.w.en : m.w.romaji;
         if (CFG.reading === 'both') sub = flip ? m.w.romaji : m.w.en;
       } else {
-        text = CFG.reading === 'gaijin' ? label(m,'gaijin') : LETTERS[m.i][2];
-        sub  = CFG.reading === 'both'   ? label(m,'gaijin') : null;
+        text = CFG.reading === 'gaijin' ? labelOf(m,'gaijin') : LETTERS[m.i][2];
+        sub  = CFG.reading === 'both'   ? labelOf(m,'gaijin') : null;
       }
       readings.push({ x:p.x, y:p.y, life:1, text, sub });
     }
@@ -672,7 +708,7 @@ LAYER = STYLE + r"""
       autocast(now);
       for (const s of shots){
         s.t += dt*2.6;
-        if (s.t >= 1){ hit(s.to, s.partial, s.auto); }
+        if (s.t >= 1){ strike(s.to, s.partial, s.auto); }
       }
       shots = shots.filter(s => s.t < 1 && monsters.includes(s.to));
     }
@@ -689,7 +725,7 @@ LAYER = STYLE + r"""
     readings = readings.filter(r => r.life > 0);
     draw();
   }
-  function loop(now){ step(now); requestAnimationFrame(loop); }
+  function fieldLoop(now){ step(now); requestAnimationFrame(fieldLoop); }
 
   function draw(){
     const g = fc.getContext('2d');
@@ -756,7 +792,10 @@ LAYER = STYLE + r"""
         g.font = '600 13px ui-sans-serif,system-ui,"Klee One",sans-serif';
         for (let k = 0; k < n; k++){
           const written = k < m.ci, cur = k === m.ci;
-          g.fillStyle = written ? '#ffe9a8' : cur ? (isT ? '#bdf0e6' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
+          // teal for a slot your own light will write: the word shows, before
+          // anything flies, how much of it you already hold and where the holes are
+          const held = !written && casting() && charge(m.w.chars[k]) >= 1;
+          g.fillStyle = written ? '#ffe9a8' : held ? 'rgba(127,209,196,.95)' : cur ? (isT ? '#bdf0e6' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
           g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
         }
       }
@@ -847,7 +886,7 @@ LAYER = STYLE + r"""
       // for a word: the word so far, blank where it is still to come
       const t = target();
       const ch = t && t.w ? t.w.chars.map((c, k) => k < t.ci ? c : '＿').join('') : LETTERS[idx][0];
-      const c = charge(t && t.w ? t.w.ja : LETTERS[idx][0]), cap = CFG.hitodamaCap;
+      const c = charge(LETTERS[idx][0]), cap = CFG.hitodamaCap;
       const d = dash();
       g.font = '700 17px ui-sans-serif,system-ui,"Klee One",sans-serif';
       const lw = Math.max(17, g.measureText(ch).width);
@@ -889,7 +928,7 @@ LAYER = STYLE + r"""
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
-    ink = 0; upg = { quick:0, bright:0, shove:0, mend:0 };
+    sumi = 0; upg = { quick:0, bright:0, shove:0, mend:0 };
     ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
     renderUpg();
@@ -902,10 +941,10 @@ LAYER = STYLE + r"""
   strip.className = 'upg'; strip.id = 'upg';
   let upgMarkup = '';
   function renderUpg(){
-    strip.innerHTML = upgMarkup = `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${ink}</div>`
+    strip.innerHTML = upgMarkup = `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${sumi}</div>`
       + Object.entries(UPG).map(([id, u]) => {
           const maxed = upg[id] >= u.max, c = costOf(id);
-          return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && ink >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
+          return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
             + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'as far as it goes' : '墨 ' + c + ' · ' + u.blurb}</small></button>`;
         }).join('');
     if (strip.querySelectorAll) for (const b of strip.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
@@ -1021,9 +1060,9 @@ LAYER = STYLE + r"""
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
-    get ink(){ return ink; }, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get ink(){ return sumi; }, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
-    earn, buy, costOf, hpFor, castMs, hit, UPG,
+    earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
     charge, kindle, quench, autocast, tidy, casting,
     touch(){ penAt = performance.now(); },
@@ -1060,11 +1099,17 @@ LAYER = STYLE + r"""
   addEventListener('DOMContentLoaded', () => document.body.appendChild(redo));
 
   addEventListener('resize', sizeField);
+  // and watched, for the same reason the stage is: a box that arrives late
+  // is not a window resize
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => {
+    const r = wrap.getBoundingClientRect();
+    if (Math.round(r.width) !== FW || Math.round(r.height) !== FH) sizeField();
+  }).observe(wrap);
   addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
   sizeField();
   spawn(); retarget();
   openStart();
-  requestAnimationFrame(loop);
+  requestAnimationFrame(fieldLoop);
 })();
 </script>
 """

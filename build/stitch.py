@@ -789,6 +789,34 @@ def main():
           r"const R_ON0=0\.07, LOOK=24, DRAIN=1\.6, FIZZ=90;",
           "let R_ON0=0.07, LOOK=24, DRAIN=1.6, FIZZ=90;")
 
+    # ---- a stage with no box yet
+    #
+    # Everything here copies between whole canvases, and drawImage throws on a
+    # source that is 0 wide. If the stage has no layout box when the page boots
+    # — which is a race, lost more often on a slow load, a background tab, or a
+    # phone still settling its toolbar — then W and H are 0, the offscreen
+    # canvases are fitted to 0, and the first copy throws. Inside resize() that
+    # abandons the sizing; inside ghostTick() it ends the animation loop, since
+    # the loop re-arms itself on its last line. And nothing ran resize() again
+    # until the window itself changed size, so the sketchbook stayed 0 pixels
+    # wide with nothing to trace. Reported from a tablet as "the japanese
+    # trace-ables are not showing up"; the table showed the same session as
+    # five breaches and not one trace. It reproduces in v0.1.37.
+    #
+    # So: nothing draws into no box, the loop waits instead of dying, and the
+    # stage is watched, because the box arriving late is not a window resize.
+    s.sub("resize survives no box",
+          r"W=Math\.round\(r\.width\); H=Math\.round\(r\.height\);\n  for\(const c of \[gC,iC,fC\]\)",
+          "W=Math.round(r.width); H=Math.round(r.height); if(!W||!H) return;\n  for(const c of [gC,iC,fC])")
+    s.sub("the stage is watched", r"addEventListener\('resize',resize\);",
+          "addEventListener('resize',resize);\n"
+          "if(typeof ResizeObserver!=='undefined') new ResizeObserver(()=>{ const r=stage.getBoundingClientRect();"
+          " if(Math.round(r.width)!==W||Math.round(r.height)!==H) resize(); }).observe(stage);")
+    s.sub("ink survives no box", r"function redrawInk\(\)\{", "function redrawInk(){ if(!W||!H) return;")
+    s.sub("guide survives no box", r"function drawGuide\(\)\{", "function drawGuide(){ if(!W||!H) return;")
+    s.sub("the ghost waits for a box", r"function ghostTick\(\)\{ if\(!ghostAnim\) return;",
+          "function ghostTick(){ if(!ghostAnim) return; if(!W||!H){ requestAnimationFrame(ghostTick); return; }")
+
     # ---- sync
     #
     # Always present, off unless a pack names an endpoint. An always-installed

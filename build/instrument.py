@@ -27,7 +27,7 @@ LAYER = r"""
 (function(){
   const KEY = 'hito-attempts';
   const log = [];
-  let cur = null, strokes = [], stroke = null, zaps = 0, t0 = 0;
+  let atChar = null, drawn = [], stroke = null, zaps = 0, began = 0;
   let level = 0, fizzles = 0, lastToast = null;
 
   function expected(ch){
@@ -36,31 +36,31 @@ LAYER = r"""
   }
 
   function flush(outcome){
-    if (!cur || !strokes.length) { reset(); return; }
+    if (!atChar || !drawn.length) { reset(); return; }
     let coverage = null;
     try { coverage = +covered().toFixed(3); } catch(_){}
     log.push({
-      char: cur,
+      char: atChar,
       level,                         // mastery level at the time
-      expectedStrokes: expected(cur),
-      drawnStrokes: strokes.length,
-      penLifts: strokes.length - 1,
-      points: strokes.map(s => s.length),
+      expectedStrokes: expected(atChar),
+      drawnStrokes: drawn.length,
+      penLifts: drawn.length - 1,
+      points: drawn.map(s => s.length),
       zaps,
       fizzles,                       // attempt restarts before this outcome
       reason: lastToast,             // why the engine complained, if it did
       coverage,
       outcome,
-      ms: Math.round(performance.now() - t0),
+      ms: Math.round(performance.now() - began),
       at: new Date().toISOString(),
-      strokes,                       // normalised 0..1, for offline analysis
+      strokes: drawn,              // normalised 0..1, for offline analysis
     });
     save();
     reset();
   }
   function reset(){
-    strokes = []; stroke = null; zaps = 0; fizzles = 0; lastToast = null;
-    t0 = performance.now();
+    drawn = []; stroke = null; zaps = 0; fizzles = 0; lastToast = null;
+    began = performance.now();
     try { level = MASTERY[LETTERS[idx][0]] || 0; } catch(_){ level = 0; }
   }
 
@@ -82,9 +82,9 @@ LAYER = r"""
   window.conjure = function(){ flush('conjured'); return _conjure.apply(this, arguments); };
   window.zap     = function(){ zaps++;            return _zap.apply(this, arguments); };
   window.load    = function(i){
-    if (cur !== null) flush('abandoned');
+    if (atChar !== null) flush('abandoned');
     const r = _load.apply(this, arguments);
-    try { cur = LETTERS[idx][0]; } catch(_){ cur = null; }
+    try { atChar = LETTERS[idx][0]; } catch(_){ atChar = null; }
     reset();
     return r;
   };
@@ -102,7 +102,7 @@ LAYER = r"""
     const c = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
     (c.length ? c : [e]).forEach(s => stroke.push(at(s)));
   }, true);
-  const up = () => { if (stroke && stroke.length > 1) strokes.push(stroke); stroke = null; };
+  const up = () => { if (stroke && stroke.length > 1) drawn.push(stroke); stroke = null; };
   pad.addEventListener('pointerup', up, true);
   pad.addEventListener('pointercancel', up, true);
 
