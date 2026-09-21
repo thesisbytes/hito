@@ -551,3 +551,30 @@ Running log. Append at the bottom, don't rewrite history.
 - Not read off a page, unlike the rest of the deck; the `source` field says
   so. These are facts of the language rather than of the book, so the
   2026-09-17 rule above bends rather than breaks.
+
+## 2026-09-20 — A second front door: Appwrite Sites
+
+- The maintainer connected the repo to an Appwrite Cloud site (`hito`, project
+  `nira-hito`, sfo). Live at https://hito.appwrite.network/ — GitHub Pages
+  stays; this is a second host, not a replacement, and nothing in `dist/`
+  changed, so no version bump.
+- The first deployment failed because the site was created with the defaults
+  `npm install` / `npm run build`, and there is no `package.json` — nothing
+  here is built on the host, the builds are committed. Both commands are now
+  empty, output directory `./`, adapter `static`. The root is served rather
+  than `dist/` because `index.html` lives at the root and links into `dist/`,
+  same as Pages.
+- `sites update` replaces the whole record: leave out `--installation-id` /
+  `--provider-repository-id` and the GitHub link is gone. Pass everything.
+- The first GitHub-triggered deployment after the fix built in under a second
+  and then sat in `building` for good, never reaching edge distribution. A
+  hand upload with identical settings went ready in 25s, and a second
+  GitHub-triggered one went ready in 30s. Cause not established — it was
+  created two seconds before the failed one was finalised, which is a guess,
+  not a finding. If a push ever leaves the site stale, look for this first.
+- Checked by fetching all 11 files from the live domain and comparing bytes
+  with the commit, not by reading the status field — the status said
+  `building` and `failed` about the same moment in two places.
+- Static hosting only. The sync endpoint is still undeployed and
+  `server/README.md` still describes Vercel + Atlas; whether Appwrite's
+  functions and tables replace that is a design question, not decided here.
