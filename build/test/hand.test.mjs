@@ -61,6 +61,7 @@ function boot(file, { stored = {}, touchPoints = 0, fine = false, coarse = false
   };
   const probe = `\nwindow.__probe = { get penOnly(){ return penOnly; }, get done(){ return done; }, get idx(){ return idx; },
     get LETTERS(){ return LETTERS; }, get strokes(){ return strokes; }, get BASE_F(){ return BASE_F; },
+    get ease(){ return HAND_EASE; }, get SIZE_MAX(){ return SIZE_MAX; }, get SIZE_MIN(){ return SIZE_MIN; },
     setStrokes(v){ strokes = v; }, setSize(f){ curF = f; curS = f/BASE_F; }, get W(){ return W; }, get H(){ return H; } };`;
   new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
   g.resize();
@@ -93,6 +94,30 @@ const workshop = process.argv[2], game = process.argv[3];
   ok(a.P.penOnly === true, 'setInput("pen") did not set the engine\'s penOnly');
   const b = boot(workshop, {stored:{'hito-input':'finger'}, touchPoints:10, coarse:true});
   ok(b.H.input === 'finger' && b.P.penOnly === false, 'a saved choice lost to the guess on reload');
+}
+
+// ---- a finger gets more room, a pen does not, and a pen in finger mode is still a pen
+{
+  const f = boot(workshop, {stored:{'hito-input':'finger'}, touchPoints:5, coarse:true, screen:{width:390, height:844}});
+  ok(f.H.roomy === true && f.P.ease > 1, `finger mode on a touch screen is not roomy (ease ${f.P.ease})`);
+  ok(f.P.ease <= 1.8, `the path forgives ${f.P.ease}x for a finger: that is no longer tracing`);
+  let small = 0; for (let i = 0; i < 40; i++) if (f.g.sizeFor('あ') < f.P.SIZE_MAX) small++;
+  ok(small === 0, `a finger was handed a glyph below the largest size ${small} times in 40`);
+  f.H.pen(true);
+  ok(f.P.ease === 1 && f.H.roomy === false, 'a pen touching down in finger mode kept the finger\'s forgiveness');
+  f.H.pen(false);
+  ok(f.P.ease > 1, 'the finger\'s room did not come back when the pen went away');
+  f.H.setInput('pen');
+  ok(f.P.ease === 1 && f.H.roomy === false, 'pen mode kept the finger\'s forgiveness');
+  let big = 0; for (let i = 0; i < 40; i++) if (f.g.sizeFor('あ') >= f.P.SIZE_MAX) big++;
+  ok(big < 40, 'pen mode is still being handed the largest glyph every time');
+  const mouse = boot(workshop, {stored:{'hito-input':'finger'}, touchPoints:0});
+  ok(mouse.H.roomy === false && mouse.P.ease === 1, 'a mouse in finger mode was given a finger\'s forgiveness: it is already precise');
+  // and the trace says so, or nobody reading the table can compare a finger with a pen
+  const r = boot(workshop, {stored:{'hito-input':'finger'}, touchPoints:5});
+  r.P.setStrokes([[{x:100,y:100,p:.5,t:0},{x:200,y:200,p:.5,t:400}]]);
+  r.g.conjure();
+  ok(r.H.hands[0] && r.H.hands[0].ease === r.P.ease, 'an eased trace does not say it was eased');
 }
 
 // A stroke in canvas pixels, as the engine keeps them.
@@ -238,5 +263,5 @@ if (game){
 }
 
 if (fail) { console.log(`  ${fail} hand check(s) failed`); process.exit(1); }
-console.log('  the switch reaches the engine and is remembered, a phone is not locked out, every attempt is written '
+console.log('  the switch reaches the engine and is remembered, a phone is not locked out, a finger gets room and a pen does not, every attempt is written '
   + 'down in book space without costing a glyph, shaky decays, sharing off means off, and the ledger exports and merges');

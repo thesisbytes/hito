@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana trace · v0.1.41</title>
+<title>hito 人 · hiragana · v0.1.42</title>
 <style>
   :root{
-    --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
-    --ash:#8b7b62;--paper:#f0e3c4;--teal:#7fd1c4;
+    --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
+    --ash:#6b8296;--paper:#d7e9f7;--teal:#5fe3a1;
     --thai:'Sarabun','Noto Sans Thai Looped','Thonburi','Leelawadee UI','Tahoma',sans-serif;
   }
   *{box-sizing:border-box}
@@ -18,26 +19,26 @@
   header{width:min(92vw,520px);padding:14px 0 6px;display:flex;align-items:center;justify-content:space-between}
   .brand{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--ash)}
   .brand span{opacity:.6;font-size:10px;letter-spacing:.1em}
-  .tabs{display:flex;border:1px solid rgba(233,196,106,.28);border-radius:10px;overflow:hidden}
+  .tabs{display:flex;border:1px solid rgba(108,184,255,.28);border-radius:10px;overflow:hidden}
   .tabs button{border:0;border-radius:0;padding:7px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;flex:none;min-width:0}
   .tabs button[aria-pressed="true"]{background:var(--gold);color:var(--lacquer)}
   .count{font-size:13px;color:var(--ash);font-variant-numeric:tabular-nums}
 
   .stage{position:relative;width:min(92vw,520px);aspect-ratio:1;margin-top:6px}
   canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:18px}
-  #guide{background:radial-gradient(60% 60% at 50% 50%,rgba(233,196,106,.06),transparent 70%),var(--lacquer-2);
-    box-shadow:inset 0 0 0 1px rgba(233,196,106,.14),0 20px 60px rgba(0,0,0,.5)}
-  body.record #guide{box-shadow:inset 0 0 0 1px rgba(127,209,196,.35),0 20px 60px rgba(0,0,0,.5)}
+  #guide{background:radial-gradient(60% 60% at 50% 50%,rgba(108,184,255,.06),transparent 70%),var(--lacquer-2);
+    box-shadow:inset 0 0 0 1px rgba(108,184,255,.14),0 20px 60px rgba(0,0,0,.5)}
+  body.record #guide{box-shadow:inset 0 0 0 1px rgba(95,227,161,.35),0 20px 60px rgba(0,0,0,.5)}
   #ink{touch-action:none;cursor:crosshair}
   #fx{pointer-events:none}
   .stage.done #guide{animation:flash 1.4s ease-out}
-  @keyframes flash{25%{box-shadow:inset 0 0 0 2px var(--gold-hot),0 0 80px rgba(233,196,106,.55)}}
+  @keyframes flash{25%{box-shadow:inset 0 0 0 2px var(--gold-hot),0 0 80px rgba(108,184,255,.55)}}
   @keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
   @keyframes zap{25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,1px)}}
   .stage.zap #guide{box-shadow:inset 0 0 0 2px rgba(220,90,60,.7),0 0 40px rgba(220,90,60,.35)!important}
   .badge{position:absolute;top:12px;right:14px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash)}
   .toast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:13px;color:var(--paper);
-    background:rgba(21,16,13,.8);border:1px solid rgba(233,196,106,.25);padding:6px 12px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+    background:rgba(21,16,13,.8);border:1px solid rgba(108,184,255,.25);padding:6px 12px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
   .toast.show{opacity:1}
 
   .meta{width:min(92vw,520px);margin-top:16px;display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:end}
@@ -47,29 +48,29 @@
   .cls{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);text-align:right;align-self:start}
 
   .power{width:min(92vw,520px);margin-top:14px}
-  .bar{height:6px;border-radius:6px;background:rgba(233,196,106,.12);overflow:hidden;display:flex;gap:3px}
-  .fill{height:100%;width:0;background:linear-gradient(90deg,var(--ember),var(--gold),var(--gold-hot));box-shadow:0 0 14px rgba(233,196,106,.7);transition:width .18s ease}
-  .seg{flex:1;height:100%;background:rgba(233,196,106,.12);border-radius:4px}
-  .seg.lit{background:linear-gradient(90deg,var(--gold),var(--gold-hot));box-shadow:0 0 14px rgba(233,196,106,.7)}
+  .bar{height:6px;border-radius:6px;background:rgba(108,184,255,.12);overflow:hidden;display:flex;gap:3px}
+  .fill{height:100%;width:0;background:linear-gradient(90deg,var(--ember),var(--gold),var(--gold-hot));box-shadow:0 0 14px rgba(108,184,255,.7);transition:width .18s ease}
+  .seg{flex:1;height:100%;background:rgba(108,184,255,.12);border-radius:4px}
+  .seg.lit{background:linear-gradient(90deg,var(--gold),var(--gold-hot));box-shadow:0 0 14px rgba(108,184,255,.7)}
   .lbl{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);margin-top:6px}
 
   .row{width:min(92vw,520px);display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-  button{flex:1;min-width:88px;padding:12px 10px;border-radius:12px;border:1px solid rgba(233,196,106,.28);background:transparent;color:var(--gold);font:inherit;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:background .15s,transform .05s}
-  button:active{transform:translateY(1px)} button:hover{background:rgba(233,196,106,.08)}
+  button{flex:1;min-width:88px;padding:12px 10px;border-radius:12px;border:1px solid rgba(108,184,255,.28);background:transparent;color:var(--gold);font:inherit;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:background .15s,transform .05s}
+  button:active{transform:translateY(1px)} button:hover{background:rgba(108,184,255,.08)}
   button.primary{background:var(--gold);color:var(--lacquer);border-color:var(--gold)}
-  button.teal{color:var(--teal);border-color:rgba(127,209,196,.4)} button.teal.primary{background:var(--teal);color:var(--lacquer)}
-  button.toggle[aria-pressed="true"]{background:rgba(233,196,106,.16)}
+  button.teal{color:var(--teal);border-color:rgba(95,227,161,.4)} button.teal.primary{background:var(--teal);color:var(--lacquer)}
+  button.toggle[aria-pressed="true"]{background:rgba(108,184,255,.16)}
   button:disabled{opacity:.35;cursor:default}
   button:focus-visible{outline:2px solid var(--gold-hot);outline-offset:2px}
   .hint{width:min(92vw,520px);margin:12px 0 8px;font-size:12px;color:var(--ash);text-align:center;line-height:1.5}
   .only-p,.only-r{display:contents} body.record .only-p{display:none} body:not(.record) .only-r{display:none}
-  textarea{-webkit-user-select:text;user-select:text;width:min(92vw,520px);height:110px;background:rgba(0,0,0,.3);color:var(--paper);border:1px solid rgba(233,196,106,.25);border-radius:10px;font:12px/1.4 ui-monospace,monospace;padding:8px;margin-top:8px;display:none}
+  textarea{-webkit-user-select:text;user-select:text;width:min(92vw,520px);height:110px;background:rgba(0,0,0,.3);color:var(--paper);border:1px solid rgba(108,184,255,.25);border-radius:10px;font:12px/1.4 ui-monospace,monospace;padding:8px;margin-top:8px;display:none}
   textarea.show{display:block}
   #fontRow button{min-width:0;flex:0 1 auto;padding:8px 12px;font-size:12px}
   .grid{width:min(92vw,520px);display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:10px 0 30px}
-  .grid button{min-width:0;padding:6px 0;font-size:16px;border-radius:8px;color:var(--ash);border-color:rgba(233,196,106,.12)}
-  .grid button.rec{color:var(--gold);border-color:rgba(233,196,106,.45)}
-  .grid button.cur{background:rgba(233,196,106,.16)}
+  .grid button{min-width:0;padding:6px 0;font-size:16px;border-radius:8px;color:var(--ash);border-color:rgba(108,184,255,.12)}
+  .grid button.rec{color:var(--gold);border-color:rgba(108,184,255,.45)}
+  .grid button.cur{background:rgba(108,184,255,.16)}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .credit{max-width:min(92vw,520px);margin:0 auto 26px;font-size:11px;line-height:1.5;color:var(--ash);opacity:.65;text-align:center}
 </style>
@@ -87,7 +88,7 @@ window.storage=window.storage||{
 </script>
 
 <header>
-  <div class="brand">hito 人 · hiragana <span id="ver"></span></div>
+  <div class="brand">hito 人 <span id="ver"></span></div>
   <div class="tabs"><button id="tabP" aria-pressed="true">Practice</button><button id="tabR" aria-pressed="false">Record</button></div>
   <div class="count" id="count">1 / 75</div>
 </header>
@@ -161,7 +162,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.41';
+const APP_VERSION='0.1.42';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -271,7 +272,7 @@ if(typeof ResizeObserver!=='undefined') new ResizeObserver(()=>{ const r=stage.g
 const inkK=()=>Math.max(.45,Math.pow(curS,.75));
 const widthFor=p=>(3+p*13)*inkK();
 function paintStroke(ctx,s,opt={}){ // s in canvas coords
-  if(!s.length) return; const col=opt.color||'#e9c46a', core=opt.core||'rgba(255,241,184,.9)';
+  if(!s.length) return; const col=opt.color||'#6cb8ff', core=opt.core||'rgba(226,243,255,.9)';
   ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.globalAlpha=opt.alpha??1;
   if(!opt.cover&&!opt.flat){ctx.shadowColor=col;ctx.shadowBlur=(opt.blur??14)*inkK();} ctx.strokeStyle=opt.cover?'#fff':col;
   if(s.length===1){if(!opt.onlycore){ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(s[0].x,s[0].y,widthFor(s[0].p||.5)/2,0,7);ctx.fill();}ctx.restore();return;}
@@ -285,8 +286,8 @@ function paintJudged(ctx,s){ let run=[],on=null;   // on-path runs lit, off-path
   for(const q of s){ const o=q.on===undefined?true:!!q.on; if(on===null) on=o; if(o!==on){ run.push(q); flush(); on=o; run=[q]; } else run.push(q); } flush(); }
 function redrawInk(){ if(!W||!H) return;
   if(mode==='record'){ ink.clearRect(0,0,W,H); inkKey='';
-    strokes.forEach((s,i)=>{ paintStroke(ink,s,{color:'#7fd1c4',core:'#e6fffa'}); if(strokes.length>1) label(ink,s[0],i+1); });
-    if(cur) paintStroke(ink,cur,{color:'#7fd1c4',core:'#e6fffa'}); return; }
+    strokes.forEach((s,i)=>{ paintStroke(ink,s,{color:'#5fe3a1',core:'#e6fff2'}); if(strokes.length>1) label(ink,s[0],i+1); });
+    if(cur) paintStroke(ink,cur,{color:'#5fe3a1',core:'#e6fff2'}); return; }
   // Finished strokes are repainted only when the list itself changed — a
   // stroke landed, tidy() trimmed one, fizzle or load() emptied it — and a
   // live stroke that was never committed is dropped with them.
@@ -304,8 +305,8 @@ function redrawInk(){ if(!W||!H) return;
   // Whole-canvas copies on purpose: a sub-rectangle copy makes the software
   // rasterizer snapshot the entire source first, and costs twenty times more.
   ink.clearRect(0,0,W,H); ink.drawImage(inkA,0,0,W,H); if(inkN>1) ink.drawImage(inkB,0,0,W,H); }
-function label(ctx,p,n){ ctx.save(); ctx.font='bold 13px system-ui'; ctx.fillStyle='#15100d'; ctx.strokeStyle='#7fd1c4'; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.arc(p.x-14,p.y-14,10,0,7); ctx.fillStyle='#7fd1c4'; ctx.fill(); ctx.fillStyle='#15100d'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(n,p.x-14,p.y-14); ctx.restore(); }
+function label(ctx,p,n){ ctx.save(); ctx.font='bold 13px system-ui'; ctx.fillStyle='#0a0f15'; ctx.strokeStyle='#5fe3a1'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(p.x-14,p.y-14,10,0,7); ctx.fillStyle='#5fe3a1'; ctx.fill(); ctx.fillStyle='#0a0f15'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(n,p.x-14,p.y-14); ctx.restore(); }
 
 // ---------- guide layer
 function fontBook(){ return TEACHER.fonts[fontId]||(TEACHER.fonts[fontId]={letters:{}}); }
@@ -319,14 +320,14 @@ function drawGrid(){
   if(GRID_MODE==='none') return;
   const b=gridBox();
   g.save(); g.lineWidth=1;
-  g.strokeStyle='rgba(233,196,106,.16)';
+  g.strokeStyle='rgba(108,184,255,.16)';
   g.strokeRect(b.x0,b.y0,b.x1-b.x0,b.y1-b.y0);
   const mx=(b.x0+b.x1)/2, my=(b.y0+b.y1)/2;
-  g.setLineDash([5,7]); g.strokeStyle='rgba(233,196,106,.13)';
+  g.setLineDash([5,7]); g.strokeStyle='rgba(108,184,255,.13)';
   g.beginPath(); g.moveTo(mx,b.y0); g.lineTo(mx,b.y1);
   g.moveTo(b.x0,my); g.lineTo(b.x1,my); g.stroke();
   if(GRID_MODE==='quarters'){
-    g.strokeStyle='rgba(233,196,106,.07)'; g.beginPath();
+    g.strokeStyle='rgba(108,184,255,.07)'; g.beginPath();
     for(const f of [0.25,0.75]){
       g.moveTo(b.x0+(b.x1-b.x0)*f,b.y0); g.lineTo(b.x0+(b.x1-b.x0)*f,b.y1);
       g.moveTo(b.x0,b.y0+(b.y1-b.y0)*f); g.lineTo(b.x1,b.y0+(b.y1-b.y0)*f); }
@@ -343,7 +344,7 @@ function drawGuide(){ if(!W||!H) return;
     // of curves, so the thin trail down its centreline cannot
     // cover it, and the stacked glows read as blur.
     if(done){
-      paintPath(g,0,PATH.length-1,{alpha:.5,blur:28,scale:SHADOW_SCALE,nocore:true,color:'rgba(255,241,184,.95)'});
+      paintPath(g,0,PATH.length-1,{alpha:.5,blur:28,scale:SHADOW_SCALE,nocore:true,color:'rgba(226,243,255,.95)'});
     } else if(SHADOW_MODE==='strokes'){
       // The shape, as a textbook would print it: a flat line down
       // the centre of each stroke at the ink's own width, one path
@@ -355,7 +356,7 @@ function drawGuide(){ if(!W||!H) return;
       // is where the stroke actually goes. The tolerance is the
       // scorer's business; the shape is the learner's.
       g.save(); g.lineCap='round'; g.lineJoin='round';
-      g.strokeStyle='#e9c46a'; g.globalAlpha=.34; g.lineWidth=widthFor(.5);
+      g.strokeStyle='#6cb8ff'; g.globalAlpha=.34; g.lineWidth=widthFor(.5);
       let open=false;
       for(let i=0;i<PATH.length;i++){ const p=denorm(PATH[i]);
         if(!open){ g.beginPath(); g.moveTo(p.x,p.y); open=true; } else g.lineTo(p.x,p.y);
@@ -365,8 +366,8 @@ function drawGuide(){ if(!W||!H) return;
     }
   } else {
     g.save(); g.font=glyphFont(size); g.textAlign='center'; g.textBaseline='middle';
-    g.fillStyle=done?'rgba(255,241,184,.9)':(mode==='record'?'rgba(127,209,196,.13)':'rgba(233,196,106,.16)');
-    if(done){g.shadowColor='rgba(233,196,106,.9)';g.shadowBlur=40;}
+    g.fillStyle=done?'rgba(226,243,255,.9)':(mode==='record'?'rgba(95,227,161,.13)':'rgba(108,184,255,.16)');
+    if(done){g.shadowColor='rgba(108,184,255,.9)';g.shadowBlur=40;}
     g.fillText(L,W/2,H/2+size*.06); g.restore();
   }
   if(rec&&!done&&prog>1) paintLit(g,{alpha:.9});
@@ -391,7 +392,7 @@ function paintLit(ctx,opt){ // PATH[0..prog] as paintPath would draw it, grown f
 function trailBit(ctx,a,b,s0,open){ // road PATH[a..b] and the embers on it; embers sit every 4th point from s0
   if(b>a) paintPath(ctx,a,b,{alpha:.38,blur:10,nocore:true,scale:.75});
   for(let i=a+(((s0-a)%4)+4)%4;open?i<b:i<=b;i+=4){ const q=denorm(PATH[i]);                 // dotted embers
-    ctx.fillStyle='rgba(240,210,130,.85)'; ctx.shadowColor='rgba(233,196,106,.9)'; ctx.shadowBlur=10;
+    ctx.fillStyle='rgba(205,234,255,.85)'; ctx.shadowColor='rgba(108,184,255,.9)'; ctx.shadowBlur=10;
     ctx.beginPath(); ctx.arc(q.x,q.y,2.4,0,7); ctx.fill(); } }
 function renderTrail(){ if(!PATH.length){trailProg=-1;return;}
   const _si=(awaitLift&&segIdx<SEGS.length-1)?segIdx+1:segIdx;
@@ -425,7 +426,7 @@ function ghostTick(){ if(!ghostAnim) return; if(!W||!H){ requestAnimationFrame(g
     // hand starts chasing it instead of dragging its own.
     if(COMET_ON){ const n=_a+Math.max(2,Math.floor(ph*(end-_a))); paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); } // comet
     const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)?SEGS[segIdx+1][0]:prog]), pulse=.5+.5*Math.sin(now/260);
-    fx.save(); fx.fillStyle=`rgba(255,241,184,${.5+.4*pulse})`; fx.shadowColor='#fff1b8'; fx.shadowBlur=16+10*pulse;
+    fx.save(); fx.fillStyle=`rgba(226,243,255,${.5+.4*pulse})`; fx.shadowColor='#e2f3ff'; fx.shadowBlur=16+10*pulse;
     fx.beginPath(); fx.arc(s0.x,s0.y,(4+3*pulse)*DOT_SCALE,0,7); fx.fill(); fx.restore();
   }
   stepParts();
@@ -451,7 +452,8 @@ iC.addEventListener('pointerup',endStroke); iC.addEventListener('pointercancel',
 
 // ---------- practice: follow the teacher's path continuously
 let R_ON0=0.07, LOOK=24, DRAIN=1.6, FIZZ=90;
-const R_ON=()=>Math.max(0.045,R_ON0*Math.sqrt(curS));
+let HAND_EASE=1;
+const R_ON=()=>Math.max(0.045,Math.min(R_ON0*HAND_EASE,0.125)*Math.sqrt(curS));
 let smudge=0;
 function covered(){ if(!hit) return 0; let c=0; for(let i=0;i<hit.length;i++) c+=hit[i]; return c/hit.length; }
 // How near the end of a stroke counts as having reached it.
@@ -607,7 +609,7 @@ function shine(a,b){ const step=Math.max(1,Math.round((b-a)/16));
   for(let i=a;i<=b;i+=step){ const q=denorm(PATH[i]);
     for(let k=0;k<3;k++){ const ang=Math.random()*6.28, v=.3+Math.random()*1.4;
       parts.push({x:q.x,y:q.y,vx:Math.cos(ang)*v,vy:Math.sin(ang)*v,
-        life:1,r:1+Math.random()*2,c:'255,241,184'}); } }
+        life:1,r:1+Math.random()*2,c:'226,243,255'}); } }
   if(navigator.vibrate) navigator.vibrate(12);
   loop(); }
 function fizzle(){ smudge=0; offCount=0; prog=Math.max(0,Math.round(prog*0.5));
@@ -652,8 +654,8 @@ function updateCoverage(){ if(!glyphPts.length||teacherStrokes()) return;
 
 // ---------- fx
 let parts=[],rafOn=false;
-function spark(x,y,p,hot){ if(!hot&&Math.random()>.55) return; parts.push({x,y,vx:(Math.random()-.5)*1.4,vy:(Math.random()-.8)*1.4,life:1,r:1+p*2.5,c:hot?'255,241,184':'233,196,106'}); loop(); }
-function burst(){ for(let i=0;i<140;i++){const a=Math.random()*Math.PI*2,v=1.5+Math.random()*4.5;parts.push({x:W/2,y:H/2,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1,life:1.4,r:1.5+Math.random()*3,c:Math.random()<.4?'255,241,184':'233,196,106'});} loop(); }
+function spark(x,y,p,hot){ if(!hot&&Math.random()>.55) return; parts.push({x,y,vx:(Math.random()-.5)*1.4,vy:(Math.random()-.8)*1.4,life:1,r:1+p*2.5,c:hot?'226,243,255':'108,184,255'}); loop(); }
+function burst(){ for(let i=0;i<140;i++){const a=Math.random()*Math.PI*2,v=1.5+Math.random()*4.5;parts.push({x:W/2,y:H/2,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1,life:1.4,r:1.5+Math.random()*3,c:Math.random()<.4?'226,243,255':'108,184,255'});} loop(); }
 function stepParts(){ parts=parts.filter(p=>p.life>0);
   for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.03;p.vx*=.98;p.life-=.025;fx.beginPath();fx.shadowBlur=0;fx.fillStyle=`rgba(${p.c},${Math.max(0,p.life)})`;fx.arc(p.x,p.y,p.r*Math.max(0,p.life),0,7);fx.fill();} }
 function loop(){ if(rafOn||ghostAnim) return; rafOn=true; requestAnimationFrame(tick); }
@@ -762,7 +764,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.41');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.42');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1056,51 +1058,56 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
 })();
 </script>
-<script>window.__HAND_CFG={maxPoints:64,keep:24,minStep:4};</script>
+<script>window.__HAND_CFG={maxPoints:64,keep:24,minStep:4,fingerEase:1.5};</script>
 <style>
-  .hand-btn{ background:transparent; color:rgba(233,196,106,.8); border:1px solid #3d3324;
+  .hand-btn{ background:transparent; color:rgba(108,184,255,.8); border:1px solid #1e2f3e;
     border-radius:7px; padding:4px 9px; font:12px ui-sans-serif,system-ui; cursor:pointer;
     margin-left:auto; margin-right:10px; white-space:nowrap;
     /* the engine styles every button as flex:1 with a min-width; in a header
        with the tabs hidden that is a bar the width of the screen */
     flex:none; min-width:0; letter-spacing:0; }
-  .hand-btn.nudge{ border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 14px rgba(127,209,196,.45); }
+  /* A finger gets more room. In the games the sketchbook is a third of the
+     screen because a pen needs no more; a fingertip hides what it is tracing,
+     so it takes some of the field's height back. The field's canvas and the
+     stage are both watched for size, so this is just a class. */
+  body.field.roomy .stage, body.vocab.roomy .stage{ width:min(96vw,42dvh); height:min(96vw,42dvh); }
+  .hand-btn.nudge{ border-color:#5fe3a1; color:#c3f7dc; box-shadow:0 0 14px rgba(95,227,161,.45); }
   .hand{ position:fixed; inset:0; z-index:10000; display:flex; align-items:center;
-    justify-content:center; background:rgba(12,10,8,.93); font:13px ui-sans-serif,system-ui; color:#e8e0cc; }
+    justify-content:center; background:rgba(6,9,13,.93); font:13px ui-sans-serif,system-ui; color:#dce8f2; }
   .hand[hidden]{ display:none; }
-  .hand-card{ width:min(94vw,520px); max-height:94dvh; overflow:auto; background:#15120f;
-    border:1px solid #57492f; border-radius:12px; padding:20px 18px; box-sizing:border-box; }
-  .hand-title{ font-size:26px; font-weight:700; color:#e9c46a; }
-  .hand-sub{ color:rgba(232,224,204,.55); margin:2px 0 14px; font-size:12px; }
+  .hand-card{ width:min(94vw,520px); max-height:94dvh; overflow:auto; background:#0c131a;
+    border:1px solid #2a4256; border-radius:12px; padding:20px 18px; box-sizing:border-box; }
+  .hand-title{ font-size:26px; font-weight:700; color:#6cb8ff; }
+  .hand-sub{ color:rgba(220,232,242,.55); margin:2px 0 14px; font-size:12px; }
   .hand-h{ font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-    color:rgba(233,196,106,.7); margin:16px 0 7px; }
+    color:rgba(108,184,255,.7); margin:16px 0 7px; }
   .hand-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
-  .hand-row button{ text-align:left; background:#1d1a16; color:#e8e0cc; border:1px solid #57492f;
+  .hand-row button{ text-align:left; background:#101820; color:#dce8f2; border:1px solid #2a4256;
     border-radius:9px; padding:10px 11px; cursor:pointer; font:inherit; }
-  .hand-row button b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
-  .hand-row button small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
-  .hand-row button[aria-pressed="true"]{ border-color:#7fd1c4; background:#172422; }
+  .hand-row button b{ display:block; font-size:15px; color:#6cb8ff; margin-bottom:3px; }
+  .hand-row button small{ display:block; color:rgba(220,232,242,.7); line-height:1.35; }
+  .hand-row button[aria-pressed="true"]{ border-color:#5fe3a1; background:#10241c; }
   .hand-nums{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; text-align:center; }
-  .hand-nums div{ background:#1d1a16; border:1px solid #3d3324; border-radius:9px; padding:9px 4px; }
-  .hand-nums b{ display:block; font-size:20px; color:#bdf0e6; }
-  .hand-nums small{ color:rgba(232,224,204,.6); font-size:11px; }
+  .hand-nums div{ background:#101820; border:1px solid #1e2f3e; border-radius:9px; padding:9px 4px; }
+  .hand-nums b{ display:block; font-size:20px; color:#c3f7dc; }
+  .hand-nums small{ color:rgba(220,232,242,.6); font-size:11px; }
   .hand-list{ display:flex; flex-wrap:wrap; gap:6px; }
-  .hand-list span{ background:#1d1a16; border:1px solid #3d3324; border-radius:8px; padding:5px 9px; }
-  .hand-list span b{ font-size:19px; color:#e9c46a; margin-right:6px; }
-  .hand-list span small{ color:rgba(232,224,204,.65); }
-  .hand-empty{ color:rgba(232,224,204,.5); }
+  .hand-list span{ background:#101820; border:1px solid #1e2f3e; border-radius:8px; padding:5px 9px; }
+  .hand-list span b{ font-size:19px; color:#6cb8ff; margin-right:6px; }
+  .hand-list span small{ color:rgba(220,232,242,.65); }
+  .hand-empty{ color:rgba(220,232,242,.5); }
   .hand-thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); gap:8px; }
-  .hand-thumbs figure{ margin:0; background:#1d1a16; border:1px solid #3d3324; border-radius:8px;
+  .hand-thumbs figure{ margin:0; background:#101820; border:1px solid #1e2f3e; border-radius:8px;
     padding:4px; text-align:center; }
   .hand-thumbs svg{ width:100%; height:auto; display:block; }
-  .hand-thumbs figcaption{ font-size:11px; color:rgba(232,224,204,.65); }
-  .hand-io{ width:100%; height:70px; margin-top:8px; background:#0f0d0b; color:#e8e0cc;
-    border:1px solid #3d3324; border-radius:7px; font:11px ui-monospace,monospace; box-sizing:border-box; }
+  .hand-thumbs figcaption{ font-size:11px; color:rgba(220,232,242,.65); }
+  .hand-io{ width:100%; height:70px; margin-top:8px; background:#080c11; color:#dce8f2;
+    border:1px solid #1e2f3e; border-radius:7px; font:11px ui-monospace,monospace; box-sizing:border-box; }
   .hand-io[hidden]{ display:none; }
   .hand-links{ display:flex; gap:8px; margin-top:10px; }
-  .hand-links button{ flex:1; background:transparent; color:rgba(233,196,106,.75);
-    border:1px solid #3d3324; border-radius:8px; padding:8px; cursor:pointer; font:inherit; }
-  .hand-go{ width:100%; margin-top:16px; background:#e9c46a; color:#1d1a16; border:0;
+  .hand-links button{ flex:1; background:transparent; color:rgba(108,184,255,.75);
+    border:1px solid #1e2f3e; border-radius:8px; padding:8px; cursor:pointer; font:inherit; }
+  .hand-go{ width:100%; margin-top:16px; background:#6cb8ff; color:#101820; border:0;
     border-radius:9px; padding:12px; font-size:15px; font-weight:700; cursor:pointer; }
 </style>
 <script>
@@ -1108,7 +1115,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
    Pen or finger, what was drawn, and how it has been going. Writes down what
    the tracer decided; decides nothing itself.                              */
 (function(){
-  const CFG = window.__HAND_CFG || {maxPoints:64, keep:24, minStep:4};
+  const CFG = window.__HAND_CFG || {maxPoints:64, keep:24, minStep:4, fingerEase:1.5};
   const K_INPUT = 'hito-input', K_LEDGER = 'hito-ledger', K_HANDS = 'hito-hands';
   const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch(_){ return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(_){ return false; } };
@@ -1139,9 +1146,35 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       if (b && b.setAttribute) b.setAttribute('aria-pressed', input === 'pen');
     }
   }
+  // ---- a finger is not a pen ---------------------------------------------
+  // The tolerance was tuned for a pen tip, which shows you the line as you
+  // draw it. A fingertip is a centimetre wide and sits on top of the path, so
+  // the hand is steering by memory of where the line was. Three things give:
+  // the glyph is drawn at its largest, the sketchbook takes more of the screen,
+  // and the path forgives more (HAND_EASE, the one seam in the scorer). Only on
+  // a screen that can feel a finger — a mouse in finger mode is already precise
+  // — and it lets go the moment a pen touches down.
+  const touchy = () => { try { return (navigator.maxTouchPoints || 0) > 0; } catch(_){ return false; } };
+  let penNow = false;
+  const roomy = () => input === 'finger' && touchy() && !penNow;
+  function applyRoom(){
+    const on = roomy();
+    try { HAND_EASE = on ? CFG.fingerEase : 1; } catch(_){}
+    try { document.body.classList[on ? 'add' : 'remove']('roomy'); } catch(_){}
+    return on;
+  }
+  // sizeFor() is the engine's single seam for size; a finger gets the top of the range.
+  const _sizeFor = window.sizeFor;
+  if (typeof _sizeFor === 'function') window.sizeFor = function(){
+    const v = _sizeFor.apply(this, arguments);
+    return roomy() && typeof SIZE_MAX === 'number' ? Math.max(v, SIZE_MAX) : v;
+  };
+
   function setInput(v, quiet){
     input = v === 'finger' ? 'finger' : 'pen';
     penOnly = input === 'pen';
+    const was = document.body.classList && document.body.classList.contains && document.body.classList.contains('roomy');
+    if (applyRoom() !== !!was && !quiet){ try { if (typeof load === 'function' && typeof idx === 'number' && !done && !strokes.length) load(idx); } catch(_){} }
     if (!quiet){ try { localStorage.setItem(K_INPUT, input); } catch(_){} }
     showInput();
     return input;
@@ -1220,6 +1253,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const rec = {
       glyph: ch, ok, ms, zaps, tries, strokes: raw.length,
       size: Math.round(curF*1000)/1000, input: lastType || input,
+      ease: (typeof HAND_EASE === 'number' && HAND_EASE !== 1) ? HAND_EASE : undefined,
       level: (typeof MASTERY !== 'undefined' && MASTERY[ch]) || 0,
       diff: (window.__field && window.__field.difficulty) || (window.__vocab && window.__vocab.difficulty) || '',
       v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
@@ -1282,6 +1316,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // Registered after the engine's own listener, so by now it has decided.
     inkEl.addEventListener('pointerdown', e => {
       if (e.pointerType === 'pen') seenPen = true;
+      // a pen in finger mode is still a pen: no extra forgiveness for it
+      const p = e.pointerType === 'pen'; if (p !== penNow){ penNow = p; applyRoom(); }
       if (typeof activeId !== 'undefined' && activeId === e.pointerId){
         lastType = e.pointerType || '';
         if (strokes.length < mine.length || !strokes.length) mine = [];   // the engine started over, so does this
@@ -1318,7 +1354,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       for (let i = 0; i + 2 < f.length; i += 3) d += (i ? 'L' : 'M') + (+f[i] || 0) + ' ' + (+f[i+1] || 0);
       return `<path d="${d}"/>`;
     }).join('');
-    return `<figure><svg viewBox="150 150 700 760" fill="none" stroke="${r.ok ? '#e9c46a' : '#dc5a3c'}" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
+    return `<figure><svg viewBox="150 150 700 760" fill="none" stroke="${r.ok ? '#6cb8ff' : '#dc5a3c'}" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
       + `<figcaption>${esc(r.glyph)} · ${r.ok ? secs(r.ms) : 'fizzled'}</figcaption></figure>`;
   }
   const sheet = document.createElement('div');
@@ -1345,7 +1381,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       <div class="hand-h">draw with</div>
       <div class="hand-row">
         ${opt('pen', input, '✎ pen only', 'fingers and palms are ignored, so the hand can rest on the glass.')}
-        ${opt('finger', input, '☝ finger', 'anything that touches draws: a finger, a mouse, a pen. one at a time.')}
+        ${opt('finger', input, '☝ finger', 'anything that touches draws, one at a time. on a touch screen the glyph is drawn bigger and the path forgives more: a fingertip hides what it is tracing.')}
       </div>
       ${sync && sync.enabled ? `<div class="hand-h">notes to the workshop</div>
       <div class="hand-row">
@@ -1431,7 +1467,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   try { window.__account && window.__account.onChange(() => { if (!sheet.hidden) render(); }); } catch(_){}
 
   window.__hand = {
-    get input(){ return input; }, setInput, guess,
+    get input(){ return input; }, setInput, guess, get roomy(){ return roomy(); }, applyRoom,
+    pen(v){ penNow = !!v; return applyRoom(); },
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
     get html(){ return markup; }, get shown(){ return !sheet.hidden; },
     show: open, close, render, note, pack, toBook, shaky, stats, streak,
@@ -1440,396 +1477,1088 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.41</div>
+<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[{"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."}, {"label": "katakana", "kana": "片", "file": "katakana-game.html", "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."}],speed:0.055,wardHp:5,hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
+<style>
+  /* The workshop's furniture, hidden. The engine still maintains all of it —
+     nothing is torn out, so a pack can switch shells without a rebuild of the
+     tracer. */
+  body.field .tabs, body.field .count, body.field .meta, body.field .power,
+  body.field .only-p, body.field .only-r, body.field #fontRow,
+  body.field .grid, body.field .hint { display:none !important; }
+
+  body.field { height:100dvh; overflow:hidden; justify-content:flex-start; }
+  body.field header { padding:6px 0 2px; }
+
+  /* Two thirds field, one third sketchbook. The stage loses its square aspect
+     ratio here — resize() reads the element's box, so the tracer follows. */
+  .field-wrap{ position:relative; width:min(96vw,760px); flex:2 1 0;
+               min-height:0; margin-top:4px; }
+  .field-wrap canvas{ position:absolute; inset:0; width:100%; height:100%;
+    border-radius:18px;
+    background:radial-gradient(70% 60% at 50% 70%,rgba(70,170,120,.07),transparent 70%),
+               var(--lacquer-2);
+    box-shadow:inset 0 0 0 1px rgba(108,184,255,.10),0 18px 50px rgba(0,0,0,.45); }
+  /* The sketchbook MUST stay square. norm() in the engine divides x by W and
+     y by H independently, so a rectangular stage does not merely stretch the
+     glyph — it makes every distance in normalised space anisotropic, and the
+     tolerance, coverage radius and travel ratio all stop meaning one thing.
+     At 760x250 the pen would be forgiven three times as much sideways as
+     vertically. The tracer has always assumed a square; this shell must not
+     be the thing that quietly breaks that assumption. */
+  body.field .stage{ flex:0 0 auto; aspect-ratio:1;
+                     width:min(96vw,34dvh); height:min(96vw,34dvh);
+                     margin:8px auto 10px; }
+  body.field .field-wrap{ flex:1 1 auto; }
+  /* The workshop strip: ink and what it buys. At the top of the field, as far
+     from the hand as the screen allows — a button under a resting palm is a
+     button that presses itself. */
+  .upg{ position:absolute; left:8px; right:8px; top:8px; z-index:2; display:flex; gap:6px;
+        align-items:stretch; font:12px ui-sans-serif,system-ui; pointer-events:none; }
+  .upg > *{ pointer-events:auto; }
+  .upg-ink{ display:flex; align-items:center; gap:5px; padding:0 9px; border-radius:9px;
+        background:rgba(13,19,26,.82); border:1px solid #1e2f3e; color:#6cb8ff; font-weight:700; }
+  .upg-ink i{ font-style:normal; color:rgba(220,232,242,.55); font-weight:400; }
+  .upg button{ flex:1 1 0; min-width:0; text-align:left; padding:5px 7px; border-radius:9px; cursor:pointer;
+        background:rgba(13,19,26,.82); border:1px solid #1e2f3e; color:#dce8f2; font:inherit; line-height:1.25; }
+  .upg button b{ color:#6cb8ff; margin-right:4px; }
+  .upg button small{ display:block; color:rgba(220,232,242,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .upg button.can{ border-color:#5fe3a1; box-shadow:0 0 10px rgba(95,227,161,.25); }
+  .upg button.can small{ color:#c3f7dc; }
+  .upg button[disabled]{ opacity:.5; cursor:default; }
+  /* At phone width four buttons are 80px each: a cost fits, a sentence does
+     not, and half a sentence is worse than none. The title attribute and the
+     start page still say what each one does. */
+  @media (max-width:560px){ .upg button small i{ display:none; } .upg{ gap:4px; left:6px; right:6px; } }
+  .upg button small i{ font-style:normal; }
+
+  /* The start page. A lacquer sheet over everything, with the two axes the
+     game actually has: how much help, and what the sign says. */
+  .start{ position:fixed; inset:0; z-index:9998; display:flex; align-items:center;
+          justify-content:center; padding:18px;
+          background:radial-gradient(60% 50% at 50% 40%,rgba(70,170,120,.10),transparent 70%),
+                     rgba(6,9,13,.94); }
+  .start[hidden]{ display:none; }
+  .start-card{ width:min(94vw,520px); max-height:94dvh; overflow:auto;
+               font:14px ui-sans-serif,system-ui; color:#dce8f2; }
+  .start-title{ font-size:34px; font-weight:700; color:#6cb8ff; letter-spacing:.02em;
+                text-shadow:0 0 24px rgba(108,184,255,.35); }
+  .start-title span{ font-size:40px; margin-left:8px; }
+  .start-sub{ color:rgba(220,232,242,.55); margin:2px 0 18px; font-size:12px; }
+  .start-h{ font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+            color:rgba(95,227,161,.8); margin:14px 0 8px; }
+  .start-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
+  .start-row button, .start-row a{ display:block; text-decoration:none; text-align:left; background:#101820; color:#dce8f2; border:1px solid #2a4256;
+                     border-radius:10px; padding:10px 12px; cursor:pointer; font:inherit; min-height:74px; }
+  .start-row a{ min-height:0; }
+  .start-row button b, .start-row a b{ display:block; font-size:15px; color:#6cb8ff; margin-bottom:3px; }
+  .start-row button b i{ font-style:normal; color:#c3f7dc; margin-right:6px; }
+  .start-row button small, .start-row a small{ display:block; color:rgba(220,232,242,.7); line-height:1.35; }
+  .start-row button[aria-pressed="true"]{ border-color:#5fe3a1; background:#10241c;
+                     box-shadow:0 0 0 1px rgba(95,227,161,.5), 0 0 22px rgba(95,227,161,.18); }
+  .start-row button[disabled]{ opacity:.42; cursor:default; }
+  .start-go{ width:100%; margin-top:20px; background:#6cb8ff; color:#101820; border:0;
+             border-radius:12px; padding:14px; font:700 17px ui-sans-serif,system-ui; cursor:pointer;
+             box-shadow:0 0 30px rgba(108,184,255,.25); }
+  .start-foot{ margin-top:12px; font-size:11px; color:rgba(220,232,242,.4); text-align:center; }
+  .start-links{ display:flex; gap:8px; margin-top:10px; }
+  .start-links button{ flex:1; background:transparent; color:rgba(108,184,255,.75); border:1px solid #1e2f3e;
+                       border-radius:9px; padding:9px; font:13px ui-sans-serif,system-ui; cursor:pointer; }
+  .credits p{ line-height:1.55; color:rgba(220,232,242,.85); margin:10px 0; }
+  .credits p.lead{ font-size:15px; color:#dce8f2; }
+  .credits p.lead b{ color:#6cb8ff; font-size:22px; margin-right:6px; }
+  .credits p.small{ font-size:12px; color:rgba(220,232,242,.6); }
+  body.field header .brand{ cursor:pointer; }
+</style>
 
 <script>
-/* ---- attempt telemetry -------------------------------------------------
-   Records what was drawn and what the engine decided. Export with the button
-   in the corner, or from the console: __hito.export()
-   Nothing here changes scoring; it only observes.                        */
+/* ---- the field ---------------------------------------------------------
+   Monsters advance in polar coordinates around the centre, so the geometry is
+   resolution independent and a rotated tablet changes nothing about the game.
+   d runs 1 at the edge to 0 at the ward.                                  */
 (function(){
-  const KEY = 'hito-attempts';
-  const log = [];
-  let atChar = null, drawn = [], stroke = null, zaps = 0, began = 0;
-  let level = 0, fizzles = 0, lastToast = null;
+  const CFG = window.__FIELD_CFG;
+  const $ = id => document.getElementById(id);
 
-  function expected(ch){
-    try { return DEFAULT_BOOK.fonts[TEACHER.activeFont].letters[ch].strokes.length; }
-    catch(_){ return null; }
+  // ---- words
+  // A deck turns the roster from characters into words. The word is shared
+  // deck data; how far a given farang has been written is on the monster
+  // (ci, zaps), and its `i` is kept pointed at the kana it is waiting for.
+  const WORDS = CFG.deck ? CFG.deck.words : null;
+  if (WORDS) for (const w of WORDS) w.chars = [...w.ja];
+  const AT = {};
+  LETTERS.forEach((L, i) => { AT[L[0]] = i; });
+  // What the hitodama is kept by: always the character. A word farang is
+  // waiting on exactly one kana at a time (`i`), and that kana's light is what
+  // can answer it. Until v0.1.40 a word kept its own light, whole — right for
+  // a flashcard, wrong for a game where the farang grow into sentences: you
+  // cannot have traced every sentence, but you can have lit every kana in one.
+  const key = m => LETTERS[m.i][0];
+  const REALM = WORDS ? CFG.deck.deck : 'hiragana';
+
+  document.body.classList.add('field');
+  const wrap = document.createElement('div');
+  wrap.className = 'field-wrap';
+  const fc = document.createElement('canvas');
+  fc.id = 'field';
+  wrap.appendChild(fc);
+  const stageEl = document.getElementById('stage');
+  stageEl.parentNode.insertBefore(wrap, stageEl);
+
+  const cx = () => fc.width / (2*DPRF());
+  const cy = () => fc.height / (2*DPRF()) * 1.06;   // ward sits a touch low
+  function DPRF(){ return Math.min(devicePixelRatio||1, 3); }
+  let FW = 0, FH = 0;
+  function sizeField(){
+    const r = wrap.getBoundingClientRect(), d = DPRF();
+    FW = Math.round(r.width); FH = Math.round(r.height);
+    fc.width = Math.round(FW*d); fc.height = Math.round(FH*d);
+    const g = fc.getContext('2d'); g.setTransform(d,0,0,d,0,0);
   }
 
-  function flush(outcome){
-    if (!atChar || !drawn.length) { reset(); return; }
-    let coverage = null;
-    try { coverage = +covered().toFixed(3); } catch(_){}
-    log.push({
-      char: atChar,
-      level,                         // mastery level at the time
-      expectedStrokes: expected(atChar),
-      drawnStrokes: drawn.length,
-      penLifts: drawn.length - 1,
-      points: drawn.map(s => s.length),
-      zaps,
-      fizzles,                       // attempt restarts before this outcome
-      reason: lastToast,             // why the engine complained, if it did
-      coverage,
-      outcome,
-      ms: Math.round(performance.now() - began),
-      at: new Date().toISOString(),
-      strokes: drawn,              // normalised 0..1, for offline analysis
+  // ---- state
+  let monsters = [], shots = [], motes = [];
+  let ward = CFG.wardHp, over = false, wave = 0, killed = 0;
+
+  // ---- ink, and what it buys during a run
+  // The Tower's loop, with one rule it does not have: nothing here draws for
+  // you. Every upgrade multiplies what a trace is worth — how fast the lights
+  // you lit are thrown, how many a clean trace lights, how hard a hit shoves —
+  // and none of them lights a character the hand has not written. Ink comes
+  // from tracing, and mostly from tracing cleanly; a wisp's kill pays a
+  // little, so the idle half earns its keep without outearning the pen.
+  // All of it belongs to the run and goes when the ward falls.
+  const UPG = {
+    quick: { kana:'早', name:'quick', blurb:'the lights are thrown faster',  max:5 },
+    bright:{ kana:'灯', name:'bright', blurb:'a trace lights one more',      max:3 },
+    shove: { kana:'押', name:'shove', blurb:'every hit pushes them back',     max:5 },
+    mend:  { kana:'守', name:'mend',  blurb:'the ward gains a heart',          max:5 },
+  };
+  // `sumi`, not `ink`: `ink` is the engine's drawing context, and this layer
+  // uses it (guided mode wipes the pen's mark with it). Calling the currency
+  // `ink` shadowed it, and guided threw on every repaint in v0.1.39.
+  let sumi = 0, upg = { quick:0, bright:0, shove:0, mend:0 };
+  const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
+  const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
+  const wardMax = () => CFG.wardHp + upg.mend;
+  function earn(n){ if (n > 0){ sumi += n; renderUpg(); } return sumi; }
+  function buy(id){
+    if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
+    const c = costOf(id);
+    if (sumi < c) return false;
+    sumi -= c; upg[id]++;
+    if (id === 'mend') ward = Math.min(wardMax(), ward + 1);
+    try { window.__sync && window.__sync.record('upgrade', { id, level: upg[id], wave }); } catch(_){}
+    renderUpg();
+    return true;
+  }
+  // Farang toughen as the waves climb. A tough one is not answered twice by
+  // hand: the trace is the first hit and it lights the character, and the
+  // character's own wisps are the rest. One clean trace is worth three hits
+  // (itself and two lights), so past three the pen has to come back — or the
+  // workshop has to have made a trace worth more. Words are already as tough
+  // as they are long, so this is for single characters.
+  const hpFor = w => WORDS || !CFG.hpEvery ? 1 : Math.min(CFG.hpMax, 1 + Math.floor(w / CFG.hpEvery));
+  let spawnAt = 0, tPrev = 0;
+  // The field holds still while the start page is up. Nothing moves, nothing
+  // spawns, no wisp flies; the clock resumes from where it stopped.
+  let paused = true;
+
+  // ---- difficulty, at runtime
+  // The pack bakes in the penalties; the start page chooses between them.
+  // The values themselves are read off the engine at boot rather than
+  // written here, so a pack that tunes them stays authoritative.
+  const BASE = { R_ON0, DRAIN, FIZZ, COVER_MIN, MAX_TRAVEL };
+  // guided is not easy with the numbers turned down. The objective is the
+  // light: drag it to the end of every stroke and the glyph is yours. So the
+  // pen leaves no ink, nothing zaps, the light is big enough to be the thing
+  // you are holding, and the only test at the end is that the light got
+  // there — coverage and travel are not asked, because the light cannot
+  // reach the end without the pen having gone the whole way with it.
+  const DIFF = {
+    // One size, the largest. Guided teaches the shape and the order; a small
+    // glyph tests the hand, and calibrating a hand is not learning hiragana.
+    // The light is dragged rather than chased (DRAG_FOLLOW), and nothing is
+    // kindled or cast: guided is practice, and the wisps are for the game.
+    // The light is easy's light, no bigger: at 2.4x, then 1.5x, it was still
+    // 'a giant circle'. And no comet: the looping run to the end of the
+    // stroke sets a pace, and the hand starts following its speed instead
+    // of dragging the light at its own. The road ahead already shows where
+    // to go; guided does not need to be shown how fast.
+    guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
+              R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
+              COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
+              guide:true, numbers:true, comet:false, shadow:'none' },
+    easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
+              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
+              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
+              guide:true, numbers:true, shadow:'none' },
+    medium: { kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
+              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
+              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
+              guide:false, numbers:false, shadow:'strokes' },
+    hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
+              locked:true },
+  };
+  // With words the joke turns around: the loanword is already English in a
+  // Japanese accent, so the farang either says it that way (romaji) or says
+  // its own word and leaves the accent to you (gaijin).
+  const SIGNS = WORDS ? {
+    kana:   { blurb:'コーヒー — the word, by copying it' },
+    romaji: { blurb:'koohii — the farang\'s accent. you know what it sounds like; write it' },
+    gaijin: { blurb:'coffee — the farang\'s own word. the accent is on you' },
+  } : {
+    kana:   { blurb:'ぬ — the shape, by copying it' },
+    romaji: { blurb:'nu — the reading, which is the direction that matters' },
+    gaijin: { blurb:'NEW — the way you probably say it' },
+  };
+  // A word realm remembers its own sign: what "gaijin" means differs.
+  const SKEY = WORDS ? 'hito-start-' + CFG.deck.deck : 'hito-start';
+  let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'easy';
+  try {
+    const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {};
+    if (s.difficulty in DIFF && !DIFF[s.difficulty].locked) difficulty = s.difficulty;
+    if (s.sign in SIGNS) CFG.sign = s.sign;
+  } catch(_){}
+  function saveStart(){ try { localStorage.setItem(SKEY, JSON.stringify({difficulty, sign:CFG.sign})); } catch(_){} }
+  function applyDifficulty(name){
+    const d = DIFF[name];
+    if (!d || d.locked) return false;
+    difficulty = name;
+    R_ON0 = d.R_ON0; DRAIN = d.DRAIN; FIZZ = d.FIZZ;
+    COVER_MIN = d.COVER_MIN; MAX_TRAVEL = d.MAX_TRAVEL; DOT_SCALE = d.dot; SIZE_PIN = d.size;
+    DRAG_FOLLOW = d.drag;
+    GUIDE_ON = d.guide; GUIDE_NUMBERS = d.numbers; SHADOW_MODE = d.shadow;
+    COMET_ON = d.comet !== false;   // the looping demonstration; guided turns it off
+    saveStart();
+    return true;
+  }
+  // and the glyph is redrawn under the new rules
+  function setDifficulty(name){
+    if (!applyDifficulty(name)) return false;
+    loading = true; try { _load(idx); } finally { loading = false; }
+    return true;
+  }
+  function setSign(v){ if (!(v in SIGNS)) return false; CFG.sign = v; saveStart(); return true; }
+  applyDifficulty(difficulty);
+
+  // ---- hitodama
+  // A ghost light per character, keyed by the character itself (a codepoint,
+  // never a grid index — words and future scripts write to the same ledger).
+  // Tracing kindles it; a monster carrying the character spends it. Kept in
+  // localStorage rather than a run, because it is what was learned, and the
+  // ward falling does not unlearn anything.
+  const HKEY = 'hito-hitodama';
+  let HITODAMA = {};
+  try { HITODAMA = JSON.parse(localStorage.getItem(HKEY) || '{}') || {}; } catch(_){ HITODAMA = {}; }
+  // Lights the word game kept by word before v0.1.40. Nothing can spend them
+  // now. Only keys longer than a character go: this store is shared with the
+  // other realms on the same origin, and their characters are not ours to bin.
+  for (const k of Object.keys(HITODAMA)) if ([...k].length > 1) delete HITODAMA[k];
+  function saveH(){ try { localStorage.setItem(HKEY, JSON.stringify(HITODAMA)); } catch(_){} }
+  const charge = ch => HITODAMA[ch] || 0;
+  function kindle(ch, n){
+    HITODAMA[ch] = Math.min(CFG.hitodamaCap, charge(ch) + n);
+    saveH();
+    try { window.__sync && window.__sync.record('kindle', { glyph: ch, charge: HITODAMA[ch] }); } catch(_){}
+    return HITODAMA[ch];
+  }
+  function quench(){ HITODAMA = {}; saveH(); }
+  // Zaps during the attempt, so a clean trace can pay more than a scrappy one.
+  // conjure() does not say how it went; zap() is the only global that does.
+  let zapped = 0;
+  const _zap = window.zap;
+  window.zap = function(){
+    if (DIFF[difficulty] && DIFF[difficulty].ink === false) return;   // guided: the light just stops
+    zapped++; return _zap.apply(this, arguments);
+  };
+  // In guided the pen leaves no mark. redrawInk() is looked up by name on
+  // every pointer move, so this wrapper does catch the engine's own calls.
+  const _redrawInk = window.redrawInk;
+  window.redrawInk = function(){
+    if (DIFF[difficulty] && DIFF[difficulty].ink === false){ ink.clearRect(0,0,W,H); return; }
+    return _redrawInk.apply(this, arguments);
+  };
+
+  // A lit character throws its own wisp. One at a time, on a cooldown, so a
+  // swarm of three ぬ is answered visibly rather than vanishing in a frame.
+  // Never at the monster the hand is answering right now: that one is yours.
+  let castAt = 0;
+  function dash(){ return { x: cx(), y: FH - 14 }; }
+  const casting = () => !DIFF[difficulty] || DIFF[difficulty].cast !== false;
+  function autocast(now){
+    if (!casting()) return null;
+    if (now - castAt < castMs()) return null;
+    let best = null;
+    for (const m of monsters){
+      if (charge(key(m)) < 1) continue;
+      if (m === locked && tracing()) continue;
+      if (shots.some(s => s.to === m)) continue;
+      if (!best || m.d < best.d) best = m;
+    }
+    if (!best) return null;
+    const ch = key(best);
+    HITODAMA[ch] = charge(ch) - 1; saveH();
+    // A word is answered one slot at a time, in order: this light writes the
+    // kana the farang is waiting on and no other. A dark kana at the front of
+    // a word holds up everything lit behind it, which is the right pressure —
+    // and it is what keeps writing a word meaning writing it.
+    let partial = false;
+    if (best.w){
+      best.ci++;
+      partial = best.ci < best.w.chars.length;
+      if (partial) best.i = AT[best.w.chars[best.ci]];
+    }
+    shots.push({ from: dash(), to: best, t: 0, ch, auto: true, partial });
+    castAt = now;
+    // The pen goes to the holes. If that was the word the tracer was pointed
+    // at, it is now waiting on a different kana; and if that one is lit too,
+    // the hand has no business here and is let go to find a dark one.
+    if (best === locked && partial){
+      if (charge(key(best)) >= 1) locked = null;
+      retarget();
+    }
+    try { window.__sync && window.__sync.record('cast', { glyph: ch, left: HITODAMA[ch] }); } catch(_){}
+    return best;
+  }
+
+  // Three ways a monster can ask. kana tests recall of the shape; romaji tests
+  // the reading, which is the direction that actually matters; gaijin asks in
+  // the learner's own broken accent, which is the same joke as the hero who
+  // cannot read — the player is the foreigner here.
+  const labelOf = (m, which) => m.w
+    ? (which === 'romaji' ? m.w.romaji : which === 'gaijin' ? m.w.en : m.w.ja)
+    : which === 'romaji' ? LETTERS[m.i][2] :
+      which === 'gaijin' ? (LETTERS[m.i][7] || LETTERS[m.i][2].toUpperCase()) :
+      LETTERS[m.i][0];
+  const sign = m => labelOf(m, CFG.sign);
+
+  // Mastery says a character was learned; the hand's ledger says whether it
+  // still bites. One that does keeps coming back however high its level —
+  // conjured six times with a fizzle each time is not a character to skip.
+  const shaky = c => { try { return !!(window.__hand && window.__hand.shaky(c)); } catch(_){ return false; } };
+  function spawn(){
+    // Bias toward glyphs whose flame has gone out: a monster is a character
+    // you are forgetting, so the roster is the gojuon and the encounter rate
+    // follows what actually needs review.
+    let i, w = null, tries = 0;
+    if (WORDS){
+      // the same rule at word level: a word whose every kana is mastered is
+      // usually passed over for one that still has a dark character in it
+      do { w = WORDS[Math.floor(Math.random()*WORDS.length)]; tries++; }
+      while (tries < 8 && w.chars.every(c => (MASTERY[c]||0) > 2 && !shaky(c)) && Math.random() < 0.7);
+      i = AT[w.chars[0]];
+    } else {
+      do { i = Math.floor(Math.random()*LETTERS.length); tries++; }
+      while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && !shaky(LETTERS[i][0]) && Math.random() < 0.7);
+    }
+    monsters.push({
+      i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
+      speed: CFG.speed * (0.8 + Math.random()*0.5),
+      hp: hpFor(wave), wob: Math.random()*6.28, born: performance.now(),
     });
-    save();
-    reset();
-  }
-  function reset(){
-    drawn = []; stroke = null; zaps = 0; fizzles = 0; lastToast = null;
-    began = performance.now();
-    try { level = MASTERY[LETTERS[idx][0]] || 0; } catch(_){ level = 0; }
+    wave++;
+    // If the tracer is idle or pointed at a glyph nobody carries, the arrival
+    // is what it should be showing.
+    if (!locked || !monsters.includes(locked)) retarget();
   }
 
-  function save(){
-    try { localStorage.setItem(KEY, JSON.stringify(log)); } catch(_){}
-    const b = document.getElementById('__tel');
-    if (b) b.textContent = `● ${log.length} attempt${log.length===1?'':'s'}`;
+  // The target is LOCKED once the tracer has loaded its glyph, and stays
+  // locked until it dies, reaches the ward, or the player taps another.
+  //
+  // It used to be recomputed as "whichever is nearest right now", which is
+  // wrong the moment anything moves: monsters advance while you trace, so one
+  // could overtake yours mid-glyph and conjure() would fire at the newcomer.
+  // You drew あ and something carrying ぬ died for it. What you are answering
+  // cannot be allowed to change underneath the answer.
+  let locked = null;
+  // The hand goes where the flame is out. A monster carrying a lit character
+  // will be answered by its own wisp, so the tracer is pointed at the nearest
+  // one that will not — which is the character that actually needs practice.
+  function nearest(){
+    let best = null, dark = null;
+    for (const m of monsters){
+      if (!best || m.d < best.d) best = m;
+      if (charge(key(m)) < 1 && (!dark || m.d < dark.d)) dark = m;
+    }
+    return casting() ? (dark || best) : best;
+  }
+  function target(){
+    if (locked && monsters.includes(locked)) return locked;
+    locked = nearest();
+    return locked;
+  }
+  function targetIdx(){ const t = target(); return t ? t.i : null; }
+
+  // Tapping a monster is how you choose what to answer. This is the
+  // identification mechanic arriving early: with the guide up the tracer still
+  // shows you the shape, but which of them you take is yours.
+  function pick(x, y){
+    let best = null, bd = 44;
+    for (const m of monsters){
+      const p = px(m), d = Math.hypot(x-p.x, y-(p.y-14));
+      if (d < bd){ bd = d; best = m; }
+    }
+    if (best && best !== locked){
+      locked = best;
+      pendingRetarget = false;
+      loading = true; try { _load(best.i); } finally { loading = false; }
+      return true;
+    }
+    return false;
   }
 
-  // ---- outcomes: wrap the globals whose calls mean something happened
-  // The toast text is the engine's own explanation of a refusal — the
-  // difference between "missed 40% of the path" and "too much wandering" is
-  // exactly what a bug report cannot tell us, so capture it.
-  const _toast = window.toast, _fizzle = window.fizzle;
-  window.toast = function(m){ lastToast = m; return _toast.apply(this, arguments); };
-  window.fizzle = function(){ fizzles++; return _fizzle.apply(this, arguments); };
+  // ---- drive the tracer from the field
+  // Every load() lands on whatever the field is asking for. conjure()'s own
+  // delayed load(idx+1) therefore advances to the next target rather than to
+  // the next character in the chart.
+  const _load = window.load;
+  let loading = false;
+  window.load = function(i){
+    zapped = 0;
+    if (loading) return _load.apply(this, arguments);
+    const t = targetIdx();
+    return _load.call(this, t === null ? i : t);
+  };
+  // A trace in progress is not to be interrupted. When several monsters land
+  // at once the field churns — each arrival clears the lock and retargets —
+  // and every one of those reloads wipes whatever the player had drawn. The
+  // glyph changing under a working hand is what makes a swarm feel broken
+  // rather than hard.
+  // `done` matters here. After a conjure prog sits at the end of the last
+  // stroke, so without that clause tracing() stayed true forever: the deferred
+  // retarget never ran, and when the field emptied and refilled the tracer was
+  // left frozen on the celebration of a glyph nothing was carrying any more.
+  // "In progress" has to mean what the hand means by it. prog > 0 misses
+  // the first stroke before it finds the path, and misses a hand that has
+  // just lifted to think — both of which is when a wisp elsewhere would swap
+  // the glyph under a pen that is about to come back down. So: ink on the
+  // board counts, and so does any contact with the pad in the last holdMs.
+  let penAt = -1e9;
+  function tracing(){
+    return !done && (activeId !== null || prog > 0 || strokes.length > 0 || !!cur
+                     || performance.now() - penAt < CFG.holdMs);
+  }
+  const inkEl = document.getElementById('ink');
+  for (const ev of ['pointerdown', 'pointermove', 'pointerup'])
+    inkEl.addEventListener(ev, e => {
+      if (ev === 'pointermove' && !e.buttons) return;   // a hovering pen is not a hand at work
+      penAt = performance.now();
+    }, true);
 
-  const _conjure = window.conjure, _zap = window.zap, _load = window.load;
-  window.conjure = function(){ flush('conjured'); return _conjure.apply(this, arguments); };
-  window.zap     = function(){ zaps++;            return _zap.apply(this, arguments); };
-  window.load    = function(i){
-    if (atChar !== null) flush('abandoned');
-    const r = _load.apply(this, arguments);
-    try { atChar = LETTERS[idx][0]; } catch(_){ atChar = null; }
-    reset();
+  // Ink that was off the path is a smudge, not an attempt. When the pen
+  // lifts the finished stroke is cut down to the runs that were on the path;
+  // the orange runs go, with a puff where they were. A stroke that never
+  // found the path goes entirely. Keeping the off-path tails of an otherwise
+  // good stroke was tried first and it is what let an overdrawn line stay
+  // and pile up. Purely cosmetic: travel and coverage are accumulated live
+  // in follow(), not read back from the stroke list, so the scribble guard
+  // is untouched. Returns how many runs were erased.
+  function tidy(){
+    if (!CFG.tidyStrays || mode !== 'practice' || !PATH.length || !strokes.length) return 0;
+    if (DIFF[difficulty] && DIFF[difficulty].ink === false){ strokes.length = 0; return 0; }
+    const s = strokes[strokes.length - 1];
+    const keep = [], gone = [];
+    let run = [];
+    const flush = () => { if (run.length > 1) keep.push(run); run = []; };
+    for (const q of s){
+      if (q.on) run.push(q);
+      else { flush(); gone.push(q); }
+    }
+    flush();
+    if (!gone.length) return 0;
+    strokes.pop(); strokes.push(...keep); redrawInk();
+    const m = gone[Math.floor(gone.length / 2)];
+    for (let k = 0; k < 10; k++){
+      const a = Math.random()*6.283, v = .5 + Math.random()*1.5;
+      parts.push({x:m.x, y:m.y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, life:.6,
+                  r:1 + Math.random()*1.5, c:'200,132,47'});
+    }
+    loop();
+    return gone.length;
+  }
+  // Registered after the engine's own pointerup, so endStroke has already
+  // pushed the stroke by the time this runs.
+  inkEl.addEventListener('pointerup', () => tidy());
+  inkEl.addEventListener('pointercancel', () => tidy());
+  let pendingRetarget = false;
+  function retarget(force){
+    if (locked && !monsters.includes(locked)) locked = null;
+    const t = targetIdx();
+    // Already on the right glyph is only a reason to do nothing if the tracer
+    // is live on it. After a conjure `done` is set, and if the next target
+    // happens to carry the same character the old early return left the
+    // tracer sitting in its celebration until the engine's own 1.9s timer
+    // fired — a dead spot precisely when two of the same arrive together.
+    if (t === null || (t === idx && !done)) { pendingRetarget = false; return; }
+    if (!force && tracing()){ pendingRetarget = true; return; }
+    pendingRetarget = false;
+    zapped = 0;
+    loading = true; try { _load(t); } finally { loading = false; }
+  }
+
+  // ---- a finished glyph is the attack
+  // What was drawn decides what is hit — not which object happened to be
+  // locked when the pen came up. "You identify, you do not aim" taken
+  // literally: finish ぬ and the nearest ぬ on the field takes it. If the
+  // monster you were answering reached the ward mid-glyph, the character is
+  // still correct and still finds a mark; if nothing on the field carries it,
+  // the shot has nowhere to go and dissipates.
+  function bearer(ch){
+    // The one the tracer is pointed at, if it is waiting on this. Two words can
+    // be waiting on the same kana (ー is in everything), and the nearer one
+    // taking a stroke meant for the other is the ぬ-for-あ bug in a new coat.
+    if (locked && monsters.includes(locked) && LETTERS[locked.i][0] === ch) return locked;
+    let best = null;
+    for (const m of monsters)
+      if (LETTERS[m.i][0] === ch && (!best || m.d < best.d)) best = m;
+    return best;
+  }
+
+  const _conjure = window.conjure;
+  window.conjure = function(){
+    const drew = LETTERS[idx][0];
+    // A word is only ever advanced by its own next kana, so there is no
+    // falling back to the locked monster: a stray character hits nothing.
+    const t = bearer(drew) || (!WORDS && monsters.includes(locked) ? locked : null);
+    let whole = true;   // did this finish what the monster carries
+    if (t && t.w){
+      // one kana of the word is written; the farang now waits for the next
+      t.ci++; t.zaps += zapped;
+      whole = t.ci >= t.w.chars.length;
+      if (!whole) t.i = AT[t.w.chars[t.ci]];
+    }
+    if (t){
+      shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:drew, partial: !whole});
+      if (navigator.vibrate) navigator.vibrate([12,30,40]);
+    }
+    // And the character is kindled whether or not anything carried it — a
+    // trace with nothing to hit is banked, not wasted. Clean pays more.
+    // In a word too: every kana written lights that kana, and clean means
+    // this kana. The light belongs to the character, whatever it was part of.
+    if (casting()){
+      const gain = CFG.hitodamaGain + upg.bright + (zapped ? 0 : CFG.cleanBonus);
+      kindle(drew, gain);
+      const d = dash();
+      for (let k=0;k<14;k++)
+        motes.push({x:d.x, y:d.y, vx:(Math.random()-.5)*1.8, vy:-Math.random()*2.2,
+                    life:1, wisp:true});
+    }
+    // Ink is paid for the trace, not for the kill: the hand did the work
+    // whether or not anything was standing there. A character conjured many
+    // times pays a little less, so the run pushes toward the ones that are new.
+    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
+    const r = _conjure.apply(this, arguments);
+    // The engine celebrates for 1.9s before advancing, which is dead time in a
+    // game with a clock running — a fast hand finishes the next glyph before
+    // the next glyph exists. Advance as soon as the shot lands instead.
+    //
+    // The engine's own delayed load(idx+1) needs no cancelling: load() clears
+    // `done`, and that callback is guarded by it, so an early advance disarms
+    // the late one. Without that it would fire mid-trace and wipe the strokes.
+    // A word half written stays yours: the lock holds until its last kana.
+    setTimeout(() => {
+      // …unless the kana it now waits on is lit. Then its own light will
+      // write it, and the hand is better spent on a farang with a dark one.
+      locked = t && t.w && !whole && monsters.includes(t) && !(casting() && charge(key(t)) >= 1) ? t : null;
+      retarget(true);
+    }, CFG.advanceMs);
     return r;
   };
 
-  // ---- what was drawn: our own listeners, capture phase, passive
-  const pad = document.getElementById('ink');
-  const box = () => pad.getBoundingClientRect();
-  const at = e => { const r = box();
-    return [ +(((e.clientX-r.left)/r.width).toFixed(4)),
-             +(((e.clientY-r.top )/r.height).toFixed(4)) ]; };
-
-  pad.addEventListener('pointerdown', e => { stroke = [at(e)]; }, true);
-  pad.addEventListener('pointermove', e => {
-    if (!stroke) return;
-    const c = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
-    (c.length ? c : [e]).forEach(s => stroke.push(at(s)));
-  }, true);
-  const up = () => { if (stroke && stroke.length > 1) drawn.push(stroke); stroke = null; };
-  pad.addEventListener('pointerup', up, true);
-  pad.addEventListener('pointercancel', up, true);
-
-  // ---- grid toggle
-  const GRIDS = ['cross','quarters','none'];
-  function cycleGrid(){
-    try {
-      GRID_MODE = GRIDS[(GRIDS.indexOf(GRID_MODE)+1) % GRIDS.length];
-      const b = document.getElementById('__gr');
-      if (b) b.textContent = 'grid: ' + GRID_MODE;
-      drawGuide();
-      return GRID_MODE;
-    } catch(_){ return null; }
+  let readings = [];
+  function strike(m, partial, auto){
+    const p0 = px(m);
+    if (upg.shove) m.d = Math.min(1, m.d + upg.shove * CFG.shoveStep);
+    if (partial){
+      // a kana landed: the farang staggers back a step and waits for the next.
+      // Only for the hand. A lit arsenal that also shoved would hold a word
+      // at the edge for ever, and then there is no clock.
+      if (!auto) m.d = Math.min(1, m.d + CFG.knockback);
+      for (let k=0;k<8;k++)
+        motes.push({x:p0.x, y:p0.y, vx:(Math.random()-.5)*2, vy:(Math.random()-.5)*2, life:.7});
+      return;
+    }
+    m.hp--;
+    // The sound, attached to the kill. Tracing a shape teaches the shape and
+    // nothing else — the hand can learn every stroke of ぬ without the reading
+    // ever arriving. Success is the moment attention is highest, so that is
+    // where the reading goes.
+    // The correct reading, and underneath it the way you probably said it.
+    // The joke is the teaching: "SOO" next to "tsu" names the dropped t far
+    // better than the correct spelling does on its own, because the learner
+    // recognises the wrong one as theirs.
+    // A tough one is hit several times. The reading blooms when the hand
+    // lands it and when it finally goes — not once per wisp, or it is noise.
+    if (CFG.reading !== 'off' && (!auto || m.hp <= 0)){
+      const p = px(m);
+      let text, sub = null;
+      if (m.w){
+        // the word blooms with whichever half the sign kept back: after
+        // "koohii" the news is "coffee", after "coffee" it is "koohii"
+        const flip = CFG.sign === 'romaji';
+        text = CFG.reading === 'gaijin' || (CFG.reading === 'both' && flip) ? m.w.en : m.w.romaji;
+        if (CFG.reading === 'both') sub = flip ? m.w.romaji : m.w.en;
+      } else {
+        text = CFG.reading === 'gaijin' ? labelOf(m,'gaijin') : LETTERS[m.i][2];
+        sub  = CFG.reading === 'both'   ? labelOf(m,'gaijin') : null;
+      }
+      readings.push({ x:p.x, y:p.y, life:1, text, sub });
+    }
+    for (let k=0;k<18;k++)
+      motes.push({x:px(m).x, y:px(m).y, vx:(Math.random()-.5)*2.4,
+                  vy:(Math.random()-.5)*2.4, life:1});
+    if (m.hp <= 0){
+      monsters = monsters.filter(x => x !== m);
+      if (m === locked) locked = null;
+      killed++;
+      if (auto) earn(CFG.inkKill);
+      // An observation, not a claim: what was answered and how long it took.
+      // Deliberately not a score — the client does not get to assert totals.
+      try { window.__sync && window.__sync.record('banish', {
+        glyph: LETTERS[m.i][0], level: MASTERY[LETTERS[m.i][0]] || 0,
+        word: m.w ? m.w.ja : undefined,
+        ms: Math.round(performance.now() - m.born), sign: CFG.sign,
+      }); } catch(_){}
+      retarget();
+    }
   }
 
-  // ---- mastery control
-  // A glyph that becomes unpassable is also untestable, because there is no
-  // way back down. This sets the level for the current character directly.
-  function setLevel(n){
-    try {
-      const ch = LETTERS[idx][0];
-      if (n <= 0) delete MASTERY[ch]; else MASTERY[ch] = n;
-      persistM(); load(idx);
-      const b = document.getElementById('__lv');
-      if (b) b.textContent = 'lv ' + (MASTERY[ch] || 0) + ' ▲▼';
-      return MASTERY[ch] || 0;
-    } catch(_){ return null; }
+  const px = m => ({ x: cx() + Math.cos(m.a)*m.d*FW*0.52,
+                     y: cy() + Math.sin(m.a)*m.d*FH*0.52 });
+
+  // ---- the loop
+  function step(now){
+    if (!tPrev) tPrev = now;
+    const dt = Math.min(0.05, (now - tPrev)/1000); tPrev = now;
+    if (paused){ draw(); return; }
+    if (!over){
+      // Nothing to answer is not a rest, it is a dead screen. Refill at once.
+      if (!monsters.length) spawnAt = Math.min(spawnAt, now);
+      if (now > spawnAt){
+        spawn();
+        spawnAt = now + Math.max(CFG.spawnMin, CFG.spawnMs - wave*CFG.spawnRamp);
+      }
+      for (const m of monsters){
+        m.d -= m.speed*dt;
+        if (m.d <= 0.06){
+          monsters = monsters.filter(x => x !== m);
+          if (m === locked) locked = null;
+          ward--;
+          try { window.__sync && window.__sync.record('breach', {
+            glyph: LETTERS[m.i][0], word: m.w ? m.w.ja : undefined, wardLeft: ward, wave,
+          }); } catch(_){}
+          retarget();
+          if (navigator.vibrate) navigator.vibrate(90);
+          if (ward <= 0){ over = true; toast('the ward falls ✦ tap to begin again'); }
+        }
+      }
+      autocast(now);
+      for (const s of shots){
+        s.t += dt*2.6;
+        if (s.t >= 1){ strike(s.to, s.partial, s.auto); }
+      }
+      shots = shots.filter(s => s.t < 1 && monsters.includes(s.to));
+    }
+    // Deferred work, once the hand is free: a queued retarget, or a glyph that
+    // no monster carries any more — which would otherwise strand the player
+    // tracing a character that can no longer hit anything.
+    if (!over && !tracing()){
+      if (pendingRetarget) retarget();
+      else if (!done && monsters.length && !bearer(LETTERS[idx][0])) retarget();
+    }
+    for (const p of motes){ p.x += p.vx; p.y += p.vy; p.life -= dt*1.6; }
+    motes = motes.filter(p => p.life > 0);
+    for (const r of readings){ r.y -= dt*26; r.life -= dt*0.85; }
+    readings = readings.filter(r => r.life > 0);
+    draw();
   }
+  function fieldLoop(now){ step(now); requestAnimationFrame(fieldLoop); }
 
-  // ---- shadow mode toggle
-  // Three ways to show the target, cycled live so they can be compared on the
-  // same glyph instead of across deploys:
-  //   none    only the trail — road ahead, dots, and the stroke already made
-  //   strokes a thick faint path under the trail
-  //   font    the glyph drawn in the trace font (misaligned by design: the
-  //           stroke data describes KanjiVG's letterforms, not this font's)
-  // easy / medium / hard, matching the pack's `mode` presets.
-  const MODES = [
-    {name:'easy',   shadow:'none',    guide:true,  numbers:true},
-    {name:'medium', shadow:'strokes', guide:false, numbers:false},
-    {name:'hard',   shadow:'none',    guide:false, numbers:false},
-  ];
-  let modeIdx = 0;
-  function cycleShadow(){
-    try {
-      modeIdx = (modeIdx+1) % MODES.length;
-      const m = MODES[modeIdx];
-      SHADOW_MODE = m.shadow; GUIDE_ON = m.guide; GUIDE_NUMBERS = m.numbers;
-      const b = document.getElementById('__sm');
-      if (b) b.textContent = 'mode: ' + m.name;
-      drawGuide();
-      return m.name;
-    } catch(_){ return null; }
-  }
+  function draw(){
+    const g = fc.getContext('2d');
+    g.clearRect(0,0,FW,FH);
+    const X = cx(), Y = cy();
 
-  // ---- alignment nudge
-  // The baked coordinates assume canvas anchors textBaseline='middle' at the
-  // em-square middle (0.38 em above the baseline for Klee One). Chrome may
-  // instead use hhea metrics, which would put it at 0.436. Rather than guess,
-  // this lets the alignment be corrected by eye and the numbers reported back.
-  const ALIGN = (function(){
-    try { return DEFAULT_BOOK.alignment || {baseF:0.62, glyphCy:0.44}; }
-    catch(_){ return {baseF:0.62, glyphCy:0.44}; }
-  })();
-  const PRISTINE = JSON.parse(JSON.stringify(
-    (function(){ try { return DEFAULT_BOOK.fonts; } catch(_){ return {}; } })()));
+    // the ward being protected
+    const pulse = 0.6 + 0.4*Math.sin(performance.now()/700);
+    g.save();
+    g.shadowColor = 'rgba(108,184,255,.8)'; g.shadowBlur = 26*pulse;
+    g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(108,184,255,.92)';
+    g.beginPath(); g.arc(X, Y, 13, 0, 6.284); g.fill();
+    g.restore();
+    g.strokeStyle = over ? 'rgba(200,90,70,.35)' : 'rgba(108,184,255,.22)';
+    g.lineWidth = 1;
+    g.beginPath(); g.arc(X, Y, 26 + 5*pulse, 0, 6.284); g.stroke();
 
-  function realign(scale, cy){
-    for (const fid in PRISTINE){
-      const src = PRISTINE[fid].letters, dst = TEACHER.fonts[fid];
-      if (!dst) continue;
-      for (const ch in src){
-        dst.letters[ch] = { strokes: src[ch].strokes.map(st => st.map(q => {
-          // undo the baked transform, then re-apply the nudged one
-          const kx = (q.x - 0.5) / ALIGN.baseF + 0.5;
-          const ky = (q.y - 0.5) / ALIGN.baseF + ALIGN.glyphCy;
-          return { x: +(0.5 + scale*(kx - 0.5)).toFixed(4),
-                   y: +(0.5 + scale*(ky - cy)).toFixed(4), p: q.p, t: q.t };
-        })) };
+    // ward health, as pips under it
+    for (let k=0;k<wardMax();k++){
+      g.fillStyle = k < ward ? 'rgba(108,184,255,.85)' : 'rgba(108,184,255,.14)';
+      g.beginPath(); g.arc(X - (wardMax()-1)*5 + k*10, Y + 34, 3, 0, 6.284); g.fill();
+    }
+
+    const tgt = target();
+    for (const m of monsters){
+      const p = px(m), isT = m === tgt;
+      const bob = Math.sin(performance.now()/500 + m.wob)*2.5;
+
+      // the farang: a pale drifting shape, brighter the closer it gets
+      const near = 1 - m.d;
+      g.save();
+      g.globalAlpha = 0.5 + 0.5*near;
+      g.shadowColor = isT ? 'rgba(95,227,161,.75)' : 'rgba(150,170,190,.4)';
+      g.shadowBlur = isT ? 20 : 10;
+      g.fillStyle = isT ? 'rgba(95,227,161,.30)' : 'rgba(170,185,200,.20)';
+      g.beginPath(); g.ellipse(p.x, p.y+bob, 17, 21, 0, 0, 6.284); g.fill();
+      g.restore();
+
+      // the sign it carries — and for a word, a strip under it showing how
+      // much of it has been written, blank where it has not
+      const label = sign(m);
+      g.font = (m.w ? (CFG.sign === 'kana' ? '600 18px' : '600 14px') : CFG.sign === 'romaji' ? '600 15px' : '600 22px')
+        + ' ui-sans-serif,system-ui,"Klee One",sans-serif';
+      const SP = 15;
+      const w = Math.max(g.measureText(label).width, m.w ? m.w.chars.length*SP : 0) + 18;
+      const bh = m.w ? 44 : 27;
+      const by = p.y + bob - 36 - (bh - 27);
+      g.fillStyle = isT ? 'rgba(16,36,28,.92)' : 'rgba(22,24,28,.85)';
+      g.strokeStyle = isT ? 'rgba(95,227,161,.65)' : 'rgba(180,195,210,.28)';
+      g.lineWidth = 1;
+      g.beginPath();
+      if (g.roundRect) g.roundRect(p.x-w/2, by-16, w, bh, 8);
+      else g.rect(p.x-w/2, by-16, w, bh);
+      g.fill(); g.stroke();
+      const bb = by - 16 + bh;
+      g.beginPath(); g.moveTo(p.x-5, bb); g.lineTo(p.x, bb+7); g.lineTo(p.x+5, bb);
+      g.fillStyle = isT ? 'rgba(16,36,28,.92)' : 'rgba(22,24,28,.85)'; g.fill();
+      g.fillStyle = isT ? '#c3f7dc' : 'rgba(226,232,240,.8)';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(label, p.x, by-2);
+      if (m.w){
+        const n = m.w.chars.length, x0 = p.x - (n-1)*SP/2;
+        const reveal = CFG.sign === 'kana' || (DIFF[difficulty] && DIFF[difficulty].reveal);
+        g.font = '600 13px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        for (let k = 0; k < n; k++){
+          const written = k < m.ci, cur = k === m.ci;
+          // teal for a slot your own light will write: the word shows, before
+          // anything flies, how much of it you already hold and where the holes are
+          const held = !written && casting() && charge(m.w.chars[k]) >= 1;
+          g.fillStyle = written ? '#bfe3ff' : held ? 'rgba(95,227,161,.95)' : cur ? (isT ? '#c3f7dc' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
+          g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
+        }
+      }
+      // how much more it takes: one pip per hit still owed, above the bubble
+      // (under it is the farang's own head)
+      if (m.hp > 1){
+        g.fillStyle = isT ? 'rgba(108,184,255,.95)' : 'rgba(108,184,255,.6)';
+        for (let k = 0; k < m.hp; k++){
+          g.beginPath(); g.arc(p.x - (m.hp-1)*4 + k*8, by - 23, 2.4, 0, 6.284); g.fill();
+        }
+      }
+      // a lit character: its own wisp will answer this one
+      if (casting() && charge(key(m)) >= 1){
+        g.save();
+        g.shadowColor = 'rgba(95,227,161,.9)'; g.shadowBlur = 10;
+        g.fillStyle = 'rgba(150,240,195,.95)';
+        g.beginPath(); g.arc(p.x + w/2 + 2, by-14, 3.2, 0, 6.284); g.fill();
+        g.restore();
       }
     }
-    try { load(idx); } catch(_){}
+
+    // the glyph in flight
+    for (const s of shots){
+      const p = px(s.to);
+      const t = s.t, e = t*t*(3-2*t);
+      const x = s.from.x + (p.x - s.from.x)*e;
+      const y = s.from.y + (p.y - s.from.y)*e - Math.sin(t*Math.PI)*46;
+      g.save();
+      if (s.auto){
+        // the ghost light, cold and trailing, the character faint inside it
+        for (let k=3;k>=1;k--){
+          const tt = Math.max(0, t - k*0.05), ee = tt*tt*(3-2*tt);
+          const tx = s.from.x + (p.x - s.from.x)*ee;
+          const ty = s.from.y + (p.y - s.from.y)*ee - Math.sin(tt*Math.PI)*46;
+          g.globalAlpha = 0.28 - k*0.07;
+          g.fillStyle = 'rgba(95,227,161,1)';
+          g.beginPath(); g.arc(tx, ty, 9 - k*1.5, 0, 6.284); g.fill();
+        }
+        g.globalAlpha = 0.95;
+        g.shadowColor = 'rgba(95,227,161,.95)'; g.shadowBlur = 22;
+        g.fillStyle = 'rgba(190,240,228,.9)';
+        g.font = '700 15px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        const rx = Math.max(11, g.measureText(s.ch).width/2 + 7);   // a word needs a longer light
+        g.beginPath(); g.ellipse(x, y, rx, 13, 0, 0, 6.284); g.fill();
+        g.shadowBlur = 0;
+        g.fillStyle = 'rgba(20,40,40,.9)';
+        g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText(s.ch, x, y+1);
+      } else {
+        g.globalAlpha = 0.9;
+        g.shadowColor = 'rgba(108,184,255,.9)'; g.shadowBlur = 18;
+        g.fillStyle = '#bfe3ff';
+        g.font = '700 26px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText(s.ch, x, y);
+      }
+      g.restore();
+    }
+
+    for (const r of readings){
+      const a = Math.min(1, r.life*1.6);
+      g.save();
+      g.globalAlpha = a;
+      g.shadowColor = 'rgba(108,184,255,.9)'; g.shadowBlur = 16;
+      g.fillStyle = '#bfe3ff';
+      g.font = `700 ${Math.round(26 + 10*(1-r.life))}px ui-sans-serif,system-ui`;
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(r.text, r.x, r.y);
+      if (r.sub){
+        g.globalAlpha = a*0.8;
+        g.fillStyle = '#93e0b9';
+        g.font = `600 ${Math.round(15 + 5*(1-r.life))}px ui-sans-serif,system-ui`;
+        g.fillText(r.sub, r.x, r.y + 26);
+      }
+      g.restore();
+    }
+    for (const p of motes){
+      g.globalAlpha = Math.max(0, p.life);
+      g.fillStyle = p.wisp ? '#aef2cf' : '#bfe3ff';
+      g.fillRect(p.x, p.y, 2, 2);
+    }
+    g.globalAlpha = 1;
+
+    // ---- the hitodama dash: the character in the sketchbook and how many
+    // ghost lights it holds. Sits on the seam between field and sketchbook,
+    // which is where the wisps set out from.
+    if (casting()) {
+      // for a word: the word so far, blank where it is still to come
+      const t = target();
+      const ch = t && t.w ? t.w.chars.map((c, k) => k < t.ci ? c : '＿').join('') : LETTERS[idx][0];
+      const c = charge(LETTERS[idx][0]), cap = CFG.hitodamaCap;
+      const d = dash();
+      g.font = '700 17px ui-sans-serif,system-ui,"Klee One",sans-serif';
+      const lw = Math.max(17, g.measureText(ch).width);
+      const pipW = 14, w = 41 + lw + cap*pipW;
+      const x0 = d.x - w/2;
+      g.fillStyle = 'rgba(16,22,24,.78)';
+      g.strokeStyle = c >= 1 ? 'rgba(95,227,161,.45)' : 'rgba(108,184,255,.16)';
+      g.lineWidth = 1;
+      g.beginPath();
+      if (g.roundRect) g.roundRect(x0, d.y-13, w, 26, 13); else g.rect(x0, d.y-13, w, 26);
+      g.fill(); g.stroke();
+      g.textBaseline = 'middle';
+      g.fillStyle = c >= 1 ? '#c3f7dc' : 'rgba(226,232,240,.75)';
+      g.font = '700 17px ui-sans-serif,system-ui,"Klee One",sans-serif';
+      g.textAlign = 'left';
+      g.fillText(ch, x0 + 11, d.y + 1);
+      g.font = '10px ui-sans-serif,system-ui';
+      g.fillStyle = 'rgba(160,190,185,.7)';
+      g.fillText('人魂', x0 + 15 + lw, d.y + 1);
+      const flick = 0.75 + 0.25*Math.sin(performance.now()/160);
+      for (let k=0;k<cap;k++){
+        const px = x0 + 41 + lw + k*pipW + 4, lit = k < c;
+        g.save();
+        if (lit){ g.shadowColor = 'rgba(95,227,161,.95)'; g.shadowBlur = 9*flick; }
+        g.fillStyle = lit ? 'rgba(170,236,220,.95)' : 'rgba(95,227,161,.14)';
+        g.beginPath(); g.ellipse(px, d.y, 3.4, lit ? 4.6*flick+1 : 3.4, 0, 0, 6.284); g.fill();
+        g.restore();
+      }
+    }
+
+    g.fillStyle = 'rgba(108,184,255,.55)';
+    g.font = '12px ui-sans-serif,system-ui'; g.textAlign = 'left';
+    g.textBaseline = 'alphabetic';
+    // Bottom left: the workshop strip has the top, and a tally under buttons
+    // is a tally nobody can read. The wave sits with it, because how far a run
+    // got is what a run is for.
+    g.fillText(`banished ${killed} · wave ${wave}`, 12, FH - 12);
   }
 
-  // ---- size control
-  // The whole point of separating size from mastery. SIZE_PIN holds one size
-  // while the alphabet is walked, so the question becomes "which glyph fails
-  // at which size" instead of "which level was I on", which is what made the
-  // last bug take three releases to corner.
-  const SIZE_LADDER = (function(){
-    const out = [];
-    try {
-      for (let f = SIZE_MAX; f >= SIZE_MIN - 1e-9; f -= 0.02) out.push(Math.round(f*1000)/1000);
-      if (!out.length || out[out.length-1] > SIZE_MIN) out.push(SIZE_MIN);
-    } catch(_){ }
-    return out.length ? out : [0.62];
-  })();
-  let sizeIdx = 0;
-
-  const glyphPx = () => { try { return Math.round(document.getElementById('ink').getBoundingClientRect().height * curF); }
-                          catch(_){ return null; } };
-  function syncSize(){
-    const b = document.getElementById('__sz');
-    if (!b) return;
-    let f = null; try { f = curF; } catch(_){}
-    const pinned = (function(){ try { return SIZE_PIN != null; } catch(_){ return false; } })();
-    b.textContent = (pinned ? 'pinned ' : 'size ') + (f==null ? '?' : f.toFixed(2))
-      + (glyphPx()==null ? '' : ` · ${glyphPx()}px`);
-    b.style.color = pinned ? '#7fd1c4' : '#ece4d8';
-  }
-  function setSizeIdx(i){
-    try {
-      sizeIdx = Math.max(0, Math.min(SIZE_LADDER.length-1, i));
-      SIZE_PIN = SIZE_LADDER[sizeIdx];
-      load(idx); syncSize();
-      return SIZE_PIN;
-    } catch(_){ return null; }
-  }
-  function unpinSize(){
-    try { SIZE_PIN = null; load(idx); syncSize(); } catch(_){}
-  }
-  // Walking the alphabet at a fixed size is the sweep. Navigation already
-  // calls load(), and a pinned size survives it, so next/prev is the loop.
-  function stepGlyph(d){ try { load(idx + d); syncSize(); } catch(_){} }
-
-  // ---- the fail flag
-  // A fizzle is one bad attempt; "this is impossible here" is a judgement only
-  // the hand can make, after several. The engine cannot infer it, so it gets a
-  // button. Everything needed to tell the three suspects apart is captured at
-  // the moment it is pressed: the size (difficulty curve), the glyph (stroke
-  // data), and the live accumulators (state).
-  const flags = [];
-  const FKEY = 'hito-size-flags';
-  try { const r = localStorage.getItem(FKEY); if (r) flags.push(...JSON.parse(r)); } catch(_){}
-  function saveFlags(){
-    try { localStorage.setItem(FKEY, JSON.stringify(flags)); } catch(_){}
-    const b = document.getElementById('__fl');
-    if (b) b.textContent = `✗ fails here (${flags.length})`;
-  }
-  function flagFail(){
-    let rec = {at: new Date().toISOString()};
-    try { rec.char = LETTERS[idx][0]; } catch(_){}
-    try { rec.romaji = LETTERS[idx][2]; } catch(_){}
-    try { rec.size = +curF.toFixed(3); } catch(_){}
-    try { rec.px = glyphPx(); } catch(_){}
-    try { rec.pinned = SIZE_PIN != null; } catch(_){}
-    try { rec.level = MASTERY[LETTERS[idx][0]] || 0; } catch(_){}
-    try { rec.coverage = +covered().toFixed(3); } catch(_){}
-    try { rec.travel = PATHLEN ? +(travel/PATHLEN).toFixed(2) : null; } catch(_){}
-    try { rec.progress = prog; rec.stroke = segIdx; } catch(_){}
-    try { rec.attempts = fizzles; } catch(_){}
-    rec.reason = lastToast;
-    try { rec.mode = MODES[modeIdx].name; } catch(_){}
-    flags.push(rec); saveFlags();
-    // Also into the outbox, so a flag can reach a machine without the
-    // mobile-devtools detour that reading the first three of these took.
-    try { window.__sync && window.__sync.record('flag', rec); } catch(_){}
-    // _toast, not toast: the wrapper records lastToast, and a flag
-    // confirmation is not the engine's explanation of anything.
-    try { _toast(`flagged: ${rec.char} at ${rec.size} (${rec.px}px)`); } catch(_){}
-    return rec;
+  function restart(){
+    monsters = []; shots = []; motes = []; readings = [];
+    sumi = 0; upg = { quick:0, bright:0, shove:0, mend:0 };
+    ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
+    spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
+    renderUpg();
   }
 
-  // A glyph × size grid is the thing the flags are for; rendering it here
-  // means it can be read on the tablet without exporting anything first.
-  function matrix(){
-    if (!flags.length) return '(nothing flagged yet)';
-    const sizes = [...new Set(flags.map(f=>f.size))].sort((a,b)=>b-a);
-    const chars = [...new Set(flags.map(f=>f.char))];
-    const head = 'glyph  ' + sizes.map(s=>s.toFixed(2)).join(' ');
-    const rows = chars.map(c => {
-      const cells = sizes.map(s => {
-        const n = flags.filter(f=>f.char===c && f.size===s).length;
-        return String(n || '·').padStart(4);
-      });
-      return `  ${c}   ${cells.join(' ')}`;
-    });
-    return [head, ...rows].join('\n');
+  // ---- the workshop strip
+  // DOM, not canvas: it is redrawn when something changes rather than every
+  // frame, and a button is a button to a screen reader and to a finger.
+  const strip = document.createElement('div');
+  strip.className = 'upg'; strip.id = 'upg';
+  let upgMarkup = '';
+  function renderUpg(){
+    strip.innerHTML = upgMarkup = `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${sumi}</div>`
+      + Object.entries(UPG).map(([id, u]) => {
+          const maxed = upg[id] >= u.max, c = costOf(id);
+          return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
+            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
+        }).join('');
+    if (strip.querySelectorAll) for (const b of strip.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
   }
+  wrap.appendChild(strip);
+  renderUpg();
 
-  // ---- export
-  window.__hito = {
-    realign,
-    cycleShadow,
-    cycleGrid,
-    setLevel,
-    setSize: f => setSizeIdx(SIZE_LADDER.indexOf(
-      SIZE_LADDER.reduce((a,b)=>Math.abs(b-f)<Math.abs(a-f)?b:a))),
-    sizeUp: () => setSizeIdx(sizeIdx-1),
-    sizeDown: () => setSizeIdx(sizeIdx+1),
-    unpinSize,
-    sizes: SIZE_LADDER,
-    flagFail,
-    matrix,
-    alignment: ALIGN,
-    get log(){ return log; },
-    get flags(){ return flags; },
-    clearFlags(){ flags.length = 0; saveFlags(); },
-    export(){
-      const payload = {
-        exported: new Date().toISOString(),
-        canvasPx: (function(){ try { return Math.round(
-          document.getElementById('ink').getBoundingClientRect().height); } catch(_){ return null; } })(),
-        sizeLadder: SIZE_LADDER,
-        flags,                         // "impossible here", judged by the hand
-        matrix: matrix(),              // the same thing, readable
-        attempts: log,
+  // ---- the start page
+  const start = document.createElement('div');
+  start.className = 'start'; start.id = 'start';
+  let view = 'start', markup = '';
+  const esc = t => String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  function renderCredits(){
+    const lines = (CFG.credits || []).map(l => `<p>${esc(l)}</p>`).join('');
+    start.innerHTML = markup = `<div class="start-card credits">
+      <div class="start-title">hito<span>人</span></div>
+      <div class="start-sub">who this leans on</div>
+      <p class="lead"><b>人</b>is two strokes, and neither can stand on its own. Take one away and the character falls.</p>
+      <p>That is the project. One person records the strokes, another draws the letterforms, testers find the bugs, someone builds it, and every learner leans on all of them.</p>
+      ${lines}
+      <p class="small">${esc(CFG.credit || '')}</p>
+      <p class="small">Single file, opens from a double-click, and needs no network to play. Your progress lives on this device.${window.__sync && window.__sync.enabled ? ' When there is a network, notes on how the tracing went are sent to the workshop under a made-up device name; ✋ hand, up top, turns that off.' : ''}</p>
+      <button class="start-go">back</button>
+    </div>`;
+    const go = start.querySelector('.start-go');
+    if (go) go.onclick = () => { view = 'start'; renderStart(); };
+  }
+  function renderStart(){
+    if (view === 'credits') return renderCredits();
+    // Other realms, as links to sibling files. They are other single-file
+    // builds beside this one — on Pages or in the same folder offline — so
+    // the page is only a hop away and nothing here depends on it loading.
+    const realms = () => !(CFG.realms || []).length ? '' :
+      `<div class="start-h">other realms</div><div class="start-row">` +
+      CFG.realms.map(r => `<a href="${esc(r.file)}"><b>${r.kana ? `<i>${esc(r.kana)}</i>` : ''}${esc(r.label)}</b><small>${esc(r.blurb || '')}</small></a>`).join('') +
+      `</div>`;
+    // What draws belongs to the hand layer; the page only shows its switch,
+    // because on a phone it is the difference between a game and a picture.
+    const hand = window.__hand;
+    const INPUTS = { pen: { kana:'✎', blurb:'fingers and palms are ignored, so the hand can rest on the glass.' },
+                     finger: { kana:'☝', blurb:'anything that touches draws. one finger at a time.' } };
+    const row = (k, table, cur) => Object.entries(table).map(([n, d]) =>
+      `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
+      + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
+    start.innerHTML = markup = `<div class="start-card">
+      <div class="start-title">hito<span>人</span></div>
+      <div class="start-sub">${esc(REALM)} · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
+      <div class="start-h">how much help</div>
+      <div class="start-row">${row('diff', DIFF, difficulty)}</div>
+      <div class="start-h">what the sign says</div>
+      <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
+      ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
+      ${realms()}
+      <button class="start-go">${over ? 'begin again' : 'begin'}</button>
+      <div class="start-links">${hand ? '<button class="start-hand">how the hand is doing</button>' : ''}<button class="start-credits">who this leans on</button></div>
+      <div class="start-foot">${WORDS ? 'draw below · the farang come from above · write what they are saying, one kana at a time' : 'draw below · the farang come from above · the one you are answering is yours'}</div>
+    </div>`;
+    const cr = start.querySelector('.start-credits');
+    if (cr) cr.onclick = () => { view = 'credits'; renderStart(); };
+    const hb = start.querySelector('.start-hand');
+    if (hb) hb.onclick = () => hand.show();
+    for (const b of start.querySelectorAll('button[data-k]')){
+      b.onclick = () => {
+        if (b.dataset.k === 'diff') setDifficulty(b.dataset.v);
+        else if (b.dataset.k === 'input') hand.setInput(b.dataset.v);
+        else setSign(b.dataset.v);
+        renderStart();
       };
-      const blob = new Blob([JSON.stringify(payload, null, 1)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `hito-attempts-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
-      a.click();
-    },
-    clear(){ log.length = 0; try{ localStorage.removeItem(KEY); }catch(_){} save(); },
-    stepGlyph,
-  };
-
+    }
+    const go = start.querySelector('.start-go');
+    if (go) go.onclick = begin;
+  }
+  // The redo button belongs to a run, not to the page over it.
+  let redoShown = false;
+  function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
+  function openStart(){ paused = true; view = 'start'; renderStart(); start.hidden = false; showRedo(false); }
+  function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; showRedo(false); }
+  function begin(){
+    start.hidden = true;
+    if (over) restart(); else paused = false;
+    tPrev = 0;
+    showRedo(true);
+  }
   addEventListener('DOMContentLoaded', () => {
-    const b = document.createElement('button');
-    b.id = '__tel';
-    b.textContent = '● 0 attempts';
-    b.title = 'Download this session\'s attempts';
-    b.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;'
-      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
-      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
-    b.onclick = () => window.__hito.export();
-    document.body.appendChild(b);
-
-    const sb = document.createElement('button');
-    sb.id = '__sm';
-    sb.textContent = 'mode: easy';
-    sb.title = 'Cycle easy / medium / hard';
-    sb.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:9999;'
-      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
-      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
-    sb.onclick = cycleShadow;
-    document.body.appendChild(sb);
-
-    const gb = document.createElement('button');
-    gb.id = '__gr';
-    gb.textContent = 'grid: ' + (typeof GRID_MODE !== 'undefined' ? GRID_MODE : '?');
-    gb.title = 'Cycle the practice grid';
-    gb.style.cssText = 'position:fixed;left:120px;bottom:10px;z-index:9999;'
-      + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
-      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.85';
-    gb.onclick = cycleGrid;
-    document.body.appendChild(gb);
-
-    const lv = document.createElement('div');
-    lv.style.cssText = 'position:fixed;left:10px;bottom:48px;z-index:9999;display:flex;gap:4px';
-    const mk = (t, fn) => { const b=document.createElement('button');
-      b.textContent=t; b.onclick=fn;
-      b.style.cssText='background:#1d1a16;color:#e9c46a;border:1px solid #57492f;'
-        +'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;'
-        +'cursor:pointer;opacity:.85'; return b; };
-    const lab = document.createElement('button');
-    lab.id='__lv'; lab.textContent='lv ?';
-    lab.style.cssText='background:#1d1a16;color:#ece4d8;border:1px solid #2f2a24;'
-      +'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;cursor:default';
-    lv.append(mk('−', ()=>setLevel((MASTERY[LETTERS[idx][0]]||0)-1)), lab,
-                mk('+', ()=>setLevel((MASTERY[LETTERS[idx][0]]||0)+1)),
-                mk('reset all', ()=>{ for(const k in MASTERY) delete MASTERY[k];
-                  persistM(); load(idx); setLevel(0); }));
-    document.body.appendChild(lv);
-    const sync=()=>{ lab.textContent='lv '+(MASTERY[LETTERS[idx][0]]||0); };
-    sync(); setInterval(() => { sync(); syncSize(); }, 400);
-
-    // ---- size row: the sweep controls
-    // Deliberately a row of its own above the mastery row. They look alike but
-    // they are no longer the same axis, and conflating them is the mistake
-    // this whole build exists to stop making.
-    const sz = document.createElement('div');
-    sz.style.cssText = 'position:fixed;left:10px;bottom:86px;z-index:9999;display:flex;gap:4px';
-    const szLab = document.createElement('button');
-    szLab.id = '__sz'; szLab.textContent = 'size ?';
-    szLab.title = 'Tap to release the pin and let the mode choose again';
-    szLab.style.cssText = 'background:#1d1a16;color:#ece4d8;border:1px solid #2f2a24;'
-      + 'border-radius:7px;padding:7px 10px;font:12px ui-sans-serif,system-ui;cursor:pointer';
-    szLab.onclick = unpinSize;
-    sz.append(mk('◀', ()=>stepGlyph(-1)),
-              mk('−', ()=>setSizeIdx(sizeIdx+1)),   // down the ladder = smaller
-              szLab,
-              mk('+', ()=>setSizeIdx(sizeIdx-1)),
-              mk('▶', ()=>stepGlyph(1)));
-    document.body.appendChild(sz);
-
-    // ---- the fail flag, put where a thumb already is
-    const fb = document.createElement('button');
-    fb.id = '__fl';
-    fb.textContent = `✗ fails here (${flags.length})`;
-    fb.title = 'This glyph cannot be traced at this size';
-    fb.style.cssText = 'position:fixed;right:10px;bottom:48px;z-index:9999;'
-      + 'background:#2a1614;color:#ef8a7a;border:1px solid #6b3129;border-radius:7px;'
-      + 'padding:7px 12px;font:12px ui-sans-serif,system-ui;cursor:pointer;opacity:.9';
-    fb.onclick = flagFail;
-    document.body.appendChild(fb);
-
-    syncSize();
-
+    document.body.appendChild(start);
+    showRedo(!paused);
+    // No menu button — it sat under the pen's hand. The name in the header
+    // is the way back to the page.
+    const brand = document.querySelector && document.querySelector('header .brand');
+    if (brand){ brand.title = 'Difficulty and the sign'; brand.onclick = openStart; }
+  });
+  fc.addEventListener('pointerdown', e => {
+    if (over){ openStart(); return; }
+    const r = fc.getBoundingClientRect();
+    pick(e.clientX - r.left, e.clientY - r.top);
   });
 
-  reset();
+  // A handle on the field, for the same reason the tracer has one: a game
+  // loop that cannot be inspected can only be tested by playing it.
+  window.__field = {
+    get monsters(){ return monsters; },
+    get shots(){ return shots; },
+    get ward(){ return ward; },
+    get over(){ return over; },
+    get killed(){ return killed; },
+    get target(){ return target(); },
+    get locked(){ return locked; },
+    get pending(){ return pendingRetarget; },
+    get readings(){ return readings; },
+    get paused(){ return paused; },
+    get difficulty(){ return difficulty; },
+    get sign(){ return CFG.sign; },
+    base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
+    get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
+    get hitodama(){ return HITODAMA; },
+    get ink(){ return sumi; }, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get upgHtml(){ return upgMarkup; },
+    earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
+    get words(){ return WORDS; }, at: AT, keyOf: key,
+    charge, kindle, quench, autocast, tidy, casting,
+    touch(){ penAt = performance.now(); },
+    bearer,
+    spawn, restart, retarget, pick,
+    posOf: px,
+    frame(now){ step(now); },
+  };
+
+  // A fizzle already clears the ink, but only rewound prog by half — so the
+  // player was left with an empty canvas and credit for a path they could no
+  // longer see, the guide resuming from the middle of a glyph while the toast
+  // said "back to the dot". Under a clock there is no time to work out where
+  // that middle is. The attempt now restarts, which is what the message always
+  // claimed and what the cleared ink already implied.
+  const _fizzle = window.fizzle;
+  window.fizzle = function(){
+    const r = _fizzle.apply(this, arguments);
+    if (CFG.fizzleRestarts) setTimeout(() => {
+      if (!done) { loading = true; try { _load(idx); } finally { loading = false; } }
+    }, 260);
+    return r;
+  };
+
+  // And an explicit way out, because auto-restart only fires on a fizzle and a
+  // trace can go wrong long before it trips one.
+  const redo = document.createElement('button');
+  redo.textContent = '↺ redo';
+  redo.title = 'Start this glyph again';
+  redo.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;'
+    + 'background:#101820;color:#6cb8ff;border:1px solid #2a4256;border-radius:7px;'
+    + 'padding:9px 14px;font:13px ui-sans-serif,system-ui;cursor:pointer;opacity:.9';
+  redo.onclick = () => { loading = true; try { _load(idx); } finally { loading = false; } };
+  addEventListener('DOMContentLoaded', () => document.body.appendChild(redo));
+
+  addEventListener('resize', sizeField);
+  // and watched, for the same reason the stage is: a box that arrives late
+  // is not a window resize
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => {
+    const r = wrap.getBoundingClientRect();
+    if (Math.round(r.width) !== FW || Math.round(r.height) !== FH) sizeField();
+  }).observe(wrap);
+  addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
+  sizeField();
+  spawn(); retarget();
+  openStart();
+  requestAnimationFrame(fieldLoop);
 })();
 </script>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.42</div>
 </body>
 </html>

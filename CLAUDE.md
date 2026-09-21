@@ -50,6 +50,8 @@ hito/
     hand_layer.py           pen or finger, the handwriting, the stats ledger
     account_layer.py        guest or signed in: Google through Appwrite, and a save that follows you
     make_index.py           writes index.html, the title screen (it shares the sign-in code)
+    theme.py                one colour table, applied to a finished page (gold, night)
+    test/theme.test.mjs     a night page has no warm colour in it but the warnings
     test/account.test.mjs   a file makes no request; merging never unlearns; a tunnel is not a sign-out
     test/hand.test.mjs      the switch reaches the engine; a note never costs a glyph
     test/server.test.mjs    what the endpoint refuses, checked without deploying
@@ -147,7 +149,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.41.html`
+### Hiragana — `dist/hiragana-v0.1.42.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -266,6 +268,15 @@ rather than the glyph:
   start page and the ✋ page, with a first guess that only has to avoid a dead
   sketchbook. Scoring is identical for both; a finger hides more of the target
   than a pen does, and no model here can see that either.
+- **A finger is not a pen (v0.1.42).** The maintainer, of finger tracing:
+  "hard, cause i have fat fingers". The tolerance was tuned for a pen tip,
+  which shows you the line as you draw it; a fingertip sits on top of the
+  path. So in finger mode on a touch screen the glyph is drawn at its
+  largest, the sketchbook grows from 34 to 42dvh, and the path forgives 1.5x
+  through `HAND_EASE` — one seam in the scorer, capped, and let go the
+  moment a pen touches down. `run.sh` runs the stroke-end guard on an eased
+  copy: forgiving a finger must not let a stroke's end be skipped. A trace
+  records its `ease`, or nobody reading the table could compare the two.
 - **The handwriting.** Every attempt, landed or fizzled, kept in the stroke
   book's own space so it lays straight over `strokes.json` at any size. It is
   the hand's copy taken at pen-up: the field tidies strays out of the engine's
@@ -283,7 +294,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.4.html`
+### Katakana — `dist/katakana-game-v0.1.5.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -304,7 +315,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.19.html`
+### Vocab — `dist/vocab-v0.1.20.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -700,7 +711,14 @@ per-character ledger. Save data must have export/import from day one.
 - **Beginner pacing:** comet/guide speed stays slow. Tested with young
   learners; keep it.
 - **Aesthetic:** traditional/classic first, modern refinements later. Gold on
-  dark lacquer is the Thai theme; hiragana may share it or get its own.
+  dark lacquer is the Thai theme and stays. The Japanese realms and the title
+  screen are **night** as of v0.1.42 — dark, blue for the ink and the thing to
+  press, green for whatever is lit or chosen — which is the night-forest this
+  file always said the shared engine should lean toward, and the maintainer's
+  own colours. Set per pack (`theme`), applied by `build/theme.py` to the
+  finished page. **Write new UI in the gold palette**: the table translates
+  it, and `theme.test.mjs` fails on any warm colour it has not been told
+  about. Warnings (a zap, strayed ink, a fallen ward) stay warm on purpose.
 - **Fonts and licences:**
   - Sarabun, Noto Sans Thai Looped, Noto Sans JP, Klee One — SIL OFL, fine
     for commercial use.

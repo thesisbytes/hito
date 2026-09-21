@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.41</title>
+<title>hito 人 · hiragana · v0.1.42</title>
 <style>
   :root{
-    --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
-    --ash:#8b7b62;--paper:#f0e3c4;--teal:#7fd1c4;
+    --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
+    --ash:#6b8296;--paper:#d7e9f7;--teal:#5fe3a1;
     --thai:'Sarabun','Noto Sans Thai Looped','Thonburi','Leelawadee UI','Tahoma',sans-serif;
   }
   *{box-sizing:border-box}
@@ -18,26 +19,26 @@
   header{width:min(92vw,520px);padding:14px 0 6px;display:flex;align-items:center;justify-content:space-between}
   .brand{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--ash)}
   .brand span{opacity:.6;font-size:10px;letter-spacing:.1em}
-  .tabs{display:flex;border:1px solid rgba(233,196,106,.28);border-radius:10px;overflow:hidden}
+  .tabs{display:flex;border:1px solid rgba(108,184,255,.28);border-radius:10px;overflow:hidden}
   .tabs button{border:0;border-radius:0;padding:7px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;flex:none;min-width:0}
   .tabs button[aria-pressed="true"]{background:var(--gold);color:var(--lacquer)}
   .count{font-size:13px;color:var(--ash);font-variant-numeric:tabular-nums}
 
   .stage{position:relative;width:min(92vw,520px);aspect-ratio:1;margin-top:6px}
   canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:18px}
-  #guide{background:radial-gradient(60% 60% at 50% 50%,rgba(233,196,106,.06),transparent 70%),var(--lacquer-2);
-    box-shadow:inset 0 0 0 1px rgba(233,196,106,.14),0 20px 60px rgba(0,0,0,.5)}
-  body.record #guide{box-shadow:inset 0 0 0 1px rgba(127,209,196,.35),0 20px 60px rgba(0,0,0,.5)}
+  #guide{background:radial-gradient(60% 60% at 50% 50%,rgba(108,184,255,.06),transparent 70%),var(--lacquer-2);
+    box-shadow:inset 0 0 0 1px rgba(108,184,255,.14),0 20px 60px rgba(0,0,0,.5)}
+  body.record #guide{box-shadow:inset 0 0 0 1px rgba(95,227,161,.35),0 20px 60px rgba(0,0,0,.5)}
   #ink{touch-action:none;cursor:crosshair}
   #fx{pointer-events:none}
   .stage.done #guide{animation:flash 1.4s ease-out}
-  @keyframes flash{25%{box-shadow:inset 0 0 0 2px var(--gold-hot),0 0 80px rgba(233,196,106,.55)}}
+  @keyframes flash{25%{box-shadow:inset 0 0 0 2px var(--gold-hot),0 0 80px rgba(108,184,255,.55)}}
   @keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
   @keyframes zap{25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,1px)}}
   .stage.zap #guide{box-shadow:inset 0 0 0 2px rgba(220,90,60,.7),0 0 40px rgba(220,90,60,.35)!important}
   .badge{position:absolute;top:12px;right:14px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash)}
   .toast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:13px;color:var(--paper);
-    background:rgba(21,16,13,.8);border:1px solid rgba(233,196,106,.25);padding:6px 12px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+    background:rgba(21,16,13,.8);border:1px solid rgba(108,184,255,.25);padding:6px 12px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
   .toast.show{opacity:1}
 
   .meta{width:min(92vw,520px);margin-top:16px;display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:end}
@@ -47,29 +48,29 @@
   .cls{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);text-align:right;align-self:start}
 
   .power{width:min(92vw,520px);margin-top:14px}
-  .bar{height:6px;border-radius:6px;background:rgba(233,196,106,.12);overflow:hidden;display:flex;gap:3px}
-  .fill{height:100%;width:0;background:linear-gradient(90deg,var(--ember),var(--gold),var(--gold-hot));box-shadow:0 0 14px rgba(233,196,106,.7);transition:width .18s ease}
-  .seg{flex:1;height:100%;background:rgba(233,196,106,.12);border-radius:4px}
-  .seg.lit{background:linear-gradient(90deg,var(--gold),var(--gold-hot));box-shadow:0 0 14px rgba(233,196,106,.7)}
+  .bar{height:6px;border-radius:6px;background:rgba(108,184,255,.12);overflow:hidden;display:flex;gap:3px}
+  .fill{height:100%;width:0;background:linear-gradient(90deg,var(--ember),var(--gold),var(--gold-hot));box-shadow:0 0 14px rgba(108,184,255,.7);transition:width .18s ease}
+  .seg{flex:1;height:100%;background:rgba(108,184,255,.12);border-radius:4px}
+  .seg.lit{background:linear-gradient(90deg,var(--gold),var(--gold-hot));box-shadow:0 0 14px rgba(108,184,255,.7)}
   .lbl{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);margin-top:6px}
 
   .row{width:min(92vw,520px);display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-  button{flex:1;min-width:88px;padding:12px 10px;border-radius:12px;border:1px solid rgba(233,196,106,.28);background:transparent;color:var(--gold);font:inherit;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:background .15s,transform .05s}
-  button:active{transform:translateY(1px)} button:hover{background:rgba(233,196,106,.08)}
+  button{flex:1;min-width:88px;padding:12px 10px;border-radius:12px;border:1px solid rgba(108,184,255,.28);background:transparent;color:var(--gold);font:inherit;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:background .15s,transform .05s}
+  button:active{transform:translateY(1px)} button:hover{background:rgba(108,184,255,.08)}
   button.primary{background:var(--gold);color:var(--lacquer);border-color:var(--gold)}
-  button.teal{color:var(--teal);border-color:rgba(127,209,196,.4)} button.teal.primary{background:var(--teal);color:var(--lacquer)}
-  button.toggle[aria-pressed="true"]{background:rgba(233,196,106,.16)}
+  button.teal{color:var(--teal);border-color:rgba(95,227,161,.4)} button.teal.primary{background:var(--teal);color:var(--lacquer)}
+  button.toggle[aria-pressed="true"]{background:rgba(108,184,255,.16)}
   button:disabled{opacity:.35;cursor:default}
   button:focus-visible{outline:2px solid var(--gold-hot);outline-offset:2px}
   .hint{width:min(92vw,520px);margin:12px 0 8px;font-size:12px;color:var(--ash);text-align:center;line-height:1.5}
   .only-p,.only-r{display:contents} body.record .only-p{display:none} body:not(.record) .only-r{display:none}
-  textarea{-webkit-user-select:text;user-select:text;width:min(92vw,520px);height:110px;background:rgba(0,0,0,.3);color:var(--paper);border:1px solid rgba(233,196,106,.25);border-radius:10px;font:12px/1.4 ui-monospace,monospace;padding:8px;margin-top:8px;display:none}
+  textarea{-webkit-user-select:text;user-select:text;width:min(92vw,520px);height:110px;background:rgba(0,0,0,.3);color:var(--paper);border:1px solid rgba(108,184,255,.25);border-radius:10px;font:12px/1.4 ui-monospace,monospace;padding:8px;margin-top:8px;display:none}
   textarea.show{display:block}
   #fontRow button{min-width:0;flex:0 1 auto;padding:8px 12px;font-size:12px}
   .grid{width:min(92vw,520px);display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:10px 0 30px}
-  .grid button{min-width:0;padding:6px 0;font-size:16px;border-radius:8px;color:var(--ash);border-color:rgba(233,196,106,.12)}
-  .grid button.rec{color:var(--gold);border-color:rgba(233,196,106,.45)}
-  .grid button.cur{background:rgba(233,196,106,.16)}
+  .grid button{min-width:0;padding:6px 0;font-size:16px;border-radius:8px;color:var(--ash);border-color:rgba(108,184,255,.12)}
+  .grid button.rec{color:var(--gold);border-color:rgba(108,184,255,.45)}
+  .grid button.cur{background:rgba(108,184,255,.16)}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .credit{max-width:min(92vw,520px);margin:0 auto 26px;font-size:11px;line-height:1.5;color:var(--ash);opacity:.65;text-align:center}
 </style>
@@ -161,7 +162,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.41';
+const APP_VERSION='0.1.42';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -271,7 +272,7 @@ if(typeof ResizeObserver!=='undefined') new ResizeObserver(()=>{ const r=stage.g
 const inkK=()=>Math.max(.45,Math.pow(curS,.75));
 const widthFor=p=>(3+p*13)*inkK();
 function paintStroke(ctx,s,opt={}){ // s in canvas coords
-  if(!s.length) return; const col=opt.color||'#e9c46a', core=opt.core||'rgba(255,241,184,.9)';
+  if(!s.length) return; const col=opt.color||'#6cb8ff', core=opt.core||'rgba(226,243,255,.9)';
   ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.globalAlpha=opt.alpha??1;
   if(!opt.cover&&!opt.flat){ctx.shadowColor=col;ctx.shadowBlur=(opt.blur??14)*inkK();} ctx.strokeStyle=opt.cover?'#fff':col;
   if(s.length===1){if(!opt.onlycore){ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(s[0].x,s[0].y,widthFor(s[0].p||.5)/2,0,7);ctx.fill();}ctx.restore();return;}
@@ -285,8 +286,8 @@ function paintJudged(ctx,s){ let run=[],on=null;   // on-path runs lit, off-path
   for(const q of s){ const o=q.on===undefined?true:!!q.on; if(on===null) on=o; if(o!==on){ run.push(q); flush(); on=o; run=[q]; } else run.push(q); } flush(); }
 function redrawInk(){ if(!W||!H) return;
   if(mode==='record'){ ink.clearRect(0,0,W,H); inkKey='';
-    strokes.forEach((s,i)=>{ paintStroke(ink,s,{color:'#7fd1c4',core:'#e6fffa'}); if(strokes.length>1) label(ink,s[0],i+1); });
-    if(cur) paintStroke(ink,cur,{color:'#7fd1c4',core:'#e6fffa'}); return; }
+    strokes.forEach((s,i)=>{ paintStroke(ink,s,{color:'#5fe3a1',core:'#e6fff2'}); if(strokes.length>1) label(ink,s[0],i+1); });
+    if(cur) paintStroke(ink,cur,{color:'#5fe3a1',core:'#e6fff2'}); return; }
   // Finished strokes are repainted only when the list itself changed — a
   // stroke landed, tidy() trimmed one, fizzle or load() emptied it — and a
   // live stroke that was never committed is dropped with them.
@@ -304,8 +305,8 @@ function redrawInk(){ if(!W||!H) return;
   // Whole-canvas copies on purpose: a sub-rectangle copy makes the software
   // rasterizer snapshot the entire source first, and costs twenty times more.
   ink.clearRect(0,0,W,H); ink.drawImage(inkA,0,0,W,H); if(inkN>1) ink.drawImage(inkB,0,0,W,H); }
-function label(ctx,p,n){ ctx.save(); ctx.font='bold 13px system-ui'; ctx.fillStyle='#15100d'; ctx.strokeStyle='#7fd1c4'; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.arc(p.x-14,p.y-14,10,0,7); ctx.fillStyle='#7fd1c4'; ctx.fill(); ctx.fillStyle='#15100d'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(n,p.x-14,p.y-14); ctx.restore(); }
+function label(ctx,p,n){ ctx.save(); ctx.font='bold 13px system-ui'; ctx.fillStyle='#0a0f15'; ctx.strokeStyle='#5fe3a1'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(p.x-14,p.y-14,10,0,7); ctx.fillStyle='#5fe3a1'; ctx.fill(); ctx.fillStyle='#0a0f15'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(n,p.x-14,p.y-14); ctx.restore(); }
 
 // ---------- guide layer
 function fontBook(){ return TEACHER.fonts[fontId]||(TEACHER.fonts[fontId]={letters:{}}); }
@@ -319,14 +320,14 @@ function drawGrid(){
   if(GRID_MODE==='none') return;
   const b=gridBox();
   g.save(); g.lineWidth=1;
-  g.strokeStyle='rgba(233,196,106,.16)';
+  g.strokeStyle='rgba(108,184,255,.16)';
   g.strokeRect(b.x0,b.y0,b.x1-b.x0,b.y1-b.y0);
   const mx=(b.x0+b.x1)/2, my=(b.y0+b.y1)/2;
-  g.setLineDash([5,7]); g.strokeStyle='rgba(233,196,106,.13)';
+  g.setLineDash([5,7]); g.strokeStyle='rgba(108,184,255,.13)';
   g.beginPath(); g.moveTo(mx,b.y0); g.lineTo(mx,b.y1);
   g.moveTo(b.x0,my); g.lineTo(b.x1,my); g.stroke();
   if(GRID_MODE==='quarters'){
-    g.strokeStyle='rgba(233,196,106,.07)'; g.beginPath();
+    g.strokeStyle='rgba(108,184,255,.07)'; g.beginPath();
     for(const f of [0.25,0.75]){
       g.moveTo(b.x0+(b.x1-b.x0)*f,b.y0); g.lineTo(b.x0+(b.x1-b.x0)*f,b.y1);
       g.moveTo(b.x0,b.y0+(b.y1-b.y0)*f); g.lineTo(b.x1,b.y0+(b.y1-b.y0)*f); }
@@ -343,7 +344,7 @@ function drawGuide(){ if(!W||!H) return;
     // of curves, so the thin trail down its centreline cannot
     // cover it, and the stacked glows read as blur.
     if(done){
-      paintPath(g,0,PATH.length-1,{alpha:.5,blur:28,scale:SHADOW_SCALE,nocore:true,color:'rgba(255,241,184,.95)'});
+      paintPath(g,0,PATH.length-1,{alpha:.5,blur:28,scale:SHADOW_SCALE,nocore:true,color:'rgba(226,243,255,.95)'});
     } else if(SHADOW_MODE==='strokes'){
       // The shape, as a textbook would print it: a flat line down
       // the centre of each stroke at the ink's own width, one path
@@ -355,7 +356,7 @@ function drawGuide(){ if(!W||!H) return;
       // is where the stroke actually goes. The tolerance is the
       // scorer's business; the shape is the learner's.
       g.save(); g.lineCap='round'; g.lineJoin='round';
-      g.strokeStyle='#e9c46a'; g.globalAlpha=.34; g.lineWidth=widthFor(.5);
+      g.strokeStyle='#6cb8ff'; g.globalAlpha=.34; g.lineWidth=widthFor(.5);
       let open=false;
       for(let i=0;i<PATH.length;i++){ const p=denorm(PATH[i]);
         if(!open){ g.beginPath(); g.moveTo(p.x,p.y); open=true; } else g.lineTo(p.x,p.y);
@@ -365,8 +366,8 @@ function drawGuide(){ if(!W||!H) return;
     }
   } else {
     g.save(); g.font=glyphFont(size); g.textAlign='center'; g.textBaseline='middle';
-    g.fillStyle=done?'rgba(255,241,184,.9)':(mode==='record'?'rgba(127,209,196,.13)':'rgba(233,196,106,.16)');
-    if(done){g.shadowColor='rgba(233,196,106,.9)';g.shadowBlur=40;}
+    g.fillStyle=done?'rgba(226,243,255,.9)':(mode==='record'?'rgba(95,227,161,.13)':'rgba(108,184,255,.16)');
+    if(done){g.shadowColor='rgba(108,184,255,.9)';g.shadowBlur=40;}
     g.fillText(L,W/2,H/2+size*.06); g.restore();
   }
   if(rec&&!done&&prog>1) paintLit(g,{alpha:.9});
@@ -391,7 +392,7 @@ function paintLit(ctx,opt){ // PATH[0..prog] as paintPath would draw it, grown f
 function trailBit(ctx,a,b,s0,open){ // road PATH[a..b] and the embers on it; embers sit every 4th point from s0
   if(b>a) paintPath(ctx,a,b,{alpha:.38,blur:10,nocore:true,scale:.75});
   for(let i=a+(((s0-a)%4)+4)%4;open?i<b:i<=b;i+=4){ const q=denorm(PATH[i]);                 // dotted embers
-    ctx.fillStyle='rgba(240,210,130,.85)'; ctx.shadowColor='rgba(233,196,106,.9)'; ctx.shadowBlur=10;
+    ctx.fillStyle='rgba(205,234,255,.85)'; ctx.shadowColor='rgba(108,184,255,.9)'; ctx.shadowBlur=10;
     ctx.beginPath(); ctx.arc(q.x,q.y,2.4,0,7); ctx.fill(); } }
 function renderTrail(){ if(!PATH.length){trailProg=-1;return;}
   const _si=(awaitLift&&segIdx<SEGS.length-1)?segIdx+1:segIdx;
@@ -425,7 +426,7 @@ function ghostTick(){ if(!ghostAnim) return; if(!W||!H){ requestAnimationFrame(g
     // hand starts chasing it instead of dragging its own.
     if(COMET_ON){ const n=_a+Math.max(2,Math.floor(ph*(end-_a))); paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); } // comet
     const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)?SEGS[segIdx+1][0]:prog]), pulse=.5+.5*Math.sin(now/260);
-    fx.save(); fx.fillStyle=`rgba(255,241,184,${.5+.4*pulse})`; fx.shadowColor='#fff1b8'; fx.shadowBlur=16+10*pulse;
+    fx.save(); fx.fillStyle=`rgba(226,243,255,${.5+.4*pulse})`; fx.shadowColor='#e2f3ff'; fx.shadowBlur=16+10*pulse;
     fx.beginPath(); fx.arc(s0.x,s0.y,(4+3*pulse)*DOT_SCALE,0,7); fx.fill(); fx.restore();
   }
   stepParts();
@@ -451,7 +452,8 @@ iC.addEventListener('pointerup',endStroke); iC.addEventListener('pointercancel',
 
 // ---------- practice: follow the teacher's path continuously
 let R_ON0=0.07, LOOK=24, DRAIN=1.6, FIZZ=90;
-const R_ON=()=>Math.max(0.045,R_ON0*Math.sqrt(curS));
+let HAND_EASE=1;
+const R_ON=()=>Math.max(0.045,Math.min(R_ON0*HAND_EASE,0.125)*Math.sqrt(curS));
 let smudge=0;
 function covered(){ if(!hit) return 0; let c=0; for(let i=0;i<hit.length;i++) c+=hit[i]; return c/hit.length; }
 // How near the end of a stroke counts as having reached it.
@@ -607,7 +609,7 @@ function shine(a,b){ const step=Math.max(1,Math.round((b-a)/16));
   for(let i=a;i<=b;i+=step){ const q=denorm(PATH[i]);
     for(let k=0;k<3;k++){ const ang=Math.random()*6.28, v=.3+Math.random()*1.4;
       parts.push({x:q.x,y:q.y,vx:Math.cos(ang)*v,vy:Math.sin(ang)*v,
-        life:1,r:1+Math.random()*2,c:'255,241,184'}); } }
+        life:1,r:1+Math.random()*2,c:'226,243,255'}); } }
   if(navigator.vibrate) navigator.vibrate(12);
   loop(); }
 function fizzle(){ smudge=0; offCount=0; prog=Math.max(0,Math.round(prog*0.5));
@@ -652,8 +654,8 @@ function updateCoverage(){ if(!glyphPts.length||teacherStrokes()) return;
 
 // ---------- fx
 let parts=[],rafOn=false;
-function spark(x,y,p,hot){ if(!hot&&Math.random()>.55) return; parts.push({x,y,vx:(Math.random()-.5)*1.4,vy:(Math.random()-.8)*1.4,life:1,r:1+p*2.5,c:hot?'255,241,184':'233,196,106'}); loop(); }
-function burst(){ for(let i=0;i<140;i++){const a=Math.random()*Math.PI*2,v=1.5+Math.random()*4.5;parts.push({x:W/2,y:H/2,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1,life:1.4,r:1.5+Math.random()*3,c:Math.random()<.4?'255,241,184':'233,196,106'});} loop(); }
+function spark(x,y,p,hot){ if(!hot&&Math.random()>.55) return; parts.push({x,y,vx:(Math.random()-.5)*1.4,vy:(Math.random()-.8)*1.4,life:1,r:1+p*2.5,c:hot?'226,243,255':'108,184,255'}); loop(); }
+function burst(){ for(let i=0;i<140;i++){const a=Math.random()*Math.PI*2,v=1.5+Math.random()*4.5;parts.push({x:W/2,y:H/2,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1,life:1.4,r:1.5+Math.random()*3,c:Math.random()<.4?'226,243,255':'108,184,255'});} loop(); }
 function stepParts(){ parts=parts.filter(p=>p.life>0);
   for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.03;p.vx*=.98;p.life-=.025;fx.beginPath();fx.shadowBlur=0;fx.fillStyle=`rgba(${p.c},${Math.max(0,p.life)})`;fx.arc(p.x,p.y,p.r*Math.max(0,p.life),0,7);fx.fill();} }
 function loop(){ if(rafOn||ghostAnim) return; rafOn=true; requestAnimationFrame(tick); }
@@ -762,7 +764,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.41');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.42');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1056,51 +1058,56 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
 })();
 </script>
-<script>window.__HAND_CFG={maxPoints:64,keep:24,minStep:4};</script>
+<script>window.__HAND_CFG={maxPoints:64,keep:24,minStep:4,fingerEase:1.5};</script>
 <style>
-  .hand-btn{ background:transparent; color:rgba(233,196,106,.8); border:1px solid #3d3324;
+  .hand-btn{ background:transparent; color:rgba(108,184,255,.8); border:1px solid #1e2f3e;
     border-radius:7px; padding:4px 9px; font:12px ui-sans-serif,system-ui; cursor:pointer;
     margin-left:auto; margin-right:10px; white-space:nowrap;
     /* the engine styles every button as flex:1 with a min-width; in a header
        with the tabs hidden that is a bar the width of the screen */
     flex:none; min-width:0; letter-spacing:0; }
-  .hand-btn.nudge{ border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 14px rgba(127,209,196,.45); }
+  /* A finger gets more room. In the games the sketchbook is a third of the
+     screen because a pen needs no more; a fingertip hides what it is tracing,
+     so it takes some of the field's height back. The field's canvas and the
+     stage are both watched for size, so this is just a class. */
+  body.field.roomy .stage, body.vocab.roomy .stage{ width:min(96vw,42dvh); height:min(96vw,42dvh); }
+  .hand-btn.nudge{ border-color:#5fe3a1; color:#c3f7dc; box-shadow:0 0 14px rgba(95,227,161,.45); }
   .hand{ position:fixed; inset:0; z-index:10000; display:flex; align-items:center;
-    justify-content:center; background:rgba(12,10,8,.93); font:13px ui-sans-serif,system-ui; color:#e8e0cc; }
+    justify-content:center; background:rgba(6,9,13,.93); font:13px ui-sans-serif,system-ui; color:#dce8f2; }
   .hand[hidden]{ display:none; }
-  .hand-card{ width:min(94vw,520px); max-height:94dvh; overflow:auto; background:#15120f;
-    border:1px solid #57492f; border-radius:12px; padding:20px 18px; box-sizing:border-box; }
-  .hand-title{ font-size:26px; font-weight:700; color:#e9c46a; }
-  .hand-sub{ color:rgba(232,224,204,.55); margin:2px 0 14px; font-size:12px; }
+  .hand-card{ width:min(94vw,520px); max-height:94dvh; overflow:auto; background:#0c131a;
+    border:1px solid #2a4256; border-radius:12px; padding:20px 18px; box-sizing:border-box; }
+  .hand-title{ font-size:26px; font-weight:700; color:#6cb8ff; }
+  .hand-sub{ color:rgba(220,232,242,.55); margin:2px 0 14px; font-size:12px; }
   .hand-h{ font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-    color:rgba(233,196,106,.7); margin:16px 0 7px; }
+    color:rgba(108,184,255,.7); margin:16px 0 7px; }
   .hand-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
-  .hand-row button{ text-align:left; background:#1d1a16; color:#e8e0cc; border:1px solid #57492f;
+  .hand-row button{ text-align:left; background:#101820; color:#dce8f2; border:1px solid #2a4256;
     border-radius:9px; padding:10px 11px; cursor:pointer; font:inherit; }
-  .hand-row button b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
-  .hand-row button small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
-  .hand-row button[aria-pressed="true"]{ border-color:#7fd1c4; background:#172422; }
+  .hand-row button b{ display:block; font-size:15px; color:#6cb8ff; margin-bottom:3px; }
+  .hand-row button small{ display:block; color:rgba(220,232,242,.7); line-height:1.35; }
+  .hand-row button[aria-pressed="true"]{ border-color:#5fe3a1; background:#10241c; }
   .hand-nums{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; text-align:center; }
-  .hand-nums div{ background:#1d1a16; border:1px solid #3d3324; border-radius:9px; padding:9px 4px; }
-  .hand-nums b{ display:block; font-size:20px; color:#bdf0e6; }
-  .hand-nums small{ color:rgba(232,224,204,.6); font-size:11px; }
+  .hand-nums div{ background:#101820; border:1px solid #1e2f3e; border-radius:9px; padding:9px 4px; }
+  .hand-nums b{ display:block; font-size:20px; color:#c3f7dc; }
+  .hand-nums small{ color:rgba(220,232,242,.6); font-size:11px; }
   .hand-list{ display:flex; flex-wrap:wrap; gap:6px; }
-  .hand-list span{ background:#1d1a16; border:1px solid #3d3324; border-radius:8px; padding:5px 9px; }
-  .hand-list span b{ font-size:19px; color:#e9c46a; margin-right:6px; }
-  .hand-list span small{ color:rgba(232,224,204,.65); }
-  .hand-empty{ color:rgba(232,224,204,.5); }
+  .hand-list span{ background:#101820; border:1px solid #1e2f3e; border-radius:8px; padding:5px 9px; }
+  .hand-list span b{ font-size:19px; color:#6cb8ff; margin-right:6px; }
+  .hand-list span small{ color:rgba(220,232,242,.65); }
+  .hand-empty{ color:rgba(220,232,242,.5); }
   .hand-thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); gap:8px; }
-  .hand-thumbs figure{ margin:0; background:#1d1a16; border:1px solid #3d3324; border-radius:8px;
+  .hand-thumbs figure{ margin:0; background:#101820; border:1px solid #1e2f3e; border-radius:8px;
     padding:4px; text-align:center; }
   .hand-thumbs svg{ width:100%; height:auto; display:block; }
-  .hand-thumbs figcaption{ font-size:11px; color:rgba(232,224,204,.65); }
-  .hand-io{ width:100%; height:70px; margin-top:8px; background:#0f0d0b; color:#e8e0cc;
-    border:1px solid #3d3324; border-radius:7px; font:11px ui-monospace,monospace; box-sizing:border-box; }
+  .hand-thumbs figcaption{ font-size:11px; color:rgba(220,232,242,.65); }
+  .hand-io{ width:100%; height:70px; margin-top:8px; background:#080c11; color:#dce8f2;
+    border:1px solid #1e2f3e; border-radius:7px; font:11px ui-monospace,monospace; box-sizing:border-box; }
   .hand-io[hidden]{ display:none; }
   .hand-links{ display:flex; gap:8px; margin-top:10px; }
-  .hand-links button{ flex:1; background:transparent; color:rgba(233,196,106,.75);
-    border:1px solid #3d3324; border-radius:8px; padding:8px; cursor:pointer; font:inherit; }
-  .hand-go{ width:100%; margin-top:16px; background:#e9c46a; color:#1d1a16; border:0;
+  .hand-links button{ flex:1; background:transparent; color:rgba(108,184,255,.75);
+    border:1px solid #1e2f3e; border-radius:8px; padding:8px; cursor:pointer; font:inherit; }
+  .hand-go{ width:100%; margin-top:16px; background:#6cb8ff; color:#101820; border:0;
     border-radius:9px; padding:12px; font-size:15px; font-weight:700; cursor:pointer; }
 </style>
 <script>
@@ -1108,7 +1115,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
    Pen or finger, what was drawn, and how it has been going. Writes down what
    the tracer decided; decides nothing itself.                              */
 (function(){
-  const CFG = window.__HAND_CFG || {maxPoints:64, keep:24, minStep:4};
+  const CFG = window.__HAND_CFG || {maxPoints:64, keep:24, minStep:4, fingerEase:1.5};
   const K_INPUT = 'hito-input', K_LEDGER = 'hito-ledger', K_HANDS = 'hito-hands';
   const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch(_){ return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(_){ return false; } };
@@ -1139,9 +1146,35 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       if (b && b.setAttribute) b.setAttribute('aria-pressed', input === 'pen');
     }
   }
+  // ---- a finger is not a pen ---------------------------------------------
+  // The tolerance was tuned for a pen tip, which shows you the line as you
+  // draw it. A fingertip is a centimetre wide and sits on top of the path, so
+  // the hand is steering by memory of where the line was. Three things give:
+  // the glyph is drawn at its largest, the sketchbook takes more of the screen,
+  // and the path forgives more (HAND_EASE, the one seam in the scorer). Only on
+  // a screen that can feel a finger — a mouse in finger mode is already precise
+  // — and it lets go the moment a pen touches down.
+  const touchy = () => { try { return (navigator.maxTouchPoints || 0) > 0; } catch(_){ return false; } };
+  let penNow = false;
+  const roomy = () => input === 'finger' && touchy() && !penNow;
+  function applyRoom(){
+    const on = roomy();
+    try { HAND_EASE = on ? CFG.fingerEase : 1; } catch(_){}
+    try { document.body.classList[on ? 'add' : 'remove']('roomy'); } catch(_){}
+    return on;
+  }
+  // sizeFor() is the engine's single seam for size; a finger gets the top of the range.
+  const _sizeFor = window.sizeFor;
+  if (typeof _sizeFor === 'function') window.sizeFor = function(){
+    const v = _sizeFor.apply(this, arguments);
+    return roomy() && typeof SIZE_MAX === 'number' ? Math.max(v, SIZE_MAX) : v;
+  };
+
   function setInput(v, quiet){
     input = v === 'finger' ? 'finger' : 'pen';
     penOnly = input === 'pen';
+    const was = document.body.classList && document.body.classList.contains && document.body.classList.contains('roomy');
+    if (applyRoom() !== !!was && !quiet){ try { if (typeof load === 'function' && typeof idx === 'number' && !done && !strokes.length) load(idx); } catch(_){} }
     if (!quiet){ try { localStorage.setItem(K_INPUT, input); } catch(_){} }
     showInput();
     return input;
@@ -1220,6 +1253,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const rec = {
       glyph: ch, ok, ms, zaps, tries, strokes: raw.length,
       size: Math.round(curF*1000)/1000, input: lastType || input,
+      ease: (typeof HAND_EASE === 'number' && HAND_EASE !== 1) ? HAND_EASE : undefined,
       level: (typeof MASTERY !== 'undefined' && MASTERY[ch]) || 0,
       diff: (window.__field && window.__field.difficulty) || (window.__vocab && window.__vocab.difficulty) || '',
       v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
@@ -1282,6 +1316,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // Registered after the engine's own listener, so by now it has decided.
     inkEl.addEventListener('pointerdown', e => {
       if (e.pointerType === 'pen') seenPen = true;
+      // a pen in finger mode is still a pen: no extra forgiveness for it
+      const p = e.pointerType === 'pen'; if (p !== penNow){ penNow = p; applyRoom(); }
       if (typeof activeId !== 'undefined' && activeId === e.pointerId){
         lastType = e.pointerType || '';
         if (strokes.length < mine.length || !strokes.length) mine = [];   // the engine started over, so does this
@@ -1318,7 +1354,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       for (let i = 0; i + 2 < f.length; i += 3) d += (i ? 'L' : 'M') + (+f[i] || 0) + ' ' + (+f[i+1] || 0);
       return `<path d="${d}"/>`;
     }).join('');
-    return `<figure><svg viewBox="150 150 700 760" fill="none" stroke="${r.ok ? '#e9c46a' : '#dc5a3c'}" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
+    return `<figure><svg viewBox="150 150 700 760" fill="none" stroke="${r.ok ? '#6cb8ff' : '#dc5a3c'}" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
       + `<figcaption>${esc(r.glyph)} · ${r.ok ? secs(r.ms) : 'fizzled'}</figcaption></figure>`;
   }
   const sheet = document.createElement('div');
@@ -1345,7 +1381,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       <div class="hand-h">draw with</div>
       <div class="hand-row">
         ${opt('pen', input, '✎ pen only', 'fingers and palms are ignored, so the hand can rest on the glass.')}
-        ${opt('finger', input, '☝ finger', 'anything that touches draws: a finger, a mouse, a pen. one at a time.')}
+        ${opt('finger', input, '☝ finger', 'anything that touches draws, one at a time. on a touch screen the glyph is drawn bigger and the path forgives more: a fingertip hides what it is tracing.')}
       </div>
       ${sync && sync.enabled ? `<div class="hand-h">notes to the workshop</div>
       <div class="hand-row">
@@ -1431,7 +1467,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   try { window.__account && window.__account.onChange(() => { if (!sheet.hidden) render(); }); } catch(_){}
 
   window.__hand = {
-    get input(){ return input; }, setInput, guess,
+    get input(){ return input; }, setInput, guess, get roomy(){ return roomy(); }, applyRoom,
+    pen(v){ penNow = !!v; return applyRoom(); },
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
     get html(){ return markup; }, get shown(){ return !sheet.hidden; },
     show: open, close, render, note, pack, toBook, shaky, stats, streak,
@@ -1458,9 +1495,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
                min-height:0; margin-top:4px; }
   .field-wrap canvas{ position:absolute; inset:0; width:100%; height:100%;
     border-radius:18px;
-    background:radial-gradient(70% 60% at 50% 70%,rgba(90,160,150,.07),transparent 70%),
+    background:radial-gradient(70% 60% at 50% 70%,rgba(70,170,120,.07),transparent 70%),
                var(--lacquer-2);
-    box-shadow:inset 0 0 0 1px rgba(233,196,106,.10),0 18px 50px rgba(0,0,0,.45); }
+    box-shadow:inset 0 0 0 1px rgba(108,184,255,.10),0 18px 50px rgba(0,0,0,.45); }
   /* The sketchbook MUST stay square. norm() in the engine divides x by W and
      y by H independently, so a rectangular stage does not merely stretch the
      glyph — it makes every distance in normalised space anisotropic, and the
@@ -1479,52 +1516,57 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         align-items:stretch; font:12px ui-sans-serif,system-ui; pointer-events:none; }
   .upg > *{ pointer-events:auto; }
   .upg-ink{ display:flex; align-items:center; gap:5px; padding:0 9px; border-radius:9px;
-        background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e9c46a; font-weight:700; }
-  .upg-ink i{ font-style:normal; color:rgba(232,224,204,.55); font-weight:400; }
+        background:rgba(13,19,26,.82); border:1px solid #1e2f3e; color:#6cb8ff; font-weight:700; }
+  .upg-ink i{ font-style:normal; color:rgba(220,232,242,.55); font-weight:400; }
   .upg button{ flex:1 1 0; min-width:0; text-align:left; padding:5px 7px; border-radius:9px; cursor:pointer;
-        background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e8e0cc; font:inherit; line-height:1.25; }
-  .upg button b{ color:#e9c46a; margin-right:4px; }
-  .upg button small{ display:block; color:rgba(232,224,204,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .upg button.can{ border-color:#7fd1c4; box-shadow:0 0 10px rgba(127,209,196,.25); }
-  .upg button.can small{ color:#bdf0e6; }
+        background:rgba(13,19,26,.82); border:1px solid #1e2f3e; color:#dce8f2; font:inherit; line-height:1.25; }
+  .upg button b{ color:#6cb8ff; margin-right:4px; }
+  .upg button small{ display:block; color:rgba(220,232,242,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .upg button.can{ border-color:#5fe3a1; box-shadow:0 0 10px rgba(95,227,161,.25); }
+  .upg button.can small{ color:#c3f7dc; }
   .upg button[disabled]{ opacity:.5; cursor:default; }
+  /* At phone width four buttons are 80px each: a cost fits, a sentence does
+     not, and half a sentence is worse than none. The title attribute and the
+     start page still say what each one does. */
+  @media (max-width:560px){ .upg button small i{ display:none; } .upg{ gap:4px; left:6px; right:6px; } }
+  .upg button small i{ font-style:normal; }
 
   /* The start page. A lacquer sheet over everything, with the two axes the
      game actually has: how much help, and what the sign says. */
   .start{ position:fixed; inset:0; z-index:9998; display:flex; align-items:center;
           justify-content:center; padding:18px;
-          background:radial-gradient(60% 50% at 50% 40%,rgba(90,160,150,.10),transparent 70%),
-                     rgba(12,10,8,.94); }
+          background:radial-gradient(60% 50% at 50% 40%,rgba(70,170,120,.10),transparent 70%),
+                     rgba(6,9,13,.94); }
   .start[hidden]{ display:none; }
   .start-card{ width:min(94vw,520px); max-height:94dvh; overflow:auto;
-               font:14px ui-sans-serif,system-ui; color:#e8e0cc; }
-  .start-title{ font-size:34px; font-weight:700; color:#e9c46a; letter-spacing:.02em;
-                text-shadow:0 0 24px rgba(233,196,106,.35); }
+               font:14px ui-sans-serif,system-ui; color:#dce8f2; }
+  .start-title{ font-size:34px; font-weight:700; color:#6cb8ff; letter-spacing:.02em;
+                text-shadow:0 0 24px rgba(108,184,255,.35); }
   .start-title span{ font-size:40px; margin-left:8px; }
-  .start-sub{ color:rgba(232,224,204,.55); margin:2px 0 18px; font-size:12px; }
+  .start-sub{ color:rgba(220,232,242,.55); margin:2px 0 18px; font-size:12px; }
   .start-h{ font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-            color:rgba(127,209,196,.8); margin:14px 0 8px; }
+            color:rgba(95,227,161,.8); margin:14px 0 8px; }
   .start-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
-  .start-row button, .start-row a{ display:block; text-decoration:none; text-align:left; background:#1d1a16; color:#e8e0cc; border:1px solid #57492f;
+  .start-row button, .start-row a{ display:block; text-decoration:none; text-align:left; background:#101820; color:#dce8f2; border:1px solid #2a4256;
                      border-radius:10px; padding:10px 12px; cursor:pointer; font:inherit; min-height:74px; }
   .start-row a{ min-height:0; }
-  .start-row button b, .start-row a b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
-  .start-row button b i{ font-style:normal; color:#bdf0e6; margin-right:6px; }
-  .start-row button small, .start-row a small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
-  .start-row button[aria-pressed="true"]{ border-color:#7fd1c4; background:#172422;
-                     box-shadow:0 0 0 1px rgba(127,209,196,.5), 0 0 22px rgba(127,209,196,.18); }
+  .start-row button b, .start-row a b{ display:block; font-size:15px; color:#6cb8ff; margin-bottom:3px; }
+  .start-row button b i{ font-style:normal; color:#c3f7dc; margin-right:6px; }
+  .start-row button small, .start-row a small{ display:block; color:rgba(220,232,242,.7); line-height:1.35; }
+  .start-row button[aria-pressed="true"]{ border-color:#5fe3a1; background:#10241c;
+                     box-shadow:0 0 0 1px rgba(95,227,161,.5), 0 0 22px rgba(95,227,161,.18); }
   .start-row button[disabled]{ opacity:.42; cursor:default; }
-  .start-go{ width:100%; margin-top:20px; background:#e9c46a; color:#1d1a16; border:0;
+  .start-go{ width:100%; margin-top:20px; background:#6cb8ff; color:#101820; border:0;
              border-radius:12px; padding:14px; font:700 17px ui-sans-serif,system-ui; cursor:pointer;
-             box-shadow:0 0 30px rgba(233,196,106,.25); }
-  .start-foot{ margin-top:12px; font-size:11px; color:rgba(232,224,204,.4); text-align:center; }
+             box-shadow:0 0 30px rgba(108,184,255,.25); }
+  .start-foot{ margin-top:12px; font-size:11px; color:rgba(220,232,242,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
-  .start-links button{ flex:1; background:transparent; color:rgba(233,196,106,.75); border:1px solid #3d3324;
+  .start-links button{ flex:1; background:transparent; color:rgba(108,184,255,.75); border:1px solid #1e2f3e;
                        border-radius:9px; padding:9px; font:13px ui-sans-serif,system-ui; cursor:pointer; }
-  .credits p{ line-height:1.55; color:rgba(232,224,204,.85); margin:10px 0; }
-  .credits p.lead{ font-size:15px; color:#e8e0cc; }
-  .credits p.lead b{ color:#e9c46a; font-size:22px; margin-right:6px; }
-  .credits p.small{ font-size:12px; color:rgba(232,224,204,.6); }
+  .credits p{ line-height:1.55; color:rgba(220,232,242,.85); margin:10px 0; }
+  .credits p.lead{ font-size:15px; color:#dce8f2; }
+  .credits p.lead b{ color:#6cb8ff; font-size:22px; margin-right:6px; }
+  .credits p.small{ font-size:12px; color:rgba(220,232,242,.6); }
   body.field header .brand{ cursor:pointer; }
 </style>
 
@@ -2140,17 +2182,17 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // the ward being protected
     const pulse = 0.6 + 0.4*Math.sin(performance.now()/700);
     g.save();
-    g.shadowColor = 'rgba(233,196,106,.8)'; g.shadowBlur = 26*pulse;
-    g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(233,196,106,.92)';
+    g.shadowColor = 'rgba(108,184,255,.8)'; g.shadowBlur = 26*pulse;
+    g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(108,184,255,.92)';
     g.beginPath(); g.arc(X, Y, 13, 0, 6.284); g.fill();
     g.restore();
-    g.strokeStyle = over ? 'rgba(200,90,70,.35)' : 'rgba(233,196,106,.22)';
+    g.strokeStyle = over ? 'rgba(200,90,70,.35)' : 'rgba(108,184,255,.22)';
     g.lineWidth = 1;
     g.beginPath(); g.arc(X, Y, 26 + 5*pulse, 0, 6.284); g.stroke();
 
     // ward health, as pips under it
     for (let k=0;k<wardMax();k++){
-      g.fillStyle = k < ward ? 'rgba(233,196,106,.85)' : 'rgba(233,196,106,.14)';
+      g.fillStyle = k < ward ? 'rgba(108,184,255,.85)' : 'rgba(108,184,255,.14)';
       g.beginPath(); g.arc(X - (wardMax()-1)*5 + k*10, Y + 34, 3, 0, 6.284); g.fill();
     }
 
@@ -2163,9 +2205,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const near = 1 - m.d;
       g.save();
       g.globalAlpha = 0.5 + 0.5*near;
-      g.shadowColor = isT ? 'rgba(127,209,196,.75)' : 'rgba(150,170,190,.4)';
+      g.shadowColor = isT ? 'rgba(95,227,161,.75)' : 'rgba(150,170,190,.4)';
       g.shadowBlur = isT ? 20 : 10;
-      g.fillStyle = isT ? 'rgba(127,209,196,.30)' : 'rgba(170,185,200,.20)';
+      g.fillStyle = isT ? 'rgba(95,227,161,.30)' : 'rgba(170,185,200,.20)';
       g.beginPath(); g.ellipse(p.x, p.y+bob, 17, 21, 0, 0, 6.284); g.fill();
       g.restore();
 
@@ -2178,8 +2220,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const w = Math.max(g.measureText(label).width, m.w ? m.w.chars.length*SP : 0) + 18;
       const bh = m.w ? 44 : 27;
       const by = p.y + bob - 36 - (bh - 27);
-      g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)';
-      g.strokeStyle = isT ? 'rgba(127,209,196,.65)' : 'rgba(180,195,210,.28)';
+      g.fillStyle = isT ? 'rgba(16,36,28,.92)' : 'rgba(22,24,28,.85)';
+      g.strokeStyle = isT ? 'rgba(95,227,161,.65)' : 'rgba(180,195,210,.28)';
       g.lineWidth = 1;
       g.beginPath();
       if (g.roundRect) g.roundRect(p.x-w/2, by-16, w, bh, 8);
@@ -2187,8 +2229,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       g.fill(); g.stroke();
       const bb = by - 16 + bh;
       g.beginPath(); g.moveTo(p.x-5, bb); g.lineTo(p.x, bb+7); g.lineTo(p.x+5, bb);
-      g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)'; g.fill();
-      g.fillStyle = isT ? '#bdf0e6' : 'rgba(226,232,240,.8)';
+      g.fillStyle = isT ? 'rgba(16,36,28,.92)' : 'rgba(22,24,28,.85)'; g.fill();
+      g.fillStyle = isT ? '#c3f7dc' : 'rgba(226,232,240,.8)';
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(label, p.x, by-2);
       if (m.w){
@@ -2200,14 +2242,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
           // teal for a slot your own light will write: the word shows, before
           // anything flies, how much of it you already hold and where the holes are
           const held = !written && casting() && charge(m.w.chars[k]) >= 1;
-          g.fillStyle = written ? '#ffe9a8' : held ? 'rgba(127,209,196,.95)' : cur ? (isT ? '#bdf0e6' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
+          g.fillStyle = written ? '#bfe3ff' : held ? 'rgba(95,227,161,.95)' : cur ? (isT ? '#c3f7dc' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
           g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
         }
       }
       // how much more it takes: one pip per hit still owed, above the bubble
       // (under it is the farang's own head)
       if (m.hp > 1){
-        g.fillStyle = isT ? 'rgba(233,196,106,.95)' : 'rgba(233,196,106,.6)';
+        g.fillStyle = isT ? 'rgba(108,184,255,.95)' : 'rgba(108,184,255,.6)';
         for (let k = 0; k < m.hp; k++){
           g.beginPath(); g.arc(p.x - (m.hp-1)*4 + k*8, by - 23, 2.4, 0, 6.284); g.fill();
         }
@@ -2215,8 +2257,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       // a lit character: its own wisp will answer this one
       if (casting() && charge(key(m)) >= 1){
         g.save();
-        g.shadowColor = 'rgba(127,209,196,.9)'; g.shadowBlur = 10;
-        g.fillStyle = 'rgba(160,230,215,.95)';
+        g.shadowColor = 'rgba(95,227,161,.9)'; g.shadowBlur = 10;
+        g.fillStyle = 'rgba(150,240,195,.95)';
         g.beginPath(); g.arc(p.x + w/2 + 2, by-14, 3.2, 0, 6.284); g.fill();
         g.restore();
       }
@@ -2236,11 +2278,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
           const tx = s.from.x + (p.x - s.from.x)*ee;
           const ty = s.from.y + (p.y - s.from.y)*ee - Math.sin(tt*Math.PI)*46;
           g.globalAlpha = 0.28 - k*0.07;
-          g.fillStyle = 'rgba(127,209,196,1)';
+          g.fillStyle = 'rgba(95,227,161,1)';
           g.beginPath(); g.arc(tx, ty, 9 - k*1.5, 0, 6.284); g.fill();
         }
         g.globalAlpha = 0.95;
-        g.shadowColor = 'rgba(127,209,196,.95)'; g.shadowBlur = 22;
+        g.shadowColor = 'rgba(95,227,161,.95)'; g.shadowBlur = 22;
         g.fillStyle = 'rgba(190,240,228,.9)';
         g.font = '700 15px ui-sans-serif,system-ui,"Klee One",sans-serif';
         const rx = Math.max(11, g.measureText(s.ch).width/2 + 7);   // a word needs a longer light
@@ -2251,8 +2293,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         g.fillText(s.ch, x, y+1);
       } else {
         g.globalAlpha = 0.9;
-        g.shadowColor = 'rgba(233,196,106,.9)'; g.shadowBlur = 18;
-        g.fillStyle = '#ffe9a8';
+        g.shadowColor = 'rgba(108,184,255,.9)'; g.shadowBlur = 18;
+        g.fillStyle = '#bfe3ff';
         g.font = '700 26px ui-sans-serif,system-ui,"Klee One",sans-serif';
         g.textAlign = 'center'; g.textBaseline = 'middle';
         g.fillText(s.ch, x, y);
@@ -2264,14 +2306,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const a = Math.min(1, r.life*1.6);
       g.save();
       g.globalAlpha = a;
-      g.shadowColor = 'rgba(233,196,106,.9)'; g.shadowBlur = 16;
-      g.fillStyle = '#ffe9a8';
+      g.shadowColor = 'rgba(108,184,255,.9)'; g.shadowBlur = 16;
+      g.fillStyle = '#bfe3ff';
       g.font = `700 ${Math.round(26 + 10*(1-r.life))}px ui-sans-serif,system-ui`;
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(r.text, r.x, r.y);
       if (r.sub){
         g.globalAlpha = a*0.8;
-        g.fillStyle = '#9fd8cc';
+        g.fillStyle = '#93e0b9';
         g.font = `600 ${Math.round(15 + 5*(1-r.life))}px ui-sans-serif,system-ui`;
         g.fillText(r.sub, r.x, r.y + 26);
       }
@@ -2279,7 +2321,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     }
     for (const p of motes){
       g.globalAlpha = Math.max(0, p.life);
-      g.fillStyle = p.wisp ? '#a8ecdc' : '#ffe9a8';
+      g.fillStyle = p.wisp ? '#aef2cf' : '#bfe3ff';
       g.fillRect(p.x, p.y, 2, 2);
     }
     g.globalAlpha = 1;
@@ -2298,13 +2340,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const pipW = 14, w = 41 + lw + cap*pipW;
       const x0 = d.x - w/2;
       g.fillStyle = 'rgba(16,22,24,.78)';
-      g.strokeStyle = c >= 1 ? 'rgba(127,209,196,.45)' : 'rgba(233,196,106,.16)';
+      g.strokeStyle = c >= 1 ? 'rgba(95,227,161,.45)' : 'rgba(108,184,255,.16)';
       g.lineWidth = 1;
       g.beginPath();
       if (g.roundRect) g.roundRect(x0, d.y-13, w, 26, 13); else g.rect(x0, d.y-13, w, 26);
       g.fill(); g.stroke();
       g.textBaseline = 'middle';
-      g.fillStyle = c >= 1 ? '#bdf0e6' : 'rgba(226,232,240,.75)';
+      g.fillStyle = c >= 1 ? '#c3f7dc' : 'rgba(226,232,240,.75)';
       g.font = '700 17px ui-sans-serif,system-ui,"Klee One",sans-serif';
       g.textAlign = 'left';
       g.fillText(ch, x0 + 11, d.y + 1);
@@ -2315,14 +2357,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       for (let k=0;k<cap;k++){
         const px = x0 + 41 + lw + k*pipW + 4, lit = k < c;
         g.save();
-        if (lit){ g.shadowColor = 'rgba(127,209,196,.95)'; g.shadowBlur = 9*flick; }
-        g.fillStyle = lit ? 'rgba(170,236,220,.95)' : 'rgba(127,209,196,.14)';
+        if (lit){ g.shadowColor = 'rgba(95,227,161,.95)'; g.shadowBlur = 9*flick; }
+        g.fillStyle = lit ? 'rgba(170,236,220,.95)' : 'rgba(95,227,161,.14)';
         g.beginPath(); g.ellipse(px, d.y, 3.4, lit ? 4.6*flick+1 : 3.4, 0, 0, 6.284); g.fill();
         g.restore();
       }
     }
 
-    g.fillStyle = 'rgba(233,196,106,.55)';
+    g.fillStyle = 'rgba(108,184,255,.55)';
     g.font = '12px ui-sans-serif,system-ui'; g.textAlign = 'left';
     g.textBaseline = 'alphabetic';
     // Bottom left: the workshop strip has the top, and a tally under buttons
@@ -2350,7 +2392,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       + Object.entries(UPG).map(([id, u]) => {
           const maxed = upg[id] >= u.max, c = costOf(id);
           return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
-            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'as far as it goes' : '墨 ' + c + ' · ' + u.blurb}</small></button>`;
+            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
         }).join('');
     if (strip.querySelectorAll) for (const b of strip.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
   }
@@ -2498,7 +2540,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   redo.textContent = '↺ redo';
   redo.title = 'Start this glyph again';
   redo.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;'
-    + 'background:#1d1a16;color:#e9c46a;border:1px solid #57492f;border-radius:7px;'
+    + 'background:#101820;color:#6cb8ff;border:1px solid #2a4256;border-radius:7px;'
     + 'padding:9px 14px;font:13px ui-sans-serif,system-ui;cursor:pointer;opacity:.9';
   redo.onclick = () => { loading = true; try { _load(idx); } finally { loading = false; } };
   addEventListener('DOMContentLoaded', () => document.body.appendChild(redo));
@@ -2517,6 +2559,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.41</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.42</div>
 </body>
 </html>

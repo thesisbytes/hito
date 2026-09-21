@@ -28,6 +28,7 @@ import sys
 from pathlib import Path
 
 import account_layer
+import theme
 import hand_layer
 import shell_field
 import shell_vocab
@@ -790,6 +791,18 @@ def main():
           r"const R_ON0=0\.07, LOOK=24, DRAIN=1\.6, FIZZ=90;",
           "let R_ON0=0.07, LOOK=24, DRAIN=1.6, FIZZ=90;")
 
+    # ---- a finger is not a pen
+    #
+    # One seam, like sizeFor(): every tolerance in the scorer derives from
+    # R_ON(), and every end-of-stroke guard is min(R_ON(), a fraction of the
+    # stroke), so easing this cannot reopen the tap-finishes-a-tiny-stroke
+    # bugs — the fraction still binds. The hand layer sets HAND_EASE; nothing
+    # else does. Capped, because guided already runs at 1.5x and the two
+    # multiplied would forgive a line drawn beside the glyph.
+    s.sub("a finger is not a pen",
+          r"const R_ON=\(\)=>Math\.max\(0\.045,R_ON0\*Math\.sqrt\(curS\)\);",
+          "let HAND_EASE=1;\nconst R_ON=()=>Math.max(0.045,Math.min(R_ON0*HAND_EASE,0.125)*Math.sqrt(curS));")
+
     # ---- a stage with no box yet
     #
     # Everything here copies between whole canvases, and drawImage throws on a
@@ -835,7 +848,7 @@ def main():
     # glyph is written down on the way into the engine, whoever asked for it,
     # and the start page finds window.__hand already there.
     s.sub("hand layer", r"</body>",
-          hand_layer.config(pack) + hand_layer.LAYER + "</body>")
+          hand_layer.config(pack) + hand_layer.layer(pack) + "</body>")
 
     # ---- the game shell
     #
@@ -877,6 +890,12 @@ def main():
           "line-height:1.5;color:var(--ash);opacity:.65;text-align:center}\n</style>")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    # ---- the theme, last: it translates the finished page, layers and all.
+    # The name is left in the page so a later pass (the debug build) can
+    # paint what it adds in the same colours.
+    theme_name = pack.get("theme", "gold")
+    s.sub("theme marker", r"<head>", f'<head>\n<meta name="hito-theme" content="{theme_name}">')
+    s.text = theme.apply(s.text, theme_name)
     out_path.write_text(s.text, encoding="utf-8")
 
     print(f"applied {len(s.log)} substitutions:")

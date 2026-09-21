@@ -6,6 +6,7 @@ cd "$(dirname "$0")/../.."
 # No test gets a network. The builds carry a live endpoint and Node has fetch;
 # see offline.mjs for what that was doing before this line existed.
 export NODE_OPTIONS="--import=$PWD/build/test/offline.mjs${NODE_OPTIONS:+ $NODE_OPTIONS}"
+tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 
 fail=0
 ver=$(python3 -c "import json;print(json.load(open('scripts/hiragana/pack.json'))['version'])")
@@ -33,6 +34,12 @@ echo
 echo "── tail (a stroke's end cannot be skipped) ─────────"
 node build/test/tail.test.mjs "dist/hiragana-v$ver.html" | sed 's/^/  /' || fail=1
 
+# The same guard with a finger's forgiveness switched on. Easing the tolerance
+# is only safe while the end of a stroke still cannot be skipped.
+sed "s/let HAND_EASE=1;/let HAND_EASE=1.5;/" "dist/hiragana-v$ver.html" > "$tmp/eased.html"
+grep -q "let HAND_EASE=1.5;" "$tmp/eased.html" || { echo "  FAIL: could not ease a copy of the build — the seam moved"; fail=1; }
+node build/test/tail.test.mjs "$tmp/eased.html" | sed 's/^/  (finger) /' || fail=1
+
 echo
 echo "── size (an honest trace passes at every size) ─────"
 # Only the current build, and only the verdict. The full glyph x size table is
@@ -51,6 +58,10 @@ node build/test/sync.test.mjs "dist/hiragana-v$ver.html" | sed 's/^/  /' || fail
 echo
 echo "── shadow (no layer hides an engine name) ──────────"
 node build/test/shadow.test.mjs dist/*-v*.html | sed 's/^/  /' || fail=1
+
+echo
+echo "── theme (a night page has no gold in it) ──────────"
+node build/test/theme.test.mjs index.html dist/*-v*.html | sed 's/^/  /' || fail=1
 
 echo
 echo "── server (observations only, refused per event) ───"
@@ -85,7 +96,6 @@ done
 
 echo
 echo "── build reproducibility ───────────────────────────"
-tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiragana-game-v$ver" "scripts/vocab:vocab-v$vver" "scripts/vocab/katakana.json:katakana-game-v$kver"; do
   src=${pack%%:*}; name=${pack##*:}
   .venv/bin/python build/stitch.py build/engine.html "$src" "$tmp/$name.html" >/dev/null

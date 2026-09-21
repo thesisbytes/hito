@@ -304,6 +304,19 @@ The player can switch all of it off from **✋ hand** in the header
 sent; the stats on that page are local and keep working. See
 `server/README.md` for what the endpoint does with what it is sent.
 
+### Theme
+
+```json
+"theme": "night"
+```
+
+`gold` (the default, and the Thai realm's) or `night`. Applied by
+`build/theme.py` as the last step of the stitch: it translates the colours of
+the finished page, layers and all, and leaves its name in a `<meta>` so the
+debug build can paint what it adds the same way. New UI is written in the
+gold palette; the table does the rest, and a colour it does not know fails
+`theme.test.mjs`.
+
 ### Account
 
 ```json
@@ -320,7 +333,7 @@ calls and the provider's redirect are both refused. See `server/README.md`.
 ### The hand
 
 ```json
-"hand": { "maxPoints": 64, "keep": 24, "minStep": 4 }
+"hand": { "maxPoints": 64, "keep": 24, "minStep": 4, "fingerEase": 1.5, "fingerStage": "42dvh" }
 ```
 
 `build/hand_layer.py`, appended to every build. It owns three things: the
@@ -330,6 +343,8 @@ pen/finger switch, the handwriting, and the ledger.
 |---|---|---|
 | `maxPoints` | 64 | most points kept per stroke in a stored trace. Ends are always kept. |
 | `keep` | 24 | how many recent traces stay on the device, for the thumbnails |
+| `fingerEase` | 1.5 | how much more the path forgives a finger on a touch screen. The scorer caps the result, and every end-of-stroke guard is still bound by the stroke's own length. |
+| `fingerStage` | `42dvh` | the sketchbook's size in the games for a finger (a pen gets 34dvh) |
 | `minStep` | 4 | points closer than this (thousandths of the stroke book's box) to the last kept one are dropped, so a slow stroke is not all samples from its first centimetre |
 
 **Pen or finger.** `pen` is the engine's `penOnly`: fingers, palms and mice

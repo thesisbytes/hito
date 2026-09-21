@@ -81,6 +81,11 @@ STYLE = """
   .upg button.can{ border-color:#7fd1c4; box-shadow:0 0 10px rgba(127,209,196,.25); }
   .upg button.can small{ color:#bdf0e6; }
   .upg button[disabled]{ opacity:.5; cursor:default; }
+  /* At phone width four buttons are 80px each: a cost fits, a sentence does
+     not, and half a sentence is worse than none. The title attribute and the
+     start page still say what each one does. */
+  @media (max-width:560px){ .upg button small i{ display:none; } .upg{ gap:4px; left:6px; right:6px; } }
+  .upg button small i{ font-style:normal; }
 
   /* The start page. A lacquer sheet over everything, with the two axes the
      game actually has: how much help, and what the sign says. */
@@ -945,7 +950,7 @@ LAYER = STYLE + r"""
       + Object.entries(UPG).map(([id, u]) => {
           const maxed = upg[id] >= u.max, c = costOf(id);
           return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
-            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'as far as it goes' : '墨 ' + c + ' · ' + u.blurb}</small></button>`;
+            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
         }).join('');
     if (strip.querySelectorAll) for (const b of strip.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
   }

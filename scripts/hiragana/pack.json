@@ -1,6 +1,6 @@
 {
   "script": "hiragana",
-  "version": "0.1.41",
+  "version": "0.1.42",
   "title": "hito 人 · hiragana trace · v0.1.29",
   "brand": "hito 人 · hiragana",
   "fontDir": "fonts",
@@ -45,6 +45,7 @@
   ],
   "mode": "easy",
   "grid": "cross",
+  "theme": "night",
   "account": {
     "endpoint": "https://sfo.cloud.appwrite.io/v1",
     "project": "6ab079700020b092b857",

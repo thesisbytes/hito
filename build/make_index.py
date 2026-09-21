@@ -22,6 +22,7 @@ import sys
 from pathlib import Path
 
 import account_layer
+import theme
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -220,6 +221,7 @@ def main():
     page = (PAGE.replace("__ACCOUNT__", js(account_layer.values(pack)))
                 .replace("__CORE__", account_layer.CORE)
                 .replace("__REALMS__", js(REALMS)))
+    page = theme.apply(page, pack.get("theme", "gold"))   # the realm you are about to step into
     out.write_text(page, encoding="utf-8")
     print(f"{out}  {len(page.encode('utf-8'))/1024:.0f} KB")
 

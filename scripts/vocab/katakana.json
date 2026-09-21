@@ -1,6 +1,6 @@
 {
   "script": "vocab",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "title": "hito 人 · katakana · v0.1.0",
   "brand": "hito 人",
   "fontDir": "fonts",
@@ -47,6 +47,7 @@
   "grid": "cross",
   "shell": "field",
   "deck": "vocab/katakana.json",
+  "theme": "night",
   "account": {
     "endpoint": "https://sfo.cloud.appwrite.io/v1",
     "project": "6ab079700020b092b857",

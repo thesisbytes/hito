@@ -750,3 +750,30 @@ Running log. Append at the bottom, don't rewrite history.
 - The player's email address is never written to localStorage: the name is
   shown, and the id is needed; nothing else is kept.
 - `index.html` is generated now, and `run.sh` fails if it is hand-edited.
+
+## 2026-09-20 — Night, and room for a finger (hiragana v0.1.42, katakana-game v0.1.5, vocab v0.1.20)
+
+- The maintainer: "i don't really fancy the gold. i like dark mode and my
+  favorite colors are blue and green. the finger tracing is hard, cause i have
+  fat fingers."
+- **The theme is a table, not a refactor.** The colours were literals in six
+  files and two languages (CSS, and rgba strings in canvas code), but a closed
+  set of about forty. So the page is built gold and translated at the end.
+  Blue takes gold's job, green takes teal's; nothing changes meaning. Warnings
+  stay warm, and against blue they warn better.
+- A screenshot found what the table had missed: the panels behind the field
+  and the sketchbook (`--lacquer-2`) and the dots along the path were still
+  brown and yellow. That scan is now `theme.test.mjs`, which promptly found
+  the debug build's red "fails here" button — a warning, allowed by name.
+- The upgrade strip cut its labels to "the l…" at phone width. It shows the
+  cost alone there now; half a sentence is worse than none.
+- **Fingers.** Three things give: size, room, tolerance. Not an offset cursor
+  (drawing above the fingertip so it can be seen) — it solves the same
+  problem and is the first thing to try if this is not enough, but it changes
+  what tracing feels like and wants a hand to judge it, not a test.
+- Only on a screen that can feel a finger. A mouse in finger mode is already
+  precise and gets nothing.
+- **Not verified by a hand.** Headless Chrome confirmed the numbers on a
+  simulated touch phone (sketchbook 262px to 324px, glyph at 0.62, ease 1.5)
+  and the tail guard holds at that ease. Whether it is *comfortable* is the
+  fifth thing in this project only a hand can say.

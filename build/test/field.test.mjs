@@ -742,7 +742,7 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   F.earn(100000);
   let n = 0; while (F.buy('bright') && n < 50) n++;
   ok(F.upgrades.bright === F.UPG.bright.max, `bright went to ${F.upgrades.bright}, its ceiling is ${F.UPG.bright.max}`);
-  ok(/as far as it goes/.test(F.upgHtml), 'a maxed upgrade still offers itself for sale');
+  ok(/<small>max<\/small>/.test(F.upgHtml) && /data-upg="bright"[^>]*disabled/.test(F.upgHtml), 'a maxed upgrade still offers itself for sale');
 
   // bright makes a trace light more — it multiplies the hand, it does not replace it
   fresh(); F.quench();

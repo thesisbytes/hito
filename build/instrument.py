@@ -433,6 +433,10 @@ def main():
     if n != 1:
         sys.exit("no </body> to append to.")
 
+    # what this adds is painted like the build it is added to
+    import re as _re, theme as _theme
+    _m = _re.search(r'<meta name="hito-theme" content="([a-z]+)">', s)
+    if _m: s = _theme.apply(s, _m.group(1))
     dest.write_text(s, encoding="utf-8")
     print(f"{dest}  {dest.stat().st_size/1024:.0f} KB")
 

@@ -32,6 +32,11 @@ LAYER = r"""
     /* the engine styles every button as flex:1 with a min-width; in a header
        with the tabs hidden that is a bar the width of the screen */
     flex:none; min-width:0; letter-spacing:0; }
+  /* A finger gets more room. In the games the sketchbook is a third of the
+     screen because a pen needs no more; a fingertip hides what it is tracing,
+     so it takes some of the field's height back. The field's canvas and the
+     stage are both watched for size, so this is just a class. */
+  body.field.roomy .stage, body.vocab.roomy .stage{ width:min(96vw,VAR_STAGE); height:min(96vw,VAR_STAGE); }
   .hand-btn.nudge{ border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 14px rgba(127,209,196,.45); }
   .hand{ position:fixed; inset:0; z-index:10000; display:flex; align-items:center;
     justify-content:center; background:rgba(12,10,8,.93); font:13px ui-sans-serif,system-ui; color:#e8e0cc; }
@@ -76,7 +81,7 @@ LAYER = r"""
    Pen or finger, what was drawn, and how it has been going. Writes down what
    the tracer decided; decides nothing itself.                              */
 (function(){
-  const CFG = window.__HAND_CFG || {maxPoints:64, keep:24, minStep:4};
+  const CFG = window.__HAND_CFG || {maxPoints:64, keep:24, minStep:4, fingerEase:1.5};
   const K_INPUT = 'hito-input', K_LEDGER = 'hito-ledger', K_HANDS = 'hito-hands';
   const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch(_){ return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(_){ return false; } };
@@ -107,9 +112,35 @@ LAYER = r"""
       if (b && b.setAttribute) b.setAttribute('aria-pressed', input === 'pen');
     }
   }
+  // ---- a finger is not a pen ---------------------------------------------
+  // The tolerance was tuned for a pen tip, which shows you the line as you
+  // draw it. A fingertip is a centimetre wide and sits on top of the path, so
+  // the hand is steering by memory of where the line was. Three things give:
+  // the glyph is drawn at its largest, the sketchbook takes more of the screen,
+  // and the path forgives more (HAND_EASE, the one seam in the scorer). Only on
+  // a screen that can feel a finger — a mouse in finger mode is already precise
+  // — and it lets go the moment a pen touches down.
+  const touchy = () => { try { return (navigator.maxTouchPoints || 0) > 0; } catch(_){ return false; } };
+  let penNow = false;
+  const roomy = () => input === 'finger' && touchy() && !penNow;
+  function applyRoom(){
+    const on = roomy();
+    try { HAND_EASE = on ? CFG.fingerEase : 1; } catch(_){}
+    try { document.body.classList[on ? 'add' : 'remove']('roomy'); } catch(_){}
+    return on;
+  }
+  // sizeFor() is the engine's single seam for size; a finger gets the top of the range.
+  const _sizeFor = window.sizeFor;
+  if (typeof _sizeFor === 'function') window.sizeFor = function(){
+    const v = _sizeFor.apply(this, arguments);
+    return roomy() && typeof SIZE_MAX === 'number' ? Math.max(v, SIZE_MAX) : v;
+  };
+
   function setInput(v, quiet){
     input = v === 'finger' ? 'finger' : 'pen';
     penOnly = input === 'pen';
+    const was = document.body.classList && document.body.classList.contains && document.body.classList.contains('roomy');
+    if (applyRoom() !== !!was && !quiet){ try { if (typeof load === 'function' && typeof idx === 'number' && !done && !strokes.length) load(idx); } catch(_){} }
     if (!quiet){ try { localStorage.setItem(K_INPUT, input); } catch(_){} }
     showInput();
     return input;
@@ -188,6 +219,7 @@ LAYER = r"""
     const rec = {
       glyph: ch, ok, ms, zaps, tries, strokes: raw.length,
       size: Math.round(curF*1000)/1000, input: lastType || input,
+      ease: (typeof HAND_EASE === 'number' && HAND_EASE !== 1) ? HAND_EASE : undefined,
       level: (typeof MASTERY !== 'undefined' && MASTERY[ch]) || 0,
       diff: (window.__field && window.__field.difficulty) || (window.__vocab && window.__vocab.difficulty) || '',
       v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
@@ -250,6 +282,8 @@ LAYER = r"""
     // Registered after the engine's own listener, so by now it has decided.
     inkEl.addEventListener('pointerdown', e => {
       if (e.pointerType === 'pen') seenPen = true;
+      // a pen in finger mode is still a pen: no extra forgiveness for it
+      const p = e.pointerType === 'pen'; if (p !== penNow){ penNow = p; applyRoom(); }
       if (typeof activeId !== 'undefined' && activeId === e.pointerId){
         lastType = e.pointerType || '';
         if (strokes.length < mine.length || !strokes.length) mine = [];   // the engine started over, so does this
@@ -313,7 +347,7 @@ LAYER = r"""
       <div class="hand-h">draw with</div>
       <div class="hand-row">
         ${opt('pen', input, '✎ pen only', 'fingers and palms are ignored, so the hand can rest on the glass.')}
-        ${opt('finger', input, '☝ finger', 'anything that touches draws: a finger, a mouse, a pen. one at a time.')}
+        ${opt('finger', input, '☝ finger', 'anything that touches draws, one at a time. on a touch screen the glyph is drawn bigger and the path forgives more: a fingertip hides what it is tracing.')}
       </div>
       ${sync && sync.enabled ? `<div class="hand-h">notes to the workshop</div>
       <div class="hand-row">
@@ -399,7 +433,8 @@ LAYER = r"""
   try { window.__account && window.__account.onChange(() => { if (!sheet.hidden) render(); }); } catch(_){}
 
   window.__hand = {
-    get input(){ return input; }, setInput, guess,
+    get input(){ return input; }, setInput, guess, get roomy(){ return roomy(); }, applyRoom,
+    pen(v){ penNow = !!v; return applyRoom(); },
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
     get html(){ return markup; }, get shown(){ return !sheet.hidden; },
     show: open, close, render, note, pack, toBook, shaky, stats, streak,
@@ -411,6 +446,16 @@ LAYER = r"""
 """
 
 
+def layer(pack):
+    """The layer, with the finger's sketchbook size written into its CSS."""
+    h = pack.get("hand") or {}
+    stage = str(h.get("fingerStage", "42dvh"))
+    import re
+    if not re.fullmatch(r"\d{1,3}(?:\.\d+)?(?:dvh|vh|vmin|px)", stage):
+        raise SystemExit(f"hand.fingerStage must be a CSS length like 42dvh, not {stage!r}")
+    return LAYER.replace("VAR_STAGE", stage)
+
+
 def config(pack):
     """The hand's tuning, written into the page."""
     h = pack.get("hand") or {}
@@ -418,6 +463,7 @@ def config(pack):
         "<script>window.__HAND_CFG={"
         f"maxPoints:{int(h.get('maxPoints', 64))},"
         f"keep:{int(h.get('keep', 24))},"
-        f"minStep:{int(h.get('minStep', 4))}"
+        f"minStep:{int(h.get('minStep', 4))},"
+        f"fingerEase:{float(h.get('fingerEase', 1.5))}"
         "};</script>"
     )
