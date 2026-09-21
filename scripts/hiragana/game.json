@@ -1,6 +1,6 @@
 {
   "script": "hiragana",
-  "version": "0.1.40",
+  "version": "0.1.41",
   "title": "hito 人 · hiragana · v0.1.29",
   "brand": "hito 人",
   "fontDir": "fonts",
@@ -60,6 +60,13 @@
     "cleanBonus": 1,
     "hitodamaCap": 6,
     "castMs": 900
+  },
+  "account": {
+    "endpoint": "https://sfo.cloud.appwrite.io/v1",
+    "project": "6ab079700020b092b857",
+    "db": "hito",
+    "table": "saves",
+    "saveMs": 20000
   },
   "sync": {
     "endpoint": "https://hito-sync.sfo.appwrite.run",

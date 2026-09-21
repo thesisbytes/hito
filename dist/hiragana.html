@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana trace · v0.1.40</title>
+<title>hito 人 · hiragana trace · v0.1.41</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.40';
+const APP_VERSION='0.1.41';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -762,7 +762,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.40');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.41');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -904,6 +904,156 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     clear(){ outbox = []; writeJSON(BOX, outbox); },
   };
   flush();
+})();
+</script>
+<script>window.__ACCOUNT_CFG={"endpoint":"https://sfo.cloud.appwrite.io/v1","project":"6ab079700020b092b857","db":"hito","table":"saves","saveMs":20000};</script>
+<script>
+/* ---- guest, or signed in ------------------------------------------------
+   Optional by construction: every call can fail and the game does not notice. */
+(function(){
+  const CFG = window.__ACCOUNT_CFG || {};
+  const K_SESSION = 'hito-session', K_USER = 'hito-user';
+  const loc = typeof location !== 'undefined' ? location : null;
+  // A provider has to send the player back to somewhere. A file has no somewhere.
+  const can = !!(CFG.endpoint && CFG.project && loc && /^https?:$/.test(loc.protocol) && typeof fetch === 'function');
+  const get = k => { try { return localStorage.getItem(k); } catch(_){ return null; } };
+  const put = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch(_){} };
+  let user = null;
+  try { user = JSON.parse(get(K_USER) || 'null'); } catch(_){ user = null; }
+  let state = user ? 'signed' : 'guest', note = '';
+  const listeners = [];
+  const changed = () => { for (const f of listeners) try { f(); } catch(_){} };
+
+  function api(method, path, body){
+    const headers = { 'X-Appwrite-Project': CFG.project, 'content-type': 'application/json' };
+    const fb = get(K_SESSION); if (fb) headers['X-Fallback-Cookies'] = fb;
+    return fetch(CFG.endpoint + path, { method, headers, credentials: 'include',
+                                        body: body === undefined ? undefined : JSON.stringify(body) })
+      .then(r => {
+        const c = r.headers && r.headers.get && r.headers.get('x-fallback-cookies');
+        if (c) put(K_SESSION, c);
+        return r.text().then(t => { let j = null; try { j = t ? JSON.parse(t) : null; } catch(_){}
+                                    return { status: r.status, ok: r.ok, json: j }; });
+      });
+  }
+
+  function signIn(){
+    if (!can) return false;
+    const here = loc.origin + loc.pathname;
+    loc.assign(CFG.endpoint + '/account/tokens/oauth2/google?project=' + encodeURIComponent(CFG.project)
+      + '&success=' + encodeURIComponent(here) + '&failure=' + encodeURIComponent(here + '?signin=failed'));
+    return true;
+  }
+  function forget(){ user = null; put(K_USER, null); put(K_SESSION, null); state = 'guest'; }
+  function signOut(){
+    const done = () => { forget(); note = ''; changed(); };
+    if (!can) { done(); return Promise.resolve(); }
+    return api('DELETE', '/account/sessions/current').catch(() => {}).then(done);
+  }
+  function me(){
+    return api('GET', '/account').then(r => {
+      if (r.ok && r.json && r.json.$id){
+        user = { id: r.json.$id, name: r.json.name || (r.json.email || '').split('@')[0] || 'you' };
+        put(K_USER, JSON.stringify(user)); state = 'signed'; changed();
+        return user;
+      }
+      // Only a real "no" signs anybody out. Offline is not a no.
+      if (r.status === 401){ forget(); changed(); }
+      return null;
+    }).catch(() => null);   // a tunnel: still whoever they were, just not reachable
+  }
+  // Back from the provider: the address carries a one-use token, which buys a session.
+  function finish(){
+    if (!can) return Promise.resolve(null);
+    const q = new URLSearchParams(loc.search);
+    const clean = () => { try { history.replaceState(null, '', loc.pathname + loc.hash); } catch(_){} };
+    if (q.get('signin') === 'failed'){ clean(); note = 'that sign-in did not go through'; changed(); return Promise.resolve(null); }
+    const userId = q.get('userId'), secret = q.get('secret');
+    if (!userId || !secret) return Promise.resolve(null);
+    clean();   // before anything else: a token in the address bar is a token in a screenshot
+    state = 'working'; changed();
+    return api('POST', '/account/sessions/token', { userId, secret })
+      .then(r => r.ok ? me() : (state = 'guest', note = 'that sign-in did not go through', changed(), null))
+      .catch(() => { state = 'guest'; note = 'no network to finish signing in'; changed(); return null; });
+  }
+
+  // ---- the save file ------------------------------------------------------
+  const DB = CFG.db || 'hito', TABLE = CFG.table || 'saves';
+  const rowPath = () => '/tablesdb/' + DB + '/tables/' + TABLE + '/rows/' + user.id;
+  let syncing = false, dirty = false, timer = 0, lastSync = 0;
+  function local(){
+    const H = window.__hand;
+    const out = { hito: 'save', v: 1, at: new Date().toISOString() };
+    try { if (H) out.ledger = JSON.parse(H.exportText()).ledger; } catch(_){}
+    try { if (typeof MASTERY !== 'undefined') out.mastery = MASTERY; } catch(_){}
+    return out;
+  }
+  // Counts only rise, so merging is never a question: the fuller record per
+  // character, and the higher mastery. Returns whether this device learned anything.
+  function merge(remote){
+    let learned = false;
+    const H = window.__hand;
+    try {
+      if (H && remote.ledger){
+        const before = H.exportText();
+        H.importText(JSON.stringify({ hito: 'ledger', ledger: remote.ledger }));
+        if (H.exportText() !== before) learned = true;
+      }
+    } catch(_){}
+    try {
+      if (typeof MASTERY !== 'undefined' && remote.mastery && typeof remote.mastery === 'object'){
+        for (const [c, n] of Object.entries(remote.mastery)){
+          if ([...c].length > 8 || !(+n > (MASTERY[c] || 0))) continue;
+          MASTERY[c] = Math.min(9999, Math.floor(+n)); learned = true;
+        }
+        if (learned && typeof persistM === 'function') persistM();
+      }
+    } catch(_){}
+    return learned;
+  }
+  function sync(){
+    if (!can || !user || syncing) return Promise.resolve(false);
+    syncing = true; dirty = false;
+    const device = (window.__sync && window.__sync.device) || null;
+    return api('GET', rowPath()).then(r => {
+      if (r.status === 401){ forget(); changed(); return false; }
+      if (r.status !== 200 && r.status !== 404) return false;          // not now; later
+      let remote = null, devices = [];
+      if (r.status === 200){
+        try { remote = JSON.parse(r.json.data || 'null'); } catch(_){}
+        devices = Array.isArray(r.json.devices) ? r.json.devices : [];
+        if (remote) merge(remote);
+      }
+      if (device && !devices.includes(device)) devices = devices.concat(device).slice(-20);
+      const body = { data: JSON.stringify(local()), devices };
+      const me_ = 'user:' + user.id;
+      return (r.status === 404
+        ? api('POST', '/tablesdb/' + DB + '/tables/' + TABLE + '/rows', { rowId: user.id, data: body,
+              permissions: ['read("' + me_ + '")', 'update("' + me_ + '")', 'delete("' + me_ + '")'] })
+        : api('PATCH', rowPath(), { data: body })
+      ).then(w => { if (w.ok){ lastSync = Date.now(); changed(); } return w.ok; });
+    }).catch(() => false).then(v => { syncing = false; return v; });
+  }
+  // Something was learned here. Not at once: a run lands a glyph every few
+  // seconds, and the save only has to be roughly current.
+  function touch(){
+    dirty = true;
+    if (!can || !user || timer) return;
+    timer = setTimeout(() => { timer = 0; if (dirty) sync(); }, CFG.saveMs || 20000);
+  }
+
+  window.__account = {
+    get can(){ return can; }, get user(){ return user; }, get state(){ return state; },
+    get note(){ return note; }, get lastSync(){ return lastSync; },
+    signIn, signOut, me, finish, sync, touch, merge, local,
+    onChange(f){ listeners.push(f); },
+  };
+
+  if (can){
+    finish().then(u => { if (u) return sync(); if (user) return me().then(v => v && sync()); }).catch(() => {});
+    if (typeof document !== 'undefined' && document.addEventListener)
+      document.addEventListener('visibilitychange', () => { if (document.hidden && dirty) sync(); });
+  }
 })();
 </script>
 <script>window.__HAND_CFG={maxPoints:64,keep:24,minStep:4};</script>
@@ -1057,6 +1207,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const ds = Object.keys(LEDGER.days).sort();
     while (ds.length > 60) delete LEDGER.days[ds.shift()];
     write(K_LEDGER, LEDGER);
+    try { window.__account && window.__account.touch(); } catch(_){}
     if (!write(K_HANDS, HANDS)){ HANDS = HANDS.slice(-Math.ceil(HANDS.length/2)); write(K_HANDS, HANDS); }
   }
   function note(ok){
@@ -1174,12 +1325,23 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   sheet.className = 'hand'; sheet.id = 'hand'; sheet.hidden = true;
   let markup = '', io = false;
   function render(){
-    const s = stats(), sync = window.__sync;
+    const s = stats(), sync = window.__sync, acct = window.__account;
+    // Who is drawing. Guest is not a lesser mode and is not dressed as one:
+    // it is the game, and signing in only adds a save that follows you.
+    const who = !acct ? '' : `<div class="hand-h">who is drawing</div><div class="hand-row">` + (
+      acct.user ? `<button data-acct="sync" aria-pressed="true"><b>${esc(acct.user.name)}</b><small>signed in. these stats and your mastery are kept, and follow you to any device you sign in on.${acct.lastSync ? ' saved just now.' : ''}</small></button>`
+                + `<button data-acct="out"><b>sign out</b><small>back to a guest. nothing on this device is lost.</small></button>`
+      : acct.state === 'working' ? `<button disabled><b>signing in…</b><small>one moment.</small></button>`
+      : `<button data-acct="guest" aria-pressed="true"><b>a guest</b><small>no account. everything stays on this device, and it all works offline.</small></button>`
+        + (acct.can ? `<button data-acct="in"><b>sign in with Google</b><small>keep these stats and your mastery, and see them on any device.${acct.note ? ' ' + esc(acct.note) + '.' : ''}</small></button>`
+                    : `<button disabled><b>sign in</b><small>only from the web: a file on a tablet has nowhere for Google to send you back to.</small></button>`)
+      ) + `</div>`;
     const opt = (v, cur, title, blurb) => `<button data-in="${v}" aria-pressed="${v === cur}"><b>${title}</b><small>${blurb}</small></button>`;
     const list = (a, f, none) => a.length ? `<div class="hand-list">${a.map(f).join('')}</div>` : `<div class="hand-empty">${none}</div>`;
     sheet.innerHTML = markup = `<div class="hand-card">
       <div class="hand-title">the hand ✋</div>
       <div class="hand-sub">what draws, and how it has been going</div>
+      ${who}
       <div class="hand-h">draw with</div>
       <div class="hand-row">
         ${opt('pen', input, '✎ pen only', 'fingers and palms are ignored, so the hand can rest on the glass.')}
@@ -1212,6 +1374,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     </div>`;
     if (!sheet.querySelectorAll) return;
     for (const b of sheet.querySelectorAll('button[data-in]')) b.onclick = () => { setInput(b.dataset.in); render(); };
+    for (const b of sheet.querySelectorAll('button[data-acct]')) b.onclick = () => {
+      const a = b.dataset.acct;
+      if (a === 'in') acct.signIn(); else if (a === 'out') acct.signOut(); else if (a === 'sync') acct.sync();
+    };
     for (const b of sheet.querySelectorAll('button[data-share]')) b.onclick = () => { sync.setShare(b.dataset.share === '1'); render(); };
     const ta = sheet.querySelector('.hand-io');
     for (const b of sheet.querySelectorAll('button[data-io]')) b.onclick = () => {
@@ -1261,6 +1427,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     showInput();
   });
 
+  // the page redraws itself when somebody signs in or out while it is open
+  try { window.__account && window.__account.onChange(() => { if (!sheet.hidden) render(); }); } catch(_){}
+
   window.__hand = {
     get input(){ return input; }, setInput, guess,
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
@@ -1271,6 +1440,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.40</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.41</div>
 </body>
 </html>

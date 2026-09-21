@@ -161,6 +161,36 @@
                     "orders": []
                 }
             ]
+        },
+        {
+            "$id": "saves",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "hito",
+            "name": "saves",
+            "enabled": true,
+            "rowSecurity": true,
+            "columns": [
+                {
+                    "key": "data",
+                    "type": "mediumtext",
+                    "required": false,
+                    "array": false,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "devices",
+                    "type": "varchar",
+                    "required": false,
+                    "array": true,
+                    "size": 17,
+                    "default": null,
+                    "encrypt": false
+                }
+            ],
+            "indexes": []
         }
     ]
 }

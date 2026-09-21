@@ -1,6 +1,6 @@
 {
   "script": "vocab",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "title": "hito 人 · vocab · v0.1.2",
   "brand": "hito 人 · vocab",
   "fontDir": "fonts",
@@ -53,6 +53,13 @@
     "wordPauseMs": 1200,
     "fizzleRestarts": true,
     "tidyStrays": true
+  },
+  "account": {
+    "endpoint": "https://sfo.cloud.appwrite.io/v1",
+    "project": "6ab079700020b092b857",
+    "db": "hito",
+    "table": "saves",
+    "saveMs": 20000
   },
   "sync": {
     "endpoint": "https://hito-sync.sfo.appwrite.run",

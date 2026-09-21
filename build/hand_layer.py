@@ -175,6 +175,7 @@ LAYER = r"""
     const ds = Object.keys(LEDGER.days).sort();
     while (ds.length > 60) delete LEDGER.days[ds.shift()];
     write(K_LEDGER, LEDGER);
+    try { window.__account && window.__account.touch(); } catch(_){}
     if (!write(K_HANDS, HANDS)){ HANDS = HANDS.slice(-Math.ceil(HANDS.length/2)); write(K_HANDS, HANDS); }
   }
   function note(ok){
@@ -292,12 +293,23 @@ LAYER = r"""
   sheet.className = 'hand'; sheet.id = 'hand'; sheet.hidden = true;
   let markup = '', io = false;
   function render(){
-    const s = stats(), sync = window.__sync;
+    const s = stats(), sync = window.__sync, acct = window.__account;
+    // Who is drawing. Guest is not a lesser mode and is not dressed as one:
+    // it is the game, and signing in only adds a save that follows you.
+    const who = !acct ? '' : `<div class="hand-h">who is drawing</div><div class="hand-row">` + (
+      acct.user ? `<button data-acct="sync" aria-pressed="true"><b>${esc(acct.user.name)}</b><small>signed in. these stats and your mastery are kept, and follow you to any device you sign in on.${acct.lastSync ? ' saved just now.' : ''}</small></button>`
+                + `<button data-acct="out"><b>sign out</b><small>back to a guest. nothing on this device is lost.</small></button>`
+      : acct.state === 'working' ? `<button disabled><b>signing in…</b><small>one moment.</small></button>`
+      : `<button data-acct="guest" aria-pressed="true"><b>a guest</b><small>no account. everything stays on this device, and it all works offline.</small></button>`
+        + (acct.can ? `<button data-acct="in"><b>sign in with Google</b><small>keep these stats and your mastery, and see them on any device.${acct.note ? ' ' + esc(acct.note) + '.' : ''}</small></button>`
+                    : `<button disabled><b>sign in</b><small>only from the web: a file on a tablet has nowhere for Google to send you back to.</small></button>`)
+      ) + `</div>`;
     const opt = (v, cur, title, blurb) => `<button data-in="${v}" aria-pressed="${v === cur}"><b>${title}</b><small>${blurb}</small></button>`;
     const list = (a, f, none) => a.length ? `<div class="hand-list">${a.map(f).join('')}</div>` : `<div class="hand-empty">${none}</div>`;
     sheet.innerHTML = markup = `<div class="hand-card">
       <div class="hand-title">the hand ✋</div>
       <div class="hand-sub">what draws, and how it has been going</div>
+      ${who}
       <div class="hand-h">draw with</div>
       <div class="hand-row">
         ${opt('pen', input, '✎ pen only', 'fingers and palms are ignored, so the hand can rest on the glass.')}
@@ -330,6 +342,10 @@ LAYER = r"""
     </div>`;
     if (!sheet.querySelectorAll) return;
     for (const b of sheet.querySelectorAll('button[data-in]')) b.onclick = () => { setInput(b.dataset.in); render(); };
+    for (const b of sheet.querySelectorAll('button[data-acct]')) b.onclick = () => {
+      const a = b.dataset.acct;
+      if (a === 'in') acct.signIn(); else if (a === 'out') acct.signOut(); else if (a === 'sync') acct.sync();
+    };
     for (const b of sheet.querySelectorAll('button[data-share]')) b.onclick = () => { sync.setShare(b.dataset.share === '1'); render(); };
     const ta = sheet.querySelector('.hand-io');
     for (const b of sheet.querySelectorAll('button[data-io]')) b.onclick = () => {
@@ -378,6 +394,9 @@ LAYER = r"""
     if (count && count.parentNode && count.parentNode.insertBefore) count.parentNode.insertBefore(btn, count);
     showInput();
   });
+
+  // the page redraws itself when somebody signs in or out while it is open
+  try { window.__account && window.__account.onChange(() => { if (!sheet.hidden) render(); }); } catch(_){}
 
   window.__hand = {
     get input(){ return input; }, setInput, guess,

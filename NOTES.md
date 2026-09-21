@@ -718,3 +718,35 @@ Running log. Append at the bottom, don't rewrite history.
 - Three word tests leaned on the random roster and broke the moment a light
   could write a doubled kana. They use a fixed three-kana word now. One was
   already flaky: "piano" is piano in both voices.
+
+## 2026-09-20 — Guest or signed in, and a title screen (hiragana v0.1.41, katakana-game v0.1.4, vocab v0.1.19)
+
+- The maintainer: "i'd like to login to see my stats. i auth'd the google sign
+  in on my end", then "so guest mode, and login mode", and of the main page,
+  "i want it to feel like the game title screen".
+- **Two things stood between that and a working sign-in**, neither in this
+  repo. The project had no web platforms registered, so Appwrite would have
+  refused both the browser's calls and the redirect. And the Google client ID
+  had been pasted with `https://` on the front; asked directly, Google answers
+  that with `Error 401: invalid_client` and answers the bare ID with its
+  sign-in page. Corrected through the CLI sending only the ID, with Appwrite's
+  own credential validation switched on so a lost secret would have shown.
+- **Not tested: the Google hop itself.** It needs the maintainer's password.
+  Everything after it was run for real in Chrome with a throwaway user and the
+  same one-use token the redirect carries: device A signed in, the token left
+  the address bar, the save was written; device B, empty, signed in as the
+  same player and came up with A's ぬ at 7 conjures and A's mastery. A
+  stranger asking for the row got 404. User and row deleted afterwards.
+- The session is a third-party cookie (page and API are different sites), and
+  most browsers refuse those now. Appwrite's answer is an
+  `X-Fallback-Cookies` header kept in localStorage; headless Chrome needed it,
+  so that path is the tested one.
+- No SDK. Five REST calls, and an SDK is a dependency in a project whose
+  constraint is that there are none.
+- The test found a real fault before it found anything else: with a remembered
+  sign-in and no network, boot rejected with nothing to catch it.
+- A cached name is not a session. With a stale `hito-user` the title screen
+  asks, gets a real 401, and says "guest". Offline it keeps the name.
+- The player's email address is never written to localStorage: the name is
+  shown, and the id is needed; nothing else is kept.
+- `index.html` is generated now, and `run.sh` fails if it is hand-edited.

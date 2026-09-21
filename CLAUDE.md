@@ -48,6 +48,9 @@ hito/
     sync_layer.py           offline outbox, appended as a layer
     test/sync.test.mjs      offline stays offline and nothing is lost
     hand_layer.py           pen or finger, the handwriting, the stats ledger
+    account_layer.py        guest or signed in: Google through Appwrite, and a save that follows you
+    make_index.py           writes index.html, the title screen (it shares the sign-in code)
+    test/account.test.mjs   a file makes no request; merging never unlearns; a tunnel is not a sign-out
     test/hand.test.mjs      the switch reaches the engine; a note never costs a glyph
     test/server.test.mjs    what the endpoint refuses, checked without deploying
     test/offline.mjs        preloaded by run.sh: no test ever reaches the live endpoint
@@ -144,7 +147,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.40.html`
+### Hiragana — `dist/hiragana-v0.1.41.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -226,6 +229,30 @@ guide is what makes them agree.
 
 Not yet implemented: the economy stubs called for below.
 
+### Guest, or signed in — every build and the title screen, as of v0.1.41
+
+**Guest is the game** and is not dressed as a lesser mode: no account, a
+made-up device id, everything on the device, opens from a double-click. A
+build opened from a file has no sign-in at all, because a provider has nowhere
+to send anybody back to, and the page says that instead of showing a button
+that cannot work.
+
+**Signed in is a save file that follows you**: Google, through Appwrite, no
+SDK (`build/account_layer.py`). One row per player in `hito.saves`, readable
+by its owner only, holding the hand's ledger and mastery. The merge is the
+rule `server/README.md` wrote down before there was a server — the fuller
+record wins per character, mastery is `max()` — so no device can unlearn what
+another learned and nothing ever asks the player which copy to keep.
+
+It is client-written, so it is exactly as trustworthy as a save file: right
+for "how am I doing", worthless as a claim about anyone else. **It is not the
+leaderboard and must not become one.**
+
+`index.html` is the title screen and is generated (`build/make_index.py`),
+because it signs people in and must run the same code the realms do. 人 is
+drawn in its two strokes, Begin goes to the realm you were last in, and the
+tally under it is read off the ledger the realms keep.
+
 ### The hand — every build, as of hiragana v0.1.38
 
 `build/hand_layer.py`, appended like the field and for the same reason: it
@@ -256,7 +283,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.3.html`
+### Katakana — `dist/katakana-game-v0.1.4.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -277,7 +304,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.18.html`
+### Vocab — `dist/vocab-v0.1.19.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke

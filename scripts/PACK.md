@@ -304,6 +304,19 @@ The player can switch all of it off from **✋ hand** in the header
 sent; the stats on that page are local and keep working. See
 `server/README.md` for what the endpoint does with what it is sent.
 
+### Account
+
+```json
+"account": { "endpoint": "https://sfo.cloud.appwrite.io/v1", "project": "…", "db": "hito",
+             "table": "saves", "saveMs": 20000 }
+```
+
+Where signing in happens. No `endpoint` means guests only and no request is
+ever made. `saveMs` is how long after something is learned the save is written
+(it only has to be roughly current). The hostname a build is served from must
+be a registered **web platform** in the Appwrite project, or the browser's
+calls and the provider's redirect are both refused. See `server/README.md`.
+
 ### The hand
 
 ```json

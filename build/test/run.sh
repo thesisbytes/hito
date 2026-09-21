@@ -57,6 +57,10 @@ echo "── server (observations only, refused per event) ───"
 node build/test/server.test.mjs | sed 's/^/  /' || fail=1
 
 echo
+echo "── account (guest or signed in, never required) ────"
+node build/test/account.test.mjs index.html "dist/hiragana-game-v$ver.html" "dist/vocab-v$vver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── hand (pen or finger, and what it drew) ──────────"
 node build/test/hand.test.mjs "dist/hiragana-v$ver.html" "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
 node build/test/hand.test.mjs "dist/vocab-v$vver.html" "dist/katakana-game-v$kver.html" | sed 's/^/  /' || fail=1
@@ -92,6 +96,16 @@ for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiraga
     fail=1
   fi
 done
+
+# The title screen is generated, because it shares its sign-in code with the
+# realms. A hand edit to index.html is an edit the next build throws away.
+.venv/bin/python build/make_index.py "$tmp/index.html" >/dev/null
+if cmp -s "$tmp/index.html" index.html; then
+  echo "  index.html rebuilds byte-identical"
+else
+  echo "  MISMATCH: index.html is not what build/make_index.py writes — run it"
+  fail=1
+fi
 
 echo
 echo "── stable links (dist/<script>.html is the current build) ──"

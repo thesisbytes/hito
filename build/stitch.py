@@ -27,6 +27,7 @@ import re
 import sys
 from pathlib import Path
 
+import account_layer
 import hand_layer
 import shell_field
 import shell_vocab
@@ -825,6 +826,10 @@ def main():
     # behaviours that drift apart between releases.
     s.sub("sync layer", r"</body>",
           sync_layer.config(pack) + sync_layer.LAYER + "</body>")
+
+    # Guest or signed in. Before the hand, whose page shows which.
+    s.sub("account layer", r"</body>",
+          account_layer.config(pack) + account_layer.LAYER + "</body>")
 
     # The hand goes in before the shells: they wrap conjure() after it, so a
     # glyph is written down on the way into the engine, whoever asked for it,

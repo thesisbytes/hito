@@ -44,6 +44,28 @@ string behind `0.0.0.0/0`.
 
 A `trace` is the handwriting: see `scripts/PACK.md`, "The hand".
 
+## Accounts
+
+Google sign-in, through Appwrite's OAuth, from `build/account_layer.py`.
+Optional in every sense: guest is the default and is the whole game.
+
+- **Web platforms** registered on the project: `hito.appwrite.network`,
+  `thesisbytes.github.io`, `nira-hito.tech`. A host that is not on that list
+  cannot sign anyone in. `localhost` is always allowed.
+- **`hito.saves`**: one row per player, id = the user id, `data` (the ledger
+  and mastery, as JSON) and `devices` (the device ids that have signed in as
+  them, which is what will let the events table be read per player later).
+  Row security is on, the table only lets signed-in users create, and each
+  row is created readable, writable and deletable by `user:<id>` alone. A
+  stranger asking for a row gets 404 and an empty list.
+- The Google client ID was saved in the console with `https://` in front of
+  it, and Google answers that with `Error 401: invalid_client`. Fixed
+  2026-09-20. If sign-in ever dies at Google's page, look there first:
+  `appwrite project get-o-auth-2-provider --provider-id google`.
+- To test everything after Google without Google: `appwrite users create`,
+  then `appwrite users create-token --show-secrets`, and open a build at
+  `?userId=…&secret=…` — that is exactly what the provider's redirect carries.
+
 ## Merge rules, decided now
 
 | data | rule | why |
