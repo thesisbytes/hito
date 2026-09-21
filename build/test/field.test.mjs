@@ -57,7 +57,7 @@ function bridgeFor(src){
   const names = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
   return names.length ? `\n;${names.map(n => `try{window.${n}=${n};}catch(_){}`).join('')}\n` : '';
 }
-const probe = `\nwindow.__probe = { get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get COMET_ON(){ return COMET_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get curF(){ return curF; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get SEGS(){ return SEGS; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get R(){ return R_ON(); }, setSeg(i){ segIdx=i; prog=SEGS[i][0]; awaitLift=false; segTravel=0; segBase=prog; segStarted=false; segNagged=false; }, denorm(q){ return denorm(q); }, follow(q,d){ return follow(q,d); }, get toast(){ return toast; }, setToast(f){ toast=f; } };`;
+const probe = `\nwindow.__probe = { get W(){ return W; }, get H(){ return H; }, get idx(){ return idx; }, get LETTERS(){ return LETTERS; }, get prog(){ return prog; }, setProg(v){ prog=v; }, get done(){ return done; }, get strokes(){ return strokes; }, get PATH(){ return PATH; }, get R_ON0(){ return R_ON0; }, get DRAIN(){ return DRAIN; }, get FIZZ(){ return FIZZ; }, get GUIDE_ON(){ return GUIDE_ON; }, get COMET_ON(){ return COMET_ON; }, get SHADOW_MODE(){ return SHADOW_MODE; }, get COVER_MIN(){ return COVER_MIN; }, get MAX_TRAVEL(){ return MAX_TRAVEL; }, get DOT_SCALE(){ return DOT_SCALE; }, get parts(){ return parts; }, get SIZE_PIN(){ return SIZE_PIN; }, get SIZE_MAX(){ return SIZE_MAX; }, get curF(){ return curF; }, get DRAG_FOLLOW(){ return DRAG_FOLLOW; }, get SEGS(){ return SEGS; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get R(){ return R_ON(); }, setSeg(i){ segIdx=i; prog=SEGS[i][0]; awaitLift=false; segTravel=0; segBase=prog; segStarted=false; segNagged=false; }, denorm(q){ return denorm(q); }, follow(q,d){ return follow(q,d); }, get toast(){ return toast; }, setToast(f){ toast=f; } };`;
 new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 
 const F = globalThis.__field, P = globalThis.__probe;
@@ -915,7 +915,50 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   F.setDifficulty('easy'); H.reset(); fresh();
 }
 
+// ---- recognisable pays more, and guided only gets you so far
+{
+  const H = globalThis.__hand; H.reset();
+  F.setDifficulty('easy');
+  // the book's own shape, drawn dx to the side of where it belongs
+  const ink = dx => { P.strokes.length = 0; for (const [a, b] of P.SEGS) P.strokes.push(P.PATH.slice(a, b + 1).map((q, i) => ({x:(q.x + dx)*P.W, y:q.y*P.H, p:.5, t:i*10}))); };
+  const payOf = dx => { fresh(); F.begin(); ink(dx); globalThis.conjure(); const r = { pay: F.run.pay, q: H.last && H.last.q }; advance(cfg.advanceMs + 60); return r; };
+  // The glyph and its size are random. 0.006 of the canvas is a small drift for the
+  // smallest character at the smallest size; 0.035 was already off the scale for those.
+  const crisp = payOf(0), off = payOf(0.006), lost = payOf(0.2);
+  ok(off.q > 0 && lost.q === 0, `the test's drifts are off the scale: ${off.q}, ${lost.q}`);
+  ok(crisp.q >= 0.9, `the book's own shape scored ${crisp.q}`);
+  ok(crisp.q > off.q && off.q > lost.q, `recognisability does not fall as the ink drifts: ${crisp.q}, ${off.q}, ${lost.q}`);
+  ok(crisp.pay > off.pay && off.pay > lost.pay, `a more recognisable trace did not pay more: ${crisp.pay}, ${off.pay}, ${lost.pay}`);
+  ok(lost.pay >= cfg.tamaClean * 0.5 - 1e-9 && crisp.pay <= cfg.tamaClean * 1.5 + 1e-9, `pay left its bounds: ${lost.pay} .. ${crisp.pay}`);
+  // a conjure with no ink (nothing to judge) pays par, not zero and not a bonus
+  fresh(); F.begin(); P.strokes.length = 0; globalThis.conjure();
+  ok(Math.abs(F.run.pay - cfg.tamaClean) < 1e-9, `a trace with nothing to judge paid ${F.run.pay}, par is ${cfg.tamaClean}`);
+
+  // guided only gets you so far
+  const st = JSON.parse(html.match(/stages:(\{[^}]*\})/)[1]);
+  ok(F.needs(1) === 'guided' && F.needs(st.easyFrom) === 'easy' && F.needs(st.mediumFrom) === 'medium', `stages ask for ${F.needs(1)}, ${F.needs(st.easyFrom)}, ${F.needs(st.mediumFrom)}`);
+  H.reset(); H.tama.earn(1e7);
+  for (let k = 1; k < st.easyFrom; k++){ H.tama.clear('hiragana', k); F.buyGate(); }
+  ok(F.stageMax === st.easyFrom, `could not reach stage ${st.easyFrom} to test it (at ${F.stageMax})`);
+  const win = d => { fresh(); F.setDifficulty(d); F.setStage(st.easyFrom); F.begin();
+    for (let g = 0; !F.over && g < 6000; g++){ for (const m of [...F.monsters]){ m.hp = 1; F.hit(m, false, false); } advance(60); } advance(900); return F.ended; };
+  const g = win('guided');
+  ok(g && g.won && g.held === false && H.tama.cleared('hiragana') === st.easyFrom - 1, `a stage that asks for easy was held in guided (cleared ${H.tama.cleared('hiragana')})`);
+  ok(g.pay > 0 || g.rec.traced === 0, 'practice in guided paid nothing');
+  ok(/only counts toward the gate at <b>easy<\/b>/.test(F.startHtml), 'the ending does not say why the stage did not count');
+  ok(F.buyGate() === false, 'the next gate was for sale after a guided hold');
+  const e = win('easy');
+  ok(e && e.won && e.held === true && H.tama.cleared('hiragana') === st.easyFrom, 'the same stage held at easy did not count');
+  ok(F.buyGate() === true, 'the gate was not for sale after holding the stage properly');
+  fresh(); F.setDifficulty('guided'); F.setStage(st.easyFrom); F.openStart();   // a live run, so the page is the start page and not the ending
+  ok(/counts at easy or harder/.test(F.startHtml), 'the start page does not say what the stage asks for');
+  F.setDifficulty('easy'); F.setStage(1); H.reset(); fresh();
+}
+
+// every conjure in this file went through the hand; none of its notes may have thrown
+ok(globalThis.__hand.faults === 0, `the hand's note threw ${globalThis.__hand.faults} time(s) during the field's checks`);
+
 if (fail) { console.log(`  ${fail} field check(s) failed`); process.exit(1); }
 console.log(`  monsters advance and spawn, a finished glyph banishes the target, `
   + `the tracer retargets, the ward falls and restarts, `
-  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, and a stage cannot be passed without holding it, nor its gate bought on credit`);
+  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, and a stage cannot be passed without holding it, nor its gate bought on credit, a recognisable trace pays more, and guided only gets you so far`);

@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · katakana · v0.1.7</title>
+<title>hito 人 · katakana · v0.1.8</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -162,7 +162,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.7';
+const APP_VERSION='0.1.8';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"A"],["い","あ行","i","","a-row",2,1,"I"],["う","あ行","u","","a-row",3,1,"U"],["え","あ行","e","","a-row",4,1,"E"],["お","あ行","o","","a-row",5,1,"O"],["か","か行","ka","","ka-row",1,2,"KA"],["き","か行","ki","","ka-row",2,2,"KI"],["く","か行","ku","","ka-row",3,2,"KU"],["け","か行","ke","","ka-row",4,2,"KE"],["こ","か行","ko","","ka-row",5,2,"KO"],["さ","さ行","sa","","sa-row",1,3,"SA"],["し","さ行","shi","","sa-row",2,3,"SHI"],["す","さ行","su","","sa-row",3,3,"SU"],["せ","さ行","se","","sa-row",4,3,"SE"],["そ","さ行","so","","sa-row",5,3,"SO"],["た","た行","ta","","ta-row",1,4,"TA"],["ち","た行","chi","","ta-row",2,4,"CHI"],["つ","た行","tsu","","ta-row",3,4,"TSU"],["て","た行","te","","ta-row",4,4,"TE"],["と","た行","to","","ta-row",5,4,"TO"],["な","な行","na","","na-row",1,5,"NA"],["に","な行","ni","","na-row",2,5,"NI"],["ぬ","な行","nu","","na-row",3,5,"NU"],["ね","な行","ne","","na-row",4,5,"NE"],["の","な行","no","","na-row",5,5,"NO"],["は","は行","ha","","ha-row",1,6,"HA"],["ひ","は行","hi","","ha-row",2,6,"HI"],["ふ","は行","fu","","ha-row",3,6,"FU"],["へ","は行","he","","ha-row",4,6,"HE"],["ほ","は行","ho","","ha-row",5,6,"HO"],["ま","ま行","ma","","ma-row",1,7,"MA"],["み","ま行","mi","","ma-row",2,7,"MI"],["む","ま行","mu","","ma-row",3,7,"MU"],["め","ま行","me","","ma-row",4,7,"ME"],["も","ま行","mo","","ma-row",5,7,"MO"],["や","や行","ya","","ya-row",1,8,"YA"],["ゆ","や行","yu","","ya-row",3,8,"YU"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RA"],["り","ら行","ri","","ra-row",2,9,"RI"],["る","ら行","ru","","ra-row",3,9,"RU"],["れ","ら行","re","","ra-row",4,9,"RE"],["ろ","ら行","ro","","ra-row",5,9,"RO"],["わ","わ行","wa","","wa-row",1,10,"WA"],["を","わ行","wo","","wa-row",5,10,"WO"],["ん","","n","","",1,37,"N"],["が","が行","ga","","ga-row",1,12,"GA"],["ぎ","が行","gi","","ga-row",2,12,"GI"],["ぐ","が行","gu","","ga-row",3,12,"GU"],["げ","が行","ge","","ga-row",4,12,"GE"],["ご","が行","go","","ga-row",5,12,"GO"],["ざ","ざ行","za","","za-row",1,13,"ZA"],["じ","ざ行","ji","","za-row",2,13,"JI"],["ず","ざ行","zu","","za-row",3,13,"ZU"],["ぜ","ざ行","ze","","za-row",4,13,"ZE"],["ぞ","ざ行","zo","","za-row",5,13,"ZO"],["だ","だ行","da","","da-row",1,14,"DA"],["ぢ","だ行","ji","","da-row",2,14,"JI"],["づ","だ行","zu","","da-row",3,14,"ZU"],["で","だ行","de","","da-row",4,14,"DE"],["ど","だ行","do","","da-row",5,14,"DO"],["ば","ば行","ba","","ba-row",1,15,"BA"],["び","ば行","bi","","ba-row",2,15,"BI"],["ぶ","ば行","bu","","ba-row",3,15,"BU"],["べ","ば行","be","","ba-row",4,15,"BE"],["ぼ","ば行","bo","","ba-row",5,15,"BO"],["ぱ","ぱ行","pa","","pa-row",1,16,"PA"],["ぴ","ぱ行","pi","","pa-row",2,16,"PI"],["ぷ","ぱ行","pu","","pa-row",3,16,"PU"],["ぺ","ぱ行","pe","","pa-row",4,16,"PE"],["ぽ","ぱ行","po","","pa-row",5,16,"PO"],["ぁ","ぁ行","xa","","small-row",1,17,"XA"],["ぃ","ぁ行","xi","","small-row",2,17,"XI"],["ぅ","ぁ行","xu","","small-row",3,17,"XU"],["ぇ","ぁ行","xe","","small-row",4,17,"XE"],["ぉ","ぁ行","xo","","small-row",5,17,"XO"],["ゃ","ぁ行","xya","","small-row",1,17,"XYA"],["ゅ","ぁ行","xyu","","small-row",3,17,"XYU"],["ょ","ぁ行","xyo","","small-row",5,17,"XYO"],["っ","ぁ行","xtsu","","small-row",3,17,"XTSU"],["ゎ","ぁ行","xwa","","small-row",1,17,"XWA"],["ア","ア行","a","","Ka-row",1,18,"A"],["イ","ア行","i","","Ka-row",2,18,"I"],["ウ","ア行","u","","Ka-row",3,18,"U"],["エ","ア行","e","","Ka-row",4,18,"E"],["オ","ア行","o","","Ka-row",5,18,"O"],["カ","カ行","ka","","Kka-row",1,19,"KA"],["キ","カ行","ki","","Kka-row",2,19,"KI"],["ク","カ行","ku","","Kka-row",3,19,"KU"],["ケ","カ行","ke","","Kka-row",4,19,"KE"],["コ","カ行","ko","","Kka-row",5,19,"KO"],["サ","サ行","sa","","Ksa-row",1,20,"SA"],["シ","サ行","shi","","Ksa-row",2,20,"SHI"],["ス","サ行","su","","Ksa-row",3,20,"SU"],["セ","サ行","se","","Ksa-row",4,20,"SE"],["ソ","サ行","so","","Ksa-row",5,20,"SO"],["タ","タ行","ta","","Kta-row",1,21,"TA"],["チ","タ行","chi","","Kta-row",2,21,"CHI"],["ツ","タ行","tsu","","Kta-row",3,21,"TSU"],["テ","タ行","te","","Kta-row",4,21,"TE"],["ト","タ行","to","","Kta-row",5,21,"TO"],["ナ","ナ行","na","","Kna-row",1,22,"NA"],["ニ","ナ行","ni","","Kna-row",2,22,"NI"],["ヌ","ナ行","nu","","Kna-row",3,22,"NU"],["ネ","ナ行","ne","","Kna-row",4,22,"NE"],["ノ","ナ行","no","","Kna-row",5,22,"NO"],["ハ","ハ行","ha","","Kha-row",1,23,"HA"],["ヒ","ハ行","hi","","Kha-row",2,23,"HI"],["フ","ハ行","fu","","Kha-row",3,23,"FU"],["ヘ","ハ行","he","","Kha-row",4,23,"HE"],["ホ","ハ行","ho","","Kha-row",5,23,"HO"],["マ","マ行","ma","","Kma-row",1,24,"MA"],["ミ","マ行","mi","","Kma-row",2,24,"MI"],["ム","マ行","mu","","Kma-row",3,24,"MU"],["メ","マ行","me","","Kma-row",4,24,"ME"],["モ","マ行","mo","","Kma-row",5,24,"MO"],["ヤ","ヤ行","ya","","Kya-row",1,25,"YA"],["ユ","ヤ行","yu","","Kya-row",3,25,"YU"],["ヨ","ヤ行","yo","","Kya-row",5,25,"YO"],["ラ","ラ行","ra","","Kra-row",1,26,"RA"],["リ","ラ行","ri","","Kra-row",2,26,"RI"],["ル","ラ行","ru","","Kra-row",3,26,"RU"],["レ","ラ行","re","","Kra-row",4,26,"RE"],["ロ","ラ行","ro","","Kra-row",5,26,"RO"],["ワ","ワ行","wa","","Kwa-row",1,27,"WA"],["ヲ","ワ行","wo","","Kwa-row",5,27,"WO"],["ン","","n","","",1,37,"N"],["ガ","ガ行","ga","","Kga-row",1,29,"GA"],["ギ","ガ行","gi","","Kga-row",2,29,"GI"],["グ","ガ行","gu","","Kga-row",3,29,"GU"],["ゲ","ガ行","ge","","Kga-row",4,29,"GE"],["ゴ","ガ行","go","","Kga-row",5,29,"GO"],["ザ","ザ行","za","","Kza-row",1,30,"ZA"],["ジ","ザ行","ji","","Kza-row",2,30,"JI"],["ズ","ザ行","zu","","Kza-row",3,30,"ZU"],["ゼ","ザ行","ze","","Kza-row",4,30,"ZE"],["ゾ","ザ行","zo","","Kza-row",5,30,"ZO"],["ダ","ダ行","da","","Kda-row",1,31,"DA"],["ヂ","ダ行","ji","","Kda-row",2,31,"JI"],["ヅ","ダ行","zu","","Kda-row",3,31,"ZU"],["デ","ダ行","de","","Kda-row",4,31,"DE"],["ド","ダ行","do","","Kda-row",5,31,"DO"],["バ","バ行","ba","","Kba-row",1,32,"BA"],["ビ","バ行","bi","","Kba-row",2,32,"BI"],["ブ","バ行","bu","","Kba-row",3,32,"BU"],["ベ","バ行","be","","Kba-row",4,32,"BE"],["ボ","バ行","bo","","Kba-row",5,32,"BO"],["パ","パ行","pa","","Kpa-row",1,33,"PA"],["ピ","パ行","pi","","Kpa-row",2,33,"PI"],["プ","パ行","pu","","Kpa-row",3,33,"PU"],["ペ","パ行","pe","","Kpa-row",4,33,"PE"],["ポ","パ行","po","","Kpa-row",5,33,"PO"],["ァ","ァ行","xa","","Ksmall-row",1,34,"XA"],["ィ","ァ行","xi","","Ksmall-row",2,34,"XI"],["ゥ","ァ行","xu","","Ksmall-row",3,34,"XU"],["ェ","ァ行","xe","","Ksmall-row",4,34,"XE"],["ォ","ァ行","xo","","Ksmall-row",5,34,"XO"],["ャ","ァ行","xya","","Ksmall-row",1,34,"XYA"],["ュ","ァ行","xyu","","Ksmall-row",3,34,"XYU"],["ョ","ァ行","xyo","","Ksmall-row",5,34,"XYO"],["ッ","ァ行","xtsu","","Ksmall-row",3,34,"XTSU"],["ヮ","ァ行","xwa","","Ksmall-row",1,34,"XWA"],["ヴ","ヴ行","vu","","Kvu-row",3,35,"VU"],["ー","ー行","-","","long-row",1,36,"-"]];
 
 // ---------- state
@@ -765,7 +765,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.7');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.8');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1059,7 +1059,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
 })();
 </script>
-<script>window.__HAND_CFG={maxPoints:64,keep:60,minStep:4,pen:{"size":null,"ease":1.0,"trail":1.0,"halo":0},finger:{"size":[0.62,0.62],"ease":1.5,"trail":2.2,"halo":36}};</script>
+<script>window.__HAND_CFG={maxPoints:64,keep:60,minStep:4,qualitySpan:0.09,pen:{"size":null,"ease":1.0,"trail":1.0,"halo":0},finger:{"size":[0.62,0.62],"ease":1.5,"trail":2.2,"halo":36}};</script>
 <style>
   .hand-btn{ background:transparent; color:rgba(108,184,255,.8); border:1px solid #1e2f3e;
     border-radius:7px; padding:4px 9px; font:12px ui-sans-serif,system-ui; cursor:pointer;
@@ -1103,6 +1103,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     padding:4px; text-align:center; }
   .hand-thumbs svg{ width:100%; height:auto; display:block; }
   .hand-thumbs figcaption{ font-size:11px; color:rgba(220,232,242,.65); }
+  .hand-thumbs figcaption em{ display:block; font-style:normal; font-size:10px; line-height:1.2; color:#c3f7dc; }
   .hand-io{ width:100%; height:70px; margin-top:8px; background:#080c11; color:#dce8f2;
     border:1px solid #1e2f3e; border-radius:7px; font:11px ui-monospace,monospace; box-sizing:border-box; }
   .hand-io[hidden]{ display:none; }
@@ -1117,7 +1118,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
    Pen or finger, what was drawn, and how it has been going. Writes down what
    the tracer decided; decides nothing itself.                              */
 (function(){
-  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0}, finger:{size:[0.62,0.62],ease:1.5,trail:2.2,halo:36}};
+  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0}, finger:{size:[0.62,0.62],ease:1.5,trail:2.2,halo:36}, qualitySpan:0.09};
   const K_INPUT = 'hito-input', K_LEDGER = 'hito-ledger', K_HANDS = 'hito-hands';
   const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch(_){ return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(_){ return false; } };
@@ -1197,6 +1198,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // The hand's own copy of the ink, taken at pen-up. The field tidies strays
   // out of `strokes` a moment later, and a log of handwriting with the
   // mistakes swept out of it is a log of the stroke book.
+  let lastRec = null;   // the last note taken, for whoever asked the tracer to land it
   let mine = [], down = null, downAt = 0, began = null;   // null, not 0: 0 is a time
   // …and the hand's own clock. The engine restarts its clock whenever the ink
   // is empty, and guided mode empties the ink after every stroke, so by the
@@ -1244,6 +1246,43 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     return out;
   }
 
+  // ---- how recognisable was that? ------------------------------------------
+  // The maintainer: "if your keys are recognizable, you end up with more
+  // currency". A trace and the shape it was asked for are in the same space, so
+  // this is geometry, not recognition: how far, on average, is the ink from the
+  // shape, and the shape from the ink. Both directions, or a dot on the path
+  // would score as a perfect が. Normalised by the glyph's own size, so つ and
+  // ぼ are judged alike. Order and stroke count are not judged here — the tracer
+  // already enforces both, and a stroke drawn in two pen-downs is still that
+  // stroke. 0..1: 1 is the book, 0 is somewhere else entirely.
+  // This is a measure of tidiness along a path the hand was shown. It is NOT
+  // hard mode's "is this あ?" — but it is the distance that will need.
+  const walk = (pts, step) => {          // points every `step` along a polyline
+    const out = []; if (!pts.length) return out;
+    out.push(pts[0]); let carry = 0;
+    for (let i = 1; i < pts.length; i++){
+      const [ax, ay] = pts[i-1], [bx, by] = pts[i], L = Math.hypot(bx-ax, by-ay);
+      if (!L) continue;
+      for (let d = step - carry; d <= L; d += step) out.push([ax + (bx-ax)*d/L, ay + (by-ay)*d/L]);
+      carry = (carry + L) % step;
+    }
+    out.push(pts[pts.length-1]); return out;
+  };
+  const toward = (A, B) => { let s = 0; for (const [x, y] of A){ let m = 1e9; for (const [u, v] of B){ const d = (x-u)*(x-u) + (y-v)*(y-v); if (d < m) m = d; } s += Math.sqrt(m); } return s / A.length; };
+  function quality(c, flats){
+    try {
+      const st = TEACHER.fonts[TEACHER.activeFont].letters[c].strokes;
+      let R = [], U = [], x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (const s of st){ const pts = s.map(q => [q.x*1000, q.y*1000]); for (const [x, y] of pts){ x0 = Math.min(x0,x); y0 = Math.min(y0,y); x1 = Math.max(x1,x); y1 = Math.max(y1,y); } R = R.concat(walk(pts, 14)); }
+      for (const f of flats){ const pts = []; for (let i = 0; i + 2 < f.length; i += 3) pts.push([+f[i], +f[i+1]]); U = U.concat(walk(pts, 14)); }
+      const diag = Math.hypot(x1-x0, y1-y0);
+      if (!R.length || U.length < 2 || !(diag > 0) || U.some(p => !isFinite(p[0]) || !isFinite(p[1]))) return null;
+      const m = (toward(U, R) + toward(R, U)) / 2 / diag;
+      return Math.max(0, Math.min(1, 1 - m / CFG.qualitySpan));
+    } catch(_){ return null; }
+  }
+  const grade = q => q == null ? '' : q >= .8 ? 'crisp' : q >= .6 ? 'clear' : q >= .4 ? 'readable' : 'barely';
+
   // ---- the ledger ----------------------------------------------------------
   // Keyed by character. `tr` is trouble, smoothed: a zap is one, a fizzle is
   // three, and it decays with every clean attempt, so a character stops being
@@ -1282,6 +1321,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
       s: pack(raw),
     };
+    const q = ok ? quality(ch, rec.s) : null;
+    if (q != null) rec.q = Math.round(q*100)/100;
     const e = LEDGER.g[ch] || (LEDGER.g[ch] = {n:0, clean:0, zaps:0, fizz:0, ms:0, rt:[], tr:0});
     const trouble = zaps + (ok ? 0 : 3);
     e.tr = Math.round(((e.tr || 0)*0.7 + trouble*0.3) * 100) / 100;
@@ -1290,6 +1331,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       e.n++; if (!zaps && !tries) e.clean++;
       e.ms += ms; e.rt = (e.rt || []).concat(Math.round(ms / raw.length)).slice(-5);
       if (!e.best || ms < e.best) e.best = ms;
+      if (rec.q != null) e.q = Math.round(((e.q == null ? rec.q : e.q*0.7 + rec.q*0.3)) * 100) / 100;
     } else e.fizz++;
     e.last = Date.now();
     const d = LEDGER.days[today()] || (LEDGER.days[today()] = [0, 0, 0]);
@@ -1300,7 +1342,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     save();
     try { window.__sync && window.__sync.record('trace', rec); } catch(_){}
     if (ok) finished = true; else { tries++; }
-    zaps = 0;
+    zaps = 0; lastRec = rec;
     return rec;
   }
   // ---- runs ---------------------------------------------------------------
@@ -1382,9 +1424,12 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // Both of these empty `strokes` on their way through, so the note is taken
   // first. A note that throws must not stop a glyph from landing.
   const _fizzle = window.fizzle;
-  window.fizzle = function(){ try { note(false); } catch(_){} return _fizzle.apply(this, arguments); };
+  // …but not silently. A note that threw every time once went unnoticed because
+  // this catch is doing its job; the count is what a test can see.
+  let faults = 0;
+  window.fizzle = function(){ try { note(false); } catch(_){ faults++; } return _fizzle.apply(this, arguments); };
   const _conjure = window.conjure;
-  window.conjure = function(){ try { note(true); } catch(_){} return _conjure.apply(this, arguments); };
+  window.conjure = function(){ try { note(true); } catch(_){ faults++; } return _conjure.apply(this, arguments); };
 
   const inkEl = document.getElementById('ink');   // not `ink`: that is the engine's context
   if (inkEl && inkEl.addEventListener){
@@ -1434,7 +1479,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     } catch(_){ return ''; }
   }
   const BOX = '150 150 700 760';
-  function thumb(r){
+  function thumb(r, tag){
     const ref = asked(r.glyph);
     const paths = (r.s || []).map(f => {
       let d = '';
@@ -1444,10 +1489,16 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     return `<figure><svg viewBox="${BOX}" fill="none" stroke-linecap="round" stroke-linejoin="round">`
       + (ref ? `<g stroke="rgba(220,232,242,.16)" stroke-width="46">${ref}</g>` : '')
       + `<g stroke="${r.ok ? '#6cb8ff' : '#dc5a3c'}" stroke-width="20">${paths}</g></svg>`
-      + `<figcaption>${esc(r.glyph)} · ${r.ok ? secs(r.ms) : 'fizzled'}</figcaption></figure>`;
+      + `<figcaption>${esc(r.glyph)} · ${r.ok ? (r.q != null ? Math.round(r.q*100) + '% ' + grade(r.q) : secs(r.ms)) : 'fizzled'}${tag ? `<em>${tag}</em>` : ''}</figcaption></figure>`;
   }
-  const thumbs = (since, n) => { const a = HANDS.filter(r => (r.at || 0) >= (since || 0)).slice(-(n || 12)).reverse();
-    return a.length ? `<div class="hand-thumbs">${a.map(thumb).join('')}</div>` : ''; };
+  // With `crown`, the best of them is named, and so — the maintainer's own
+  // idea, and their own words — is the worst, if it earned it.
+  const thumbs = (since, n, crown) => { const a = HANDS.filter(r => (r.at || 0) >= (since || 0)).slice(-(n || 12)).reverse();
+    const scored = crown ? a.filter(r => r.ok && r.q != null) : [];
+    const top = scored.length > 1 ? scored.reduce((x, y) => y.q > x.q ? y : x) : null;
+    const low = scored.length > 1 ? scored.reduce((x, y) => y.q < x.q ? y : x) : null;
+    const tag = r => r === top ? 'best stroke of the run ✦' : (r === low && r.q < .45) ? 'you could barely recognize this' : '';
+    return a.length ? `<div class="hand-thumbs">${a.map(r => thumb(r, tag(r))).join('')}</div>` : ''; };
   // Every trace still on the device, as one SVG: a sheet to keep, print, or be
   // teased about. Built here and handed over as a file; nothing is uploaded.
   function sheetSVG(){
@@ -1607,12 +1658,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
     get html(){ return markup; }, get shown(){ return !sheet.hidden; },
     show: open, close, render, note, pack, toBook, shaky, stats, streak, run, thumbs, sheetSVG, saveSheet, tama,
+    quality, grade, get last(){ return lastRec; }, get faults(){ return faults; },
     exportText, importText,
     reset(){ LEDGER = {v:1, g:{}, days:{}, by:{}, runs:[], best:{}, tama:{earned:{}, spent:{}, own:{}, cleared:{}}}; HANDS = []; save(); },
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:{"deck":"katakana","words":[{"ja":"アメリカ","romaji":"amerika","en":"U.S.A."},{"ja":"カナダ","romaji":"kanada","en":"Canada"},{"ja":"イギリス","romaji":"igirisu","en":"Britain"},{"ja":"テレビ","romaji":"terebi","en":"TV"},{"ja":"カメラ","romaji":"kamera","en":"camera"},{"ja":"テニス","romaji":"tenisu","en":"tennis"},{"ja":"パン","romaji":"pan","en":"bread"},{"ja":"ピザ","romaji":"piza","en":"pizza"},{"ja":"ホテル","romaji":"hoteru","en":"hotel"},{"ja":"バス","romaji":"basu","en":"bus"},{"ja":"ペン","romaji":"pen","en":"pen"},{"ja":"クラス","romaji":"kurasu","en":"class"},{"ja":"テスト","romaji":"tesuto","en":"test"},{"ja":"ドア","romaji":"doa","en":"door"},{"ja":"トイレ","romaji":"toire","en":"toilet"},{"ja":"カラオケ","romaji":"karaoke","en":"karaoke"},{"ja":"バナナ","romaji":"banana","en":"banana"},{"ja":"トマト","romaji":"tomato","en":"tomato"},{"ja":"ミルク","romaji":"miruku","en":"milk"},{"ja":"ワイン","romaji":"wain","en":"wine"},{"ja":"サラダ","romaji":"sarada","en":"salad"},{"ja":"ピアノ","romaji":"piano","en":"piano"},{"ja":"ハワイ","romaji":"hawai","en":"Hawaii"},{"ja":"パリ","romaji":"pari","en":"Paris"},{"ja":"タオル","romaji":"taoru","en":"towel"},{"ja":"ドラマ","romaji":"dorama","en":"drama"},{"ja":"アニメ","romaji":"anime","en":"anime"},{"ja":"プレゼント","romaji":"purezento","en":"present"},{"ja":"ダンス","romaji":"dansu","en":"dance"},{"ja":"ビデオ","romaji":"bideo","en":"video"},{"ja":"ラジオ","romaji":"rajio","en":"radio"},{"ja":"ズボン","romaji":"zubon","en":"trousers"},{"ja":"ネクタイ","romaji":"nekutai","en":"necktie"},{"ja":"ガソリン","romaji":"gasorin","en":"gasoline"},{"ja":"エアコン","romaji":"eakon","en":"air conditioner"},{"ja":"アルバイト","romaji":"arubaito","en":"part-time job"},{"ja":"レストラン","romaji":"resutoran","en":"restaurant"},{"ja":"クリスマス","romaji":"kurisumasu","en":"Christmas"},{"ja":"サングラス","romaji":"sangurasu","en":"sunglasses"},{"ja":"スマホ","romaji":"sumaho","en":"smartphone"},{"ja":"ロンドン","romaji":"rondon","en":"London"},{"ja":"メロン","romaji":"meron","en":"melon"},{"ja":"オレンジ","romaji":"orenji","en":"orange"},{"ja":"コーヒー","romaji":"koohii","en":"coffee"},{"ja":"デート","romaji":"deeto","en":"date (romantic)"},{"ja":"ハンバーガー","romaji":"hanbaagaa","en":"hamburger"},{"ja":"ビール","romaji":"biiru","en":"beer"},{"ja":"スーパー","romaji":"suupaa","en":"supermarket"},{"ja":"デパート","romaji":"depaato","en":"department store"},{"ja":"タクシー","romaji":"takushii","en":"taxi"},{"ja":"ノート","romaji":"nooto","en":"notebook"},{"ja":"ボールペン","romaji":"boorupen","en":"ballpoint pen"},{"ja":"セーター","romaji":"seetaa","en":"sweater"},{"ja":"ゲーム","romaji":"geemu","en":"game"},{"ja":"ページ","romaji":"peeji","en":"page"},{"ja":"プール","romaji":"puuru","en":"swimming pool"},{"ja":"メール","romaji":"meeru","en":"e-mail"},{"ja":"アパート","romaji":"apaato","en":"apartment"},{"ja":"ケーキ","romaji":"keeki","en":"cake"},{"ja":"ラーメン","romaji":"raamen","en":"ramen"},{"ja":"コート","romaji":"kooto","en":"coat"},{"ja":"スキー","romaji":"sukii","en":"skiing"},{"ja":"ギター","romaji":"gitaa","en":"guitar"},{"ja":"スープ","romaji":"suupu","en":"soup"},{"ja":"ステーキ","romaji":"suteeki","en":"steak"},{"ja":"レポート","romaji":"repooto","en":"report"},{"ja":"エレベーター","romaji":"erebeetaa","en":"elevator"},{"ja":"ジーンズ","romaji":"jiinzu","en":"jeans"},{"ja":"スカート","romaji":"sukaato","en":"skirt"},{"ja":"アイスクリーム","romaji":"aisukuriimu","en":"ice cream"},{"ja":"ホームステイ","romaji":"hoomusutei","en":"homestay"},{"ja":"ルームメイト","romaji":"ruumumeito","en":"roommate"},{"ja":"カード","romaji":"kaado","en":"card"},{"ja":"オーストラリア","romaji":"oosutoraria","en":"Australia"},{"ja":"スポーツ","romaji":"supootsu","en":"sports"},{"ja":"サッカー","romaji":"sakkaa","en":"soccer"},{"ja":"ジュース","romaji":"juusu","en":"juice"},{"ja":"コンピューター","romaji":"konpyuutaa","en":"computer"},{"ja":"シャツ","romaji":"shatsu","en":"shirt"},{"ja":"パーティー","romaji":"paatii","en":"party"},{"ja":"カフェ","romaji":"kafe","en":"cafe"},{"ja":"サンドイッチ","romaji":"sandoitchi","en":"sandwich"},{"ja":"チョコレート","romaji":"chokoreeto","en":"chocolate"},{"ja":"キャンプ","romaji":"kyanpu","en":"camping"},{"ja":"シャワー","romaji":"shawaa","en":"shower"},{"ja":"インターネット","romaji":"intaanetto","en":"internet"},{"ja":"チケット","romaji":"chiketto","en":"ticket"},{"ja":"メニュー","romaji":"menyuu","en":"menu"},{"ja":"ニューヨーク","romaji":"nyuuyooku","en":"New York"},{"ja":"ソファ","romaji":"sofa","en":"sofa"},{"ja":"ジョギング","romaji":"jogingu","en":"jogging"},{"ja":"ファックス","romaji":"fakkusu","en":"fax"},{"ja":"キャンパス","romaji":"kyanpasu","en":"campus"},{"ja":"マッチ","romaji":"matchi","en":"match"},{"ja":"クッキー","romaji":"kukkii","en":"cookie"},{"ja":"ホッチキス","romaji":"hotchikisu","en":"stapler"},{"ja":"ティーシャツ","romaji":"tiishatsu","en":"T-shirt"},{"ja":"ミュージカル","romaji":"myuujikaru","en":"musical"},{"ja":"チャンス","romaji":"chansu","en":"chance"},{"ja":"ラッシュ","romaji":"rasshu","en":"rush hour"},{"ja":"ニュース","romaji":"nyuusu","en":"news"}]},knockback:0.07,sign:"romaji",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",credits:["Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.", "Stroke order recorded and checked by the project's teachers.", "Built by the maintainer, one version at a time."],realms:[{"label": "hiragana", "kana": "仮", "file": "hiragana-game.html", "blurb": "the game with single characters. the farang carry the ones you are forgetting."}, {"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I vocabulary as flashcards. read the meaning, write the word."}],speed:0.03,wardHp:5,stages:{"rows":2,"count":12,"countStep":3,"gate":30,"gateRamp":1.45,"hpEvery":4,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15},hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:9000,spawnRamp:200,spawnMin:3600,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:{"deck":"katakana","words":[{"ja":"アメリカ","romaji":"amerika","en":"U.S.A."},{"ja":"カナダ","romaji":"kanada","en":"Canada"},{"ja":"イギリス","romaji":"igirisu","en":"Britain"},{"ja":"テレビ","romaji":"terebi","en":"TV"},{"ja":"カメラ","romaji":"kamera","en":"camera"},{"ja":"テニス","romaji":"tenisu","en":"tennis"},{"ja":"パン","romaji":"pan","en":"bread"},{"ja":"ピザ","romaji":"piza","en":"pizza"},{"ja":"ホテル","romaji":"hoteru","en":"hotel"},{"ja":"バス","romaji":"basu","en":"bus"},{"ja":"ペン","romaji":"pen","en":"pen"},{"ja":"クラス","romaji":"kurasu","en":"class"},{"ja":"テスト","romaji":"tesuto","en":"test"},{"ja":"ドア","romaji":"doa","en":"door"},{"ja":"トイレ","romaji":"toire","en":"toilet"},{"ja":"カラオケ","romaji":"karaoke","en":"karaoke"},{"ja":"バナナ","romaji":"banana","en":"banana"},{"ja":"トマト","romaji":"tomato","en":"tomato"},{"ja":"ミルク","romaji":"miruku","en":"milk"},{"ja":"ワイン","romaji":"wain","en":"wine"},{"ja":"サラダ","romaji":"sarada","en":"salad"},{"ja":"ピアノ","romaji":"piano","en":"piano"},{"ja":"ハワイ","romaji":"hawai","en":"Hawaii"},{"ja":"パリ","romaji":"pari","en":"Paris"},{"ja":"タオル","romaji":"taoru","en":"towel"},{"ja":"ドラマ","romaji":"dorama","en":"drama"},{"ja":"アニメ","romaji":"anime","en":"anime"},{"ja":"プレゼント","romaji":"purezento","en":"present"},{"ja":"ダンス","romaji":"dansu","en":"dance"},{"ja":"ビデオ","romaji":"bideo","en":"video"},{"ja":"ラジオ","romaji":"rajio","en":"radio"},{"ja":"ズボン","romaji":"zubon","en":"trousers"},{"ja":"ネクタイ","romaji":"nekutai","en":"necktie"},{"ja":"ガソリン","romaji":"gasorin","en":"gasoline"},{"ja":"エアコン","romaji":"eakon","en":"air conditioner"},{"ja":"アルバイト","romaji":"arubaito","en":"part-time job"},{"ja":"レストラン","romaji":"resutoran","en":"restaurant"},{"ja":"クリスマス","romaji":"kurisumasu","en":"Christmas"},{"ja":"サングラス","romaji":"sangurasu","en":"sunglasses"},{"ja":"スマホ","romaji":"sumaho","en":"smartphone"},{"ja":"ロンドン","romaji":"rondon","en":"London"},{"ja":"メロン","romaji":"meron","en":"melon"},{"ja":"オレンジ","romaji":"orenji","en":"orange"},{"ja":"コーヒー","romaji":"koohii","en":"coffee"},{"ja":"デート","romaji":"deeto","en":"date (romantic)"},{"ja":"ハンバーガー","romaji":"hanbaagaa","en":"hamburger"},{"ja":"ビール","romaji":"biiru","en":"beer"},{"ja":"スーパー","romaji":"suupaa","en":"supermarket"},{"ja":"デパート","romaji":"depaato","en":"department store"},{"ja":"タクシー","romaji":"takushii","en":"taxi"},{"ja":"ノート","romaji":"nooto","en":"notebook"},{"ja":"ボールペン","romaji":"boorupen","en":"ballpoint pen"},{"ja":"セーター","romaji":"seetaa","en":"sweater"},{"ja":"ゲーム","romaji":"geemu","en":"game"},{"ja":"ページ","romaji":"peeji","en":"page"},{"ja":"プール","romaji":"puuru","en":"swimming pool"},{"ja":"メール","romaji":"meeru","en":"e-mail"},{"ja":"アパート","romaji":"apaato","en":"apartment"},{"ja":"ケーキ","romaji":"keeki","en":"cake"},{"ja":"ラーメン","romaji":"raamen","en":"ramen"},{"ja":"コート","romaji":"kooto","en":"coat"},{"ja":"スキー","romaji":"sukii","en":"skiing"},{"ja":"ギター","romaji":"gitaa","en":"guitar"},{"ja":"スープ","romaji":"suupu","en":"soup"},{"ja":"ステーキ","romaji":"suteeki","en":"steak"},{"ja":"レポート","romaji":"repooto","en":"report"},{"ja":"エレベーター","romaji":"erebeetaa","en":"elevator"},{"ja":"ジーンズ","romaji":"jiinzu","en":"jeans"},{"ja":"スカート","romaji":"sukaato","en":"skirt"},{"ja":"アイスクリーム","romaji":"aisukuriimu","en":"ice cream"},{"ja":"ホームステイ","romaji":"hoomusutei","en":"homestay"},{"ja":"ルームメイト","romaji":"ruumumeito","en":"roommate"},{"ja":"カード","romaji":"kaado","en":"card"},{"ja":"オーストラリア","romaji":"oosutoraria","en":"Australia"},{"ja":"スポーツ","romaji":"supootsu","en":"sports"},{"ja":"サッカー","romaji":"sakkaa","en":"soccer"},{"ja":"ジュース","romaji":"juusu","en":"juice"},{"ja":"コンピューター","romaji":"konpyuutaa","en":"computer"},{"ja":"シャツ","romaji":"shatsu","en":"shirt"},{"ja":"パーティー","romaji":"paatii","en":"party"},{"ja":"カフェ","romaji":"kafe","en":"cafe"},{"ja":"サンドイッチ","romaji":"sandoitchi","en":"sandwich"},{"ja":"チョコレート","romaji":"chokoreeto","en":"chocolate"},{"ja":"キャンプ","romaji":"kyanpu","en":"camping"},{"ja":"シャワー","romaji":"shawaa","en":"shower"},{"ja":"インターネット","romaji":"intaanetto","en":"internet"},{"ja":"チケット","romaji":"chiketto","en":"ticket"},{"ja":"メニュー","romaji":"menyuu","en":"menu"},{"ja":"ニューヨーク","romaji":"nyuuyooku","en":"New York"},{"ja":"ソファ","romaji":"sofa","en":"sofa"},{"ja":"ジョギング","romaji":"jogingu","en":"jogging"},{"ja":"ファックス","romaji":"fakkusu","en":"fax"},{"ja":"キャンパス","romaji":"kyanpasu","en":"campus"},{"ja":"マッチ","romaji":"matchi","en":"match"},{"ja":"クッキー","romaji":"kukkii","en":"cookie"},{"ja":"ホッチキス","romaji":"hotchikisu","en":"stapler"},{"ja":"ティーシャツ","romaji":"tiishatsu","en":"T-shirt"},{"ja":"ミュージカル","romaji":"myuujikaru","en":"musical"},{"ja":"チャンス","romaji":"chansu","en":"chance"},{"ja":"ラッシュ","romaji":"rasshu","en":"rush hour"},{"ja":"ニュース","romaji":"nyuusu","en":"news"}]},knockback:0.07,sign:"romaji",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",credits:["Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.", "Stroke order recorded and checked by the project's teachers.", "Built by the maintainer, one version at a time."],realms:[{"label": "hiragana", "kana": "仮", "file": "hiragana-game.html", "blurb": "the game with single characters. the farang carry the ones you are forgetting."}, {"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I vocabulary as flashcards. read the meaning, write the word."}],speed:0.03,wardHp:5,stages:{"rows":2,"count":12,"countStep":3,"gate":30,"gateRamp":1.45,"hpEvery":4,"speedStep":0.03,"easyFrom":3,"mediumFrom":8},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15},hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:9000,spawnRamp:200,spawnMin:3600,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -1701,6 +1753,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .over-line{ margin:0 0 6px; font-size:12.5px; color:rgba(220,232,242,.65); text-align:center; }
   .start-card.over .start-title{ color:#e8a0a0; }
   .start-card.over.won .start-title{ color:#5fe3a1; }
+  .over-line.warn{ color:#e8a0a0; } .over-line.warn b{ color:#6cb8ff; }
   .over-pay{ margin:2px 0 4px; text-align:center; font-size:20px; font-weight:700; color:#c3f7dc; }
   .over-pay small{ display:block; font-size:11.5px; font-weight:400; color:rgba(220,232,242,.55); }
   .start-row.lantern button.can{ border-color:#5fe3a1; }
@@ -1708,6 +1761,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .start-row.stages{ grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); }
   .start-row.stages button{ text-align:center; padding:8px 2px; }
   .start-row.stages button b{ margin:0; }
+  .start-h b.needs{ color:#e8a0a0; font-weight:600; letter-spacing:.04em; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(220,232,242,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
   .start-links button{ flex:1; background:transparent; color:rgba(108,184,255,.75); border:1px solid #1e2f3e;
@@ -1811,6 +1865,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   const lanternCost = id => Math.round((CFG.lanternCost[id] || 20) * Math.pow(CFG.lanternRamp, own(id)));
   const stageMax = () => ST ? 1 + own('gate') : 1;
   const gateCost = () => ST ? Math.round(ST.gate * Math.pow(ST.gateRamp, own('gate'))) : 0;
+  // Guided only gets you so far, and then the tracing happens. Any stage can be
+  // PLAYED in any mode, and pays; but from `easyFrom` a stage is only HELD —
+  // only counts toward its gate — if it was held at easy or harder, and from
+  // `mediumFrom`, at medium. Guided teaches the motion; the chart past the
+  // first rows has to be earned with ink.
+  const RANK = { guided:0, easy:1, medium:2, hard:3 };
+  const needs = k => !ST ? 'guided' : k >= ST.mediumFrom ? 'medium' : k >= ST.easyFrom ? 'easy' : 'guided';
+  const counts = k => (RANK[difficulty] || 0) >= RANK[needs(k)];
   let stageNo = 1;
   const stageRows  = k => ST ? ST.rows + (k - 1) : Infinity;
   const stageCount = k => ST ? ST.count + ST.countStep * (k - 1) : Infinity;
@@ -1832,7 +1894,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // What this run was, kept as it goes so the end can say it. Observations:
   // how far, how many, how cleanly. Never a score.
   let run = null;
-  const newRun = () => ({ at: Date.now(), began: performance.now(), traced: 0, clean: 0, earned: 0, cast: 0, ended: null });
+  const newRun = () => ({ at: Date.now(), began: performance.now(), traced: 0, clean: 0, earned: 0, cast: 0, ended: null, pay: 0, q: 0, qn: 0 });
   function earn(n){ if (n > 0){ sumi += n; if (run) run.earned += n; renderUpg(); } return sumi; }
   function buy(id){
     if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
@@ -1885,7 +1947,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:true, numbers:true, shadow:'none' },
-    medium: { tama:1.5, kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
+    medium: { tama:2, kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:false, numbers:false, shadow:'strokes' },
@@ -2241,9 +2303,19 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // Ink is paid for the trace, not for the kill: the hand did the work
     // whether or not anything was standing there. A character conjured many
     // times pays a little less, so the run pushes toward the ones that are new.
-    if (run){ run.traced++; if (!zapped) run.clean++; }
+    const wasClean = !zapped;
+    if (run){ run.traced++; if (wasClean) run.clean++; }
     if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
     const r = _conjure.apply(this, arguments);
+    // What this trace is worth when the run ends. The hand has just judged how
+    // recognisable it was (the note is taken on the way into the engine): a
+    // trace nobody could read pays half, one that could be the book pays half
+    // again. With no judgement to go on — a build without the hand — it pays par.
+    if (run){
+      let q = null; try { const l = window.__hand && window.__hand.last; if (l && l.ok && l.glyph === drew && l.q != null) q = l.q; } catch(_){}
+      if (q != null){ run.q += q; run.qn++; }
+      run.pay += (wasClean ? CFG.tamaClean : CFG.tamaTrace) * (q == null ? 1 : 0.5 + q);
+    }
     // The engine celebrates for 1.9s before advancing, which is dead time in a
     // game with a clock running — a fast hand finishes the next glyph before
     // the next glyph exists. Advance as soon as the shot lands instead.
@@ -2574,6 +2646,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
     upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null; won = false;
+    zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
+                  // and a run that restarts on the same character does not load one
     stageNo = Math.min(stageNo, stageMax());
     sumi = own('inkwell') * CFG.inkwellStep;
     ward = wardMax(); over = false; wave = 0; killed = 0; locked = null;
@@ -2597,16 +2671,18 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // guided cannot be zapped, so there every trace would count as clean, and
     // it pays less instead. Holding a stage to the end is worth half again.
     const p = purse();
-    const pay = !p ? 0 : Math.round((run.clean*CFG.tamaClean + (run.traced - run.clean)*CFG.tamaTrace + Math.floor(wave/CFG.tamaWaves))
+    const pay = !p ? 0 : Math.round((run.pay + Math.floor(wave/CFG.tamaWaves))
                                      * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1) * (won ? 1.5 : 1));
-    if (p){ p.earn(pay); if (won && ST) p.clear(REALM, stageNo); }
-    const rec = { at: run.at, realm: REALM, stage: ST ? stageNo : undefined, won: won || undefined, tama: pay, wave, banished: killed, traced: run.traced, clean: run.clean,
+    const held = won && counts(stageNo);
+    if (p){ p.earn(pay); if (held && ST) p.clear(REALM, stageNo); }
+    const rec = { at: run.at, realm: REALM, stage: ST ? stageNo : undefined, won: won || undefined, held: (ST && won) ? held : undefined, tama: pay,
+                  quality: run.qn ? Math.round(100*run.q/run.qn)/100 : undefined, wave, banished: killed, traced: run.traced, clean: run.clean,
                   sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
                   difficulty, sign: CFG.sign, upgrades: {...upg} };
     let best = null;
     try { if (H && H.run) best = H.run(rec); } catch(_){}
     try { window.__sync && window.__sync.record('run', rec); } catch(_){}
-    ended = { rec, best, since: run.at, won, pay };
+    ended = { rec, best, since: run.at, won, pay, held, needs: needs(stageNo) };
     if (navigator.vibrate) navigator.vibrate([90, 60, 160]);
     // a beat, so the last breach is seen before the page covers it
     setTimeout(() => { if (over && ended) openOver(); }, 700);
@@ -2676,7 +2752,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       <div class="start-row">${row('diff', DIFF, difficulty)}</div>
       <div class="start-h">what the sign says</div>
       <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
-      ${ST ? `<div class="start-h">stage · ${roster().length} characters on the field · ${stageCount(stageNo)} farang</div><div class="start-row stages">`
+      ${ST ? `<div class="start-h">stage · ${roster().length} characters on the field · ${stageCount(stageNo)} farang${counts(stageNo) ? '' : ' · <b class="needs">counts at ' + needs(stageNo) + ' or harder</b>'}</div><div class="start-row stages">`
         + Array.from({length: stageMax()}, (_, k) => `<button data-k="stage" data-v="${k+1}" aria-pressed="${k+1 === stageNo}"><b>${k+1}</b></button>`).join('') + `</div>` : ''}
       ${workshopHtml()}
       ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
@@ -2718,7 +2794,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const top = stageMax(), held = p.cleared(REALM) >= top, c = gateCost();
       gate = top >= lastStage() ? `<button disabled><b><i>関</i>the last gate</b><small>every row of the chart is on the field.</small></button>`
         : `<button data-lantern="gate"${held && p.balance >= c ? '' : ' disabled'} class="${held && p.balance >= c ? 'can' : ''}"><b><i>関</i>gate to stage ${top + 1}</b>`
-          + `<small>${held ? '魂 ' + c + ' · one more row of the chart, and more of them' : 'hold stage ' + top + ' to the end first'}</small></button>`;
+          + `<small>${held ? '魂 ' + c + ' · one more row of the chart, and more of them' : 'hold stage ' + top + ' to the end first' + (needs(top) !== 'guided' ? ', at ' + needs(top) + ' or harder' : '')}</small></button>`;
     }
     return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
   }
@@ -2735,7 +2811,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const fresh = e.best && e.best.isBest && e.best.runs > 1;
     // the handwriting of this run, the way the hand's own page draws it
     let hands = '';
-    try { if (H && H.thumbs) hands = H.thumbs(e.since, 12); } catch(_){}
+    try { if (H && H.thumbs) hands = H.thumbs(e.since, 12, true); } catch(_){}
     start.innerHTML = markup = `<div class="start-card over${e.won ? ' won' : ''}">
       <div class="start-title">${e.won ? 'the ward held' : 'the ward fell'}</div>
       <div class="start-sub">${esc(REALM)}${ST ? ' · stage ' + r.stage : ''} · ${e.won ? 'all ' + r.wave + ' of them' : 'wave ' + r.wave + (ST ? ' of ' + stageCount(r.stage) : '')}${fresh ? ' · <b>your furthest yet</b>' : ''}</div>
@@ -2746,7 +2822,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         <div><b>${mins}</b><small>held</small></div>
       </div>
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
-      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${e.won ? 'held to the end: half again' : 'clean traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
+      ${e.won && ST && !e.held ? `<p class="over-line warn">held — but from stage ${r.stage >= ST.mediumFrom ? ST.mediumFrom : ST.easyFrom} it only counts toward the gate at <b>${e.needs}</b> or harder. ${difficulty} is practice here, and it still pays.</p>` : ''}
+      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}${e.won ? 'held to the end: half again' : 'clean, readable traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
       ${workshopHtml()}
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
       <button class="start-go">${ST && stageNo !== r.stage ? 'on to stage ' + stageNo : e.won && ST && stageNo < stageMax() ? 'on to stage ' + (stageNo + 1) : 'again'}</button>
@@ -2803,7 +2880,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get stage(){ return stageNo; }, get stageMax(){ return stageMax(); }, get won(){ return won; },
-    setStage, stageRows, stageCount, lastStage, roster, buyLantern, buyGate, lanternCost, gateCost, capNow, LANTERN,
+    setStage, needs, counts, stageRows, stageCount, lastStage, roster, buyLantern, buyGate, lanternCost, gateCost, capNow, LANTERN,
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
@@ -2859,6 +2936,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.7</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.8</div>
 </body>
 </html>

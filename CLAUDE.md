@@ -150,7 +150,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.44.html`
+### Hiragana — `dist/hiragana-v0.1.45.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -304,7 +304,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.7.html`
+### Katakana — `dist/katakana-game-v0.1.8.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -325,7 +325,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.22.html`
+### Vocab — `dist/vocab-v0.1.23.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -590,6 +590,22 @@ buys what lasts, in the lantern workshop shown where a round ends and where one
 begins: 心 hearts, 灯 how many lights a character holds, 硯 ink in hand at the
 start. Word decks are not staged — a deck is class content with its own order
 — and the workshop page is never gated, so anything can always be practised.
+
+**Guided only gets you so far, and recognisable pays more (v0.1.45).** The
+maintainer: "guided play only gets you so far. then the tracing happens. if
+your keys are recognizable, you end up with more currency. medium, up the
+ante." Any stage can be *played* in any mode and pays; but from stage 3 a stage
+is only *held* — only counts toward its gate — at easy or harder, and from
+stage 8, at medium. Guided teaches the motion; the chart past its first rows
+is earned with ink. Every landed trace is scored for how recognisable it is
+(`quality()` in the hand: the mean distance between the ink and the shape asked
+for, both ways, over the glyph's own size) and pays between half and half
+again by that score. Medium pays double.
+
+That score measures tidiness along a path the hand was shown. It is **not**
+hard mode's "is this あ?" — order and stroke count are the tracer's business,
+and nothing here could tell a confident wrong character from a shaky right one
+without the path. It is, though, the distance hard mode will need.
 
 **No balance is stored.** A purse has to merge from two tablets with no server
 to arbitrate, and a balance cannot. Each device keeps what *it* earned and

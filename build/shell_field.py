@@ -122,6 +122,7 @@ STYLE = """
   .over-line{ margin:0 0 6px; font-size:12.5px; color:rgba(232,224,204,.65); text-align:center; }
   .start-card.over .start-title{ color:#e8a0a0; }
   .start-card.over.won .start-title{ color:#7fd1c4; }
+  .over-line.warn{ color:#e8a0a0; } .over-line.warn b{ color:#e9c46a; }
   .over-pay{ margin:2px 0 4px; text-align:center; font-size:20px; font-weight:700; color:#bdf0e6; }
   .over-pay small{ display:block; font-size:11.5px; font-weight:400; color:rgba(232,224,204,.55); }
   .start-row.lantern button.can{ border-color:#7fd1c4; }
@@ -129,6 +130,7 @@ STYLE = """
   .start-row.stages{ grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); }
   .start-row.stages button{ text-align:center; padding:8px 2px; }
   .start-row.stages button b{ margin:0; }
+  .start-h b.needs{ color:#e8a0a0; font-weight:600; letter-spacing:.04em; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(232,224,204,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
   .start-links button{ flex:1; background:transparent; color:rgba(233,196,106,.75); border:1px solid #3d3324;
@@ -234,6 +236,14 @@ LAYER = STYLE + r"""
   const lanternCost = id => Math.round((CFG.lanternCost[id] || 20) * Math.pow(CFG.lanternRamp, own(id)));
   const stageMax = () => ST ? 1 + own('gate') : 1;
   const gateCost = () => ST ? Math.round(ST.gate * Math.pow(ST.gateRamp, own('gate'))) : 0;
+  // Guided only gets you so far, and then the tracing happens. Any stage can be
+  // PLAYED in any mode, and pays; but from `easyFrom` a stage is only HELD —
+  // only counts toward its gate — if it was held at easy or harder, and from
+  // `mediumFrom`, at medium. Guided teaches the motion; the chart past the
+  // first rows has to be earned with ink.
+  const RANK = { guided:0, easy:1, medium:2, hard:3 };
+  const needs = k => !ST ? 'guided' : k >= ST.mediumFrom ? 'medium' : k >= ST.easyFrom ? 'easy' : 'guided';
+  const counts = k => (RANK[difficulty] || 0) >= RANK[needs(k)];
   let stageNo = 1;
   const stageRows  = k => ST ? ST.rows + (k - 1) : Infinity;
   const stageCount = k => ST ? ST.count + ST.countStep * (k - 1) : Infinity;
@@ -255,7 +265,7 @@ LAYER = STYLE + r"""
   // What this run was, kept as it goes so the end can say it. Observations:
   // how far, how many, how cleanly. Never a score.
   let run = null;
-  const newRun = () => ({ at: Date.now(), began: performance.now(), traced: 0, clean: 0, earned: 0, cast: 0, ended: null });
+  const newRun = () => ({ at: Date.now(), began: performance.now(), traced: 0, clean: 0, earned: 0, cast: 0, ended: null, pay: 0, q: 0, qn: 0 });
   function earn(n){ if (n > 0){ sumi += n; if (run) run.earned += n; renderUpg(); } return sumi; }
   function buy(id){
     if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
@@ -308,7 +318,7 @@ LAYER = STYLE + r"""
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:true, numbers:true, shadow:'none' },
-    medium: { tama:1.5, kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
+    medium: { tama:2, kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:false, numbers:false, shadow:'strokes' },
@@ -664,9 +674,19 @@ LAYER = STYLE + r"""
     // Ink is paid for the trace, not for the kill: the hand did the work
     // whether or not anything was standing there. A character conjured many
     // times pays a little less, so the run pushes toward the ones that are new.
-    if (run){ run.traced++; if (!zapped) run.clean++; }
+    const wasClean = !zapped;
+    if (run){ run.traced++; if (wasClean) run.clean++; }
     if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
     const r = _conjure.apply(this, arguments);
+    // What this trace is worth when the run ends. The hand has just judged how
+    // recognisable it was (the note is taken on the way into the engine): a
+    // trace nobody could read pays half, one that could be the book pays half
+    // again. With no judgement to go on — a build without the hand — it pays par.
+    if (run){
+      let q = null; try { const l = window.__hand && window.__hand.last; if (l && l.ok && l.glyph === drew && l.q != null) q = l.q; } catch(_){}
+      if (q != null){ run.q += q; run.qn++; }
+      run.pay += (wasClean ? CFG.tamaClean : CFG.tamaTrace) * (q == null ? 1 : 0.5 + q);
+    }
     // The engine celebrates for 1.9s before advancing, which is dead time in a
     // game with a clock running — a fast hand finishes the next glyph before
     // the next glyph exists. Advance as soon as the shot lands instead.
@@ -997,6 +1017,8 @@ LAYER = STYLE + r"""
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
     upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null; won = false;
+    zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
+                  // and a run that restarts on the same character does not load one
     stageNo = Math.min(stageNo, stageMax());
     sumi = own('inkwell') * CFG.inkwellStep;
     ward = wardMax(); over = false; wave = 0; killed = 0; locked = null;
@@ -1020,16 +1042,18 @@ LAYER = STYLE + r"""
     // guided cannot be zapped, so there every trace would count as clean, and
     // it pays less instead. Holding a stage to the end is worth half again.
     const p = purse();
-    const pay = !p ? 0 : Math.round((run.clean*CFG.tamaClean + (run.traced - run.clean)*CFG.tamaTrace + Math.floor(wave/CFG.tamaWaves))
+    const pay = !p ? 0 : Math.round((run.pay + Math.floor(wave/CFG.tamaWaves))
                                      * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1) * (won ? 1.5 : 1));
-    if (p){ p.earn(pay); if (won && ST) p.clear(REALM, stageNo); }
-    const rec = { at: run.at, realm: REALM, stage: ST ? stageNo : undefined, won: won || undefined, tama: pay, wave, banished: killed, traced: run.traced, clean: run.clean,
+    const held = won && counts(stageNo);
+    if (p){ p.earn(pay); if (held && ST) p.clear(REALM, stageNo); }
+    const rec = { at: run.at, realm: REALM, stage: ST ? stageNo : undefined, won: won || undefined, held: (ST && won) ? held : undefined, tama: pay,
+                  quality: run.qn ? Math.round(100*run.q/run.qn)/100 : undefined, wave, banished: killed, traced: run.traced, clean: run.clean,
                   sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
                   difficulty, sign: CFG.sign, upgrades: {...upg} };
     let best = null;
     try { if (H && H.run) best = H.run(rec); } catch(_){}
     try { window.__sync && window.__sync.record('run', rec); } catch(_){}
-    ended = { rec, best, since: run.at, won, pay };
+    ended = { rec, best, since: run.at, won, pay, held, needs: needs(stageNo) };
     if (navigator.vibrate) navigator.vibrate([90, 60, 160]);
     // a beat, so the last breach is seen before the page covers it
     setTimeout(() => { if (over && ended) openOver(); }, 700);
@@ -1099,7 +1123,7 @@ LAYER = STYLE + r"""
       <div class="start-row">${row('diff', DIFF, difficulty)}</div>
       <div class="start-h">what the sign says</div>
       <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
-      ${ST ? `<div class="start-h">stage · ${roster().length} characters on the field · ${stageCount(stageNo)} farang</div><div class="start-row stages">`
+      ${ST ? `<div class="start-h">stage · ${roster().length} characters on the field · ${stageCount(stageNo)} farang${counts(stageNo) ? '' : ' · <b class="needs">counts at ' + needs(stageNo) + ' or harder</b>'}</div><div class="start-row stages">`
         + Array.from({length: stageMax()}, (_, k) => `<button data-k="stage" data-v="${k+1}" aria-pressed="${k+1 === stageNo}"><b>${k+1}</b></button>`).join('') + `</div>` : ''}
       ${workshopHtml()}
       ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
@@ -1141,7 +1165,7 @@ LAYER = STYLE + r"""
       const top = stageMax(), held = p.cleared(REALM) >= top, c = gateCost();
       gate = top >= lastStage() ? `<button disabled><b><i>関</i>the last gate</b><small>every row of the chart is on the field.</small></button>`
         : `<button data-lantern="gate"${held && p.balance >= c ? '' : ' disabled'} class="${held && p.balance >= c ? 'can' : ''}"><b><i>関</i>gate to stage ${top + 1}</b>`
-          + `<small>${held ? '魂 ' + c + ' · one more row of the chart, and more of them' : 'hold stage ' + top + ' to the end first'}</small></button>`;
+          + `<small>${held ? '魂 ' + c + ' · one more row of the chart, and more of them' : 'hold stage ' + top + ' to the end first' + (needs(top) !== 'guided' ? ', at ' + needs(top) + ' or harder' : '')}</small></button>`;
     }
     return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
   }
@@ -1158,7 +1182,7 @@ LAYER = STYLE + r"""
     const fresh = e.best && e.best.isBest && e.best.runs > 1;
     // the handwriting of this run, the way the hand's own page draws it
     let hands = '';
-    try { if (H && H.thumbs) hands = H.thumbs(e.since, 12); } catch(_){}
+    try { if (H && H.thumbs) hands = H.thumbs(e.since, 12, true); } catch(_){}
     start.innerHTML = markup = `<div class="start-card over${e.won ? ' won' : ''}">
       <div class="start-title">${e.won ? 'the ward held' : 'the ward fell'}</div>
       <div class="start-sub">${esc(REALM)}${ST ? ' · stage ' + r.stage : ''} · ${e.won ? 'all ' + r.wave + ' of them' : 'wave ' + r.wave + (ST ? ' of ' + stageCount(r.stage) : '')}${fresh ? ' · <b>your furthest yet</b>' : ''}</div>
@@ -1169,7 +1193,8 @@ LAYER = STYLE + r"""
         <div><b>${mins}</b><small>held</small></div>
       </div>
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
-      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${e.won ? 'held to the end: half again' : 'clean traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
+      ${e.won && ST && !e.held ? `<p class="over-line warn">held — but from stage ${r.stage >= ST.mediumFrom ? ST.mediumFrom : ST.easyFrom} it only counts toward the gate at <b>${e.needs}</b> or harder. ${difficulty} is practice here, and it still pays.</p>` : ''}
+      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}${e.won ? 'held to the end: half again' : 'clean, readable traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
       ${workshopHtml()}
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
       <button class="start-go">${ST && stageNo !== r.stage ? 'on to stage ' + stageNo : e.won && ST && stageNo < stageMax() ? 'on to stage ' + (stageNo + 1) : 'again'}</button>
@@ -1226,7 +1251,7 @@ LAYER = STYLE + r"""
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get stage(){ return stageNo; }, get stageMax(){ return stageMax(); }, get won(){ return won; },
-    setStage, stageRows, stageCount, lastStage, roster, buyLantern, buyGate, lanternCost, gateCost, capNow, LANTERN,
+    setStage, needs, counts, stageRows, stageCount, lastStage, roster, buyLantern, buyGate, lanternCost, gateCost, capNow, LANTERN,
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
@@ -1321,7 +1346,7 @@ def config(pack, deck=None):
         f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"
         f"speed:{f.get('speed', 0.055)},"
         f"wardHp:{int(f.get('wardHp', 5))},"
-        f"stages:{js({**{'rows': 2, 'count': 12, 'countStep': 3, 'gate': 30, 'gateRamp': 1.45, 'hpEvery': 4, 'speedStep': 0.03}, **(f.get('stages') or {})}) if f.get('stages', True) else 'null'},"
+        f"stages:{js({**{'rows': 2, 'count': 12, 'countStep': 3, 'gate': 30, 'gateRamp': 1.45, 'hpEvery': 4, 'speedStep': 0.03, 'easyFrom': 3, 'mediumFrom': 8}, **(f.get('stages') or {})}) if f.get('stages', True) else 'null'},"
         f"tamaClean:{int(f.get('tamaClean', 2))},"
         f"tamaTrace:{int(f.get('tamaTrace', 1))},"
         f"tamaWaves:{int(f.get('tamaWaves', 3))},"

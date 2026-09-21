@@ -235,6 +235,7 @@ needs the pen again or a brighter workshop. That is the whole curve.
 | `stages.rows` | 2 | rows of the chart on the field at stage 1; each stage adds one |
 | `stages.count`, `countStep` | 12, 3 | farang in stage 1, and how many more each stage. Hold the ward through all of them and the stage is cleared. |
 | `stages.gate`, `gateRamp` | 30, 1.45 | what the gate to stage 2 costs, and how each gate grows. A gate is only for sale once the stage before it has been held. |
+| `stages.easyFrom`, `mediumFrom` | 3, 8 | from these stages on, a stage only counts toward its gate if it was held at that difficulty or harder. It can still be played, and still pays, in any. |
 | `stages.hpEvery` | 4 | farang take one more hit every this many stages, on top of the run's own ramp |
 | `stages.speedStep` | 0.03 | and come this much faster per stage |
 | `tamaClean`, `tamaTrace` | 2, 1 | tama for a clean trace, and for one that was zapped |
@@ -242,8 +243,11 @@ needs the pen again or a brighter workshop. That is the whole curve.
 | `inkwellStep` | 6 | ink in hand at the start of a run, per inkwell |
 | `lanternCost`, `lanternRamp` | see above | level one of each lantern, and how each level grows |
 
-A difficulty can carry a `tama` multiplier (guided 0.5, medium 1.5). Holding a
-stage to the end pays half again.
+A difficulty can carry a `tama` multiplier (guided 0.5, medium 2). Holding a
+stage to the end pays half again. Each trace's share is scaled by how
+recognisable it was, from half (nobody could read it) to half again (it could
+be the book); `hand.qualitySpan` (0.09) is the mean distance, as a fraction of
+the glyph's diagonal, at which a trace scores zero.
 
 ### The three voices
 

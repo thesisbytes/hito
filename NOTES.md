@@ -857,3 +857,34 @@ Running log. Append at the bottom, don't rewrite history.
   skipped a real use sitting before a colon, which would have put a DOM element
   in the run record. A stubbed test caught the label and the record; the real
   browser had only been asked about one button. Rename by hand.
+
+## 2026-09-20 — Guided only gets you so far; recognisable pays more (hiragana v0.1.45, katakana-game v0.1.8, vocab v0.1.23)
+
+- The maintainer's design, in their words, DECIDED in CLAUDE.md. Thresholds
+  (stage 3 for easy, stage 8 for medium) are a starting position.
+- **Played is not held.** A stage below its required mode still runs and still
+  pays — guided stays a place to practise anything unlocked — but it does not
+  clear, and the ending says why rather than letting the gate stay shut in
+  silence.
+- **The score is a symmetric chamfer distance**, because one direction alone
+  lies: a tick drawn on the path is entirely "on the shape", and scored as a
+  perfect あ until the other direction — how much of the shape has ink near it
+  — was averaged in. There is a test for exactly that tick.
+- In Chrome, three traces of one character with 0, 9 and 22px of wobble scored
+  98%, 77% and 59%. So the scale has room at both ends, which is all that can
+  be said without a hand.
+- "best stroke of the run ✦" and "you could barely recognize this" went in
+  after all, since the score they need now exists. The second only appears
+  under 45%, and only when there is more than one trace to be the worst of.
+- **A bug that the safety net hid.** The score's first version reused the name
+  `last` inside `note()`, where it is already a const: every note threw after
+  saving, the wrapper that stops a failed note costing a glyph swallowed it,
+  and the only symptom was a score of null. The wrapper is right; the silence
+  was not. It counts its faults now and the tests assert the count.
+- Two intermittent test failures on the way out, and they were different
+  things. One was the test: a fixed sideways drift is already off the scale for
+  the smallest glyph at the smallest size, and the glyph is random. The other
+  was the game: the field's zap counter is only cleared when a glyph loads, so
+  a run that ended after a zap and restarted on the same character counted the
+  new run's first trace as unclean. `restart()` clears it. Suite run three
+  times clean before shipping, because one green run had stopped meaning much.

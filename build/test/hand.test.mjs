@@ -72,7 +72,7 @@ function boot(file, { stored = {}, touchPoints = 0, fine = false, coarse = false
   const probe = `\nwindow.__probe = { get penOnly(){ return penOnly; }, get done(){ return done; }, get idx(){ return idx; },
     get LETTERS(){ return LETTERS; }, get strokes(){ return strokes; }, get BASE_F(){ return BASE_F; },
     get ease(){ return HAND_EASE; }, get SIZE_MAX(){ return SIZE_MAX; }, get SIZE_MIN(){ return SIZE_MIN; },
-    setStrokes(v){ strokes = v; }, setSize(f){ curF = f; curS = f/BASE_F; }, get W(){ return W; }, get H(){ return H; } };`;
+    get TEACHER(){ return TEACHER; }, setStrokes(v){ strokes = v; }, setSize(f){ curF = f; curS = f/BASE_F; }, get W(){ return W; }, get H(){ return H; } };`;
   new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
   g.resize();
   if (g.__field) g.__field.begin();
@@ -142,6 +142,7 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({
   g.zap({x:1, y:1});
   g.conjure();
   ok(P.done === true, 'conjure() did not reach the engine through the hand');
+  ok(H.faults === 0, `taking the note threw ${H.faults} time(s): the glyph landed, and nothing was written down`);
   const e = H.ledger.g[ch];
   ok(e && e.n === 1 && e.zaps === 1 && e.clean === 0, `ledger for ${ch} is ${JSON.stringify(e)}`);
   const r = H.hands[H.hands.length - 1];
@@ -238,6 +239,7 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({
   let threw = null;
   try { g.conjure(); } catch(e){ threw = e; }
   ok(!threw && P.done === true, `garbage in strokes stopped a glyph landing: ${threw && threw.message}`);
+  ok(H.faults === 1, `garbage in the ink was counted as ${H.faults} fault(s), expected exactly 1`);
   // Not left lying about: the engine repaints `strokes` on a deferred
   // font-ready resize, and it cannot paint a null any more than a pen can draw one.
   P.setStrokes([]);
@@ -304,6 +306,28 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({
   ok(b.H.ledger.best.hiragana.wave === 12 && b.H.ledger.runs.every(r => typeof r.at === 'number' && typeof r.realm === 'string'), 'junk runs got into the ledger');
   for (let i = 0; i < 30; i++) b.H.run({at:5000+i, realm:'hiragana', wave:1});
   ok(b.H.ledger.runs.length === 20, `the run list grew to ${b.H.ledger.runs.length}`);
+}
+
+// ---- how recognisable: geometry, both ways, and never a throw
+{
+  const { H, P } = boot(workshop, {stored:{'hito-input':'pen'}});
+  const T = P.TEACHER, book = T.fonts[T.activeFont].letters;
+  const flat = (ch, dx = 0, dy = 0, keep = 1) => book[ch].strokes.map(s => [].concat(...s.slice(0, Math.max(2, Math.ceil(s.length*keep))).map((q, i) => [Math.round((q.x+dx)*1000), Math.round((q.y+dy)*1000), i*10])));
+  const chars = Object.keys(book).slice(0, 12);
+  for (const c of chars) ok(H.quality(c, flat(c)) >= 0.95, `${c} drawn as the book draws it scored ${H.quality(c, flat(c))}`);
+  const c = 'あ';
+  const q0 = H.quality(c, flat(c)), q1 = H.quality(c, flat(c, 0.02)), q2 = H.quality(c, flat(c, 0.05)), q3 = H.quality(c, flat(c, 0.3));
+  ok(q0 > q1 && q1 > q2 && q2 > q3 && q3 === 0, `quality does not fall with distance: ${[q0,q1,q2,q3]}`);
+  ok(H.quality(c, flat('し')) < 0.5, `し handed in as あ scored ${H.quality(c, flat('し'))}`);
+  // a tick on the path is ON the shape, but the shape is not under the tick
+  const tick = H.quality(c, flat(c, 0, 0, 0.12));
+  ok(tick < 0.6, `the first tenth of each stroke scored ${tick}: only one direction is being measured`);
+  ok(H.grade(0.9) === 'crisp' && H.grade(0.3) === 'barely' && H.grade(null) === '', 'the grades are off');
+  for (const junk of [[], [[]], [[NaN, 1, 0]], [['a','b','c','d','e','f']], null, [[1,2]]]){
+    let threw = null, v; try { v = H.quality(c, junk); } catch(e){ threw = e; }
+    ok(!threw && (v === null || (v >= 0 && v <= 1)), `quality(${JSON.stringify(junk)}) gave ${v} ${threw ? 'and threw' : ''}`);
+  }
+  ok(H.quality('no such glyph', flat(c)) === null, 'a character with no reference was scored');
 }
 
 // ---- the purse: two tablets, no server, and nothing doubled or lost

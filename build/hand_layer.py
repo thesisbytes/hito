@@ -68,6 +68,7 @@ LAYER = r"""
     padding:4px; text-align:center; }
   .hand-thumbs svg{ width:100%; height:auto; display:block; }
   .hand-thumbs figcaption{ font-size:11px; color:rgba(232,224,204,.65); }
+  .hand-thumbs figcaption em{ display:block; font-style:normal; font-size:10px; line-height:1.2; color:#bdf0e6; }
   .hand-io{ width:100%; height:70px; margin-top:8px; background:#0f0d0b; color:#e8e0cc;
     border:1px solid #3d3324; border-radius:7px; font:11px ui-monospace,monospace; box-sizing:border-box; }
   .hand-io[hidden]{ display:none; }
@@ -82,7 +83,7 @@ LAYER = r"""
    Pen or finger, what was drawn, and how it has been going. Writes down what
    the tracer decided; decides nothing itself.                              */
 (function(){
-  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0}, finger:{size:[0.62,0.62],ease:1.5,trail:2.2,halo:36}};
+  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0}, finger:{size:[0.62,0.62],ease:1.5,trail:2.2,halo:36}, qualitySpan:0.09};
   const K_INPUT = 'hito-input', K_LEDGER = 'hito-ledger', K_HANDS = 'hito-hands';
   const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch(_){ return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(_){ return false; } };
@@ -162,6 +163,7 @@ LAYER = r"""
   // The hand's own copy of the ink, taken at pen-up. The field tidies strays
   // out of `strokes` a moment later, and a log of handwriting with the
   // mistakes swept out of it is a log of the stroke book.
+  let lastRec = null;   // the last note taken, for whoever asked the tracer to land it
   let mine = [], down = null, downAt = 0, began = null;   // null, not 0: 0 is a time
   // …and the hand's own clock. The engine restarts its clock whenever the ink
   // is empty, and guided mode empties the ink after every stroke, so by the
@@ -209,6 +211,43 @@ LAYER = r"""
     return out;
   }
 
+  // ---- how recognisable was that? ------------------------------------------
+  // The maintainer: "if your keys are recognizable, you end up with more
+  // currency". A trace and the shape it was asked for are in the same space, so
+  // this is geometry, not recognition: how far, on average, is the ink from the
+  // shape, and the shape from the ink. Both directions, or a dot on the path
+  // would score as a perfect が. Normalised by the glyph's own size, so つ and
+  // ぼ are judged alike. Order and stroke count are not judged here — the tracer
+  // already enforces both, and a stroke drawn in two pen-downs is still that
+  // stroke. 0..1: 1 is the book, 0 is somewhere else entirely.
+  // This is a measure of tidiness along a path the hand was shown. It is NOT
+  // hard mode's "is this あ?" — but it is the distance that will need.
+  const walk = (pts, step) => {          // points every `step` along a polyline
+    const out = []; if (!pts.length) return out;
+    out.push(pts[0]); let carry = 0;
+    for (let i = 1; i < pts.length; i++){
+      const [ax, ay] = pts[i-1], [bx, by] = pts[i], L = Math.hypot(bx-ax, by-ay);
+      if (!L) continue;
+      for (let d = step - carry; d <= L; d += step) out.push([ax + (bx-ax)*d/L, ay + (by-ay)*d/L]);
+      carry = (carry + L) % step;
+    }
+    out.push(pts[pts.length-1]); return out;
+  };
+  const toward = (A, B) => { let s = 0; for (const [x, y] of A){ let m = 1e9; for (const [u, v] of B){ const d = (x-u)*(x-u) + (y-v)*(y-v); if (d < m) m = d; } s += Math.sqrt(m); } return s / A.length; };
+  function quality(c, flats){
+    try {
+      const st = TEACHER.fonts[TEACHER.activeFont].letters[c].strokes;
+      let R = [], U = [], x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (const s of st){ const pts = s.map(q => [q.x*1000, q.y*1000]); for (const [x, y] of pts){ x0 = Math.min(x0,x); y0 = Math.min(y0,y); x1 = Math.max(x1,x); y1 = Math.max(y1,y); } R = R.concat(walk(pts, 14)); }
+      for (const f of flats){ const pts = []; for (let i = 0; i + 2 < f.length; i += 3) pts.push([+f[i], +f[i+1]]); U = U.concat(walk(pts, 14)); }
+      const diag = Math.hypot(x1-x0, y1-y0);
+      if (!R.length || U.length < 2 || !(diag > 0) || U.some(p => !isFinite(p[0]) || !isFinite(p[1]))) return null;
+      const m = (toward(U, R) + toward(R, U)) / 2 / diag;
+      return Math.max(0, Math.min(1, 1 - m / CFG.qualitySpan));
+    } catch(_){ return null; }
+  }
+  const grade = q => q == null ? '' : q >= .8 ? 'crisp' : q >= .6 ? 'clear' : q >= .4 ? 'readable' : 'barely';
+
   // ---- the ledger ----------------------------------------------------------
   // Keyed by character. `tr` is trouble, smoothed: a zap is one, a fizzle is
   // three, and it decays with every clean attempt, so a character stops being
@@ -247,6 +286,8 @@ LAYER = r"""
       v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
       s: pack(raw),
     };
+    const q = ok ? quality(ch, rec.s) : null;
+    if (q != null) rec.q = Math.round(q*100)/100;
     const e = LEDGER.g[ch] || (LEDGER.g[ch] = {n:0, clean:0, zaps:0, fizz:0, ms:0, rt:[], tr:0});
     const trouble = zaps + (ok ? 0 : 3);
     e.tr = Math.round(((e.tr || 0)*0.7 + trouble*0.3) * 100) / 100;
@@ -255,6 +296,7 @@ LAYER = r"""
       e.n++; if (!zaps && !tries) e.clean++;
       e.ms += ms; e.rt = (e.rt || []).concat(Math.round(ms / raw.length)).slice(-5);
       if (!e.best || ms < e.best) e.best = ms;
+      if (rec.q != null) e.q = Math.round(((e.q == null ? rec.q : e.q*0.7 + rec.q*0.3)) * 100) / 100;
     } else e.fizz++;
     e.last = Date.now();
     const d = LEDGER.days[today()] || (LEDGER.days[today()] = [0, 0, 0]);
@@ -265,7 +307,7 @@ LAYER = r"""
     save();
     try { window.__sync && window.__sync.record('trace', rec); } catch(_){}
     if (ok) finished = true; else { tries++; }
-    zaps = 0;
+    zaps = 0; lastRec = rec;
     return rec;
   }
   // ---- runs ---------------------------------------------------------------
@@ -347,9 +389,12 @@ LAYER = r"""
   // Both of these empty `strokes` on their way through, so the note is taken
   // first. A note that throws must not stop a glyph from landing.
   const _fizzle = window.fizzle;
-  window.fizzle = function(){ try { note(false); } catch(_){} return _fizzle.apply(this, arguments); };
+  // …but not silently. A note that threw every time once went unnoticed because
+  // this catch is doing its job; the count is what a test can see.
+  let faults = 0;
+  window.fizzle = function(){ try { note(false); } catch(_){ faults++; } return _fizzle.apply(this, arguments); };
   const _conjure = window.conjure;
-  window.conjure = function(){ try { note(true); } catch(_){} return _conjure.apply(this, arguments); };
+  window.conjure = function(){ try { note(true); } catch(_){ faults++; } return _conjure.apply(this, arguments); };
 
   const inkEl = document.getElementById('ink');   // not `ink`: that is the engine's context
   if (inkEl && inkEl.addEventListener){
@@ -399,7 +444,7 @@ LAYER = r"""
     } catch(_){ return ''; }
   }
   const BOX = '150 150 700 760';
-  function thumb(r){
+  function thumb(r, tag){
     const ref = asked(r.glyph);
     const paths = (r.s || []).map(f => {
       let d = '';
@@ -409,10 +454,16 @@ LAYER = r"""
     return `<figure><svg viewBox="${BOX}" fill="none" stroke-linecap="round" stroke-linejoin="round">`
       + (ref ? `<g stroke="rgba(232,224,204,.16)" stroke-width="46">${ref}</g>` : '')
       + `<g stroke="${r.ok ? '#e9c46a' : '#dc5a3c'}" stroke-width="20">${paths}</g></svg>`
-      + `<figcaption>${esc(r.glyph)} · ${r.ok ? secs(r.ms) : 'fizzled'}</figcaption></figure>`;
+      + `<figcaption>${esc(r.glyph)} · ${r.ok ? (r.q != null ? Math.round(r.q*100) + '% ' + grade(r.q) : secs(r.ms)) : 'fizzled'}${tag ? `<em>${tag}</em>` : ''}</figcaption></figure>`;
   }
-  const thumbs = (since, n) => { const a = HANDS.filter(r => (r.at || 0) >= (since || 0)).slice(-(n || 12)).reverse();
-    return a.length ? `<div class="hand-thumbs">${a.map(thumb).join('')}</div>` : ''; };
+  // With `crown`, the best of them is named, and so — the maintainer's own
+  // idea, and their own words — is the worst, if it earned it.
+  const thumbs = (since, n, crown) => { const a = HANDS.filter(r => (r.at || 0) >= (since || 0)).slice(-(n || 12)).reverse();
+    const scored = crown ? a.filter(r => r.ok && r.q != null) : [];
+    const top = scored.length > 1 ? scored.reduce((x, y) => y.q > x.q ? y : x) : null;
+    const low = scored.length > 1 ? scored.reduce((x, y) => y.q < x.q ? y : x) : null;
+    const tag = r => r === top ? 'best stroke of the run ✦' : (r === low && r.q < .45) ? 'you could barely recognize this' : '';
+    return a.length ? `<div class="hand-thumbs">${a.map(r => thumb(r, tag(r))).join('')}</div>` : ''; };
   // Every trace still on the device, as one SVG: a sheet to keep, print, or be
   // teased about. Built here and handed over as a file; nothing is uploaded.
   function sheetSVG(){
@@ -572,6 +623,7 @@ LAYER = r"""
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
     get html(){ return markup; }, get shown(){ return !sheet.hidden; },
     show: open, close, render, note, pack, toBook, shaky, stats, streak, run, thumbs, sheetSVG, saveSheet, tama,
+    quality, grade, get last(){ return lastRec; }, get faults(){ return faults; },
     exportText, importText,
     reset(){ LEDGER = {v:1, g:{}, days:{}, by:{}, runs:[], best:{}, tama:{earned:{}, spent:{}, own:{}, cleared:{}}}; HANDS = []; save(); },
   };
@@ -622,6 +674,7 @@ def config(pack):
         f"maxPoints:{int(h.get('maxPoints', 64))},"
         f"keep:{int(h.get('keep', 60))},"
         f"minStep:{int(h.get('minStep', 4))},"
+        f"qualitySpan:{float(h.get('qualitySpan', 0.09))},"
         f"pen:{js(pr['pen'])},finger:{js(pr['finger'])}"
         "};</script>"
     )
