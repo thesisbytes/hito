@@ -121,6 +121,14 @@ STYLE = """
   .over-nums small{ color:rgba(232,224,204,.6); font-size:11px; }
   .over-line{ margin:0 0 6px; font-size:12.5px; color:rgba(232,224,204,.65); text-align:center; }
   .start-card.over .start-title{ color:#e8a0a0; }
+  .start-card.over.won .start-title{ color:#7fd1c4; }
+  .over-pay{ margin:2px 0 4px; text-align:center; font-size:20px; font-weight:700; color:#bdf0e6; }
+  .over-pay small{ display:block; font-size:11.5px; font-weight:400; color:rgba(232,224,204,.55); }
+  .start-row.lantern button.can{ border-color:#7fd1c4; }
+  .start-row.lantern{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
+  .start-row.stages{ grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); }
+  .start-row.stages button{ text-align:center; padding:8px 2px; }
+  .start-row.stages button b{ margin:0; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(232,224,204,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
   .start-links button{ flex:1; background:transparent; color:rgba(233,196,106,.75); border:1px solid #3d3324;
@@ -203,7 +211,47 @@ LAYER = STYLE + r"""
   let sumi = 0, upg = { quick:0, bright:0, shove:0, mend:0 };
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
   const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
-  const wardMax = () => CFG.wardHp + upg.mend;
+  // ---- stages, and the workshop between rounds ------------------------------
+  // The maintainer: "make it impossible to advance without unlocking stuff. so
+  // there needs to be a currency to use after each round". So a run is a STAGE
+  // now: a fixed number of farang, carrying only the rows of the chart that
+  // stage has reached. Hold the ward through all of them and the stage is
+  // cleared — which is the only thing that lets the gate to the next be bought,
+  // with 魂 tama, which only a finished run pays. Tama also buys what lasts:
+  // hearts, how many lights a character can hold, ink in hand at the start.
+  // Same rule as the run's upgrades: they multiply the hand, and not one of
+  // them writes a character for you.
+  // Word decks are not staged: a deck is class content with its own order. And
+  // the workshop page is never gated, so anything can always be practised.
+  const ST = WORDS ? null : CFG.stages;
+  const purse = () => { try { return window.__hand && window.__hand.tama; } catch(_){ return null; } };
+  const own = id => { const p = purse(); return p ? p.own(id) : 0; };
+  const LANTERN = {
+    heart:   { kana:'心', name:'heart',   blurb:'the ward starts with one more',        max:5 },
+    lamp:    { kana:'灯', name:'lamp',    blurb:'a character can hold one more light',  max:4 },
+    inkwell: { kana:'硯', name:'inkwell', blurb:'every run starts with more ink in hand', max:5 },
+  };
+  const lanternCost = id => Math.round((CFG.lanternCost[id] || 20) * Math.pow(CFG.lanternRamp, own(id)));
+  const stageMax = () => ST ? 1 + own('gate') : 1;
+  const gateCost = () => ST ? Math.round(ST.gate * Math.pow(ST.gateRamp, own('gate'))) : 0;
+  let stageNo = 1;
+  const stageRows  = k => ST ? ST.rows + (k - 1) : Infinity;
+  const stageCount = k => ST ? ST.count + ST.countStep * (k - 1) : Infinity;
+  const lastStage  = () => ST ? Math.max(1, Math.max(...LETTERS.map(L => L[6] || 1)) - ST.rows + 1) : 1;
+  const roster = () => { const r = stageRows(stageNo); const a = []; LETTERS.forEach((L, i) => { if ((L[6] || 1) <= r) a.push(i); }); return a.length ? a : LETTERS.map((_, i) => i); };
+  function setStage(k){ k = Math.max(1, Math.min(stageMax(), Math.floor(+k) || 1)); if (k !== stageNo){ stageNo = k; saveStart(); } return stageNo; }
+  function buyLantern(id){
+    const p = purse(); if (!p || !LANTERN[id]) return false;
+    return p.buy(id, lanternCost(id), LANTERN[id].max);
+  }
+  // The gate is for sale only to somebody who has held the stage before it.
+  function buyGate(){
+    const p = purse(); if (!p || !ST) return false;
+    if (stageMax() >= lastStage() || p.cleared(REALM) < stageMax()) return false;
+    return p.buy('gate', gateCost(), null);
+  }
+  const capNow = () => CFG.hitodamaCap + own('lamp');
+  const wardMax = () => CFG.wardHp + own('heart') + upg.mend;
   // What this run was, kept as it goes so the end can say it. Observations:
   // how far, how many, how cleanly. Never a score.
   let run = null;
@@ -252,7 +300,7 @@ LAYER = STYLE + r"""
     // stroke sets a pace, and the hand starts following its speed instead
     // of dragging the light at its own. The road ahead already shows where
     // to go; guided does not need to be shown how fast.
-    guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
+    guided: { tama:.5, kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
               guide:true, numbers:true, comet:false, shadow:'none' },
@@ -260,7 +308,7 @@ LAYER = STYLE + r"""
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:true, numbers:true, shadow:'none' },
-    medium: { kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
+    medium: { tama:1.5, kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:false, numbers:false, shadow:'strokes' },
@@ -286,8 +334,9 @@ LAYER = STYLE + r"""
     const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {};
     if (s.difficulty in DIFF && !DIFF[s.difficulty].locked) difficulty = s.difficulty;
     if (s.sign in SIGNS) CFG.sign = s.sign;
+    if (s.stage) stageNo = Math.max(1, Math.floor(+s.stage) || 1);
   } catch(_){}
-  function saveStart(){ try { localStorage.setItem(SKEY, JSON.stringify({difficulty, sign:CFG.sign})); } catch(_){} }
+  function saveStart(){ try { localStorage.setItem(SKEY, JSON.stringify({difficulty, sign:CFG.sign, stage:stageNo})); } catch(_){} }
   function applyDifficulty(name){
     const d = DIFF[name];
     if (!d || d.locked) return false;
@@ -325,7 +374,7 @@ LAYER = STYLE + r"""
   function saveH(){ try { localStorage.setItem(HKEY, JSON.stringify(HITODAMA)); } catch(_){} }
   const charge = ch => HITODAMA[ch] || 0;
   function kindle(ch, n){
-    HITODAMA[ch] = Math.min(CFG.hitodamaCap, charge(ch) + n);
+    HITODAMA[ch] = Math.min(capNow(), charge(ch) + n);
     saveH();
     try { window.__sync && window.__sync.record('kindle', { glyph: ch, charge: HITODAMA[ch] }); } catch(_){}
     return HITODAMA[ch];
@@ -416,13 +465,14 @@ LAYER = STYLE + r"""
       while (tries < 8 && w.chars.every(c => (MASTERY[c]||0) > 2 && !shaky(c)) && Math.random() < 0.7);
       i = AT[w.chars[0]];
     } else {
-      do { i = Math.floor(Math.random()*LETTERS.length); tries++; }
+      const pool = roster();
+      do { i = pool[Math.floor(Math.random()*pool.length)]; tries++; }
       while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && !shaky(LETTERS[i][0]) && Math.random() < 0.7);
     }
     monsters.push({
       i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
-      speed: CFG.speed * (0.8 + Math.random()*0.5),
-      hp: hpFor(wave), wob: Math.random()*6.28, born: performance.now(),
+      speed: CFG.speed * (0.8 + Math.random()*0.5) * (ST ? 1 + ST.speedStep*(stageNo - 1) : 1),
+      hp: hpFor(wave) + (ST ? Math.floor((stageNo - 1) / ST.hpEvery) : 0), wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
@@ -702,8 +752,10 @@ LAYER = STYLE + r"""
     if (paused){ draw(); return; }
     if (!over){
       // Nothing to answer is not a rest, it is a dead screen. Refill at once.
+      const left = stageCount(stageNo) - wave;          // farang this stage has yet to send
+      if (left <= 0 && !monsters.length){ won = true; over = true; endRun(); }
       if (!monsters.length) spawnAt = Math.min(spawnAt, now);
-      if (now > spawnAt){
+      if (left > 0 && now > spawnAt){
         spawn();
         spawnAt = now + Math.max(CFG.spawnMin, CFG.spawnMs - wave*CFG.spawnRamp);
       }
@@ -902,7 +954,7 @@ LAYER = STYLE + r"""
       // for a word: the word so far, blank where it is still to come
       const t = target();
       const ch = t && t.w ? t.w.chars.map((c, k) => k < t.ci ? c : '＿').join('') : LETTERS[idx][0];
-      const c = charge(LETTERS[idx][0]), cap = CFG.hitodamaCap;
+      const c = charge(LETTERS[idx][0]), cap = capNow();
       const d = dash();
       g.font = '700 17px ui-sans-serif,system-ui,"Klee One",sans-serif';
       const lw = Math.max(17, g.measureText(ch).width);
@@ -944,8 +996,10 @@ LAYER = STYLE + r"""
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
-    sumi = 0; upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null;
-    ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
+    upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null; won = false;
+    stageNo = Math.min(stageNo, stageMax());
+    sumi = own('inkwell') * CFG.inkwellStep;
+    ward = wardMax(); over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
     renderUpg();
   }
@@ -958,17 +1012,24 @@ LAYER = STYLE + r"""
   // happened, and it is written down in three places that each do a different
   // job: the hand's ledger (on the device, and in the save that follows a
   // signed-in player), and the events table (an observation, for later).
-  let ended = null;
+  let ended = null, won = false;
   function endRun(){
     if (!run || ended) return ended;
     const H = window.__hand;
-    const rec = { at: run.at, realm: REALM, wave, banished: killed, traced: run.traced, clean: run.clean,
+    // What the run leaves behind. Paid for tracing, most of all clean tracing;
+    // guided cannot be zapped, so there every trace would count as clean, and
+    // it pays less instead. Holding a stage to the end is worth half again.
+    const p = purse();
+    const pay = !p ? 0 : Math.round((run.clean*CFG.tamaClean + (run.traced - run.clean)*CFG.tamaTrace + Math.floor(wave/CFG.tamaWaves))
+                                     * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1) * (won ? 1.5 : 1));
+    if (p){ p.earn(pay); if (won && ST) p.clear(REALM, stageNo); }
+    const rec = { at: run.at, realm: REALM, stage: ST ? stageNo : undefined, won: won || undefined, tama: pay, wave, banished: killed, traced: run.traced, clean: run.clean,
                   sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
                   difficulty, sign: CFG.sign, upgrades: {...upg} };
     let best = null;
     try { if (H && H.run) best = H.run(rec); } catch(_){}
     try { window.__sync && window.__sync.record('run', rec); } catch(_){}
-    ended = { rec, best, since: run.at };
+    ended = { rec, best, since: run.at, won, pay };
     if (navigator.vibrate) navigator.vibrate([90, 60, 160]);
     // a beat, so the last breach is seen before the page covers it
     setTimeout(() => { if (over && ended) openOver(); }, 700);
@@ -1038,6 +1099,9 @@ LAYER = STYLE + r"""
       <div class="start-row">${row('diff', DIFF, difficulty)}</div>
       <div class="start-h">what the sign says</div>
       <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
+      ${ST ? `<div class="start-h">stage · ${roster().length} characters on the field · ${stageCount(stageNo)} farang</div><div class="start-row stages">`
+        + Array.from({length: stageMax()}, (_, k) => `<button data-k="stage" data-v="${k+1}" aria-pressed="${k+1 === stageNo}"><b>${k+1}</b></button>`).join('') + `</div>` : ''}
+      ${workshopHtml()}
       ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
       ${realms()}
       <button class="start-go">${over ? 'begin again' : 'begin'}</button>
@@ -1048,10 +1112,12 @@ LAYER = STYLE + r"""
     if (cr) cr.onclick = () => { view = 'credits'; renderStart(); };
     const hb = start.querySelector('.start-hand');
     if (hb) hb.onclick = () => hand.show();
+    wireWorkshop(renderStart);
     for (const b of start.querySelectorAll('button[data-k]')){
       b.onclick = () => {
         if (b.dataset.k === 'diff') setDifficulty(b.dataset.v);
         else if (b.dataset.k === 'input') hand.setInput(b.dataset.v);
+        else if (b.dataset.k === 'stage'){ if (setStage(b.dataset.v) && !over){ monsters = []; wave = 0; killed = 0; locked = null; spawn(); retarget(true); } }
         else setSign(b.dataset.v);
         renderStart();
       };
@@ -1062,6 +1128,29 @@ LAYER = STYLE + r"""
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
   function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
+  // The lantern workshop. Shown where a round ends and where one begins.
+  function workshopHtml(){
+    const p = purse(); if (!p) return '';
+    const items = Object.entries(LANTERN).map(([id, u]) => {
+      const lv = own(id), maxed = lv >= u.max, c = lanternCost(id);
+      return `<button data-lantern="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
+        + `<b><i>${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}</b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
+    }).join('');
+    let gate = '';
+    if (ST){
+      const top = stageMax(), held = p.cleared(REALM) >= top, c = gateCost();
+      gate = top >= lastStage() ? `<button disabled><b><i>関</i>the last gate</b><small>every row of the chart is on the field.</small></button>`
+        : `<button data-lantern="gate"${held && p.balance >= c ? '' : ' disabled'} class="${held && p.balance >= c ? 'can' : ''}"><b><i>関</i>gate to stage ${top + 1}</b>`
+          + `<small>${held ? '魂 ' + c + ' · one more row of the chart, and more of them' : 'hold stage ' + top + ' to the end first'}</small></button>`;
+    }
+    return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
+  }
+  function wireWorkshop(again){
+    for (const b of start.querySelectorAll('button[data-lantern]')) b.onclick = () => {
+      const id = b.dataset.lantern;
+      if (id === 'gate' ? buyGate() : buyLantern(id)){ if (id === 'gate') setStage(stageMax()); again(); }
+    };
+  }
   function renderOver(){
     const e = ended; if (!e){ view = 'start'; return renderStart(); }
     const r = e.rec, H = window.__hand;
@@ -1070,22 +1159,26 @@ LAYER = STYLE + r"""
     // the handwriting of this run, the way the hand's own page draws it
     let hands = '';
     try { if (H && H.thumbs) hands = H.thumbs(e.since, 12); } catch(_){}
-    start.innerHTML = markup = `<div class="start-card over">
-      <div class="start-title">the ward fell</div>
-      <div class="start-sub">${esc(REALM)} · wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave ? ' · furthest ' + e.best.wave : ''}</div>
+    start.innerHTML = markup = `<div class="start-card over${e.won ? ' won' : ''}">
+      <div class="start-title">${e.won ? 'the ward held' : 'the ward fell'}</div>
+      <div class="start-sub">${esc(REALM)}${ST ? ' · stage ' + r.stage : ''} · ${e.won ? 'all ' + r.wave + ' of them' : 'wave ' + r.wave + (ST ? ' of ' + stageCount(r.stage) : '')}${fresh ? ' · <b>your furthest yet</b>' : ''}</div>
       <div class="over-nums">
         <div><b>${r.banished}</b><small>banished</small></div>
         <div><b>${r.traced}</b><small>traced</small></div>
         <div><b>${r.traced ? Math.round(100*r.clean/r.traced) + '%' : '—'}</b><small>clean</small></div>
         <div><b>${mins}</b><small>held</small></div>
       </div>
-      <p class="over-line">${r.cast} answered by your own lights · 墨 ${r.sumi} earned${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
+      <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
+      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${e.won ? 'held to the end: half again' : 'clean traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
+      ${workshopHtml()}
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
-      <button class="start-go">again</button>
+      <button class="start-go">${ST && stageNo !== r.stage ? 'on to stage ' + stageNo : e.won && ST && stageNo < stageMax() ? 'on to stage ' + (stageNo + 1) : 'again'}</button>
       <div class="start-links"><button class="start-page">difficulty and the sign</button>${H ? '<button class="start-hand">how the hand is doing</button>' : ''}</div>
       <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
     </div>`;
-    const go = start.querySelector('.start-go'); if (go) go.onclick = begin;
+    const go = start.querySelector('.start-go');
+    if (go) go.onclick = () => { if (e.won && ST && stageNo === r.stage && stageNo < stageMax()) setStage(stageNo + 1); begin(); };
+    wireWorkshop(renderOver);
     const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
     const hb = start.querySelector('.start-hand'); if (hb) hb.onclick = () => H.show();
   }
@@ -1132,7 +1225,9 @@ LAYER = STYLE + r"""
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
-    get ink(){ return sumi; }, get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get ink(){ return sumi; }, get stage(){ return stageNo; }, get stageMax(){ return stageMax(); }, get won(){ return won; },
+    setStage, stageRows, stageCount, lastStage, roster, buyLantern, buyGate, lanternCost, gateCost, capNow, LANTERN,
+    get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -1180,6 +1275,8 @@ LAYER = STYLE + r"""
   addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
   sizeField();
   run = newRun();
+  // what lasts is in force from the first run, not the second
+  stageNo = Math.min(stageNo, stageMax()); ward = wardMax(); sumi = own('inkwell') * CFG.inkwellStep;
   spawn(); retarget();
   openStart();
   requestAnimationFrame(fieldLoop);
@@ -1224,6 +1321,13 @@ def config(pack, deck=None):
         f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"
         f"speed:{f.get('speed', 0.055)},"
         f"wardHp:{int(f.get('wardHp', 5))},"
+        f"stages:{js({**{'rows': 2, 'count': 12, 'countStep': 3, 'gate': 30, 'gateRamp': 1.45, 'hpEvery': 4, 'speedStep': 0.03}, **(f.get('stages') or {})}) if f.get('stages', True) else 'null'},"
+        f"tamaClean:{int(f.get('tamaClean', 2))},"
+        f"tamaTrace:{int(f.get('tamaTrace', 1))},"
+        f"tamaWaves:{int(f.get('tamaWaves', 3))},"
+        f"inkwellStep:{int(f.get('inkwellStep', 6))},"
+        f"lanternRamp:{float(f.get('lanternRamp', 1.6))},"
+        f"lanternCost:{js({**{'heart': 20, 'lamp': 30, 'inkwell': 15}, **(f.get('lanternCost') or {})})},"
         f"hpEvery:{int(f.get('hpEvery', 10))},"
         f"hpMax:{int(f.get('hpMax', 5))},"
         f"inkTrace:{int(f.get('inkTrace', 2))},"

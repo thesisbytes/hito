@@ -816,3 +816,44 @@ Running log. Append at the bottom, don't rewrite history.
   workshop. The accounting has to merge across devices without a server, so a
   balance cannot be stored: earnings are per-device totals merged by max,
   purchases are owned levels merged by max, and the balance is derived.
+
+## 2026-09-20 — Stages, 魂, and the lantern workshop (hiragana v0.1.44, katakana-game v0.1.7, vocab v0.1.22)
+
+- Asked for in one line and DECIDED in CLAUDE.md. What was chosen, and why:
+  - **The gate is the curriculum.** What a stage unlocks is the next row of the
+    chart, in the order the chart is learned. An arbitrary gate (pay to raise
+    a number) would have been a grind; this one is the syllabus with a price
+    on it, and the price is paid in tracing.
+  - **Clearing, not just paying.** A gate is for sale only after the stage
+    before it has been held to the end. Otherwise enough lost runs buy any
+    gate, and "cannot advance without unlocking" quietly becomes "cannot
+    advance without waiting".
+  - **Guided pays half.** It cannot be zapped, so every guided trace would
+    count as clean and guided would be the best-paying way to play. The
+    maintainer plays guided; this is aimed at the rule, not at them, and the
+    number is theirs to change (`DIFF.guided.tama`).
+  - **The light cap finally has a home.** It was left out of the run's
+    upgrades because lights outlive a run and a run-scoped cap would strand
+    them. It is a lantern now, which lasts as long as they do.
+- **No stored balance**, for the reason in CLAUDE.md. The known wart: the same
+  level bought on two offline devices is paid for twice. It costs the player,
+  never the game, and only if they go looking for it.
+- The purse test first failed for a reason that was the test's: its two
+  "devices" share a global, so A's earnings were credited to B. Real tablets
+  do not share a `window`. One device at a time now.
+- Checked against a mutant that sells the gate without the stage held: three
+  checks fail. Won a stage in Chrome: "the ward held", + 魂 21, the gate on
+  sale, the sixth heart from a bought lantern in force.
+- **Not balanced by a hand.** Twelve farang, 30 tama a gate, 1.45x: a starting
+  position. At these numbers a clean stage pays roughly 20-30, so about one
+  gate per one or two held stages — by arithmetic, not by play.
+- Existing players keep everything: mastery, lights and the ledger are
+  untouched. They start at stage 1 with two rows on the field, which for
+  somebody who knows the chart will be a quick climb, not a wall.
+- The shadow lint caught its own author: the stage number was first a variable
+  called `stage`, which is the engine's sketchbook element. Nothing was broken
+  yet — which is what `ink` looked like for a release, too. The rename was done
+  with a regex that was too clever: it rewrote labels ("gate to stageNo 2") and
+  skipped a real use sitting before a colon, which would have put a DOM element
+  in the run record. A stubbed test caught the label and the record; the real
+  browser had only been asked about one button. Rename by hand.

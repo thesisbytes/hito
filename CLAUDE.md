@@ -150,7 +150,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.43.html`
+### Hiragana — `dist/hiragana-v0.1.44.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -304,7 +304,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.6.html`
+### Katakana — `dist/katakana-game-v0.1.7.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -325,7 +325,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.21.html`
+### Vocab — `dist/vocab-v0.1.22.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -575,6 +575,28 @@ another go. The run is written to the hand's ledger (the last twenty, and the
 furthest wave per realm for good), travels with a signed-in player's save, and
 goes to the events table as a `run`. These are the player's record of
 themselves, never a score anyone is ranked by.
+
+**DECIDED — you cannot advance without unlocking (v0.1.44).** The
+maintainer: "make it impossible to advance without unlocking stuff. so there
+needs to be a currency to use after each round". A run in the hiragana game is
+a **stage**: a fixed number of farang, carrying only the rows of the chart that
+stage has reached (two rows at stage 1, one more each stage — the order the
+chart is learned in, so the gate is the curriculum). Hold the ward through all
+of them and the stage is cleared, which is the only thing that lets the gate
+to the next be bought. It is bought with **魂 tama**, which only a finished run
+pays: most for clean traces, half again for holding to the end, less in guided
+(it cannot be zapped, so every trace there would count as clean). Tama also
+buys what lasts, in the lantern workshop shown where a round ends and where one
+begins: 心 hearts, 灯 how many lights a character holds, 硯 ink in hand at the
+start. Word decks are not staged — a deck is class content with its own order
+— and the workshop page is never gated, so anything can always be practised.
+
+**No balance is stored.** A purse has to merge from two tablets with no server
+to arbitrate, and a balance cannot. Each device keeps what *it* earned and
+spent as totals that only rise; those merge by max per device; the balance is
+the difference of the sums. This is the first piece of the economy, and it is
+client-written: fine for a single player's own progress, and exactly the
+reason nothing ranked may ever be built on it.
 
 **DECIDED — nothing draws for you.** This is the one rule The Tower does not
 have, and the maintainer's words for it were "it is important that we keep

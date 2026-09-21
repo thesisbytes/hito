@@ -842,7 +842,80 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   fresh();
 }
 
+// ---- stages, 魂, and the workshop between rounds
+// "make it impossible to advance without unlocking stuff." The checks that
+// matter are the ones about what cannot be done: a gate bought without holding
+// the stage before it, a purchase on credit, a character on the field that the
+// stage has not reached, a guided run paid like a hard one.
+{
+  const H = globalThis.__hand; H.reset();
+  fresh(); F.setDifficulty('easy');
+  const realm = 'hiragana';
+  ok(F.stage === 1 && F.stageMax === 1, `a new player starts at stage ${F.stage} of ${F.stageMax}`);
+  // only the rows this stage has reached are ever on the field
+  const allowed = new Set(F.roster());
+  ok(allowed.size > 0 && allowed.size < P.LETTERS.length, `stage 1 puts ${allowed.size} of ${P.LETTERS.length} characters on the field`);
+  ok([...allowed].every(i => (P.LETTERS[i][6] || 1) <= F.stageRows(1)), 'the roster reaches past the stage\'s rows');
+  let stray = 0; for (let k = 0; k < 150; k++){ F.spawn(); if (!allowed.has(F.monsters[F.monsters.length-1].i)) stray++; }
+  ok(stray === 0, `${stray} of 150 farang carried a character this stage has not reached`);
+
+  // nothing is for sale to an empty purse, and the gate is not for sale at all yet
+  fresh();
+  ok(H.tama.balance === 0 && F.buyLantern('heart') === false && F.buyGate() === false, 'something was bought with nothing');
+  H.tama.earn(100000);
+  ok(F.buyGate() === false && F.stageMax === 1, 'the gate was bought without holding the stage before it');
+
+  // lose: it pays, and it does not clear
+  fresh(); F.begin();
+  globalThis.conjure(); advance(cfg.advanceMs + 60);
+  const bal0 = H.tama.balance;
+  for (let g = 0; !F.over && g < 400; g++){ for (const m of F.monsters) m.d = 0.061; advance(40); }
+  ok(F.over && !F.won && F.ended.pay > 0 && H.tama.balance === bal0 + F.ended.pay, `a lost run paid ${F.ended && F.ended.pay} and the purse moved by ${H.tama.balance - bal0}`);
+  ok(H.tama.cleared(realm) === 0, 'losing a stage cleared it');
+  ok(F.buyGate() === false, 'the gate was for sale after a loss');
+
+  // win: every farang the stage sends is answered, and the ward held
+  fresh(); F.begin();
+  const need = F.stageCount(1);
+  for (let g = 0; !F.over && g < 4000; g++){ for (const m of [...F.monsters]){ m.hp = 1; F.hit(m, false, false); } advance(60); }
+  ok(F.over && F.won, `stage 1 did not end in a win after its ${need} farang (wave ${F.run && 0}, over ${F.over})`);
+  ok(F.ended.rec.won === true && F.ended.rec.stage === 1 && F.ended.rec.wave === need, `the winning run's record is ${JSON.stringify(F.ended.rec).slice(0,160)}`);
+  ok(H.tama.cleared(realm) === 1, 'holding stage 1 to the end did not clear it');
+  advance(900);
+  ok(/the ward held/.test(F.startHtml) && /gate to stage 2/.test(F.startHtml) && /\+ 魂/.test(F.startHtml), 'the ending does not say the ward held, what was paid, or offer the gate');
+
+  // now the gate can be bought, once, and the field grows by a row
+  const before = H.tama.balance, cost = F.gateCost();
+  ok(F.buyGate() === true && F.stageMax === 2 && H.tama.balance === before - cost, 'buying the gate did not open stage 2 or did not cost what it said');
+  ok(F.buyGate() === false, 'the gate to stage 3 was for sale without holding stage 2');
+  ok(F.gateCost() > cost, 'the second gate costs no more than the first');
+  F.setStage(2);
+  ok(F.roster().length > allowed.size && F.stageCount(2) > need, 'stage 2 has no more characters or no more farang than stage 1');
+  ok(F.setStage(99) === 2, 'a stage that is not unlocked could be selected');
+
+  // what lasts, lasts: into the next run and the one after
+  F.setStage(1);
+  const hearts = F.wardMax, cap = F.capNow();
+  ok(F.buyLantern('heart') && F.buyLantern('lamp') && F.buyLantern('inkwell'), 'a full purse could not buy the lanterns');
+  fresh(); F.begin();
+  ok(F.ward === hearts + 1 && F.wardMax === hearts + 1, `a heart did not carry into the next run (ward ${F.ward}, was ${hearts})`);
+  ok(F.capNow() === cap + 1, 'a lamp did not raise how many lights a character holds');
+  ok(F.ink === cfg.inkwellStep, `an inkwell started the run with ${F.ink} ink, expected ${cfg.inkwellStep}`);
+  F.quench(); const ch = P.LETTERS[P.idx][0]; F.kindle(ch, 99);
+  ok(F.charge(ch) === cap + 1, `a character holds ${F.charge(ch)} lights with one lamp`);
+  F.quench();
+  let n = 0; while (F.buyLantern('heart') && n < 20) n++;
+  ok(H.tama.own('heart') === F.LANTERN.heart.max, `hearts went to ${H.tama.own('heart')}`);
+
+  // guided cannot be zapped, so it pays less for the same hand
+  const payFor = d => { H.reset(); fresh(); F.setDifficulty(d); F.begin(); for (let k = 0; k < 4; k++){ globalThis.conjure(); advance(cfg.advanceMs + 60); }
+    for (let g = 0; !F.over && g < 400; g++){ for (const m of F.monsters) m.d = 0.061; advance(40); } return F.ended.pay; };
+  const easy = payFor('easy'), guided = payFor('guided'), medium = payFor('medium');
+  ok(guided < easy && easy < medium, `four clean traces paid guided ${guided}, easy ${easy}, medium ${medium}`);
+  F.setDifficulty('easy'); H.reset(); fresh();
+}
+
 if (fail) { console.log(`  ${fail} field check(s) failed`); process.exit(1); }
 console.log(`  monsters advance and spawn, a finished glyph banishes the target, `
   + `the tracer retargets, the ward falls and restarts, `
-  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, and a fallen ward ends the run, says what it was and writes it down`);
+  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, and a stage cannot be passed without holding it, nor its gate bought on credit`);

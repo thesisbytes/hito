@@ -272,5 +272,12 @@ fresh();
   }
 }
 
+// ---- a deck is not staged: it is class content with its own order
+fresh();
+{
+  ok(F.stageMax === 1 && F.roster().length === P.LETTERS.length, 'the word game put a stage gate on a deck');
+  ok(F.stageCount(1) === Infinity, 'a deck run has a farang count: it would end in a "win" mid-lesson');
+}
+
 if (fail){ console.log(`  ${fail} failure(s) in ${target}`); process.exit(1); }
 console.log('  the farang carry words: a kana advances and knocks back, the last one banishes, every kana written is lit, a word is written away by the lights of its own kana in order and stops at a dark one, and the sign has three voices');

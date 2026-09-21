@@ -217,6 +217,8 @@ LAYER = r"""
   if (!LEDGER || typeof LEDGER !== 'object' || !LEDGER.g) LEDGER = {v:1, g:{}, days:{}, by:{}};
   if (!Array.isArray(LEDGER.runs)) LEDGER.runs = [];
   if (!LEDGER.best || typeof LEDGER.best !== 'object') LEDGER.best = {};
+  const purseOK = p => p && typeof p === 'object' && ['earned','spent','own','cleared'].every(k => p[k] && typeof p[k] === 'object');
+  if (!purseOK(LEDGER.tama)) LEDGER.tama = { earned:{}, spent:{}, own:{}, cleared:{} };
   let HANDS = read(K_HANDS, []);
   if (!Array.isArray(HANDS)) HANDS = [];
   const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
@@ -287,6 +289,32 @@ LAYER = r"""
     const total = Object.values(LEDGER.g).reduce((a, e) => a + (e.n || 0), 0);
     return { isBest, wave: LEDGER.best[r.realm].wave, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
   }
+  // ---- 魂 tama: what a run leaves behind ----------------------------------
+  // Spent between rounds, on things that last. It has to survive being merged
+  // from two tablets with no server to arbitrate, and a balance cannot: two
+  // devices that each hold 40 do not make 40, or 80, without knowing what
+  // happened in between. So no balance is ever stored. Each device keeps what
+  // IT has earned and what IT has spent, as totals that only rise; those merge
+  // by max, per device, with no conflict possible; and the balance is the
+  // difference of the sums. What is owned merges by max level.
+  // The one wart: buy the same level on two offline devices and both spends
+  // count. It costs the player, never the game, and only if they try.
+  const me = () => { try { return (window.__sync && window.__sync.device) || 'local'; } catch(_){ return 'local'; } };
+  const sum = o => Object.values(o).reduce((a, b) => a + (+b || 0), 0);
+  const tama = {
+    get balance(){ return Math.max(0, sum(LEDGER.tama.earned) - sum(LEDGER.tama.spent)); },
+    get earned(){ return sum(LEDGER.tama.earned); },
+    own: id => +LEDGER.tama.own[id] || 0,
+    cleared: realm => +LEDGER.tama.cleared[realm] || 0,
+    earn(n){ n = Math.max(0, Math.floor(+n || 0)); if (n){ LEDGER.tama.earned[me()] = (+LEDGER.tama.earned[me()] || 0) + n; save(); } return n; },
+    clear(realm, stage){ if (stage > tama.cleared(realm)){ LEDGER.tama.cleared[realm] = stage; save(); return true; } return false; },
+    buy(id, cost, max){
+      cost = Math.ceil(+cost); if (!(cost >= 0) || tama.balance < cost) return false;
+      if (max != null && tama.own(id) >= max) return false;
+      LEDGER.tama.spent[me()] = (+LEDGER.tama.spent[me()] || 0) + cost;
+      LEDGER.tama.own[id] = tama.own(id) + 1; save(); return true;
+    },
+  };
   const attempts = e => (e.n || 0) + (e.fizz || 0);
   const shaky = c => { const e = LEDGER.g[c]; return !!e && attempts(e) >= 3 && (e.tr || 0) >= 1.5; };
   const median = a => { const s = a.slice().sort((x, y) => x - y); return s.length ? s[s.length >> 1] : 0; };
@@ -503,6 +531,12 @@ LAYER = r"""
     for (const [realm, b] of Object.entries(o.ledger.best || {})){
       if (b && typeof b === 'object' && realm.length <= 24) bestOf(realm, { wave:+b.wave||0, banished:+b.banished||0, at:+b.at||0 });
     }
+    if (purseOK(o.ledger.tama)){
+      const up = (mine, theirs, ok) => { for (const [k, v] of Object.entries(theirs)) if (ok(k) && +v > (+mine[k] || 0) && +v < 1e9) mine[k] = Math.floor(+v); };
+      const dev = k => /^(d[0-9a-f]{16}|local)$/.test(k), word = k => /^[a-z][a-z0-9-]{0,23}$/i.test(k);
+      up(LEDGER.tama.earned, o.ledger.tama.earned, dev); up(LEDGER.tama.spent, o.ledger.tama.spent, dev);
+      up(LEDGER.tama.own, o.ledger.tama.own, word);      up(LEDGER.tama.cleared, o.ledger.tama.cleared, word);
+    }
     for (const [d, v] of Object.entries(o.ledger.days || {})){
       if (!/^\d{4}-\d\d-\d\d$/.test(d) || !Array.isArray(v)) continue;
       const m = LEDGER.days[d];
@@ -537,9 +571,9 @@ LAYER = r"""
     pen(v){ penNow = !!v; return applyRoom(); },
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
     get html(){ return markup; }, get shown(){ return !sheet.hidden; },
-    show: open, close, render, note, pack, toBook, shaky, stats, streak, run, thumbs, sheetSVG, saveSheet,
+    show: open, close, render, note, pack, toBook, shaky, stats, streak, run, thumbs, sheetSVG, saveSheet, tama,
     exportText, importText,
-    reset(){ LEDGER = {v:1, g:{}, days:{}, by:{}, runs:[], best:{}}; HANDS = []; save(); },
+    reset(){ LEDGER = {v:1, g:{}, days:{}, by:{}, runs:[], best:{}, tama:{earned:{}, spent:{}, own:{}, cleared:{}}}; HANDS = []; save(); },
   };
 })();
 </script>

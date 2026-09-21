@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · katakana · v0.1.6</title>
+<title>hito 人 · katakana · v0.1.7</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -162,7 +162,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.6';
+const APP_VERSION='0.1.7';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"A"],["い","あ行","i","","a-row",2,1,"I"],["う","あ行","u","","a-row",3,1,"U"],["え","あ行","e","","a-row",4,1,"E"],["お","あ行","o","","a-row",5,1,"O"],["か","か行","ka","","ka-row",1,2,"KA"],["き","か行","ki","","ka-row",2,2,"KI"],["く","か行","ku","","ka-row",3,2,"KU"],["け","か行","ke","","ka-row",4,2,"KE"],["こ","か行","ko","","ka-row",5,2,"KO"],["さ","さ行","sa","","sa-row",1,3,"SA"],["し","さ行","shi","","sa-row",2,3,"SHI"],["す","さ行","su","","sa-row",3,3,"SU"],["せ","さ行","se","","sa-row",4,3,"SE"],["そ","さ行","so","","sa-row",5,3,"SO"],["た","た行","ta","","ta-row",1,4,"TA"],["ち","た行","chi","","ta-row",2,4,"CHI"],["つ","た行","tsu","","ta-row",3,4,"TSU"],["て","た行","te","","ta-row",4,4,"TE"],["と","た行","to","","ta-row",5,4,"TO"],["な","な行","na","","na-row",1,5,"NA"],["に","な行","ni","","na-row",2,5,"NI"],["ぬ","な行","nu","","na-row",3,5,"NU"],["ね","な行","ne","","na-row",4,5,"NE"],["の","な行","no","","na-row",5,5,"NO"],["は","は行","ha","","ha-row",1,6,"HA"],["ひ","は行","hi","","ha-row",2,6,"HI"],["ふ","は行","fu","","ha-row",3,6,"FU"],["へ","は行","he","","ha-row",4,6,"HE"],["ほ","は行","ho","","ha-row",5,6,"HO"],["ま","ま行","ma","","ma-row",1,7,"MA"],["み","ま行","mi","","ma-row",2,7,"MI"],["む","ま行","mu","","ma-row",3,7,"MU"],["め","ま行","me","","ma-row",4,7,"ME"],["も","ま行","mo","","ma-row",5,7,"MO"],["や","や行","ya","","ya-row",1,8,"YA"],["ゆ","や行","yu","","ya-row",3,8,"YU"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RA"],["り","ら行","ri","","ra-row",2,9,"RI"],["る","ら行","ru","","ra-row",3,9,"RU"],["れ","ら行","re","","ra-row",4,9,"RE"],["ろ","ら行","ro","","ra-row",5,9,"RO"],["わ","わ行","wa","","wa-row",1,10,"WA"],["を","わ行","wo","","wa-row",5,10,"WO"],["ん","","n","","",1,37,"N"],["が","が行","ga","","ga-row",1,12,"GA"],["ぎ","が行","gi","","ga-row",2,12,"GI"],["ぐ","が行","gu","","ga-row",3,12,"GU"],["げ","が行","ge","","ga-row",4,12,"GE"],["ご","が行","go","","ga-row",5,12,"GO"],["ざ","ざ行","za","","za-row",1,13,"ZA"],["じ","ざ行","ji","","za-row",2,13,"JI"],["ず","ざ行","zu","","za-row",3,13,"ZU"],["ぜ","ざ行","ze","","za-row",4,13,"ZE"],["ぞ","ざ行","zo","","za-row",5,13,"ZO"],["だ","だ行","da","","da-row",1,14,"DA"],["ぢ","だ行","ji","","da-row",2,14,"JI"],["づ","だ行","zu","","da-row",3,14,"ZU"],["で","だ行","de","","da-row",4,14,"DE"],["ど","だ行","do","","da-row",5,14,"DO"],["ば","ば行","ba","","ba-row",1,15,"BA"],["び","ば行","bi","","ba-row",2,15,"BI"],["ぶ","ば行","bu","","ba-row",3,15,"BU"],["べ","ば行","be","","ba-row",4,15,"BE"],["ぼ","ば行","bo","","ba-row",5,15,"BO"],["ぱ","ぱ行","pa","","pa-row",1,16,"PA"],["ぴ","ぱ行","pi","","pa-row",2,16,"PI"],["ぷ","ぱ行","pu","","pa-row",3,16,"PU"],["ぺ","ぱ行","pe","","pa-row",4,16,"PE"],["ぽ","ぱ行","po","","pa-row",5,16,"PO"],["ぁ","ぁ行","xa","","small-row",1,17,"XA"],["ぃ","ぁ行","xi","","small-row",2,17,"XI"],["ぅ","ぁ行","xu","","small-row",3,17,"XU"],["ぇ","ぁ行","xe","","small-row",4,17,"XE"],["ぉ","ぁ行","xo","","small-row",5,17,"XO"],["ゃ","ぁ行","xya","","small-row",1,17,"XYA"],["ゅ","ぁ行","xyu","","small-row",3,17,"XYU"],["ょ","ぁ行","xyo","","small-row",5,17,"XYO"],["っ","ぁ行","xtsu","","small-row",3,17,"XTSU"],["ゎ","ぁ行","xwa","","small-row",1,17,"XWA"],["ア","ア行","a","","Ka-row",1,18,"A"],["イ","ア行","i","","Ka-row",2,18,"I"],["ウ","ア行","u","","Ka-row",3,18,"U"],["エ","ア行","e","","Ka-row",4,18,"E"],["オ","ア行","o","","Ka-row",5,18,"O"],["カ","カ行","ka","","Kka-row",1,19,"KA"],["キ","カ行","ki","","Kka-row",2,19,"KI"],["ク","カ行","ku","","Kka-row",3,19,"KU"],["ケ","カ行","ke","","Kka-row",4,19,"KE"],["コ","カ行","ko","","Kka-row",5,19,"KO"],["サ","サ行","sa","","Ksa-row",1,20,"SA"],["シ","サ行","shi","","Ksa-row",2,20,"SHI"],["ス","サ行","su","","Ksa-row",3,20,"SU"],["セ","サ行","se","","Ksa-row",4,20,"SE"],["ソ","サ行","so","","Ksa-row",5,20,"SO"],["タ","タ行","ta","","Kta-row",1,21,"TA"],["チ","タ行","chi","","Kta-row",2,21,"CHI"],["ツ","タ行","tsu","","Kta-row",3,21,"TSU"],["テ","タ行","te","","Kta-row",4,21,"TE"],["ト","タ行","to","","Kta-row",5,21,"TO"],["ナ","ナ行","na","","Kna-row",1,22,"NA"],["ニ","ナ行","ni","","Kna-row",2,22,"NI"],["ヌ","ナ行","nu","","Kna-row",3,22,"NU"],["ネ","ナ行","ne","","Kna-row",4,22,"NE"],["ノ","ナ行","no","","Kna-row",5,22,"NO"],["ハ","ハ行","ha","","Kha-row",1,23,"HA"],["ヒ","ハ行","hi","","Kha-row",2,23,"HI"],["フ","ハ行","fu","","Kha-row",3,23,"FU"],["ヘ","ハ行","he","","Kha-row",4,23,"HE"],["ホ","ハ行","ho","","Kha-row",5,23,"HO"],["マ","マ行","ma","","Kma-row",1,24,"MA"],["ミ","マ行","mi","","Kma-row",2,24,"MI"],["ム","マ行","mu","","Kma-row",3,24,"MU"],["メ","マ行","me","","Kma-row",4,24,"ME"],["モ","マ行","mo","","Kma-row",5,24,"MO"],["ヤ","ヤ行","ya","","Kya-row",1,25,"YA"],["ユ","ヤ行","yu","","Kya-row",3,25,"YU"],["ヨ","ヤ行","yo","","Kya-row",5,25,"YO"],["ラ","ラ行","ra","","Kra-row",1,26,"RA"],["リ","ラ行","ri","","Kra-row",2,26,"RI"],["ル","ラ行","ru","","Kra-row",3,26,"RU"],["レ","ラ行","re","","Kra-row",4,26,"RE"],["ロ","ラ行","ro","","Kra-row",5,26,"RO"],["ワ","ワ行","wa","","Kwa-row",1,27,"WA"],["ヲ","ワ行","wo","","Kwa-row",5,27,"WO"],["ン","","n","","",1,37,"N"],["ガ","ガ行","ga","","Kga-row",1,29,"GA"],["ギ","ガ行","gi","","Kga-row",2,29,"GI"],["グ","ガ行","gu","","Kga-row",3,29,"GU"],["ゲ","ガ行","ge","","Kga-row",4,29,"GE"],["ゴ","ガ行","go","","Kga-row",5,29,"GO"],["ザ","ザ行","za","","Kza-row",1,30,"ZA"],["ジ","ザ行","ji","","Kza-row",2,30,"JI"],["ズ","ザ行","zu","","Kza-row",3,30,"ZU"],["ゼ","ザ行","ze","","Kza-row",4,30,"ZE"],["ゾ","ザ行","zo","","Kza-row",5,30,"ZO"],["ダ","ダ行","da","","Kda-row",1,31,"DA"],["ヂ","ダ行","ji","","Kda-row",2,31,"JI"],["ヅ","ダ行","zu","","Kda-row",3,31,"ZU"],["デ","ダ行","de","","Kda-row",4,31,"DE"],["ド","ダ行","do","","Kda-row",5,31,"DO"],["バ","バ行","ba","","Kba-row",1,32,"BA"],["ビ","バ行","bi","","Kba-row",2,32,"BI"],["ブ","バ行","bu","","Kba-row",3,32,"BU"],["ベ","バ行","be","","Kba-row",4,32,"BE"],["ボ","バ行","bo","","Kba-row",5,32,"BO"],["パ","パ行","pa","","Kpa-row",1,33,"PA"],["ピ","パ行","pi","","Kpa-row",2,33,"PI"],["プ","パ行","pu","","Kpa-row",3,33,"PU"],["ペ","パ行","pe","","Kpa-row",4,33,"PE"],["ポ","パ行","po","","Kpa-row",5,33,"PO"],["ァ","ァ行","xa","","Ksmall-row",1,34,"XA"],["ィ","ァ行","xi","","Ksmall-row",2,34,"XI"],["ゥ","ァ行","xu","","Ksmall-row",3,34,"XU"],["ェ","ァ行","xe","","Ksmall-row",4,34,"XE"],["ォ","ァ行","xo","","Ksmall-row",5,34,"XO"],["ャ","ァ行","xya","","Ksmall-row",1,34,"XYA"],["ュ","ァ行","xyu","","Ksmall-row",3,34,"XYU"],["ョ","ァ行","xyo","","Ksmall-row",5,34,"XYO"],["ッ","ァ行","xtsu","","Ksmall-row",3,34,"XTSU"],["ヮ","ァ行","xwa","","Ksmall-row",1,34,"XWA"],["ヴ","ヴ行","vu","","Kvu-row",3,35,"VU"],["ー","ー行","-","","long-row",1,36,"-"]];
 
 // ---------- state
@@ -765,7 +765,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.6');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.7');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1252,6 +1252,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   if (!LEDGER || typeof LEDGER !== 'object' || !LEDGER.g) LEDGER = {v:1, g:{}, days:{}, by:{}};
   if (!Array.isArray(LEDGER.runs)) LEDGER.runs = [];
   if (!LEDGER.best || typeof LEDGER.best !== 'object') LEDGER.best = {};
+  const purseOK = p => p && typeof p === 'object' && ['earned','spent','own','cleared'].every(k => p[k] && typeof p[k] === 'object');
+  if (!purseOK(LEDGER.tama)) LEDGER.tama = { earned:{}, spent:{}, own:{}, cleared:{} };
   let HANDS = read(K_HANDS, []);
   if (!Array.isArray(HANDS)) HANDS = [];
   const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
@@ -1322,6 +1324,32 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const total = Object.values(LEDGER.g).reduce((a, e) => a + (e.n || 0), 0);
     return { isBest, wave: LEDGER.best[r.realm].wave, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
   }
+  // ---- 魂 tama: what a run leaves behind ----------------------------------
+  // Spent between rounds, on things that last. It has to survive being merged
+  // from two tablets with no server to arbitrate, and a balance cannot: two
+  // devices that each hold 40 do not make 40, or 80, without knowing what
+  // happened in between. So no balance is ever stored. Each device keeps what
+  // IT has earned and what IT has spent, as totals that only rise; those merge
+  // by max, per device, with no conflict possible; and the balance is the
+  // difference of the sums. What is owned merges by max level.
+  // The one wart: buy the same level on two offline devices and both spends
+  // count. It costs the player, never the game, and only if they try.
+  const me = () => { try { return (window.__sync && window.__sync.device) || 'local'; } catch(_){ return 'local'; } };
+  const sum = o => Object.values(o).reduce((a, b) => a + (+b || 0), 0);
+  const tama = {
+    get balance(){ return Math.max(0, sum(LEDGER.tama.earned) - sum(LEDGER.tama.spent)); },
+    get earned(){ return sum(LEDGER.tama.earned); },
+    own: id => +LEDGER.tama.own[id] || 0,
+    cleared: realm => +LEDGER.tama.cleared[realm] || 0,
+    earn(n){ n = Math.max(0, Math.floor(+n || 0)); if (n){ LEDGER.tama.earned[me()] = (+LEDGER.tama.earned[me()] || 0) + n; save(); } return n; },
+    clear(realm, stage){ if (stage > tama.cleared(realm)){ LEDGER.tama.cleared[realm] = stage; save(); return true; } return false; },
+    buy(id, cost, max){
+      cost = Math.ceil(+cost); if (!(cost >= 0) || tama.balance < cost) return false;
+      if (max != null && tama.own(id) >= max) return false;
+      LEDGER.tama.spent[me()] = (+LEDGER.tama.spent[me()] || 0) + cost;
+      LEDGER.tama.own[id] = tama.own(id) + 1; save(); return true;
+    },
+  };
   const attempts = e => (e.n || 0) + (e.fizz || 0);
   const shaky = c => { const e = LEDGER.g[c]; return !!e && attempts(e) >= 3 && (e.tr || 0) >= 1.5; };
   const median = a => { const s = a.slice().sort((x, y) => x - y); return s.length ? s[s.length >> 1] : 0; };
@@ -1538,6 +1566,12 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     for (const [realm, b] of Object.entries(o.ledger.best || {})){
       if (b && typeof b === 'object' && realm.length <= 24) bestOf(realm, { wave:+b.wave||0, banished:+b.banished||0, at:+b.at||0 });
     }
+    if (purseOK(o.ledger.tama)){
+      const up = (mine, theirs, ok) => { for (const [k, v] of Object.entries(theirs)) if (ok(k) && +v > (+mine[k] || 0) && +v < 1e9) mine[k] = Math.floor(+v); };
+      const dev = k => /^(d[0-9a-f]{16}|local)$/.test(k), word = k => /^[a-z][a-z0-9-]{0,23}$/i.test(k);
+      up(LEDGER.tama.earned, o.ledger.tama.earned, dev); up(LEDGER.tama.spent, o.ledger.tama.spent, dev);
+      up(LEDGER.tama.own, o.ledger.tama.own, word);      up(LEDGER.tama.cleared, o.ledger.tama.cleared, word);
+    }
     for (const [d, v] of Object.entries(o.ledger.days || {})){
       if (!/^\d{4}-\d\d-\d\d$/.test(d) || !Array.isArray(v)) continue;
       const m = LEDGER.days[d];
@@ -1572,13 +1606,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     pen(v){ penNow = !!v; return applyRoom(); },
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
     get html(){ return markup; }, get shown(){ return !sheet.hidden; },
-    show: open, close, render, note, pack, toBook, shaky, stats, streak, run, thumbs, sheetSVG, saveSheet,
+    show: open, close, render, note, pack, toBook, shaky, stats, streak, run, thumbs, sheetSVG, saveSheet, tama,
     exportText, importText,
-    reset(){ LEDGER = {v:1, g:{}, days:{}, by:{}, runs:[], best:{}}; HANDS = []; save(); },
+    reset(){ LEDGER = {v:1, g:{}, days:{}, by:{}, runs:[], best:{}, tama:{earned:{}, spent:{}, own:{}, cleared:{}}}; HANDS = []; save(); },
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:{"deck":"katakana","words":[{"ja":"アメリカ","romaji":"amerika","en":"U.S.A."},{"ja":"カナダ","romaji":"kanada","en":"Canada"},{"ja":"イギリス","romaji":"igirisu","en":"Britain"},{"ja":"テレビ","romaji":"terebi","en":"TV"},{"ja":"カメラ","romaji":"kamera","en":"camera"},{"ja":"テニス","romaji":"tenisu","en":"tennis"},{"ja":"パン","romaji":"pan","en":"bread"},{"ja":"ピザ","romaji":"piza","en":"pizza"},{"ja":"ホテル","romaji":"hoteru","en":"hotel"},{"ja":"バス","romaji":"basu","en":"bus"},{"ja":"ペン","romaji":"pen","en":"pen"},{"ja":"クラス","romaji":"kurasu","en":"class"},{"ja":"テスト","romaji":"tesuto","en":"test"},{"ja":"ドア","romaji":"doa","en":"door"},{"ja":"トイレ","romaji":"toire","en":"toilet"},{"ja":"カラオケ","romaji":"karaoke","en":"karaoke"},{"ja":"バナナ","romaji":"banana","en":"banana"},{"ja":"トマト","romaji":"tomato","en":"tomato"},{"ja":"ミルク","romaji":"miruku","en":"milk"},{"ja":"ワイン","romaji":"wain","en":"wine"},{"ja":"サラダ","romaji":"sarada","en":"salad"},{"ja":"ピアノ","romaji":"piano","en":"piano"},{"ja":"ハワイ","romaji":"hawai","en":"Hawaii"},{"ja":"パリ","romaji":"pari","en":"Paris"},{"ja":"タオル","romaji":"taoru","en":"towel"},{"ja":"ドラマ","romaji":"dorama","en":"drama"},{"ja":"アニメ","romaji":"anime","en":"anime"},{"ja":"プレゼント","romaji":"purezento","en":"present"},{"ja":"ダンス","romaji":"dansu","en":"dance"},{"ja":"ビデオ","romaji":"bideo","en":"video"},{"ja":"ラジオ","romaji":"rajio","en":"radio"},{"ja":"ズボン","romaji":"zubon","en":"trousers"},{"ja":"ネクタイ","romaji":"nekutai","en":"necktie"},{"ja":"ガソリン","romaji":"gasorin","en":"gasoline"},{"ja":"エアコン","romaji":"eakon","en":"air conditioner"},{"ja":"アルバイト","romaji":"arubaito","en":"part-time job"},{"ja":"レストラン","romaji":"resutoran","en":"restaurant"},{"ja":"クリスマス","romaji":"kurisumasu","en":"Christmas"},{"ja":"サングラス","romaji":"sangurasu","en":"sunglasses"},{"ja":"スマホ","romaji":"sumaho","en":"smartphone"},{"ja":"ロンドン","romaji":"rondon","en":"London"},{"ja":"メロン","romaji":"meron","en":"melon"},{"ja":"オレンジ","romaji":"orenji","en":"orange"},{"ja":"コーヒー","romaji":"koohii","en":"coffee"},{"ja":"デート","romaji":"deeto","en":"date (romantic)"},{"ja":"ハンバーガー","romaji":"hanbaagaa","en":"hamburger"},{"ja":"ビール","romaji":"biiru","en":"beer"},{"ja":"スーパー","romaji":"suupaa","en":"supermarket"},{"ja":"デパート","romaji":"depaato","en":"department store"},{"ja":"タクシー","romaji":"takushii","en":"taxi"},{"ja":"ノート","romaji":"nooto","en":"notebook"},{"ja":"ボールペン","romaji":"boorupen","en":"ballpoint pen"},{"ja":"セーター","romaji":"seetaa","en":"sweater"},{"ja":"ゲーム","romaji":"geemu","en":"game"},{"ja":"ページ","romaji":"peeji","en":"page"},{"ja":"プール","romaji":"puuru","en":"swimming pool"},{"ja":"メール","romaji":"meeru","en":"e-mail"},{"ja":"アパート","romaji":"apaato","en":"apartment"},{"ja":"ケーキ","romaji":"keeki","en":"cake"},{"ja":"ラーメン","romaji":"raamen","en":"ramen"},{"ja":"コート","romaji":"kooto","en":"coat"},{"ja":"スキー","romaji":"sukii","en":"skiing"},{"ja":"ギター","romaji":"gitaa","en":"guitar"},{"ja":"スープ","romaji":"suupu","en":"soup"},{"ja":"ステーキ","romaji":"suteeki","en":"steak"},{"ja":"レポート","romaji":"repooto","en":"report"},{"ja":"エレベーター","romaji":"erebeetaa","en":"elevator"},{"ja":"ジーンズ","romaji":"jiinzu","en":"jeans"},{"ja":"スカート","romaji":"sukaato","en":"skirt"},{"ja":"アイスクリーム","romaji":"aisukuriimu","en":"ice cream"},{"ja":"ホームステイ","romaji":"hoomusutei","en":"homestay"},{"ja":"ルームメイト","romaji":"ruumumeito","en":"roommate"},{"ja":"カード","romaji":"kaado","en":"card"},{"ja":"オーストラリア","romaji":"oosutoraria","en":"Australia"},{"ja":"スポーツ","romaji":"supootsu","en":"sports"},{"ja":"サッカー","romaji":"sakkaa","en":"soccer"},{"ja":"ジュース","romaji":"juusu","en":"juice"},{"ja":"コンピューター","romaji":"konpyuutaa","en":"computer"},{"ja":"シャツ","romaji":"shatsu","en":"shirt"},{"ja":"パーティー","romaji":"paatii","en":"party"},{"ja":"カフェ","romaji":"kafe","en":"cafe"},{"ja":"サンドイッチ","romaji":"sandoitchi","en":"sandwich"},{"ja":"チョコレート","romaji":"chokoreeto","en":"chocolate"},{"ja":"キャンプ","romaji":"kyanpu","en":"camping"},{"ja":"シャワー","romaji":"shawaa","en":"shower"},{"ja":"インターネット","romaji":"intaanetto","en":"internet"},{"ja":"チケット","romaji":"chiketto","en":"ticket"},{"ja":"メニュー","romaji":"menyuu","en":"menu"},{"ja":"ニューヨーク","romaji":"nyuuyooku","en":"New York"},{"ja":"ソファ","romaji":"sofa","en":"sofa"},{"ja":"ジョギング","romaji":"jogingu","en":"jogging"},{"ja":"ファックス","romaji":"fakkusu","en":"fax"},{"ja":"キャンパス","romaji":"kyanpasu","en":"campus"},{"ja":"マッチ","romaji":"matchi","en":"match"},{"ja":"クッキー","romaji":"kukkii","en":"cookie"},{"ja":"ホッチキス","romaji":"hotchikisu","en":"stapler"},{"ja":"ティーシャツ","romaji":"tiishatsu","en":"T-shirt"},{"ja":"ミュージカル","romaji":"myuujikaru","en":"musical"},{"ja":"チャンス","romaji":"chansu","en":"chance"},{"ja":"ラッシュ","romaji":"rasshu","en":"rush hour"},{"ja":"ニュース","romaji":"nyuusu","en":"news"}]},knockback:0.07,sign:"romaji",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",credits:["Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.", "Stroke order recorded and checked by the project's teachers.", "Built by the maintainer, one version at a time."],realms:[{"label": "hiragana", "kana": "仮", "file": "hiragana-game.html", "blurb": "the game with single characters. the farang carry the ones you are forgetting."}, {"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I vocabulary as flashcards. read the meaning, write the word."}],speed:0.03,wardHp:5,hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:9000,spawnRamp:200,spawnMin:3600,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:{"deck":"katakana","words":[{"ja":"アメリカ","romaji":"amerika","en":"U.S.A."},{"ja":"カナダ","romaji":"kanada","en":"Canada"},{"ja":"イギリス","romaji":"igirisu","en":"Britain"},{"ja":"テレビ","romaji":"terebi","en":"TV"},{"ja":"カメラ","romaji":"kamera","en":"camera"},{"ja":"テニス","romaji":"tenisu","en":"tennis"},{"ja":"パン","romaji":"pan","en":"bread"},{"ja":"ピザ","romaji":"piza","en":"pizza"},{"ja":"ホテル","romaji":"hoteru","en":"hotel"},{"ja":"バス","romaji":"basu","en":"bus"},{"ja":"ペン","romaji":"pen","en":"pen"},{"ja":"クラス","romaji":"kurasu","en":"class"},{"ja":"テスト","romaji":"tesuto","en":"test"},{"ja":"ドア","romaji":"doa","en":"door"},{"ja":"トイレ","romaji":"toire","en":"toilet"},{"ja":"カラオケ","romaji":"karaoke","en":"karaoke"},{"ja":"バナナ","romaji":"banana","en":"banana"},{"ja":"トマト","romaji":"tomato","en":"tomato"},{"ja":"ミルク","romaji":"miruku","en":"milk"},{"ja":"ワイン","romaji":"wain","en":"wine"},{"ja":"サラダ","romaji":"sarada","en":"salad"},{"ja":"ピアノ","romaji":"piano","en":"piano"},{"ja":"ハワイ","romaji":"hawai","en":"Hawaii"},{"ja":"パリ","romaji":"pari","en":"Paris"},{"ja":"タオル","romaji":"taoru","en":"towel"},{"ja":"ドラマ","romaji":"dorama","en":"drama"},{"ja":"アニメ","romaji":"anime","en":"anime"},{"ja":"プレゼント","romaji":"purezento","en":"present"},{"ja":"ダンス","romaji":"dansu","en":"dance"},{"ja":"ビデオ","romaji":"bideo","en":"video"},{"ja":"ラジオ","romaji":"rajio","en":"radio"},{"ja":"ズボン","romaji":"zubon","en":"trousers"},{"ja":"ネクタイ","romaji":"nekutai","en":"necktie"},{"ja":"ガソリン","romaji":"gasorin","en":"gasoline"},{"ja":"エアコン","romaji":"eakon","en":"air conditioner"},{"ja":"アルバイト","romaji":"arubaito","en":"part-time job"},{"ja":"レストラン","romaji":"resutoran","en":"restaurant"},{"ja":"クリスマス","romaji":"kurisumasu","en":"Christmas"},{"ja":"サングラス","romaji":"sangurasu","en":"sunglasses"},{"ja":"スマホ","romaji":"sumaho","en":"smartphone"},{"ja":"ロンドン","romaji":"rondon","en":"London"},{"ja":"メロン","romaji":"meron","en":"melon"},{"ja":"オレンジ","romaji":"orenji","en":"orange"},{"ja":"コーヒー","romaji":"koohii","en":"coffee"},{"ja":"デート","romaji":"deeto","en":"date (romantic)"},{"ja":"ハンバーガー","romaji":"hanbaagaa","en":"hamburger"},{"ja":"ビール","romaji":"biiru","en":"beer"},{"ja":"スーパー","romaji":"suupaa","en":"supermarket"},{"ja":"デパート","romaji":"depaato","en":"department store"},{"ja":"タクシー","romaji":"takushii","en":"taxi"},{"ja":"ノート","romaji":"nooto","en":"notebook"},{"ja":"ボールペン","romaji":"boorupen","en":"ballpoint pen"},{"ja":"セーター","romaji":"seetaa","en":"sweater"},{"ja":"ゲーム","romaji":"geemu","en":"game"},{"ja":"ページ","romaji":"peeji","en":"page"},{"ja":"プール","romaji":"puuru","en":"swimming pool"},{"ja":"メール","romaji":"meeru","en":"e-mail"},{"ja":"アパート","romaji":"apaato","en":"apartment"},{"ja":"ケーキ","romaji":"keeki","en":"cake"},{"ja":"ラーメン","romaji":"raamen","en":"ramen"},{"ja":"コート","romaji":"kooto","en":"coat"},{"ja":"スキー","romaji":"sukii","en":"skiing"},{"ja":"ギター","romaji":"gitaa","en":"guitar"},{"ja":"スープ","romaji":"suupu","en":"soup"},{"ja":"ステーキ","romaji":"suteeki","en":"steak"},{"ja":"レポート","romaji":"repooto","en":"report"},{"ja":"エレベーター","romaji":"erebeetaa","en":"elevator"},{"ja":"ジーンズ","romaji":"jiinzu","en":"jeans"},{"ja":"スカート","romaji":"sukaato","en":"skirt"},{"ja":"アイスクリーム","romaji":"aisukuriimu","en":"ice cream"},{"ja":"ホームステイ","romaji":"hoomusutei","en":"homestay"},{"ja":"ルームメイト","romaji":"ruumumeito","en":"roommate"},{"ja":"カード","romaji":"kaado","en":"card"},{"ja":"オーストラリア","romaji":"oosutoraria","en":"Australia"},{"ja":"スポーツ","romaji":"supootsu","en":"sports"},{"ja":"サッカー","romaji":"sakkaa","en":"soccer"},{"ja":"ジュース","romaji":"juusu","en":"juice"},{"ja":"コンピューター","romaji":"konpyuutaa","en":"computer"},{"ja":"シャツ","romaji":"shatsu","en":"shirt"},{"ja":"パーティー","romaji":"paatii","en":"party"},{"ja":"カフェ","romaji":"kafe","en":"cafe"},{"ja":"サンドイッチ","romaji":"sandoitchi","en":"sandwich"},{"ja":"チョコレート","romaji":"chokoreeto","en":"chocolate"},{"ja":"キャンプ","romaji":"kyanpu","en":"camping"},{"ja":"シャワー","romaji":"shawaa","en":"shower"},{"ja":"インターネット","romaji":"intaanetto","en":"internet"},{"ja":"チケット","romaji":"chiketto","en":"ticket"},{"ja":"メニュー","romaji":"menyuu","en":"menu"},{"ja":"ニューヨーク","romaji":"nyuuyooku","en":"New York"},{"ja":"ソファ","romaji":"sofa","en":"sofa"},{"ja":"ジョギング","romaji":"jogingu","en":"jogging"},{"ja":"ファックス","romaji":"fakkusu","en":"fax"},{"ja":"キャンパス","romaji":"kyanpasu","en":"campus"},{"ja":"マッチ","romaji":"matchi","en":"match"},{"ja":"クッキー","romaji":"kukkii","en":"cookie"},{"ja":"ホッチキス","romaji":"hotchikisu","en":"stapler"},{"ja":"ティーシャツ","romaji":"tiishatsu","en":"T-shirt"},{"ja":"ミュージカル","romaji":"myuujikaru","en":"musical"},{"ja":"チャンス","romaji":"chansu","en":"chance"},{"ja":"ラッシュ","romaji":"rasshu","en":"rush hour"},{"ja":"ニュース","romaji":"nyuusu","en":"news"}]},knockback:0.07,sign:"romaji",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",credits:["Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.", "Stroke order recorded and checked by the project's teachers.", "Built by the maintainer, one version at a time."],realms:[{"label": "hiragana", "kana": "仮", "file": "hiragana-game.html", "blurb": "the game with single characters. the farang carry the ones you are forgetting."}, {"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I vocabulary as flashcards. read the meaning, write the word."}],speed:0.03,wardHp:5,stages:{"rows":2,"count":12,"countStep":3,"gate":30,"gateRamp":1.45,"hpEvery":4,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15},hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:9000,spawnRamp:200,spawnMin:3600,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -1666,6 +1700,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .over-nums small{ color:rgba(220,232,242,.6); font-size:11px; }
   .over-line{ margin:0 0 6px; font-size:12.5px; color:rgba(220,232,242,.65); text-align:center; }
   .start-card.over .start-title{ color:#e8a0a0; }
+  .start-card.over.won .start-title{ color:#5fe3a1; }
+  .over-pay{ margin:2px 0 4px; text-align:center; font-size:20px; font-weight:700; color:#c3f7dc; }
+  .over-pay small{ display:block; font-size:11.5px; font-weight:400; color:rgba(220,232,242,.55); }
+  .start-row.lantern button.can{ border-color:#5fe3a1; }
+  .start-row.lantern{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
+  .start-row.stages{ grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); }
+  .start-row.stages button{ text-align:center; padding:8px 2px; }
+  .start-row.stages button b{ margin:0; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(220,232,242,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
   .start-links button{ flex:1; background:transparent; color:rgba(108,184,255,.75); border:1px solid #1e2f3e;
@@ -1746,7 +1788,47 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   let sumi = 0, upg = { quick:0, bright:0, shove:0, mend:0 };
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
   const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
-  const wardMax = () => CFG.wardHp + upg.mend;
+  // ---- stages, and the workshop between rounds ------------------------------
+  // The maintainer: "make it impossible to advance without unlocking stuff. so
+  // there needs to be a currency to use after each round". So a run is a STAGE
+  // now: a fixed number of farang, carrying only the rows of the chart that
+  // stage has reached. Hold the ward through all of them and the stage is
+  // cleared — which is the only thing that lets the gate to the next be bought,
+  // with 魂 tama, which only a finished run pays. Tama also buys what lasts:
+  // hearts, how many lights a character can hold, ink in hand at the start.
+  // Same rule as the run's upgrades: they multiply the hand, and not one of
+  // them writes a character for you.
+  // Word decks are not staged: a deck is class content with its own order. And
+  // the workshop page is never gated, so anything can always be practised.
+  const ST = WORDS ? null : CFG.stages;
+  const purse = () => { try { return window.__hand && window.__hand.tama; } catch(_){ return null; } };
+  const own = id => { const p = purse(); return p ? p.own(id) : 0; };
+  const LANTERN = {
+    heart:   { kana:'心', name:'heart',   blurb:'the ward starts with one more',        max:5 },
+    lamp:    { kana:'灯', name:'lamp',    blurb:'a character can hold one more light',  max:4 },
+    inkwell: { kana:'硯', name:'inkwell', blurb:'every run starts with more ink in hand', max:5 },
+  };
+  const lanternCost = id => Math.round((CFG.lanternCost[id] || 20) * Math.pow(CFG.lanternRamp, own(id)));
+  const stageMax = () => ST ? 1 + own('gate') : 1;
+  const gateCost = () => ST ? Math.round(ST.gate * Math.pow(ST.gateRamp, own('gate'))) : 0;
+  let stageNo = 1;
+  const stageRows  = k => ST ? ST.rows + (k - 1) : Infinity;
+  const stageCount = k => ST ? ST.count + ST.countStep * (k - 1) : Infinity;
+  const lastStage  = () => ST ? Math.max(1, Math.max(...LETTERS.map(L => L[6] || 1)) - ST.rows + 1) : 1;
+  const roster = () => { const r = stageRows(stageNo); const a = []; LETTERS.forEach((L, i) => { if ((L[6] || 1) <= r) a.push(i); }); return a.length ? a : LETTERS.map((_, i) => i); };
+  function setStage(k){ k = Math.max(1, Math.min(stageMax(), Math.floor(+k) || 1)); if (k !== stageNo){ stageNo = k; saveStart(); } return stageNo; }
+  function buyLantern(id){
+    const p = purse(); if (!p || !LANTERN[id]) return false;
+    return p.buy(id, lanternCost(id), LANTERN[id].max);
+  }
+  // The gate is for sale only to somebody who has held the stage before it.
+  function buyGate(){
+    const p = purse(); if (!p || !ST) return false;
+    if (stageMax() >= lastStage() || p.cleared(REALM) < stageMax()) return false;
+    return p.buy('gate', gateCost(), null);
+  }
+  const capNow = () => CFG.hitodamaCap + own('lamp');
+  const wardMax = () => CFG.wardHp + own('heart') + upg.mend;
   // What this run was, kept as it goes so the end can say it. Observations:
   // how far, how many, how cleanly. Never a score.
   let run = null;
@@ -1795,7 +1877,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // stroke sets a pace, and the hand starts following its speed instead
     // of dragging the light at its own. The road ahead already shows where
     // to go; guided does not need to be shown how fast.
-    guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
+    guided: { tama:.5, kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
               guide:true, numbers:true, comet:false, shadow:'none' },
@@ -1803,7 +1885,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:true, numbers:true, shadow:'none' },
-    medium: { kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
+    medium: { tama:1.5, kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:false, numbers:false, shadow:'strokes' },
@@ -1829,8 +1911,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {};
     if (s.difficulty in DIFF && !DIFF[s.difficulty].locked) difficulty = s.difficulty;
     if (s.sign in SIGNS) CFG.sign = s.sign;
+    if (s.stage) stageNo = Math.max(1, Math.floor(+s.stage) || 1);
   } catch(_){}
-  function saveStart(){ try { localStorage.setItem(SKEY, JSON.stringify({difficulty, sign:CFG.sign})); } catch(_){} }
+  function saveStart(){ try { localStorage.setItem(SKEY, JSON.stringify({difficulty, sign:CFG.sign, stage:stageNo})); } catch(_){} }
   function applyDifficulty(name){
     const d = DIFF[name];
     if (!d || d.locked) return false;
@@ -1868,7 +1951,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   function saveH(){ try { localStorage.setItem(HKEY, JSON.stringify(HITODAMA)); } catch(_){} }
   const charge = ch => HITODAMA[ch] || 0;
   function kindle(ch, n){
-    HITODAMA[ch] = Math.min(CFG.hitodamaCap, charge(ch) + n);
+    HITODAMA[ch] = Math.min(capNow(), charge(ch) + n);
     saveH();
     try { window.__sync && window.__sync.record('kindle', { glyph: ch, charge: HITODAMA[ch] }); } catch(_){}
     return HITODAMA[ch];
@@ -1959,13 +2042,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       while (tries < 8 && w.chars.every(c => (MASTERY[c]||0) > 2 && !shaky(c)) && Math.random() < 0.7);
       i = AT[w.chars[0]];
     } else {
-      do { i = Math.floor(Math.random()*LETTERS.length); tries++; }
+      const pool = roster();
+      do { i = pool[Math.floor(Math.random()*pool.length)]; tries++; }
       while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && !shaky(LETTERS[i][0]) && Math.random() < 0.7);
     }
     monsters.push({
       i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
-      speed: CFG.speed * (0.8 + Math.random()*0.5),
-      hp: hpFor(wave), wob: Math.random()*6.28, born: performance.now(),
+      speed: CFG.speed * (0.8 + Math.random()*0.5) * (ST ? 1 + ST.speedStep*(stageNo - 1) : 1),
+      hp: hpFor(wave) + (ST ? Math.floor((stageNo - 1) / ST.hpEvery) : 0), wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
@@ -2245,8 +2329,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     if (paused){ draw(); return; }
     if (!over){
       // Nothing to answer is not a rest, it is a dead screen. Refill at once.
+      const left = stageCount(stageNo) - wave;          // farang this stage has yet to send
+      if (left <= 0 && !monsters.length){ won = true; over = true; endRun(); }
       if (!monsters.length) spawnAt = Math.min(spawnAt, now);
-      if (now > spawnAt){
+      if (left > 0 && now > spawnAt){
         spawn();
         spawnAt = now + Math.max(CFG.spawnMin, CFG.spawnMs - wave*CFG.spawnRamp);
       }
@@ -2445,7 +2531,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       // for a word: the word so far, blank where it is still to come
       const t = target();
       const ch = t && t.w ? t.w.chars.map((c, k) => k < t.ci ? c : '＿').join('') : LETTERS[idx][0];
-      const c = charge(LETTERS[idx][0]), cap = CFG.hitodamaCap;
+      const c = charge(LETTERS[idx][0]), cap = capNow();
       const d = dash();
       g.font = '700 17px ui-sans-serif,system-ui,"Klee One",sans-serif';
       const lw = Math.max(17, g.measureText(ch).width);
@@ -2487,8 +2573,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
-    sumi = 0; upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null;
-    ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
+    upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null; won = false;
+    stageNo = Math.min(stageNo, stageMax());
+    sumi = own('inkwell') * CFG.inkwellStep;
+    ward = wardMax(); over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
     renderUpg();
   }
@@ -2501,17 +2589,24 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // happened, and it is written down in three places that each do a different
   // job: the hand's ledger (on the device, and in the save that follows a
   // signed-in player), and the events table (an observation, for later).
-  let ended = null;
+  let ended = null, won = false;
   function endRun(){
     if (!run || ended) return ended;
     const H = window.__hand;
-    const rec = { at: run.at, realm: REALM, wave, banished: killed, traced: run.traced, clean: run.clean,
+    // What the run leaves behind. Paid for tracing, most of all clean tracing;
+    // guided cannot be zapped, so there every trace would count as clean, and
+    // it pays less instead. Holding a stage to the end is worth half again.
+    const p = purse();
+    const pay = !p ? 0 : Math.round((run.clean*CFG.tamaClean + (run.traced - run.clean)*CFG.tamaTrace + Math.floor(wave/CFG.tamaWaves))
+                                     * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1) * (won ? 1.5 : 1));
+    if (p){ p.earn(pay); if (won && ST) p.clear(REALM, stageNo); }
+    const rec = { at: run.at, realm: REALM, stage: ST ? stageNo : undefined, won: won || undefined, tama: pay, wave, banished: killed, traced: run.traced, clean: run.clean,
                   sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
                   difficulty, sign: CFG.sign, upgrades: {...upg} };
     let best = null;
     try { if (H && H.run) best = H.run(rec); } catch(_){}
     try { window.__sync && window.__sync.record('run', rec); } catch(_){}
-    ended = { rec, best, since: run.at };
+    ended = { rec, best, since: run.at, won, pay };
     if (navigator.vibrate) navigator.vibrate([90, 60, 160]);
     // a beat, so the last breach is seen before the page covers it
     setTimeout(() => { if (over && ended) openOver(); }, 700);
@@ -2581,6 +2676,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       <div class="start-row">${row('diff', DIFF, difficulty)}</div>
       <div class="start-h">what the sign says</div>
       <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
+      ${ST ? `<div class="start-h">stage · ${roster().length} characters on the field · ${stageCount(stageNo)} farang</div><div class="start-row stages">`
+        + Array.from({length: stageMax()}, (_, k) => `<button data-k="stage" data-v="${k+1}" aria-pressed="${k+1 === stageNo}"><b>${k+1}</b></button>`).join('') + `</div>` : ''}
+      ${workshopHtml()}
       ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
       ${realms()}
       <button class="start-go">${over ? 'begin again' : 'begin'}</button>
@@ -2591,10 +2689,12 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     if (cr) cr.onclick = () => { view = 'credits'; renderStart(); };
     const hb = start.querySelector('.start-hand');
     if (hb) hb.onclick = () => hand.show();
+    wireWorkshop(renderStart);
     for (const b of start.querySelectorAll('button[data-k]')){
       b.onclick = () => {
         if (b.dataset.k === 'diff') setDifficulty(b.dataset.v);
         else if (b.dataset.k === 'input') hand.setInput(b.dataset.v);
+        else if (b.dataset.k === 'stage'){ if (setStage(b.dataset.v) && !over){ monsters = []; wave = 0; killed = 0; locked = null; spawn(); retarget(true); } }
         else setSign(b.dataset.v);
         renderStart();
       };
@@ -2605,6 +2705,29 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
   function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
+  // The lantern workshop. Shown where a round ends and where one begins.
+  function workshopHtml(){
+    const p = purse(); if (!p) return '';
+    const items = Object.entries(LANTERN).map(([id, u]) => {
+      const lv = own(id), maxed = lv >= u.max, c = lanternCost(id);
+      return `<button data-lantern="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
+        + `<b><i>${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}</b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
+    }).join('');
+    let gate = '';
+    if (ST){
+      const top = stageMax(), held = p.cleared(REALM) >= top, c = gateCost();
+      gate = top >= lastStage() ? `<button disabled><b><i>関</i>the last gate</b><small>every row of the chart is on the field.</small></button>`
+        : `<button data-lantern="gate"${held && p.balance >= c ? '' : ' disabled'} class="${held && p.balance >= c ? 'can' : ''}"><b><i>関</i>gate to stage ${top + 1}</b>`
+          + `<small>${held ? '魂 ' + c + ' · one more row of the chart, and more of them' : 'hold stage ' + top + ' to the end first'}</small></button>`;
+    }
+    return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
+  }
+  function wireWorkshop(again){
+    for (const b of start.querySelectorAll('button[data-lantern]')) b.onclick = () => {
+      const id = b.dataset.lantern;
+      if (id === 'gate' ? buyGate() : buyLantern(id)){ if (id === 'gate') setStage(stageMax()); again(); }
+    };
+  }
   function renderOver(){
     const e = ended; if (!e){ view = 'start'; return renderStart(); }
     const r = e.rec, H = window.__hand;
@@ -2613,22 +2736,26 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // the handwriting of this run, the way the hand's own page draws it
     let hands = '';
     try { if (H && H.thumbs) hands = H.thumbs(e.since, 12); } catch(_){}
-    start.innerHTML = markup = `<div class="start-card over">
-      <div class="start-title">the ward fell</div>
-      <div class="start-sub">${esc(REALM)} · wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave ? ' · furthest ' + e.best.wave : ''}</div>
+    start.innerHTML = markup = `<div class="start-card over${e.won ? ' won' : ''}">
+      <div class="start-title">${e.won ? 'the ward held' : 'the ward fell'}</div>
+      <div class="start-sub">${esc(REALM)}${ST ? ' · stage ' + r.stage : ''} · ${e.won ? 'all ' + r.wave + ' of them' : 'wave ' + r.wave + (ST ? ' of ' + stageCount(r.stage) : '')}${fresh ? ' · <b>your furthest yet</b>' : ''}</div>
       <div class="over-nums">
         <div><b>${r.banished}</b><small>banished</small></div>
         <div><b>${r.traced}</b><small>traced</small></div>
         <div><b>${r.traced ? Math.round(100*r.clean/r.traced) + '%' : '—'}</b><small>clean</small></div>
         <div><b>${mins}</b><small>held</small></div>
       </div>
-      <p class="over-line">${r.cast} answered by your own lights · 墨 ${r.sumi} earned${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
+      <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
+      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${e.won ? 'held to the end: half again' : 'clean traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
+      ${workshopHtml()}
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
-      <button class="start-go">again</button>
+      <button class="start-go">${ST && stageNo !== r.stage ? 'on to stage ' + stageNo : e.won && ST && stageNo < stageMax() ? 'on to stage ' + (stageNo + 1) : 'again'}</button>
       <div class="start-links"><button class="start-page">difficulty and the sign</button>${H ? '<button class="start-hand">how the hand is doing</button>' : ''}</div>
       <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
     </div>`;
-    const go = start.querySelector('.start-go'); if (go) go.onclick = begin;
+    const go = start.querySelector('.start-go');
+    if (go) go.onclick = () => { if (e.won && ST && stageNo === r.stage && stageNo < stageMax()) setStage(stageNo + 1); begin(); };
+    wireWorkshop(renderOver);
     const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
     const hb = start.querySelector('.start-hand'); if (hb) hb.onclick = () => H.show();
   }
@@ -2675,7 +2802,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
-    get ink(){ return sumi; }, get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get ink(){ return sumi; }, get stage(){ return stageNo; }, get stageMax(){ return stageMax(); }, get won(){ return won; },
+    setStage, stageRows, stageCount, lastStage, roster, buyLantern, buyGate, lanternCost, gateCost, capNow, LANTERN,
+    get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -2723,11 +2852,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
   sizeField();
   run = newRun();
+  // what lasts is in force from the first run, not the second
+  stageNo = Math.min(stageNo, stageMax()); ward = wardMax(); sumi = own('inkwell') * CFG.inkwellStep;
   spawn(); retarget();
   openStart();
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.6</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.7</div>
 </body>
 </html>

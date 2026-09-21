@@ -306,6 +306,31 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({
   ok(b.H.ledger.runs.length === 20, `the run list grew to ${b.H.ledger.runs.length}`);
 }
 
+// ---- the purse: two tablets, no server, and nothing doubled or lost
+// A balance cannot be merged; totals that only rise can. Each device keeps what
+// it earned and what it spent, those merge by max per device, and the balance
+// is derived. This is the check that says that actually works.
+{
+  // (one device at a time: the test's devices share a global, real ones do not,
+  // and a purse credits whichever device is current)
+  const a = boot(workshop, {stored:{'hito-input':'pen', 'hito-device':'d000000000000000a'}});
+  a.H.tama.earn(100); ok(a.H.tama.buy('heart', 30, 5) && a.H.tama.balance === 70, `device A: balance ${a.H.tama.balance} after earning 100 and spending 30`);
+  ok(a.H.tama.buy('heart', 9999, 5) === false && a.H.tama.balance === 70, 'device A bought on credit');
+  ok(a.H.tama.buy('heart', -50, 5) === false && a.H.tama.balance === 70, 'a negative price paid the player');
+  const A = a.H.exportText();
+  const b = boot(workshop, {stored:{'hito-input':'pen', 'hito-device':'d000000000000000b'}});
+  b.H.tama.earn(40); b.H.tama.buy('lamp', 25, 4); b.H.tama.clear('hiragana', 3);
+  const B = b.H.exportText();
+  a.H.importText(B); a.H.importText(B); a.H.importText(A);
+  ok(a.H.tama.balance === (100 + 40) - (30 + 25), `merged twice, the balance is ${a.H.tama.balance}, expected 85`);
+  ok(a.H.tama.own('heart') === 1 && a.H.tama.own('lamp') === 1 && a.H.tama.cleared('hiragana') === 3, 'what was owned or cleared on the other device did not arrive');
+  b.H.importText(A);
+  ok(b.H.tama.balance === a.H.tama.balance, `the two devices disagree after merging: ${a.H.tama.balance} and ${b.H.tama.balance}`);
+  a.H.importText(JSON.stringify({hito:'ledger', ledger:{g:{}, tama:{earned:{'<script>':9e8, 'd000000000000000c':1e12, 'd000000000000000a':5}, spent:{}, own:{'__proto__':9, 'gate':'lots'}, cleared:{}}}}));
+  ok(a.H.tama.balance === 85 && a.H.tama.own('gate') === 0, `junk reached the purse: balance ${a.H.tama.balance}, gates ${a.H.tama.own('gate')}`);
+  ok(({}).polluted === undefined && a.H.tama.own('__proto__') === 0, 'a purse key reached the prototype');
+}
+
 // ---- the handwriting sheet is a real SVG, drawn over what was asked for
 {
   const { H, P } = boot(workshop, {stored:{'hito-input':'pen'}});

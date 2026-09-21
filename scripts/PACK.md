@@ -220,6 +220,31 @@ never lights a character the hand has not written.** A clean trace is three
 hits — itself and the two lights it kindles — so a farang past three hits
 needs the pen again or a brighter workshop. That is the whole curve.
 
+### Stages, 魂 tama and the lantern workshop
+
+```json
+"field": { "stages": { "rows": 2, "count": 12, "countStep": 3, "gate": 30, "gateRamp": 1.45,
+                       "hpEvery": 4, "speedStep": 0.03 },
+           "tamaClean": 2, "tamaTrace": 1, "tamaWaves": 3, "inkwellStep": 6,
+           "lanternCost": { "heart": 20, "lamp": 30, "inkwell": 15 }, "lanternRamp": 1.6 }
+```
+
+| key | default | what it does |
+|---|---|---|
+| `stages` | see above | `false` switches stages off. A deck is never staged whatever this says. |
+| `stages.rows` | 2 | rows of the chart on the field at stage 1; each stage adds one |
+| `stages.count`, `countStep` | 12, 3 | farang in stage 1, and how many more each stage. Hold the ward through all of them and the stage is cleared. |
+| `stages.gate`, `gateRamp` | 30, 1.45 | what the gate to stage 2 costs, and how each gate grows. A gate is only for sale once the stage before it has been held. |
+| `stages.hpEvery` | 4 | farang take one more hit every this many stages, on top of the run's own ramp |
+| `stages.speedStep` | 0.03 | and come this much faster per stage |
+| `tamaClean`, `tamaTrace` | 2, 1 | tama for a clean trace, and for one that was zapped |
+| `tamaWaves` | 3 | one tama per this many farang faced |
+| `inkwellStep` | 6 | ink in hand at the start of a run, per inkwell |
+| `lanternCost`, `lanternRamp` | see above | level one of each lantern, and how each level grows |
+
+A difficulty can carry a `tama` multiplier (guided 0.5, medium 1.5). Holding a
+stage to the end pays half again.
+
 ### The three voices
 
 Each glyph carries three labels, and they ask for different things:
