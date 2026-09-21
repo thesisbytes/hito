@@ -801,7 +801,22 @@ def main():
     # multiplied would forgive a line drawn beside the glyph.
     s.sub("a finger is not a pen",
           r"const R_ON=\(\)=>Math\.max\(0\.045,R_ON0\*Math\.sqrt\(curS\)\);",
-          "let HAND_EASE=1;\nconst R_ON=()=>Math.max(0.045,Math.min(R_ON0*HAND_EASE,0.125)*Math.sqrt(curS));")
+          "let HAND_EASE=1,HAND_TRAIL=1,HAND_HALO=0;\nconst R_ON=()=>Math.max(0.045,Math.min(R_ON0*HAND_EASE,0.15)*Math.sqrt(curS));")
+
+    # Forgiveness was the wrong half of it. The maintainer plays guided with a
+    # finger, and guided is "drag the light": a light 4-7px across, on a trail
+    # 9px wide, under a fingertip that covers 50. Nothing to steer by. So for a
+    # finger the road ahead is drawn wider than the finger hides, and the light
+    # wears a ring that shows around it. No shadowBlur on the ring: it is drawn
+    # every frame, and per-frame blur is the one thing this engine never does.
+    s.sub("a road a finger can see",
+          r"paintPath\(ctx,a,b,\{alpha:\.38,blur:10,nocore:true,scale:\.75\}\);",
+          "paintPath(ctx,a,b,{alpha:HAND_TRAIL>1?.5:.38,blur:10,nocore:true,scale:.75*HAND_TRAIL});")
+    s.sub("a light a finger can see",
+          r"fx\.beginPath\(\); fx\.arc\(s0\.x,s0\.y,\(4\+3\*pulse\)\*DOT_SCALE,0,7\); fx\.fill\(\); fx\.restore\(\);",
+          "fx.beginPath(); fx.arc(s0.x,s0.y,(4+3*pulse)*DOT_SCALE,0,7); fx.fill(); fx.restore();\n"
+          "    if(HAND_HALO){ fx.save(); fx.lineWidth=3; fx.strokeStyle=`rgba(255,241,184,${.35+.35*pulse})`;"
+          " fx.beginPath(); fx.arc(s0.x,s0.y,HAND_HALO+3*pulse,0,7); fx.stroke(); fx.restore(); }")
 
     # ---- a stage with no box yet
     #

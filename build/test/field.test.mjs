@@ -800,7 +800,49 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   ok(/墨 0/.test(F.upgHtml) && /data-upg="quick"/.test(F.upgHtml), 'the workshop strip is missing or stale after a restart');
 }
 
+// ---- the run ends, says what it was, and is written down
+// The ward falling was a toast and a field that went quiet. Now it is an
+// ending: a record of the run goes to the hand's ledger (and from there to a
+// signed-in player's save), the page says what happened, and "again" starts a
+// clean run. What must not happen: a run recorded twice, a run that includes
+// the time spent reading the start page, or an ending that can be dismissed
+// into a field that is still dead.
+{
+  fresh();
+  const H = globalThis.__hand; H.reset();
+  F.begin();
+  globalThis.conjure(); advance(cfg.advanceMs + 100);
+  globalThis.zap({x:1,y:1}); globalThis.conjure(); advance(cfg.advanceMs + 100);
+  const tracedBefore = F.run.traced, cleanBefore = F.run.clean;
+  ok(tracedBefore === 2 && cleanBefore === 1, `the run counted ${tracedBefore} traces, ${cleanBefore} clean; expected 2 and 1`);
+  // let them in
+  for (let guard = 0; !F.over && guard < 400; guard++){ for (const m of F.monsters) m.d = 0.061; advance(40); }
+  ok(F.over, 'the ward never fell');
+  const e = F.ended;
+  ok(e && e.rec.traced === 2 && e.rec.clean === 1 && e.rec.wave >= 1, `the run's record is ${JSON.stringify(e && e.rec)}`);
+  ok(e && e.rec.ms > 0 && e.rec.ms < 120000, `the run lasted ${e && e.rec.ms}ms by its own account`);
+  ok(H.ledger.runs.length === 1 && H.ledger.best[e.rec.realm].wave === e.rec.wave, 'the run was not written into the ledger');
+  F.endRun(); F.endRun();
+  ok(H.ledger.runs.length === 1, `ending twice recorded the run ${H.ledger.runs.length} times`);
+  advance(900);
+  ok(F.view === 'over' && F.paused, `after the ward fell the page shows "${F.view}"`);
+  ok(/the ward fell/.test(F.startHtml) && /banished/.test(F.startHtml) && />again</.test(F.startHtml), 'the ending does not say what happened or offer another go');
+  ok(/saved on this device/.test(F.startHtml), 'the ending does not say where the run was kept');
+  // the page and back: still the ending, not a start page over a dead field
+  F.openStart();
+  ok(F.view === 'over', 'reopening the page after a fall showed the start page over a dead field');
+  // again: a clean run
+  F.begin();
+  ok(!F.over && F.ward === cfg.wardHp && F.run.traced === 0 && F.ink === 0 && F.ended === null, 'again did not start a clean run');
+  // a second, shorter run does not overwrite the furthest
+  const far = H.ledger.best[e.rec.realm].wave;
+  for (let guard = 0; !F.over && guard < 400; guard++){ for (const m of F.monsters) m.d = 0.061; advance(40); }
+  ok(H.ledger.runs.length === 2, 'the second run was not recorded');
+  ok(H.ledger.best[e.rec.realm].wave >= far, 'a shorter run overwrote the furthest one');
+  fresh();
+}
+
 if (fail) { console.log(`  ${fail} field check(s) failed`); process.exit(1); }
 console.log(`  monsters advance and spawn, a finished glyph banishes the target, `
   + `the tracer retargets, the ward falls and restarts, `
-  + `ink is earned by tracing, upgrades multiply the hand without replacing it, and a tough farang is finished by the lights one trace lit`);
+  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, and a fallen ward ends the run, says what it was and writes it down`);

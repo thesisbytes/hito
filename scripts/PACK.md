@@ -333,7 +333,9 @@ calls and the provider's redirect are both refused. See `server/README.md`.
 ### The hand
 
 ```json
-"hand": { "maxPoints": 64, "keep": 24, "minStep": 4, "fingerEase": 1.5, "fingerStage": "42dvh" }
+"hand": { "maxPoints": 64, "keep": 60, "minStep": 4,
+          "pen":    { "size": null,         "stage": "34dvh", "ease": 1,   "trail": 1,   "halo": 0 },
+          "finger": { "size": [0.62, 0.62], "stage": "42dvh", "ease": 1.5, "trail": 2.2, "halo": 36 } }
 ```
 
 `build/hand_layer.py`, appended to every build. It owns three things: the
@@ -343,8 +345,7 @@ pen/finger switch, the handwriting, and the ledger.
 |---|---|---|
 | `maxPoints` | 64 | most points kept per stroke in a stored trace. Ends are always kept. |
 | `keep` | 24 | how many recent traces stay on the device, for the thumbnails |
-| `fingerEase` | 1.5 | how much more the path forgives a finger on a touch screen. The scorer caps the result, and every end-of-stroke guard is still bound by the stroke's own length. |
-| `fingerStage` | `42dvh` | the sketchbook's size in the games for a finger (a pen gets 34dvh) |
+| `pen`, `finger` | see above | the two hands, tuned apart. `size` is a `[min, max]` glyph size for that hand, or `null` to leave the pack's own rule alone (a size a difficulty pins, like guided's, is never overridden). `stage` is the sketchbook's size in the games. `ease` multiplies the path's forgiveness (1–2; the scorer caps the result and every end-of-stroke guard is still bound by the stroke's own length). `trail` widens the road ahead, and `halo` is the radius in px of a ring around the light — both so a fingertip does not hide what it is steering by. The finger profile applies in finger mode on a touch screen, and lets go while a pen is down. |
 | `minStep` | 4 | points closer than this (thousandths of the stroke book's box) to the last kept one are dropped, so a slow stroke is not all samples from its first centimetre |
 
 **Pen or finger.** `pen` is the engine's `penOnly`: fingers, palms and mice

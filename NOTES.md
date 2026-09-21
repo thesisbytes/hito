@@ -777,3 +777,42 @@ Running log. Append at the bottom, don't rewrite history.
   simulated touch phone (sketchbook 262px to 324px, glyph at 0.62, ease 1.5)
   and the tail guard holds at that ease. Whether it is *comfortable* is the
   fifth thing in this project only a hand can say.
+
+## 2026-09-20 — A run ends, two hands, and the traces were lone ticks (hiragana v0.1.43, katakana-game v0.1.6, vocab v0.1.21)
+
+- Google sign-in confirmed by the maintainer on their own account. The table
+  agrees: one user, one save row readable by that user alone, their device
+  linked, 22 conjured across 16 characters.
+- **The handwriting log was broken for guided players, for two releases.** The
+  maintainer's 24 traces had a median of 166ms and が was 3 points long. Guided
+  wipes the engine's ink after every stroke; the hand read "no ink" as "new
+  attempt" and started over each time, and the engine restarts its own clock
+  whenever the ink is empty. So every character was logged as its last stroke.
+  The hand now starts over only when a glyph loads, keeps its own clock, and a
+  test fires real pointer events through the engine's handlers while wiping the
+  ink between strokes. It failed the live build: "logged as 1 stroke(s)".
+  Confirmed in Chrome under guided: 3 of 3 strokes. **Traces before v0.1.43 in
+  guided are last-stroke-only**, and `traces_gallery.py` marks them.
+- The fix had its own small bug, caught by the same test: `0` meant "not
+  started" and the test's clock starts at 0. `null` is the sentinel now.
+- "still hard to trace with the thickness of the hiragana". They play guided
+  with a finger, so forgiveness was the wrong half of it — see CLAUDE.md. Also
+  the cap on eased tolerance had been swallowing most of the finger's 1.5x in
+  guided, which already runs at 1.5x; raised from 0.125 to 0.15.
+- "touch / pen sizes should be optimized separately": two profiles.
+- "make it so the game ends when i lose all health and saves that trace
+  experience": the ending, the run record, the three places it is kept.
+- "are we collecting the traces somewhere? we can totally make them svgs":
+  yes — `hito.events`, kind `trace`. In the game the ✋ page draws them over the
+  reference and saves a sheet as one SVG, offline, nothing uploaded. From the
+  repo, `build/traces_gallery.py` writes `scratch/handwriting.html` (gitignored:
+  it is people's handwriting) through the CLI's own login, so no key.
+- **Ideas, the maintainer's, "maybe later":** "best stroke of the day" and "you
+  could barely recognize this". Feasible as it stands: a trace and its
+  reference share a coordinate space, so distance from the asked-for shape is a
+  number per trace, and the same number is what hard mode's `compare()` needs.
+- **Next, asked for:** "make it impossible to advance without unlocking stuff.
+  so there needs to be a currency to use after each round" — The Tower's
+  workshop. The accounting has to merge across devices without a server, so a
+  balance cannot be stored: earnings are per-device totals merged by max,
+  purchases are owned levels merged by max, and the balance is derived.

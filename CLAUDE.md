@@ -50,6 +50,7 @@ hito/
     hand_layer.py           pen or finger, the handwriting, the stats ledger
     account_layer.py        guest or signed in: Google through Appwrite, and a save that follows you
     make_index.py           writes index.html, the title screen (it shares the sign-in code)
+    traces_gallery.py       the events table's traces as a page of SVGs over the shape asked for
     theme.py                one colour table, applied to a finished page (gold, night)
     test/theme.test.mjs     a night page has no warm colour in it but the warnings
     test/account.test.mjs   a file makes no request; merging never unlearns; a tunnel is not a sign-out
@@ -149,7 +150,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.42.html`
+### Hiragana — `dist/hiragana-v0.1.43.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -268,6 +269,15 @@ rather than the glyph:
   start page and the ✋ page, with a first guess that only has to avoid a dead
   sketchbook. Scoring is identical for both; a finger hides more of the target
   than a pen does, and no model here can see that either.
+- **Two hands, tuned apart (v0.1.43).** The maintainer: "touch / pen sizes
+  should be optimized separately". `hand.pen` and `hand.finger` are separate
+  profiles — glyph size range, sketchbook size, forgiveness, width of the road
+  ahead, halo — and neither is the other with a multiplier on it. Every trace
+  records which it was drawn under (`prof`), so each can be tuned from its own
+  data. What the finger profile is really for is **seeing**: the maintainer
+  plays guided, which is "drag the light", and the light was 4-7px across on a
+  9px road under a fingertip that covers 50. The road is drawn wider than the
+  finger hides and the light wears a ring that shows around it.
 - **A finger is not a pen (v0.1.42).** The maintainer, of finger tracing:
   "hard, cause i have fat fingers". The tolerance was tuned for a pen tip,
   which shows you the line as you draw it; a fingertip sits on top of the
@@ -294,7 +304,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.5.html`
+### Katakana — `dist/katakana-game-v0.1.6.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -315,7 +325,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.20.html`
+### Vocab — `dist/vocab-v0.1.21.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -557,6 +567,14 @@ farang close from every side, and a lit character already fires by itself.
 Single characters take more hits as the waves climb; tracing earns ink (墨),
 clean tracing most; and ink buys four upgrades from a strip at the top of the
 field, all of which end with the run. See `scripts/PACK.md`.
+
+**A run ends (v0.1.43).** The ward falling was a toast and a field that went
+quiet. It is an ending now: a page that says how far, how many, how cleanly,
+shows the run's handwriting over the shapes that were asked for, and offers
+another go. The run is written to the hand's ledger (the last twenty, and the
+furthest wave per realm for good), travels with a signed-in player's save, and
+goes to the events table as a `run`. These are the player's record of
+themselves, never a score anyone is ranked by.
 
 **DECIDED — nothing draws for you.** This is the one rule The Tower does not
 have, and the maintainer's words for it were "it is important that we keep

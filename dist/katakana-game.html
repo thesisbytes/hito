@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · katakana · v0.1.5</title>
+<title>hito 人 · katakana · v0.1.6</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -162,7 +162,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.5';
+const APP_VERSION='0.1.6';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"A"],["い","あ行","i","","a-row",2,1,"I"],["う","あ行","u","","a-row",3,1,"U"],["え","あ行","e","","a-row",4,1,"E"],["お","あ行","o","","a-row",5,1,"O"],["か","か行","ka","","ka-row",1,2,"KA"],["き","か行","ki","","ka-row",2,2,"KI"],["く","か行","ku","","ka-row",3,2,"KU"],["け","か行","ke","","ka-row",4,2,"KE"],["こ","か行","ko","","ka-row",5,2,"KO"],["さ","さ行","sa","","sa-row",1,3,"SA"],["し","さ行","shi","","sa-row",2,3,"SHI"],["す","さ行","su","","sa-row",3,3,"SU"],["せ","さ行","se","","sa-row",4,3,"SE"],["そ","さ行","so","","sa-row",5,3,"SO"],["た","た行","ta","","ta-row",1,4,"TA"],["ち","た行","chi","","ta-row",2,4,"CHI"],["つ","た行","tsu","","ta-row",3,4,"TSU"],["て","た行","te","","ta-row",4,4,"TE"],["と","た行","to","","ta-row",5,4,"TO"],["な","な行","na","","na-row",1,5,"NA"],["に","な行","ni","","na-row",2,5,"NI"],["ぬ","な行","nu","","na-row",3,5,"NU"],["ね","な行","ne","","na-row",4,5,"NE"],["の","な行","no","","na-row",5,5,"NO"],["は","は行","ha","","ha-row",1,6,"HA"],["ひ","は行","hi","","ha-row",2,6,"HI"],["ふ","は行","fu","","ha-row",3,6,"FU"],["へ","は行","he","","ha-row",4,6,"HE"],["ほ","は行","ho","","ha-row",5,6,"HO"],["ま","ま行","ma","","ma-row",1,7,"MA"],["み","ま行","mi","","ma-row",2,7,"MI"],["む","ま行","mu","","ma-row",3,7,"MU"],["め","ま行","me","","ma-row",4,7,"ME"],["も","ま行","mo","","ma-row",5,7,"MO"],["や","や行","ya","","ya-row",1,8,"YA"],["ゆ","や行","yu","","ya-row",3,8,"YU"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RA"],["り","ら行","ri","","ra-row",2,9,"RI"],["る","ら行","ru","","ra-row",3,9,"RU"],["れ","ら行","re","","ra-row",4,9,"RE"],["ろ","ら行","ro","","ra-row",5,9,"RO"],["わ","わ行","wa","","wa-row",1,10,"WA"],["を","わ行","wo","","wa-row",5,10,"WO"],["ん","","n","","",1,37,"N"],["が","が行","ga","","ga-row",1,12,"GA"],["ぎ","が行","gi","","ga-row",2,12,"GI"],["ぐ","が行","gu","","ga-row",3,12,"GU"],["げ","が行","ge","","ga-row",4,12,"GE"],["ご","が行","go","","ga-row",5,12,"GO"],["ざ","ざ行","za","","za-row",1,13,"ZA"],["じ","ざ行","ji","","za-row",2,13,"JI"],["ず","ざ行","zu","","za-row",3,13,"ZU"],["ぜ","ざ行","ze","","za-row",4,13,"ZE"],["ぞ","ざ行","zo","","za-row",5,13,"ZO"],["だ","だ行","da","","da-row",1,14,"DA"],["ぢ","だ行","ji","","da-row",2,14,"JI"],["づ","だ行","zu","","da-row",3,14,"ZU"],["で","だ行","de","","da-row",4,14,"DE"],["ど","だ行","do","","da-row",5,14,"DO"],["ば","ば行","ba","","ba-row",1,15,"BA"],["び","ば行","bi","","ba-row",2,15,"BI"],["ぶ","ば行","bu","","ba-row",3,15,"BU"],["べ","ば行","be","","ba-row",4,15,"BE"],["ぼ","ば行","bo","","ba-row",5,15,"BO"],["ぱ","ぱ行","pa","","pa-row",1,16,"PA"],["ぴ","ぱ行","pi","","pa-row",2,16,"PI"],["ぷ","ぱ行","pu","","pa-row",3,16,"PU"],["ぺ","ぱ行","pe","","pa-row",4,16,"PE"],["ぽ","ぱ行","po","","pa-row",5,16,"PO"],["ぁ","ぁ行","xa","","small-row",1,17,"XA"],["ぃ","ぁ行","xi","","small-row",2,17,"XI"],["ぅ","ぁ行","xu","","small-row",3,17,"XU"],["ぇ","ぁ行","xe","","small-row",4,17,"XE"],["ぉ","ぁ行","xo","","small-row",5,17,"XO"],["ゃ","ぁ行","xya","","small-row",1,17,"XYA"],["ゅ","ぁ行","xyu","","small-row",3,17,"XYU"],["ょ","ぁ行","xyo","","small-row",5,17,"XYO"],["っ","ぁ行","xtsu","","small-row",3,17,"XTSU"],["ゎ","ぁ行","xwa","","small-row",1,17,"XWA"],["ア","ア行","a","","Ka-row",1,18,"A"],["イ","ア行","i","","Ka-row",2,18,"I"],["ウ","ア行","u","","Ka-row",3,18,"U"],["エ","ア行","e","","Ka-row",4,18,"E"],["オ","ア行","o","","Ka-row",5,18,"O"],["カ","カ行","ka","","Kka-row",1,19,"KA"],["キ","カ行","ki","","Kka-row",2,19,"KI"],["ク","カ行","ku","","Kka-row",3,19,"KU"],["ケ","カ行","ke","","Kka-row",4,19,"KE"],["コ","カ行","ko","","Kka-row",5,19,"KO"],["サ","サ行","sa","","Ksa-row",1,20,"SA"],["シ","サ行","shi","","Ksa-row",2,20,"SHI"],["ス","サ行","su","","Ksa-row",3,20,"SU"],["セ","サ行","se","","Ksa-row",4,20,"SE"],["ソ","サ行","so","","Ksa-row",5,20,"SO"],["タ","タ行","ta","","Kta-row",1,21,"TA"],["チ","タ行","chi","","Kta-row",2,21,"CHI"],["ツ","タ行","tsu","","Kta-row",3,21,"TSU"],["テ","タ行","te","","Kta-row",4,21,"TE"],["ト","タ行","to","","Kta-row",5,21,"TO"],["ナ","ナ行","na","","Kna-row",1,22,"NA"],["ニ","ナ行","ni","","Kna-row",2,22,"NI"],["ヌ","ナ行","nu","","Kna-row",3,22,"NU"],["ネ","ナ行","ne","","Kna-row",4,22,"NE"],["ノ","ナ行","no","","Kna-row",5,22,"NO"],["ハ","ハ行","ha","","Kha-row",1,23,"HA"],["ヒ","ハ行","hi","","Kha-row",2,23,"HI"],["フ","ハ行","fu","","Kha-row",3,23,"FU"],["ヘ","ハ行","he","","Kha-row",4,23,"HE"],["ホ","ハ行","ho","","Kha-row",5,23,"HO"],["マ","マ行","ma","","Kma-row",1,24,"MA"],["ミ","マ行","mi","","Kma-row",2,24,"MI"],["ム","マ行","mu","","Kma-row",3,24,"MU"],["メ","マ行","me","","Kma-row",4,24,"ME"],["モ","マ行","mo","","Kma-row",5,24,"MO"],["ヤ","ヤ行","ya","","Kya-row",1,25,"YA"],["ユ","ヤ行","yu","","Kya-row",3,25,"YU"],["ヨ","ヤ行","yo","","Kya-row",5,25,"YO"],["ラ","ラ行","ra","","Kra-row",1,26,"RA"],["リ","ラ行","ri","","Kra-row",2,26,"RI"],["ル","ラ行","ru","","Kra-row",3,26,"RU"],["レ","ラ行","re","","Kra-row",4,26,"RE"],["ロ","ラ行","ro","","Kra-row",5,26,"RO"],["ワ","ワ行","wa","","Kwa-row",1,27,"WA"],["ヲ","ワ行","wo","","Kwa-row",5,27,"WO"],["ン","","n","","",1,37,"N"],["ガ","ガ行","ga","","Kga-row",1,29,"GA"],["ギ","ガ行","gi","","Kga-row",2,29,"GI"],["グ","ガ行","gu","","Kga-row",3,29,"GU"],["ゲ","ガ行","ge","","Kga-row",4,29,"GE"],["ゴ","ガ行","go","","Kga-row",5,29,"GO"],["ザ","ザ行","za","","Kza-row",1,30,"ZA"],["ジ","ザ行","ji","","Kza-row",2,30,"JI"],["ズ","ザ行","zu","","Kza-row",3,30,"ZU"],["ゼ","ザ行","ze","","Kza-row",4,30,"ZE"],["ゾ","ザ行","zo","","Kza-row",5,30,"ZO"],["ダ","ダ行","da","","Kda-row",1,31,"DA"],["ヂ","ダ行","ji","","Kda-row",2,31,"JI"],["ヅ","ダ行","zu","","Kda-row",3,31,"ZU"],["デ","ダ行","de","","Kda-row",4,31,"DE"],["ド","ダ行","do","","Kda-row",5,31,"DO"],["バ","バ行","ba","","Kba-row",1,32,"BA"],["ビ","バ行","bi","","Kba-row",2,32,"BI"],["ブ","バ行","bu","","Kba-row",3,32,"BU"],["ベ","バ行","be","","Kba-row",4,32,"BE"],["ボ","バ行","bo","","Kba-row",5,32,"BO"],["パ","パ行","pa","","Kpa-row",1,33,"PA"],["ピ","パ行","pi","","Kpa-row",2,33,"PI"],["プ","パ行","pu","","Kpa-row",3,33,"PU"],["ペ","パ行","pe","","Kpa-row",4,33,"PE"],["ポ","パ行","po","","Kpa-row",5,33,"PO"],["ァ","ァ行","xa","","Ksmall-row",1,34,"XA"],["ィ","ァ行","xi","","Ksmall-row",2,34,"XI"],["ゥ","ァ行","xu","","Ksmall-row",3,34,"XU"],["ェ","ァ行","xe","","Ksmall-row",4,34,"XE"],["ォ","ァ行","xo","","Ksmall-row",5,34,"XO"],["ャ","ァ行","xya","","Ksmall-row",1,34,"XYA"],["ュ","ァ行","xyu","","Ksmall-row",3,34,"XYU"],["ョ","ァ行","xyo","","Ksmall-row",5,34,"XYO"],["ッ","ァ行","xtsu","","Ksmall-row",3,34,"XTSU"],["ヮ","ァ行","xwa","","Ksmall-row",1,34,"XWA"],["ヴ","ヴ行","vu","","Kvu-row",3,35,"VU"],["ー","ー行","-","","long-row",1,36,"-"]];
 
 // ---------- state
@@ -390,7 +390,7 @@ function paintLit(ctx,opt){ // PATH[0..prog] as paintPath would draw it, grown f
     litProg=last; }
   ctx.drawImage(litA,0,0,W,H); ctx.drawImage(litB,0,0,W,H); }
 function trailBit(ctx,a,b,s0,open){ // road PATH[a..b] and the embers on it; embers sit every 4th point from s0
-  if(b>a) paintPath(ctx,a,b,{alpha:.38,blur:10,nocore:true,scale:.75});
+  if(b>a) paintPath(ctx,a,b,{alpha:HAND_TRAIL>1?.5:.38,blur:10,nocore:true,scale:.75*HAND_TRAIL});
   for(let i=a+(((s0-a)%4)+4)%4;open?i<b:i<=b;i+=4){ const q=denorm(PATH[i]);                 // dotted embers
     ctx.fillStyle='rgba(205,234,255,.85)'; ctx.shadowColor='rgba(108,184,255,.9)'; ctx.shadowBlur=10;
     ctx.beginPath(); ctx.arc(q.x,q.y,2.4,0,7); ctx.fill(); } }
@@ -428,6 +428,7 @@ function ghostTick(){ if(!ghostAnim) return; if(!W||!H){ requestAnimationFrame(g
     const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)?SEGS[segIdx+1][0]:prog]), pulse=.5+.5*Math.sin(now/260);
     fx.save(); fx.fillStyle=`rgba(226,243,255,${.5+.4*pulse})`; fx.shadowColor='#e2f3ff'; fx.shadowBlur=16+10*pulse;
     fx.beginPath(); fx.arc(s0.x,s0.y,(4+3*pulse)*DOT_SCALE,0,7); fx.fill(); fx.restore();
+    if(HAND_HALO){ fx.save(); fx.lineWidth=3; fx.strokeStyle=`rgba(226,243,255,${.35+.35*pulse})`; fx.beginPath(); fx.arc(s0.x,s0.y,HAND_HALO+3*pulse,0,7); fx.stroke(); fx.restore(); }
   }
   stepParts();
   requestAnimationFrame(ghostTick); }
@@ -452,8 +453,8 @@ iC.addEventListener('pointerup',endStroke); iC.addEventListener('pointercancel',
 
 // ---------- practice: follow the teacher's path continuously
 let R_ON0=0.07, LOOK=24, DRAIN=1.6, FIZZ=90;
-let HAND_EASE=1;
-const R_ON=()=>Math.max(0.045,Math.min(R_ON0*HAND_EASE,0.125)*Math.sqrt(curS));
+let HAND_EASE=1,HAND_TRAIL=1,HAND_HALO=0;
+const R_ON=()=>Math.max(0.045,Math.min(R_ON0*HAND_EASE,0.15)*Math.sqrt(curS));
 let smudge=0;
 function covered(){ if(!hit) return 0; let c=0; for(let i=0;i<hit.length;i++) c+=hit[i]; return c/hit.length; }
 // How near the end of a stroke counts as having reached it.
@@ -764,7 +765,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.5');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.6');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1058,7 +1059,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
 })();
 </script>
-<script>window.__HAND_CFG={maxPoints:64,keep:24,minStep:4,fingerEase:1.5};</script>
+<script>window.__HAND_CFG={maxPoints:64,keep:60,minStep:4,pen:{"size":null,"ease":1.0,"trail":1.0,"halo":0},finger:{"size":[0.62,0.62],"ease":1.5,"trail":2.2,"halo":36}};</script>
 <style>
   .hand-btn{ background:transparent; color:rgba(108,184,255,.8); border:1px solid #1e2f3e;
     border-radius:7px; padding:4px 9px; font:12px ui-sans-serif,system-ui; cursor:pointer;
@@ -1070,7 +1071,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
      screen because a pen needs no more; a fingertip hides what it is tracing,
      so it takes some of the field's height back. The field's canvas and the
      stage are both watched for size, so this is just a class. */
-  body.field.roomy .stage, body.vocab.roomy .stage{ width:min(96vw,42dvh); height:min(96vw,42dvh); }
+  body.field.hand-pen .stage, body.vocab.hand-pen .stage{ width:min(96vw,34dvh); height:min(96vw,34dvh); }
+  body.field.hand-finger .stage, body.vocab.hand-finger .stage{ width:min(96vw,42dvh); height:min(96vw,42dvh); }
   .hand-btn.nudge{ border-color:#5fe3a1; color:#c3f7dc; box-shadow:0 0 14px rgba(95,227,161,.45); }
   .hand{ position:fixed; inset:0; z-index:10000; display:flex; align-items:center;
     justify-content:center; background:rgba(6,9,13,.93); font:13px ui-sans-serif,system-ui; color:#dce8f2; }
@@ -1115,7 +1117,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
    Pen or finger, what was drawn, and how it has been going. Writes down what
    the tracer decided; decides nothing itself.                              */
 (function(){
-  const CFG = window.__HAND_CFG || {maxPoints:64, keep:24, minStep:4, fingerEase:1.5};
+  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0}, finger:{size:[0.62,0.62],ease:1.5,trail:2.2,halo:36}};
   const K_INPUT = 'hito-input', K_LEDGER = 'hito-ledger', K_HANDS = 'hito-hands';
   const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch(_){ return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(_){ return false; } };
@@ -1157,17 +1159,26 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   const touchy = () => { try { return (navigator.maxTouchPoints || 0) > 0; } catch(_){ return false; } };
   let penNow = false;
   const roomy = () => input === 'finger' && touchy() && !penNow;
+  // Two profiles, tuned apart (the maintainer: "touch / pen sizes should be
+  // optimized separately"). Neither is the other with a multiplier on it: each
+  // has its own glyph sizes, sketchbook, forgiveness, road and halo, and every
+  // trace says which it was drawn under, so each can be tuned from its own data.
+  const prof = () => roomy() ? CFG.finger : CFG.pen;
   function applyRoom(){
-    const on = roomy();
-    try { HAND_EASE = on ? CFG.fingerEase : 1; } catch(_){}
-    try { document.body.classList[on ? 'add' : 'remove']('roomy'); } catch(_){}
+    const on = roomy(), p = prof();
+    try { HAND_EASE = p.ease; HAND_TRAIL = p.trail; HAND_HALO = p.halo;
+          trailProg = -1; } catch(_){}   // the road ahead is cached; a new width is a new road
+    try { const c = document.body.classList; c[on ? 'add' : 'remove']('hand-finger'); c[on ? 'remove' : 'add']('hand-pen'); c[on ? 'add' : 'remove']('roomy'); } catch(_){}
     return on;
   }
-  // sizeFor() is the engine's single seam for size; a finger gets the top of the range.
+  // sizeFor() is the engine's single seam for size. A profile with its own
+  // range draws from it; one without leaves the pack's rule alone. A size a
+  // difficulty has pinned (guided: one big size) is nobody's to change.
   const _sizeFor = window.sizeFor;
   if (typeof _sizeFor === 'function') window.sizeFor = function(){
-    const v = _sizeFor.apply(this, arguments);
-    return roomy() && typeof SIZE_MAX === 'number' ? Math.max(v, SIZE_MAX) : v;
+    const v = _sizeFor.apply(this, arguments), s = prof().size;
+    if (!s || (typeof SIZE_PIN !== 'undefined' && SIZE_PIN != null)) return v;
+    return s[0] + Math.random()*(s[1] - s[0]);
   };
 
   function setInput(v, quiet){
@@ -1186,7 +1197,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // The hand's own copy of the ink, taken at pen-up. The field tidies strays
   // out of `strokes` a moment later, and a log of handwriting with the
   // mistakes swept out of it is a log of the stroke book.
-  let mine = [], down = null;
+  let mine = [], down = null, downAt = 0, began = null;   // null, not 0: 0 is a time
+  // …and the hand's own clock. The engine restarts its clock whenever the ink
+  // is empty, and guided mode empties the ink after every stroke, so by the
+  // engine's watch each stroke of が began at zero and the whole character
+  // took as long as its last tick.
+  const shift = (s, at) => { const off = (at - began) - (s[0] ? s[0].t : 0); return s.map(q => ({x:q.x, y:q.y, p:q.p, t:q.t + off})); };
+  function fresh(){ mine = []; down = null; began = null; }
   const glyph = () => { try { return LETTERS[idx][0]; } catch(_){ return null; } };
   function attempt(){
     const g = glyph();
@@ -1233,6 +1250,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // called shaky two clean traces after it stops being shaky.
   let LEDGER = read(K_LEDGER, null);
   if (!LEDGER || typeof LEDGER !== 'object' || !LEDGER.g) LEDGER = {v:1, g:{}, days:{}, by:{}};
+  if (!Array.isArray(LEDGER.runs)) LEDGER.runs = [];
+  if (!LEDGER.best || typeof LEDGER.best !== 'object') LEDGER.best = {};
   let HANDS = read(K_HANDS, []);
   if (!Array.isArray(HANDS)) HANDS = [];
   const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
@@ -1245,15 +1264,17 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
   function note(ok){
     attempt();
-    const raw = (mine.length ? mine : strokes).concat(cur && cur.length ? [cur] : []);
-    mine = []; down = null;
+    const live = cur && cur.length ? [began !== null ? shift(cur, downAt) : cur] : [];
+    const raw = (mine.length ? mine : strokes).concat(live);
+    fresh();
     if (!raw.length || !ch){ if (ok) finished = true; return null; }
     const last = raw[raw.length - 1], first = raw[0];
     const ms = Math.max(0, Math.round(last[last.length - 1].t - first[0].t));
     const rec = {
-      glyph: ch, ok, ms, zaps, tries, strokes: raw.length,
+      glyph: ch, ok, ms, zaps, tries, strokes: raw.length, at: Date.now(),
       size: Math.round(curF*1000)/1000, input: lastType || input,
       ease: (typeof HAND_EASE === 'number' && HAND_EASE !== 1) ? HAND_EASE : undefined,
+      prof: roomy() ? 'finger' : 'pen',
       level: (typeof MASTERY !== 'undefined' && MASTERY[ch]) || 0,
       diff: (window.__field && window.__field.difficulty) || (window.__vocab && window.__vocab.difficulty) || '',
       v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
@@ -1280,6 +1301,27 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     zaps = 0;
     return rec;
   }
+  // ---- runs ---------------------------------------------------------------
+  // A run is written down when it ends: how far, how many, how cleanly. The
+  // last twenty are kept, and the furthest wave per realm for good. These are
+  // the player's own record of themselves and travel with their save; they are
+  // not a score anyone else will ever be ranked by.
+  const cleanRun = r => ({ at:+r.at||0, realm:String(r.realm||'').slice(0,24), wave:+r.wave||0, banished:+r.banished||0,
+    traced:+r.traced||0, clean:+r.clean||0, sumi:+r.sumi||0, cast:+r.cast||0, ms:+r.ms||0,
+    difficulty:String(r.difficulty||'').slice(0,12) });
+  function bestOf(realm, r){
+    const b = LEDGER.best[realm];
+    if (!b || r.wave > b.wave || (r.wave === b.wave && r.banished > b.banished)){ LEDGER.best[realm] = { wave:r.wave, banished:r.banished, at:r.at }; return true; }
+    return false;
+  }
+  function run(rec){
+    const r = cleanRun(rec);
+    const isBest = bestOf(r.realm, r);
+    LEDGER.runs.push(r); LEDGER.runs = LEDGER.runs.slice(-20);
+    save();
+    const total = Object.values(LEDGER.g).reduce((a, e) => a + (e.n || 0), 0);
+    return { isBest, wave: LEDGER.best[r.realm].wave, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
+  }
   const attempts = e => (e.n || 0) + (e.fizz || 0);
   const shaky = c => { const e = LEDGER.g[c]; return !!e && attempts(e) >= 3 && (e.tr || 0) >= 1.5; };
   const median = a => { const s = a.slice().sort((x, y) => x - y); return s.length ? s[s.length >> 1] : 0; };
@@ -1302,6 +1344,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
 
   // ---- hooks ---------------------------------------------------------------
+  // A new glyph is a new attempt. This used to be inferred from the engine's
+  // ink being empty, which in guided it always is: every character a guided
+  // player wrote was logged as its last stroke alone, for two releases.
+  const _load = window.load;
+  if (typeof _load === 'function') window.load = function(){ fresh(); return _load.apply(this, arguments); };
   const _zap = window.zap;
   window.zap = function(){ attempt(); zaps++; return _zap.apply(this, arguments); };
   // Both of these empty `strokes` on their way through, so the note is taken
@@ -1320,8 +1367,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const p = e.pointerType === 'pen'; if (p !== penNow){ penNow = p; applyRoom(); }
       if (typeof activeId !== 'undefined' && activeId === e.pointerId){
         lastType = e.pointerType || '';
-        if (strokes.length < mine.length || !strokes.length) mine = [];   // the engine started over, so does this
-        down = e.pointerId; return;
+        down = e.pointerId; downAt = performance.now();
+        if (began === null) began = downAt;             // the first touch of this attempt
+        return;
       }
       // Refused. If no pen has ever touched this sketchbook, that was probably
       // not a palm — it was somebody trying to draw. Say so, but not every time.
@@ -1337,7 +1385,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     if (e.pointerId !== down) return;
     down = null;
     const s = strokes[strokes.length - 1];
-    if (s && s.length) mine.push(s.slice());
+    if (s && s.length) mine.push(shift(s, downAt));
   });
   // The workshop's own button still works; it just gets remembered now.
   for (const id of ['penOnly', 'rPenOnly']){
@@ -1348,14 +1396,52 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // ---- the sheet -----------------------------------------------------------
   const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const secs = ms => ms >= 60000 ? Math.round(ms/60000) + 'm' : (ms/1000).toFixed(ms < 10000 ? 1 : 0) + 's';
+  // The shape that was asked for, from the same book the tracer reads. The
+  // trace is in that book's space already, so the two lie on each other with
+  // no fitting: what is off in the picture is what was off in the hand.
+  function asked(ch){
+    try {
+      const st = TEACHER.fonts[TEACHER.activeFont].letters[ch].strokes;
+      return st.map(s => `<path d="${s.map((q, i) => (i ? 'L' : 'M') + Math.round(q.x*1000) + ' ' + Math.round(q.y*1000)).join('')}"/>`).join('');
+    } catch(_){ return ''; }
+  }
+  const BOX = '150 150 700 760';
   function thumb(r){
+    const ref = asked(r.glyph);
     const paths = (r.s || []).map(f => {
       let d = '';
       for (let i = 0; i + 2 < f.length; i += 3) d += (i ? 'L' : 'M') + (+f[i] || 0) + ' ' + (+f[i+1] || 0);
       return `<path d="${d}"/>`;
     }).join('');
-    return `<figure><svg viewBox="150 150 700 760" fill="none" stroke="${r.ok ? '#6cb8ff' : '#dc5a3c'}" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
+    return `<figure><svg viewBox="${BOX}" fill="none" stroke-linecap="round" stroke-linejoin="round">`
+      + (ref ? `<g stroke="rgba(220,232,242,.16)" stroke-width="46">${ref}</g>` : '')
+      + `<g stroke="${r.ok ? '#6cb8ff' : '#dc5a3c'}" stroke-width="20">${paths}</g></svg>`
       + `<figcaption>${esc(r.glyph)} · ${r.ok ? secs(r.ms) : 'fizzled'}</figcaption></figure>`;
+  }
+  const thumbs = (since, n) => { const a = HANDS.filter(r => (r.at || 0) >= (since || 0)).slice(-(n || 12)).reverse();
+    return a.length ? `<div class="hand-thumbs">${a.map(thumb).join('')}</div>` : ''; };
+  // Every trace still on the device, as one SVG: a sheet to keep, print, or be
+  // teased about. Built here and handed over as a file; nothing is uploaded.
+  function sheetSVG(){
+    const a = HANDS.slice().reverse(), cols = Math.min(6, Math.max(1, a.length)), cw = 240, chh = 290;
+    const rows = Math.ceil(a.length / cols) || 1;
+    const cells = a.map((r, i) => {
+      const x = (i % cols)*cw, y = Math.floor(i / cols)*chh, k = 220/760;
+      const paths = (r.s || []).map(f => { let d = ''; for (let j = 0; j + 2 < f.length; j += 3) d += (j ? 'L' : 'M') + (+f[j]||0) + ' ' + (+f[j+1]||0); return `<path d="${d}"/>`; }).join('');
+      return `<g transform="translate(${x + 10},${y + 10})"><rect width="220" height="270" rx="12" fill="#101820" stroke="#1e2f3e"/>`
+        + `<g transform="scale(${k.toFixed(4)}) translate(-150,-150)" fill="none" stroke-linecap="round" stroke-linejoin="round">`
+        + `<g stroke="rgba(220,232,242,.16)" stroke-width="46">${asked(r.glyph)}</g><g stroke="${r.ok ? '#6cb8ff' : '#dc5a3c'}" stroke-width="20">${paths}</g></g>`
+        + `<text x="110" y="258" text-anchor="middle" font-size="15" font-family="system-ui,sans-serif" fill="#dce8f2">${esc(r.glyph)} · ${r.ok ? secs(r.ms) : 'fizzled'}${r.prof === 'finger' ? ' · finger' : ''}</text></g>`;
+    }).join('');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${cols*cw} ${rows*chh}" width="${cols*cw}" height="${rows*chh}"><rect width="100%" height="100%" fill="#0a0f15"/>${cells}</svg>`;
+  }
+  function saveSheet(){
+    try {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([sheetSVG()], {type:'image/svg+xml'}));
+      a.download = 'hito-handwriting-' + today() + '.svg'; a.click();
+      say('handwriting saved as an SVG'); return true;
+    } catch(_){ say('could not save the sheet here'); return false; }
   }
   const sheet = document.createElement('div');
   sheet.className = 'hand'; sheet.id = 'hand'; sheet.hidden = true;
@@ -1381,7 +1467,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       <div class="hand-h">draw with</div>
       <div class="hand-row">
         ${opt('pen', input, '✎ pen only', 'fingers and palms are ignored, so the hand can rest on the glass.')}
-        ${opt('finger', input, '☝ finger', 'anything that touches draws, one at a time. on a touch screen the glyph is drawn bigger and the path forgives more: a fingertip hides what it is tracing.')}
+        ${opt('finger', input, '☝ finger', 'anything that touches draws, one at a time. on a touch screen it is tuned for a fingertip: a bigger glyph, a wider road, and a ring around the light so you can see it past your finger.')}
       </div>
       ${sync && sync.enabled ? `<div class="hand-h">notes to the workshop</div>
       <div class="hand-row">
@@ -1395,6 +1481,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         <div><b>${secs(s.today.ms)}</b><small>pen down</small></div>
         <div><b>${s.streak}</b><small>day${s.streak === 1 ? '' : 's'} running</small></div>
       </div>
+      ${Object.keys(LEDGER.best).length ? `<div class="hand-h">furthest you have held</div>`
+        + list(Object.entries(LEDGER.best), ([realm, b]) => `<span><b>${b.wave}</b><small>waves · ${esc(realm)} · ${b.banished} banished</small></span>`, '') : ''}
       <div class="hand-h">these bite you most</div>
       ${list(s.bites, b => `<span><b>${esc(b.c)}</b><small>${b.zaps} zap${b.zaps === 1 ? '' : 's'}, ${b.fizz} fizzle${b.fizz === 1 ? '' : 's'}</small></span>`, 'nothing is biting. the phi pop are bored.')}
       <div class="hand-h">these take you longest, per stroke</div>
@@ -1403,6 +1491,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       ${list(s.clean.slice(0, 24), c => `<span><b>${esc(c)}</b></span>`, 'three traces without a zap puts a character here.')}
       <div class="hand-h">the last few, as you wrote them</div>
       ${HANDS.length ? `<div class="hand-thumbs">${HANDS.slice(-12).reverse().map(thumb).join('')}</div>` : '<div class="hand-empty">nothing yet. go and draw something.</div>'}
+      ${HANDS.length ? '<div class="hand-links"><button data-svg="1">save my handwriting as an SVG</button></div>' : ''}
       <div class="hand-links"><button data-io="export">export the ledger</button><button data-io="import">import</button></div>
       <textarea class="hand-io" spellcheck="false" ${io ? '' : 'hidden'} placeholder="paste an exported ledger here, then tap import again"></textarea>
       <div class="hand-sub" style="margin:10px 0 0">${s.total} conjured in all, across ${s.known} character${s.known === 1 ? '' : 's'} · kept on this device</div>
@@ -1415,6 +1504,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       if (a === 'in') acct.signIn(); else if (a === 'out') acct.signOut(); else if (a === 'sync') acct.sync();
     };
     for (const b of sheet.querySelectorAll('button[data-share]')) b.onclick = () => { sync.setShare(b.dataset.share === '1'); render(); };
+    const sv = sheet.querySelector('button[data-svg]'); if (sv) sv.onclick = saveSheet;
     const ta = sheet.querySelector('.hand-io');
     for (const b of sheet.querySelectorAll('button[data-io]')) b.onclick = () => {
       if (b.dataset.io === 'export'){ io = true; render(); const t = sheet.querySelector('.hand-io'); t.value = exportText(); t.select(); say('ledger exported — copy it somewhere safe'); }
@@ -1436,6 +1526,17 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         n:+e.n||0, clean:+e.clean||0, zaps:+e.zaps||0, fizz:+e.fizz||0, ms:+e.ms||0,
         rt:(Array.isArray(e.rt) ? e.rt : []).map(Number).filter(isFinite).slice(-5),
         tr:+e.tr||0, best:+e.best||0, last:+e.last||0 };
+    }
+    const seen = new Set(LEDGER.runs.map(r => r.at + '/' + r.realm));
+    for (const r0 of (Array.isArray(o.ledger.runs) ? o.ledger.runs.slice(-40) : [])){
+      if (!r0 || typeof r0 !== 'object') continue;
+      const r = cleanRun(r0);
+      if (!r.at || seen.has(r.at + '/' + r.realm)) continue;
+      seen.add(r.at + '/' + r.realm); LEDGER.runs.push(r); bestOf(r.realm, r);
+    }
+    LEDGER.runs.sort((a, b) => a.at - b.at); LEDGER.runs = LEDGER.runs.slice(-20);
+    for (const [realm, b] of Object.entries(o.ledger.best || {})){
+      if (b && typeof b === 'object' && realm.length <= 24) bestOf(realm, { wave:+b.wave||0, banished:+b.banished||0, at:+b.at||0 });
     }
     for (const [d, v] of Object.entries(o.ledger.days || {})){
       if (!/^\d{4}-\d\d-\d\d$/.test(d) || !Array.isArray(v)) continue;
@@ -1471,9 +1572,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     pen(v){ penNow = !!v; return applyRoom(); },
     get ledger(){ return LEDGER; }, get hands(){ return HANDS; },
     get html(){ return markup; }, get shown(){ return !sheet.hidden; },
-    show: open, close, render, note, pack, toBook, shaky, stats, streak,
+    show: open, close, render, note, pack, toBook, shaky, stats, streak, run, thumbs, sheetSVG, saveSheet,
     exportText, importText,
-    reset(){ LEDGER = {v:1, g:{}, days:{}, by:{}}; HANDS = []; save(); },
+    reset(){ LEDGER = {v:1, g:{}, days:{}, by:{}, runs:[], best:{}}; HANDS = []; save(); },
   };
 })();
 </script>
@@ -1559,6 +1660,12 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .start-go{ width:100%; margin-top:20px; background:#6cb8ff; color:#101820; border:0;
              border-radius:12px; padding:14px; font:700 17px ui-sans-serif,system-ui; cursor:pointer;
              box-shadow:0 0 30px rgba(108,184,255,.25); }
+  .over-nums{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; text-align:center; margin:6px 0 10px; }
+  .over-nums div{ background:#101820; border:1px solid #1e2f3e; border-radius:9px; padding:10px 4px; }
+  .over-nums b{ display:block; font-size:22px; color:#c3f7dc; }
+  .over-nums small{ color:rgba(220,232,242,.6); font-size:11px; }
+  .over-line{ margin:0 0 6px; font-size:12.5px; color:rgba(220,232,242,.65); text-align:center; }
+  .start-card.over .start-title{ color:#e8a0a0; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(220,232,242,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
   .start-links button{ flex:1; background:transparent; color:rgba(108,184,255,.75); border:1px solid #1e2f3e;
@@ -1640,7 +1747,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
   const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
   const wardMax = () => CFG.wardHp + upg.mend;
-  function earn(n){ if (n > 0){ sumi += n; renderUpg(); } return sumi; }
+  // What this run was, kept as it goes so the end can say it. Observations:
+  // how far, how many, how cleanly. Never a score.
+  let run = null;
+  const newRun = () => ({ at: Date.now(), began: performance.now(), traced: 0, clean: 0, earned: 0, cast: 0, ended: null });
+  function earn(n){ if (n > 0){ sumi += n; if (run) run.earned += n; renderUpg(); } return sumi; }
   function buy(id){
     if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
     const c = costOf(id);
@@ -1809,7 +1920,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       if (partial) best.i = AT[best.w.chars[best.ci]];
     }
     shots.push({ from: dash(), to: best, t: 0, ch, auto: true, partial });
-    castAt = now;
+    castAt = now; if (run) run.cast++;
     // The pen goes to the holes. If that was the word the tracer was pointed
     // at, it is now waiting on a different kana; and if that one is lit too,
     // the hand has no business here and is let go to find a dark one.
@@ -2046,6 +2157,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // Ink is paid for the trace, not for the kill: the hand did the work
     // whether or not anything was standing there. A character conjured many
     // times pays a little less, so the run pushes toward the ones that are new.
+    if (run){ run.traced++; if (!zapped) run.clean++; }
     if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
     const r = _conjure.apply(this, arguments);
     // The engine celebrates for 1.9s before advancing, which is dead time in a
@@ -2149,7 +2261,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
           }); } catch(_){}
           retarget();
           if (navigator.vibrate) navigator.vibrate(90);
-          if (ward <= 0){ over = true; toast('the ward falls ✦ tap to begin again'); }
+          if (ward <= 0){ over = true; endRun(); }
         }
       }
       autocast(now);
@@ -2375,10 +2487,35 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
-    sumi = 0; upg = { quick:0, bright:0, shove:0, mend:0 };
+    sumi = 0; upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null;
     ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
     renderUpg();
+  }
+
+  // ---- the end of a run
+  // The ward falling used to be a toast and a field that went quiet. A run
+  // that ends without saying what it was is a run that did not count, and the
+  // player said so: "make it so the game ends when i lose all health and
+  // saves that trace experience and all that". So it ends, it says what
+  // happened, and it is written down in three places that each do a different
+  // job: the hand's ledger (on the device, and in the save that follows a
+  // signed-in player), and the events table (an observation, for later).
+  let ended = null;
+  function endRun(){
+    if (!run || ended) return ended;
+    const H = window.__hand;
+    const rec = { at: run.at, realm: REALM, wave, banished: killed, traced: run.traced, clean: run.clean,
+                  sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
+                  difficulty, sign: CFG.sign, upgrades: {...upg} };
+    let best = null;
+    try { if (H && H.run) best = H.run(rec); } catch(_){}
+    try { window.__sync && window.__sync.record('run', rec); } catch(_){}
+    ended = { rec, best, since: run.at };
+    if (navigator.vibrate) navigator.vibrate([90, 60, 160]);
+    // a beat, so the last breach is seen before the page covers it
+    setTimeout(() => { if (over && ended) openOver(); }, 700);
+    return ended;
   }
 
   // ---- the workshop strip
@@ -2421,6 +2558,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
   function renderStart(){
     if (view === 'credits') return renderCredits();
+    if (view === 'over') return renderOver();
     // Other realms, as links to sibling files. They are other single-file
     // builds beside this one — on Pages or in the same folder offline — so
     // the page is only a hop away and nothing here depends on it loading.
@@ -2467,11 +2605,41 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
   function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
-  function openStart(){ paused = true; view = 'start'; renderStart(); start.hidden = false; showRedo(false); }
+  function renderOver(){
+    const e = ended; if (!e){ view = 'start'; return renderStart(); }
+    const r = e.rec, H = window.__hand;
+    const mins = r.ms >= 60000 ? Math.floor(r.ms/60000) + 'm ' + Math.round((r.ms % 60000)/1000) + 's' : Math.round(r.ms/1000) + 's';
+    const fresh = e.best && e.best.isBest && e.best.runs > 1;
+    // the handwriting of this run, the way the hand's own page draws it
+    let hands = '';
+    try { if (H && H.thumbs) hands = H.thumbs(e.since, 12); } catch(_){}
+    start.innerHTML = markup = `<div class="start-card over">
+      <div class="start-title">the ward fell</div>
+      <div class="start-sub">${esc(REALM)} · wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave ? ' · furthest ' + e.best.wave : ''}</div>
+      <div class="over-nums">
+        <div><b>${r.banished}</b><small>banished</small></div>
+        <div><b>${r.traced}</b><small>traced</small></div>
+        <div><b>${r.traced ? Math.round(100*r.clean/r.traced) + '%' : '—'}</b><small>clean</small></div>
+        <div><b>${mins}</b><small>held</small></div>
+      </div>
+      <p class="over-line">${r.cast} answered by your own lights · 墨 ${r.sumi} earned${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
+      ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
+      <button class="start-go">again</button>
+      <div class="start-links"><button class="start-page">difficulty and the sign</button>${H ? '<button class="start-hand">how the hand is doing</button>' : ''}</div>
+      <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
+    </div>`;
+    const go = start.querySelector('.start-go'); if (go) go.onclick = begin;
+    const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
+    const hb = start.querySelector('.start-hand'); if (hb) hb.onclick = () => H.show();
+  }
+  function openOver(){ paused = true; view = 'over'; renderStart(); start.hidden = false; showRedo(false); }
+  function openStart(){ paused = true; view = over && ended ? 'over' : 'start'; renderStart(); start.hidden = false; showRedo(false); }
   function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; showRedo(false); }
   function begin(){
     start.hidden = true;
     if (over) restart(); else paused = false;
+    // the clock starts when the player does, not when the page loaded
+    if (run && !run.started){ run.started = true; run.began = performance.now(); run.at = Date.now(); }
     tPrev = 0;
     showRedo(true);
   }
@@ -2507,7 +2675,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
-    get ink(){ return sumi; }, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get ink(){ return sumi; }, get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -2554,11 +2722,12 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }).observe(wrap);
   addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
   sizeField();
+  run = newRun();
   spawn(); retarget();
   openStart();
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.5</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.6</div>
 </body>
 </html>

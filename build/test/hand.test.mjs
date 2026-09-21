@@ -37,7 +37,17 @@ function boot(file, { stored = {}, touchPoints = 0, fine = false, coarse = false
         return new Proxy(function(){ return el(); }, { get:()=>'' });
       }, set(t,k,v){ t[k]=v; return true; } });
   const g = globalThis;
-  g.document = { getElementById:el, createElement:el, body:el(), addEventListener(){},
+  // The sketchbook keeps its listeners, in the order they were added, so a
+  // test can put a pen down on it and have the engine, the hand and the shell
+  // each hear about it in turn — which is the only way to test what one of
+  // them does to the ink before the next one looks.
+  const heard = {};
+  const inkEl = el(); inkEl.addEventListener = (ev, f) => { (heard[ev] = heard[ev] || []).push(f); };
+  const fire = (type, x, y, pt = 'touch', id = 1) => {
+    const e = { type, pointerId:id, pointerType:pt, clientX:x, clientY:y, buttons:1, pressure:.5, preventDefault(){}, getCoalescedEvents(){ return [e]; } };
+    for (const f of heard[type] || []) f(e);
+  };
+  g.document = { getElementById: id => id === 'ink' ? inkEl : el(), createElement:el, body:el(), addEventListener(){},
     documentElement:el(), fonts:{ready:Promise.resolve(), add(){}} };
   g.window = g;
   g.addEventListener = () => {};
@@ -66,7 +76,7 @@ function boot(file, { stored = {}, touchPoints = 0, fine = false, coarse = false
   new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
   g.resize();
   if (g.__field) g.__field.begin();
-  return { H: g.__hand, P: g.__probe, S: g.__sync, store, g, tick: ms => { T += ms; } };
+  return { H: g.__hand, P: g.__probe, S: g.__sync, store, g, fire, tick: ms => { T += ms; } };
 }
 
 const workshop = process.argv[2], game = process.argv[3];
@@ -144,6 +154,47 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({
   const queued = JSON.parse(store['hito-outbox'] || '[]');
   ok(queued.some(q => q.kind === 'trace' && q.body.glyph === ch), 'the trace was not handed to the outbox');
   ok(S.enabled === true, 'this build has no sync endpoint, so nothing it records can ever arrive');
+}
+
+// ---- every stroke is kept, on one clock, even when the shell wipes the ink between them
+// Guided mode empties the engine's ink after each stroke. The hand used to
+// read "no ink" as "new attempt": every が a guided player wrote was logged as
+// its last tick, 3 points and 77ms, for two releases. Found in the
+// maintainer's own traces.
+{
+  const { H, P, g, fire, tick } = boot(workshop, {stored:{'hito-input':'finger'}, touchPoints:5});
+  g.load(P.idx);
+  const stroke = (x0, y0, x1, y1, ms) => {
+    fire('pointerdown', x0, y0);
+    for (let i = 1; i <= 10; i++){ tick(ms/10); fire('pointermove', x0 + (x1-x0)*i/10, y0 + (y1-y0)*i/10); }
+    fire('pointerup', x1, y1);
+  };
+  stroke(100, 100, 300, 110, 400);
+  // (not asserting the engine still holds the stroke: a shell that wipes its ink at
+  // pen-up — guided, and the cards — is the very case this is here for)
+  P.setStrokes([]);                 // what guided's tidy() does at every pen-up
+  tick(600);
+  stroke(200, 80, 210, 300, 500);
+  P.setStrokes([]);
+  tick(300);
+  fire('pointerdown', 250, 250); tick(80); fire('pointermove', 262, 262);   // the last tick, still down when it lands
+  g.conjure();
+  const r = H.hands[H.hands.length - 1];
+  ok(r && r.strokes === 3, `a three-stroke character was logged as ${r && r.strokes} stroke(s)`);
+  if (r && r.s.length === 3){
+    const first = s => s[2], last = s => s[s.length - 1];
+    ok(first(r.s[0]) === 0, `the first stroke starts at ${first(r.s[0])}ms, not 0`);
+    ok(first(r.s[1]) >= last(r.s[0]) + 500 && first(r.s[2]) >= last(r.s[1]) + 250,
+       `the strokes are not on one clock: ${r.s.map(s => [first(s), last(s)]).join(' | ')}`);
+    ok(Math.abs(r.ms - (400 + 600 + 500 + 300 + 80)) <= 5, `the character took ${r.ms}ms by the hand's clock, 1880 by the test's`);
+  }
+  // a new glyph is a new attempt: nothing of the old one leaks into it
+  stroke(100, 100, 300, 110, 200); P.setStrokes([]);
+  g.load(P.idx + 1);
+  stroke(120, 120, 280, 130, 200);
+  H.note(true);
+  const n = H.hands[H.hands.length - 1];
+  ok(n.strokes === 1, `a stroke from the glyph before was logged with this one (${n.strokes} strokes)`);
 }
 
 // ---- a fizzle is written down too, and the attempt carries its history
@@ -236,6 +287,35 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({
   b.H.importText(JSON.stringify({hito:'ledger', ledger:{g:{'<img src=x onerror=alert(1)>':{n:99, fizz:9, tr:9}}}}));
   b.H.render();
   ok(!/<img/.test(b.H.html), 'an imported character name reached the page unescaped');
+}
+
+// ---- runs: kept, merged without doubling, and the furthest is never lost
+{
+  const a = boot(workshop, {stored:{'hito-input':'pen'}});
+  const r1 = a.H.run({at:1000, realm:'hiragana', wave:12, banished:9, traced:20, clean:15, ms:90000});
+  const r2 = a.H.run({at:2000, realm:'hiragana', wave:7, banished:4, traced:9, clean:2, ms:40000});
+  ok(r1.isBest && !r2.isBest && r2.wave === 12, `best-run bookkeeping is off: ${JSON.stringify([r1, r2])}`);
+  const b = boot(workshop, {stored:{'hito-input':'pen'}});
+  b.H.run({at:3000, realm:'hiragana', wave:9, banished:5, traced:11, clean:6, ms:50000});
+  b.H.importText(a.H.exportText()); b.H.importText(a.H.exportText());
+  ok(b.H.ledger.runs.length === 3, `importing the same save twice left ${b.H.ledger.runs.length} runs, expected 3`);
+  ok(b.H.ledger.best.hiragana.wave === 12, 'the furthest run did not survive the merge');
+  b.H.importText(JSON.stringify({hito:'ledger', ledger:{g:{}, runs:[{at:'<img>', realm:{}, wave:'9e9'}, null, 7], best:{hiragana:{wave:-5}}}}));
+  ok(b.H.ledger.best.hiragana.wave === 12 && b.H.ledger.runs.every(r => typeof r.at === 'number' && typeof r.realm === 'string'), 'junk runs got into the ledger');
+  for (let i = 0; i < 30; i++) b.H.run({at:5000+i, realm:'hiragana', wave:1});
+  ok(b.H.ledger.runs.length === 20, `the run list grew to ${b.H.ledger.runs.length}`);
+}
+
+// ---- the handwriting sheet is a real SVG, drawn over what was asked for
+{
+  const { H, P } = boot(workshop, {stored:{'hito-input':'pen'}});
+  P.setStrokes([line(120,120,280,130,30)]); H.note(true);
+  const svg = H.sheetSVG();
+  ok(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/.test(svg) && /<\/svg>$/.test(svg), 'the sheet is not a standalone SVG');
+  ok((svg.match(/<path /g) || []).length >= 2, 'the sheet does not draw the trace over the shape that was asked for');
+  ok(!/<script|onload=|href=/i.test(svg), 'the sheet carries something that is not a drawing');
+  ok(/as you wrote them|hand-thumbs/.test(H.thumbs(0, 12)), 'thumbs() returned nothing for a trace just made');
+  ok(H.thumbs(Date.now() + 60000, 12) === '', 'thumbs() returned traces from before the run it was asked about');
 }
 
 // ---- the sheet says what it is doing

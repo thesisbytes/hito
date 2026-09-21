@@ -115,6 +115,12 @@ STYLE = """
   .start-go{ width:100%; margin-top:20px; background:#e9c46a; color:#1d1a16; border:0;
              border-radius:12px; padding:14px; font:700 17px ui-sans-serif,system-ui; cursor:pointer;
              box-shadow:0 0 30px rgba(233,196,106,.25); }
+  .over-nums{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; text-align:center; margin:6px 0 10px; }
+  .over-nums div{ background:#1d1a16; border:1px solid #3d3324; border-radius:9px; padding:10px 4px; }
+  .over-nums b{ display:block; font-size:22px; color:#bdf0e6; }
+  .over-nums small{ color:rgba(232,224,204,.6); font-size:11px; }
+  .over-line{ margin:0 0 6px; font-size:12.5px; color:rgba(232,224,204,.65); text-align:center; }
+  .start-card.over .start-title{ color:#e8a0a0; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(232,224,204,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
   .start-links button{ flex:1; background:transparent; color:rgba(233,196,106,.75); border:1px solid #3d3324;
@@ -198,7 +204,11 @@ LAYER = STYLE + r"""
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
   const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
   const wardMax = () => CFG.wardHp + upg.mend;
-  function earn(n){ if (n > 0){ sumi += n; renderUpg(); } return sumi; }
+  // What this run was, kept as it goes so the end can say it. Observations:
+  // how far, how many, how cleanly. Never a score.
+  let run = null;
+  const newRun = () => ({ at: Date.now(), began: performance.now(), traced: 0, clean: 0, earned: 0, cast: 0, ended: null });
+  function earn(n){ if (n > 0){ sumi += n; if (run) run.earned += n; renderUpg(); } return sumi; }
   function buy(id){
     if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
     const c = costOf(id);
@@ -367,7 +377,7 @@ LAYER = STYLE + r"""
       if (partial) best.i = AT[best.w.chars[best.ci]];
     }
     shots.push({ from: dash(), to: best, t: 0, ch, auto: true, partial });
-    castAt = now;
+    castAt = now; if (run) run.cast++;
     // The pen goes to the holes. If that was the word the tracer was pointed
     // at, it is now waiting on a different kana; and if that one is lit too,
     // the hand has no business here and is let go to find a dark one.
@@ -604,6 +614,7 @@ LAYER = STYLE + r"""
     // Ink is paid for the trace, not for the kill: the hand did the work
     // whether or not anything was standing there. A character conjured many
     // times pays a little less, so the run pushes toward the ones that are new.
+    if (run){ run.traced++; if (!zapped) run.clean++; }
     if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
     const r = _conjure.apply(this, arguments);
     // The engine celebrates for 1.9s before advancing, which is dead time in a
@@ -707,7 +718,7 @@ LAYER = STYLE + r"""
           }); } catch(_){}
           retarget();
           if (navigator.vibrate) navigator.vibrate(90);
-          if (ward <= 0){ over = true; toast('the ward falls ✦ tap to begin again'); }
+          if (ward <= 0){ over = true; endRun(); }
         }
       }
       autocast(now);
@@ -933,10 +944,35 @@ LAYER = STYLE + r"""
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
-    sumi = 0; upg = { quick:0, bright:0, shove:0, mend:0 };
+    sumi = 0; upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null;
     ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
     renderUpg();
+  }
+
+  // ---- the end of a run
+  // The ward falling used to be a toast and a field that went quiet. A run
+  // that ends without saying what it was is a run that did not count, and the
+  // player said so: "make it so the game ends when i lose all health and
+  // saves that trace experience and all that". So it ends, it says what
+  // happened, and it is written down in three places that each do a different
+  // job: the hand's ledger (on the device, and in the save that follows a
+  // signed-in player), and the events table (an observation, for later).
+  let ended = null;
+  function endRun(){
+    if (!run || ended) return ended;
+    const H = window.__hand;
+    const rec = { at: run.at, realm: REALM, wave, banished: killed, traced: run.traced, clean: run.clean,
+                  sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
+                  difficulty, sign: CFG.sign, upgrades: {...upg} };
+    let best = null;
+    try { if (H && H.run) best = H.run(rec); } catch(_){}
+    try { window.__sync && window.__sync.record('run', rec); } catch(_){}
+    ended = { rec, best, since: run.at };
+    if (navigator.vibrate) navigator.vibrate([90, 60, 160]);
+    // a beat, so the last breach is seen before the page covers it
+    setTimeout(() => { if (over && ended) openOver(); }, 700);
+    return ended;
   }
 
   // ---- the workshop strip
@@ -979,6 +1015,7 @@ LAYER = STYLE + r"""
   }
   function renderStart(){
     if (view === 'credits') return renderCredits();
+    if (view === 'over') return renderOver();
     // Other realms, as links to sibling files. They are other single-file
     // builds beside this one — on Pages or in the same folder offline — so
     // the page is only a hop away and nothing here depends on it loading.
@@ -1025,11 +1062,41 @@ LAYER = STYLE + r"""
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
   function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
-  function openStart(){ paused = true; view = 'start'; renderStart(); start.hidden = false; showRedo(false); }
+  function renderOver(){
+    const e = ended; if (!e){ view = 'start'; return renderStart(); }
+    const r = e.rec, H = window.__hand;
+    const mins = r.ms >= 60000 ? Math.floor(r.ms/60000) + 'm ' + Math.round((r.ms % 60000)/1000) + 's' : Math.round(r.ms/1000) + 's';
+    const fresh = e.best && e.best.isBest && e.best.runs > 1;
+    // the handwriting of this run, the way the hand's own page draws it
+    let hands = '';
+    try { if (H && H.thumbs) hands = H.thumbs(e.since, 12); } catch(_){}
+    start.innerHTML = markup = `<div class="start-card over">
+      <div class="start-title">the ward fell</div>
+      <div class="start-sub">${esc(REALM)} · wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave ? ' · furthest ' + e.best.wave : ''}</div>
+      <div class="over-nums">
+        <div><b>${r.banished}</b><small>banished</small></div>
+        <div><b>${r.traced}</b><small>traced</small></div>
+        <div><b>${r.traced ? Math.round(100*r.clean/r.traced) + '%' : '—'}</b><small>clean</small></div>
+        <div><b>${mins}</b><small>held</small></div>
+      </div>
+      <p class="over-line">${r.cast} answered by your own lights · 墨 ${r.sumi} earned${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
+      ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
+      <button class="start-go">again</button>
+      <div class="start-links"><button class="start-page">difficulty and the sign</button>${H ? '<button class="start-hand">how the hand is doing</button>' : ''}</div>
+      <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
+    </div>`;
+    const go = start.querySelector('.start-go'); if (go) go.onclick = begin;
+    const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
+    const hb = start.querySelector('.start-hand'); if (hb) hb.onclick = () => H.show();
+  }
+  function openOver(){ paused = true; view = 'over'; renderStart(); start.hidden = false; showRedo(false); }
+  function openStart(){ paused = true; view = over && ended ? 'over' : 'start'; renderStart(); start.hidden = false; showRedo(false); }
   function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; showRedo(false); }
   function begin(){
     start.hidden = true;
     if (over) restart(); else paused = false;
+    // the clock starts when the player does, not when the page loaded
+    if (run && !run.started){ run.started = true; run.began = performance.now(); run.at = Date.now(); }
     tPrev = 0;
     showRedo(true);
   }
@@ -1065,7 +1132,7 @@ LAYER = STYLE + r"""
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
-    get ink(){ return sumi; }, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get ink(){ return sumi; }, get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -1112,6 +1179,7 @@ LAYER = STYLE + r"""
   }).observe(wrap);
   addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
   sizeField();
+  run = newRun();
   spawn(); retarget();
   openStart();
   requestAnimationFrame(fieldLoop);

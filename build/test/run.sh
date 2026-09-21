@@ -36,8 +36,8 @@ node build/test/tail.test.mjs "dist/hiragana-v$ver.html" | sed 's/^/  /' || fail
 
 # The same guard with a finger's forgiveness switched on. Easing the tolerance
 # is only safe while the end of a stroke still cannot be skipped.
-sed "s/let HAND_EASE=1;/let HAND_EASE=1.5;/" "dist/hiragana-v$ver.html" > "$tmp/eased.html"
-grep -q "let HAND_EASE=1.5;" "$tmp/eased.html" || { echo "  FAIL: could not ease a copy of the build — the seam moved"; fail=1; }
+sed "s/let HAND_EASE=1,/let HAND_EASE=1.5,/" "dist/hiragana-v$ver.html" > "$tmp/eased.html"
+grep -q "let HAND_EASE=1.5," "$tmp/eased.html" || { echo "  FAIL: could not ease a copy of the build — the seam moved"; fail=1; }
 node build/test/tail.test.mjs "$tmp/eased.html" | sed 's/^/  (finger) /' || fail=1
 
 echo
