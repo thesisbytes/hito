@@ -626,3 +626,12 @@ Running log. Append at the bottom, don't rewrite history.
 - Not done: nothing reads the traces yet. They are there for hard mode's
   thresholds and for finding the strokes everyone gets wrong; both are a
   notebook and an afternoon, not an engine change.
+- **A build with a live endpoint is live wherever it runs.** Driving the game
+  in headless Chrome to check finger input put 9 rows in the production table
+  — mine, from six throwaway device ids, recognisable by `ms: 0`, which no
+  hand can do. Deleted by device id, not by wiping the table. Then the same
+  question asked of `run.sh`: four tests boot a whole build, Node has a global
+  `fetch`, and each was attempting a real POST. None had landed, which was
+  luck. `build/test/offline.mjs` is now preloaded into every test. Anyone
+  driving a build by hand should switch sharing off first, or expect to clean
+  up after themselves.

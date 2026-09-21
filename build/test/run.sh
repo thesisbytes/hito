@@ -3,6 +3,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
+# No test gets a network. The builds carry a live endpoint and Node has fetch;
+# see offline.mjs for what that was doing before this line existed.
+export NODE_OPTIONS="--import=$PWD/build/test/offline.mjs${NODE_OPTIONS:+ $NODE_OPTIONS}"
+
 fail=0
 ver=$(python3 -c "import json;print(json.load(open('scripts/hiragana/pack.json'))['version'])")
 vver=$(python3 -c "import json;print(json.load(open('scripts/vocab/pack.json'))['version'])")

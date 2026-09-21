@@ -50,6 +50,7 @@ hito/
     hand_layer.py           pen or finger, the handwriting, the stats ledger
     test/hand.test.mjs      the switch reaches the engine; a note never costs a glyph
     test/server.test.mjs    what the endpoint refuses, checked without deploying
+    test/offline.mjs        preloaded by run.sh: no test ever reaches the live endpoint
     shell_vocab.py          the flashcard shell, appended as a layer
     kana_glyphs.py          writes the 164-kana glyph list the vocab realm traces
     test/vocab.test.mjs     a word is walked through the seam
