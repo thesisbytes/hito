@@ -190,6 +190,36 @@ continuously because they never share space with the pen: the sketchbook is a
 fixed rectangle that does not scroll, scale or reflow while the field moves
 above it.
 
+### The run: ink and the workshop strip
+
+```json
+"field": { "hpEvery": 10, "hpMax": 5, "inkTrace": 2, "inkClean": 2, "inkKill": 1,
+           "inkMastered": 6, "shoveStep": 0.025, "upgradeRamp": 1.6,
+           "upgradeCost": { "quick": 8, "bright": 14, "shove": 6, "mend": 10 } }
+```
+
+| key | default | what it does |
+|---|---|---|
+| `hpEvery` | 10 | single characters take one more hit every this many waves. `0` switches it off. Words ignore it: a word is already as tough as it is long. |
+| `hpMax` | 5 | and no more than this |
+| `inkTrace` | 2 | ink for landing a trace, whether or not anything was standing there |
+| `inkClean` | 2 | more, if it was clean |
+| `inkMastered` | 6 | a character conjured this many times pays one less |
+| `inkKill` | 1 | ink when a wisp finishes a farang. Small on purpose: the idle half earns its keep without outearning the pen. |
+| `shoveStep` | 0.025 | how far one level of shove pushes a farang back per hit (the field is 1 across) |
+| `upgradeCost` | see above | what level one costs |
+| `upgradeRamp` | 1.6 | each level costs this many times the last |
+
+Four upgrades, bought during a run from the strip at the top of the field, and
+gone when the ward falls: **早 quick** (wisps fly 18% sooner per level, 5),
+**灯 bright** (a trace lights one more, 3), **押 shove** (every hit pushes them
+back, 5), **守 mend** (a heart now, and a bigger ward, 5).
+
+The rule they all obey: **an upgrade multiplies what a trace is worth and
+never lights a character the hand has not written.** A clean trace is three
+hits — itself and the two lights it kindles — so a farang past three hits
+needs the pen again or a brighter workshop. That is the whole curve.
+
 ### The three voices
 
 Each glyph carries three labels, and they ask for different things:

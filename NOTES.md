@@ -635,3 +635,45 @@ Running log. Append at the bottom, don't rewrite history.
   luck. `build/test/offline.mjs` is now preloaded into every test. Anyone
   driving a build by hand should switch sharing off first, or expect to clean
   up after themselves.
+
+## 2026-09-20 — The run: ink, four upgrades, farang that take more than one hit (hiragana v0.1.39, katakana-game v0.1.2, vocab v0.1.17)
+
+- The maintainer: "I'm trying to make a game inspired by the tower defense
+  game, The Tower", then, on what to keep: "I think it is important that we
+  keep tracing. the idle portion should be like the characters we charged up..
+  but as the stage increments, the farang become more than characters. they
+  could be names, sentences, nouns". Both are now DECIDED in `CLAUDE.md`, with
+  how the second one plays written out so it survives the chat it was said in.
+- The field was already most of The Tower: a ward at the centre, enemies from
+  every side in polar coordinates, and hitodama as an auto-firing tower. What
+  it lacked was a reason for a run to get harder and something to spend.
+- **Built:** `hp` was already on every monster and always 1; it now climbs
+  with the wave for single characters. Ink is paid for the *trace*, not the
+  kill, because the hand did the work whether or not anything was standing
+  there; a wisp's kill pays 1 so the idle half earns without outearning the
+  pen. Four upgrades on a DOM strip at the top of the field — the far end of
+  the screen from the hand, since a button under a resting palm presses itself.
+- **The arithmetic that makes the curve:** a clean trace is three hits (itself
+  plus the two lights it kindles). So up to 3 HP one clean trace finishes a
+  farang by itself a few seconds later; past that the pen has to come back, or
+  `bright` has to have been bought. No tuning pass has been done by a hand —
+  the numbers are a starting position.
+- Deliberately absent: an upgrade that raises the charge cap. Charges persist
+  across runs and upgrades do not, so a run-scoped cap would leave charges
+  above the cap when it ended. That belongs with the permanent upgrades.
+- The reading used to bloom on every hit. With 4-HP farang that is the same
+  word four times, so it blooms when the hand lands a hit and when the farang
+  finally goes, and not for a wisp in between.
+- **Three faults only a real browser showed**, all mine: the engine styles
+  every `button` as `flex:1; min-width:88px`, so the ✋ button was a bar across
+  the header in the games (shipped that way in v0.1.38 — nobody had looked at
+  a running field, only at the sheets laid over it); the HP pips were drawn on
+  the farang's head; and the strip covered the `banished` tally, which moved
+  to the bottom left and gained the wave number. The stub passed all three.
+- The new field checks were run against two deliberately broken builds (ink
+  surviving a restart; buying on credit) and failed both, as they should.
+- `upgrade` is a new event kind; the function was redeployed and
+  `server.test.mjs` would have failed the build had it not been added.
+- Not done, in order: characters-as-charges for words (the `key()` change),
+  in-order slot filling by wisps, named farang, then sentences with particles
+  by hand. After that the persistent half: workshop upgrades, research, tiers.

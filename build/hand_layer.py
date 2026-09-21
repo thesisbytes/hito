@@ -28,7 +28,10 @@ LAYER = r"""
 <style>
   .hand-btn{ background:transparent; color:rgba(233,196,106,.8); border:1px solid #3d3324;
     border-radius:7px; padding:4px 9px; font:12px ui-sans-serif,system-ui; cursor:pointer;
-    margin-left:auto; margin-right:10px; white-space:nowrap; }
+    margin-left:auto; margin-right:10px; white-space:nowrap;
+    /* the engine styles every button as flex:1 with a min-width; in a header
+       with the tabs hidden that is a bar the width of the screen */
+    flex:none; min-width:0; letter-spacing:0; }
   .hand-btn.nudge{ border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 14px rgba(127,209,196,.45); }
   .hand{ position:fixed; inset:0; z-index:10000; display:flex; align-items:center;
     justify-content:center; background:rgba(12,10,8,.93); font:13px ui-sans-serif,system-ui; color:#e8e0cc; }

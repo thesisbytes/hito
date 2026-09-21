@@ -694,6 +694,101 @@ ok(F.ward <= 0, `run ended with ward ${F.ward}`);
 F.restart();
 ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new run');
 
+// ---- the run: ink, the workshop strip, and farang that take more than one hit
+//
+// The rule being defended is the one The Tower does not have: nothing here
+// draws for you. Ink comes from tracing, upgrades multiply what a trace is
+// worth, and a tough farang still needs the hand before the lights can finish
+// it. If any of that slips, the idle half quietly becomes the whole game.
+{
+  fresh(); F.setDifficulty('easy');
+  ok(F.ink === 0 && Object.values(F.upgrades).every(v => v === 0), 'a fresh run did not start with no ink and no upgrades');
+  ok(F.hpFor(0) === 1 && F.hpFor(cfg.hpEvery - 1) === 1, 'the first farang take more than one hit');
+  ok(F.hpFor(cfg.hpEvery) === 2, `farang did not toughen at wave ${cfg.hpEvery}`);
+  ok(F.hpFor(cfg.hpEvery * 99) === cfg.hpMax, 'toughness is not capped');
+
+  // ink is paid for the trace, and a clean one pays more
+  globalThis.conjure();
+  ok(F.ink === cfg.inkTrace + cfg.inkClean, `a clean trace paid ${F.ink} ink, expected ${cfg.inkTrace + cfg.inkClean}`);
+  advance(cfg.advanceMs + 50);
+  const before = F.ink;
+  globalThis.zap({x:1, y:1});
+  globalThis.conjure();
+  ok(F.ink - before === cfg.inkTrace, `a zapped trace paid ${F.ink - before} ink, expected ${cfg.inkTrace}`);
+
+  // nothing is bought on credit, and a purchase is spent
+  fresh();
+  ok(F.buy('quick') === false && F.upgrades.quick === 0, 'an upgrade was bought with no ink');
+  const c0 = F.costOf('quick');
+  F.earn(c0);
+  ok(F.buy('quick') === true && F.upgrades.quick === 1 && F.ink === 0, 'buying did not spend the ink or raise the level');
+  ok(F.costOf('quick') > c0, 'the second level costs no more than the first');
+  ok(F.castMs() < cfg.castMs, 'quick did not make the lights fly faster');
+  ok(F.buy('nonsense') === false, 'an upgrade that does not exist was bought');
+
+  // an upgrade stops at its ceiling
+  F.earn(100000);
+  let n = 0; while (F.buy('bright') && n < 50) n++;
+  ok(F.upgrades.bright === F.UPG.bright.max, `bright went to ${F.upgrades.bright}, its ceiling is ${F.UPG.bright.max}`);
+  ok(/as far as it goes/.test(F.upgHtml), 'a maxed upgrade still offers itself for sale');
+
+  // bright makes a trace light more — it multiplies the hand, it does not replace it
+  fresh(); F.quench();
+  const ch0 = P.LETTERS[P.idx][0];
+  globalThis.conjure();
+  const plain = F.charge(ch0);
+  fresh(); F.quench(); F.earn(100000); F.buy('bright');
+  const ch1 = P.LETTERS[P.idx][0];
+  globalThis.conjure();
+  ok(F.charge(ch1) === Math.min(cfg.hitodamaCap, plain + 1), `bright lit ${F.charge(ch1)}, a plain trace lit ${plain}`);
+  F.quench();
+  ok(Object.keys(F.hitodama).length === 0, 'buying something lit a character nobody traced');
+
+  // mend is a heart now and a bigger ward for the rest of the run
+  fresh(); F.earn(100000);
+  const w0 = F.ward, m0 = F.wardMax;
+  F.buy('mend');
+  ok(F.wardMax === m0 + 1 && F.ward === w0 + 1, `mend took the ward from ${w0}/${m0} to ${F.ward}/${F.wardMax}`);
+
+  // a tough farang survives the first hit, and the pips say how much is owed
+  fresh(); F.quench();
+  const tough = F.monsters[0];
+  tough.hp = 3; tough.d = 0.9;
+  F.hit(tough, false, false);
+  ok(F.monsters.includes(tough) && tough.hp === 2, `one hit on a 3-hit farang left it at ${tough.hp} and ${F.monsters.includes(tough) ? 'alive' : 'gone'}`);
+  ok(F.readings.length === 1, 'the hand landed a hit and no reading bloomed');
+  F.hit(tough, false, true);
+  ok(F.readings.length === 1, 'a wisp that did not finish the job bloomed a reading anyway');
+  const inkBefore = F.ink;
+  F.hit(tough, false, true);
+  ok(!F.monsters.includes(tough), 'three hits did not banish a 3-hit farang');
+  ok(F.ink === inkBefore + cfg.inkKill, 'a wisp finishing a farang paid no ink');
+  ok(F.readings.length === 2, 'the reading did not bloom when it finally went');
+
+  // shove: every hit pushes them back, and never past the edge
+  fresh(); F.earn(100000); F.buy('shove');
+  const s = F.monsters[0]; s.hp = 2; s.d = 0.5;
+  F.hit(s, false, true);
+  ok(Math.abs(s.d - (0.5 + cfg.shoveStep)) < 1e-9, `shove moved it to ${s.d}, expected ${0.5 + cfg.shoveStep}`);
+  s.d = 0.999; s.hp = 2; F.hit(s, false, true);
+  ok(s.d <= 1, 'shove pushed a farang off the field');
+
+  // the whole loop: a 3-hit farang is finished by the lights one trace lit
+  fresh(); F.quench();
+  const boss = F.monsters[0];
+  boss.hp = 3; boss.d = 0.95; boss.speed = 0;
+  globalThis.conjure();                       // hit one, and the character is lit
+  advance(cfg.castMs * 4 + 2000);
+  ok(!F.monsters.includes(boss), `a clean trace and its two lights did not finish a 3-hit farang (hp ${boss.hp})`);
+
+  // and all of it belongs to the run
+  F.earn(50); F.buy('quick');
+  fresh();
+  ok(F.ink === 0 && F.upgrades.quick === 0 && F.wardMax === cfg.wardHp, 'ink or upgrades survived the ward falling');
+  ok(/墨 0/.test(F.upgHtml) && /data-upg="quick"/.test(F.upgHtml), 'the workshop strip is missing or stale after a restart');
+}
+
 if (fail) { console.log(`  ${fail} field check(s) failed`); process.exit(1); }
 console.log(`  monsters advance and spawn, a finished glyph banishes the target, `
-  + `the tracer retargets, the ward falls and restarts`);
+  + `the tracer retargets, the ward falls and restarts, `
+  + `ink is earned by tracing, upgrades multiply the hand without replacing it, and a tough farang is finished by the lights one trace lit`);

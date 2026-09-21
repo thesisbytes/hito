@@ -14,7 +14,7 @@ export const WEEK = 7 * 24 * 3600 * 1000;
 
 export const KINDS = new Set([
   'flag', 'attempt',                  // the workshop
-  'banish', 'breach', 'kindle', 'cast',   // the field
+  'banish', 'breach', 'kindle', 'cast', 'upgrade',   // the field
   'word',                             // the cards
   'trace',                            // the hand itself
 ]);

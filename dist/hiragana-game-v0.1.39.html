@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.38</title>
+<title>hito 人 · hiragana · v0.1.39</title>
 <style>
   :root{
     --lacquer:#15100d;--lacquer-2:#211812;--gold:#e9c46a;--gold-hot:#fff1b8;--ember:#c8842f;
@@ -161,7 +161,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.38';
+const APP_VERSION='0.1.39';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -761,7 +761,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.38');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.39');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -909,7 +909,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 <style>
   .hand-btn{ background:transparent; color:rgba(233,196,106,.8); border:1px solid #3d3324;
     border-radius:7px; padding:4px 9px; font:12px ui-sans-serif,system-ui; cursor:pointer;
-    margin-left:auto; margin-right:10px; white-space:nowrap; }
+    margin-left:auto; margin-right:10px; white-space:nowrap;
+    /* the engine styles every button as flex:1 with a min-width; in a header
+       with the tabs hidden that is a bar the width of the screen */
+    flex:none; min-width:0; letter-spacing:0; }
   .hand-btn.nudge{ border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 14px rgba(127,209,196,.45); }
   .hand{ position:fixed; inset:0; z-index:10000; display:flex; align-items:center;
     justify-content:center; background:rgba(12,10,8,.93); font:13px ui-sans-serif,system-ui; color:#e8e0cc; }
@@ -1267,7 +1270,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[{"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."}, {"label": "katakana", "kana": "片", "file": "katakana-game.html", "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."}],speed:0.055,wardHp:5,spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[{"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."}, {"label": "katakana", "kana": "片", "file": "katakana-game.html", "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."}],speed:0.055,wardHp:5,hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -1299,6 +1302,22 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
                      width:min(96vw,34dvh); height:min(96vw,34dvh);
                      margin:8px auto 10px; }
   body.field .field-wrap{ flex:1 1 auto; }
+  /* The workshop strip: ink and what it buys. At the top of the field, as far
+     from the hand as the screen allows — a button under a resting palm is a
+     button that presses itself. */
+  .upg{ position:absolute; left:8px; right:8px; top:8px; z-index:2; display:flex; gap:6px;
+        align-items:stretch; font:12px ui-sans-serif,system-ui; pointer-events:none; }
+  .upg > *{ pointer-events:auto; }
+  .upg-ink{ display:flex; align-items:center; gap:5px; padding:0 9px; border-radius:9px;
+        background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e9c46a; font-weight:700; }
+  .upg-ink i{ font-style:normal; color:rgba(232,224,204,.55); font-weight:400; }
+  .upg button{ flex:1 1 0; min-width:0; text-align:left; padding:5px 7px; border-radius:9px; cursor:pointer;
+        background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e8e0cc; font:inherit; line-height:1.25; }
+  .upg button b{ color:#e9c46a; margin-right:4px; }
+  .upg button small{ display:block; color:rgba(232,224,204,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .upg button.can{ border-color:#7fd1c4; box-shadow:0 0 10px rgba(127,209,196,.25); }
+  .upg button.can small{ color:#bdf0e6; }
+  .upg button[disabled]{ opacity:.5; cursor:default; }
 
   /* The start page. A lacquer sheet over everything, with the two axes the
      game actually has: how much help, and what the sign says. */
@@ -1383,6 +1402,43 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // ---- state
   let monsters = [], shots = [], motes = [];
   let ward = CFG.wardHp, over = false, wave = 0, killed = 0;
+
+  // ---- ink, and what it buys during a run
+  // The Tower's loop, with one rule it does not have: nothing here draws for
+  // you. Every upgrade multiplies what a trace is worth — how fast the lights
+  // you lit are thrown, how many a clean trace lights, how hard a hit shoves —
+  // and none of them lights a character the hand has not written. Ink comes
+  // from tracing, and mostly from tracing cleanly; a wisp's kill pays a
+  // little, so the idle half earns its keep without outearning the pen.
+  // All of it belongs to the run and goes when the ward falls.
+  const UPG = {
+    quick: { kana:'早', name:'quick', blurb:'the lights are thrown faster',  max:5 },
+    bright:{ kana:'灯', name:'bright', blurb:'a trace lights one more',      max:3 },
+    shove: { kana:'押', name:'shove', blurb:'every hit pushes them back',     max:5 },
+    mend:  { kana:'守', name:'mend',  blurb:'the ward gains a heart',          max:5 },
+  };
+  let ink = 0, upg = { quick:0, bright:0, shove:0, mend:0 };
+  const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
+  const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
+  const wardMax = () => CFG.wardHp + upg.mend;
+  function earn(n){ if (n > 0){ ink += n; renderUpg(); } return ink; }
+  function buy(id){
+    if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
+    const c = costOf(id);
+    if (ink < c) return false;
+    ink -= c; upg[id]++;
+    if (id === 'mend') ward = Math.min(wardMax(), ward + 1);
+    try { window.__sync && window.__sync.record('upgrade', { id, level: upg[id], wave }); } catch(_){}
+    renderUpg();
+    return true;
+  }
+  // Farang toughen as the waves climb. A tough one is not answered twice by
+  // hand: the trace is the first hit and it lights the character, and the
+  // character's own wisps are the rest. One clean trace is worth three hits
+  // (itself and two lights), so past three the pen has to come back — or the
+  // workshop has to have made a trace worth more. Words are already as tough
+  // as they are long, so this is for single characters.
+  const hpFor = w => WORDS || !CFG.hpEvery ? 1 : Math.min(CFG.hpMax, 1 + Math.floor(w / CFG.hpEvery));
   let spawnAt = 0, tPrev = 0;
   // The field holds still while the start page is up. Nothing moves, nothing
   // spawns, no wisp flies; the clock resumes from where it stopped.
@@ -1508,7 +1564,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   const casting = () => !DIFF[difficulty] || DIFF[difficulty].cast !== false;
   function autocast(now){
     if (!casting()) return null;
-    if (now - castAt < CFG.castMs) return null;
+    if (now - castAt < castMs()) return null;
     let best = null;
     for (const m of monsters){
       if (charge(key(m)) < 1) continue;
@@ -1558,7 +1614,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     monsters.push({
       i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
       speed: CFG.speed * (0.8 + Math.random()*0.5),
-      hp: 1, wob: Math.random()*6.28, born: performance.now(),
+      hp: hpFor(wave), wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
@@ -1736,13 +1792,17 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // A word kindles once, when it is whole, and clean means the whole word.
     if (casting() && (!WORDS || (t && whole))){
       const zaps = WORDS ? t.zaps : zapped;
-      const gain = CFG.hitodamaGain + (zaps ? 0 : CFG.cleanBonus);
+      const gain = CFG.hitodamaGain + upg.bright + (zaps ? 0 : CFG.cleanBonus);
       kindle(WORDS ? t.w.ja : drew, gain);
       const d = dash();
       for (let k=0;k<14;k++)
         motes.push({x:d.x, y:d.y, vx:(Math.random()-.5)*1.8, vy:-Math.random()*2.2,
                     life:1, wisp:true});
     }
+    // Ink is paid for the trace, not for the kill: the hand did the work
+    // whether or not anything was standing there. A character conjured many
+    // times pays a little less, so the run pushes toward the ones that are new.
+    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
     const r = _conjure.apply(this, arguments);
     // The engine celebrates for 1.9s before advancing, which is dead time in a
     // game with a clock running — a fast hand finishes the next glyph before
@@ -1760,8 +1820,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 
   let readings = [];
-  function hit(m, partial){
+  function hit(m, partial, auto){
     const p0 = px(m);
+    if (upg.shove) m.d = Math.min(1, m.d + upg.shove * CFG.shoveStep);
     if (partial){
       // a kana landed: the farang staggers back a step and waits for the next
       m.d = Math.min(1, m.d + CFG.knockback);
@@ -1778,7 +1839,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // The joke is the teaching: "SOO" next to "tsu" names the dropped t far
     // better than the correct spelling does on its own, because the learner
     // recognises the wrong one as theirs.
-    if (CFG.reading !== 'off'){
+    // A tough one is hit several times. The reading blooms when the hand
+    // lands it and when it finally goes — not once per wisp, or it is noise.
+    if (CFG.reading !== 'off' && (!auto || m.hp <= 0)){
       const p = px(m);
       let text, sub = null;
       if (m.w){
@@ -1800,6 +1863,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       monsters = monsters.filter(x => x !== m);
       if (m === locked) locked = null;
       killed++;
+      if (auto) earn(CFG.inkKill);
       // An observation, not a claim: what was answered and how long it took.
       // Deliberately not a score — the client does not get to assert totals.
       try { window.__sync && window.__sync.record('banish', {
@@ -1843,7 +1907,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       autocast(now);
       for (const s of shots){
         s.t += dt*2.6;
-        if (s.t >= 1){ hit(s.to, s.partial); }
+        if (s.t >= 1){ hit(s.to, s.partial, s.auto); }
       }
       shots = shots.filter(s => s.t < 1 && monsters.includes(s.to));
     }
@@ -1879,9 +1943,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     g.beginPath(); g.arc(X, Y, 26 + 5*pulse, 0, 6.284); g.stroke();
 
     // ward health, as pips under it
-    for (let k=0;k<CFG.wardHp;k++){
+    for (let k=0;k<wardMax();k++){
       g.fillStyle = k < ward ? 'rgba(233,196,106,.85)' : 'rgba(233,196,106,.14)';
-      g.beginPath(); g.arc(X - (CFG.wardHp-1)*5 + k*10, Y + 34, 3, 0, 6.284); g.fill();
+      g.beginPath(); g.arc(X - (wardMax()-1)*5 + k*10, Y + 34, 3, 0, 6.284); g.fill();
     }
 
     const tgt = target();
@@ -1929,6 +1993,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
           const written = k < m.ci, cur = k === m.ci;
           g.fillStyle = written ? '#ffe9a8' : cur ? (isT ? '#bdf0e6' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
           g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
+        }
+      }
+      // how much more it takes: one pip per hit still owed, above the bubble
+      // (under it is the farang's own head)
+      if (m.hp > 1){
+        g.fillStyle = isT ? 'rgba(233,196,106,.95)' : 'rgba(233,196,106,.6)';
+        for (let k = 0; k < m.hp; k++){
+          g.beginPath(); g.arc(p.x - (m.hp-1)*4 + k*8, by - 23, 2.4, 0, 6.284); g.fill();
         }
       }
       // a lit character: its own wisp will answer this one
@@ -2044,14 +2116,37 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     g.fillStyle = 'rgba(233,196,106,.55)';
     g.font = '12px ui-sans-serif,system-ui'; g.textAlign = 'left';
     g.textBaseline = 'alphabetic';
-    g.fillText(`banished ${killed}`, 12, 20);
+    // Bottom left: the workshop strip has the top, and a tally under buttons
+    // is a tally nobody can read. The wave sits with it, because how far a run
+    // got is what a run is for.
+    g.fillText(`banished ${killed} · wave ${wave}`, 12, FH - 12);
   }
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
+    ink = 0; upg = { quick:0, bright:0, shove:0, mend:0 };
     ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
+    renderUpg();
   }
+
+  // ---- the workshop strip
+  // DOM, not canvas: it is redrawn when something changes rather than every
+  // frame, and a button is a button to a screen reader and to a finger.
+  const strip = document.createElement('div');
+  strip.className = 'upg'; strip.id = 'upg';
+  let upgMarkup = '';
+  function renderUpg(){
+    strip.innerHTML = upgMarkup = `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${ink}</div>`
+      + Object.entries(UPG).map(([id, u]) => {
+          const maxed = upg[id] >= u.max, c = costOf(id);
+          return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && ink >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
+            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'as far as it goes' : '墨 ' + c + ' · ' + u.blurb}</small></button>`;
+        }).join('');
+    if (strip.querySelectorAll) for (const b of strip.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
+  }
+  wrap.appendChild(strip);
+  renderUpg();
 
   // ---- the start page
   const start = document.createElement('div');
@@ -2161,6 +2256,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
+    get ink(){ return ink; }, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get upgHtml(){ return upgMarkup; },
+    earn, buy, costOf, hpFor, castMs, hit, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
     charge, kindle, quench, autocast, tidy, casting,
     touch(){ penAt = performance.now(); },
@@ -2204,6 +2302,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(loop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.38</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.39</div>
 </body>
 </html>

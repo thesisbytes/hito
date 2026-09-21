@@ -65,6 +65,22 @@ STYLE = """
                      width:min(96vw,34dvh); height:min(96vw,34dvh);
                      margin:8px auto 10px; }
   body.field .field-wrap{ flex:1 1 auto; }
+  /* The workshop strip: ink and what it buys. At the top of the field, as far
+     from the hand as the screen allows — a button under a resting palm is a
+     button that presses itself. */
+  .upg{ position:absolute; left:8px; right:8px; top:8px; z-index:2; display:flex; gap:6px;
+        align-items:stretch; font:12px ui-sans-serif,system-ui; pointer-events:none; }
+  .upg > *{ pointer-events:auto; }
+  .upg-ink{ display:flex; align-items:center; gap:5px; padding:0 9px; border-radius:9px;
+        background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e9c46a; font-weight:700; }
+  .upg-ink i{ font-style:normal; color:rgba(232,224,204,.55); font-weight:400; }
+  .upg button{ flex:1 1 0; min-width:0; text-align:left; padding:5px 7px; border-radius:9px; cursor:pointer;
+        background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e8e0cc; font:inherit; line-height:1.25; }
+  .upg button b{ color:#e9c46a; margin-right:4px; }
+  .upg button small{ display:block; color:rgba(232,224,204,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .upg button.can{ border-color:#7fd1c4; box-shadow:0 0 10px rgba(127,209,196,.25); }
+  .upg button.can small{ color:#bdf0e6; }
+  .upg button[disabled]{ opacity:.5; cursor:default; }
 
   /* The start page. A lacquer sheet over everything, with the two axes the
      game actually has: how much help, and what the sign says. */
@@ -151,6 +167,43 @@ LAYER = STYLE + r"""
   // ---- state
   let monsters = [], shots = [], motes = [];
   let ward = CFG.wardHp, over = false, wave = 0, killed = 0;
+
+  // ---- ink, and what it buys during a run
+  // The Tower's loop, with one rule it does not have: nothing here draws for
+  // you. Every upgrade multiplies what a trace is worth — how fast the lights
+  // you lit are thrown, how many a clean trace lights, how hard a hit shoves —
+  // and none of them lights a character the hand has not written. Ink comes
+  // from tracing, and mostly from tracing cleanly; a wisp's kill pays a
+  // little, so the idle half earns its keep without outearning the pen.
+  // All of it belongs to the run and goes when the ward falls.
+  const UPG = {
+    quick: { kana:'早', name:'quick', blurb:'the lights are thrown faster',  max:5 },
+    bright:{ kana:'灯', name:'bright', blurb:'a trace lights one more',      max:3 },
+    shove: { kana:'押', name:'shove', blurb:'every hit pushes them back',     max:5 },
+    mend:  { kana:'守', name:'mend',  blurb:'the ward gains a heart',          max:5 },
+  };
+  let ink = 0, upg = { quick:0, bright:0, shove:0, mend:0 };
+  const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
+  const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
+  const wardMax = () => CFG.wardHp + upg.mend;
+  function earn(n){ if (n > 0){ ink += n; renderUpg(); } return ink; }
+  function buy(id){
+    if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
+    const c = costOf(id);
+    if (ink < c) return false;
+    ink -= c; upg[id]++;
+    if (id === 'mend') ward = Math.min(wardMax(), ward + 1);
+    try { window.__sync && window.__sync.record('upgrade', { id, level: upg[id], wave }); } catch(_){}
+    renderUpg();
+    return true;
+  }
+  // Farang toughen as the waves climb. A tough one is not answered twice by
+  // hand: the trace is the first hit and it lights the character, and the
+  // character's own wisps are the rest. One clean trace is worth three hits
+  // (itself and two lights), so past three the pen has to come back — or the
+  // workshop has to have made a trace worth more. Words are already as tough
+  // as they are long, so this is for single characters.
+  const hpFor = w => WORDS || !CFG.hpEvery ? 1 : Math.min(CFG.hpMax, 1 + Math.floor(w / CFG.hpEvery));
   let spawnAt = 0, tPrev = 0;
   // The field holds still while the start page is up. Nothing moves, nothing
   // spawns, no wisp flies; the clock resumes from where it stopped.
@@ -276,7 +329,7 @@ LAYER = STYLE + r"""
   const casting = () => !DIFF[difficulty] || DIFF[difficulty].cast !== false;
   function autocast(now){
     if (!casting()) return null;
-    if (now - castAt < CFG.castMs) return null;
+    if (now - castAt < castMs()) return null;
     let best = null;
     for (const m of monsters){
       if (charge(key(m)) < 1) continue;
@@ -326,7 +379,7 @@ LAYER = STYLE + r"""
     monsters.push({
       i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
       speed: CFG.speed * (0.8 + Math.random()*0.5),
-      hp: 1, wob: Math.random()*6.28, born: performance.now(),
+      hp: hpFor(wave), wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
@@ -504,13 +557,17 @@ LAYER = STYLE + r"""
     // A word kindles once, when it is whole, and clean means the whole word.
     if (casting() && (!WORDS || (t && whole))){
       const zaps = WORDS ? t.zaps : zapped;
-      const gain = CFG.hitodamaGain + (zaps ? 0 : CFG.cleanBonus);
+      const gain = CFG.hitodamaGain + upg.bright + (zaps ? 0 : CFG.cleanBonus);
       kindle(WORDS ? t.w.ja : drew, gain);
       const d = dash();
       for (let k=0;k<14;k++)
         motes.push({x:d.x, y:d.y, vx:(Math.random()-.5)*1.8, vy:-Math.random()*2.2,
                     life:1, wisp:true});
     }
+    // Ink is paid for the trace, not for the kill: the hand did the work
+    // whether or not anything was standing there. A character conjured many
+    // times pays a little less, so the run pushes toward the ones that are new.
+    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
     const r = _conjure.apply(this, arguments);
     // The engine celebrates for 1.9s before advancing, which is dead time in a
     // game with a clock running — a fast hand finishes the next glyph before
@@ -528,8 +585,9 @@ LAYER = STYLE + r"""
   };
 
   let readings = [];
-  function hit(m, partial){
+  function hit(m, partial, auto){
     const p0 = px(m);
+    if (upg.shove) m.d = Math.min(1, m.d + upg.shove * CFG.shoveStep);
     if (partial){
       // a kana landed: the farang staggers back a step and waits for the next
       m.d = Math.min(1, m.d + CFG.knockback);
@@ -546,7 +604,9 @@ LAYER = STYLE + r"""
     // The joke is the teaching: "SOO" next to "tsu" names the dropped t far
     // better than the correct spelling does on its own, because the learner
     // recognises the wrong one as theirs.
-    if (CFG.reading !== 'off'){
+    // A tough one is hit several times. The reading blooms when the hand
+    // lands it and when it finally goes — not once per wisp, or it is noise.
+    if (CFG.reading !== 'off' && (!auto || m.hp <= 0)){
       const p = px(m);
       let text, sub = null;
       if (m.w){
@@ -568,6 +628,7 @@ LAYER = STYLE + r"""
       monsters = monsters.filter(x => x !== m);
       if (m === locked) locked = null;
       killed++;
+      if (auto) earn(CFG.inkKill);
       // An observation, not a claim: what was answered and how long it took.
       // Deliberately not a score — the client does not get to assert totals.
       try { window.__sync && window.__sync.record('banish', {
@@ -611,7 +672,7 @@ LAYER = STYLE + r"""
       autocast(now);
       for (const s of shots){
         s.t += dt*2.6;
-        if (s.t >= 1){ hit(s.to, s.partial); }
+        if (s.t >= 1){ hit(s.to, s.partial, s.auto); }
       }
       shots = shots.filter(s => s.t < 1 && monsters.includes(s.to));
     }
@@ -647,9 +708,9 @@ LAYER = STYLE + r"""
     g.beginPath(); g.arc(X, Y, 26 + 5*pulse, 0, 6.284); g.stroke();
 
     // ward health, as pips under it
-    for (let k=0;k<CFG.wardHp;k++){
+    for (let k=0;k<wardMax();k++){
       g.fillStyle = k < ward ? 'rgba(233,196,106,.85)' : 'rgba(233,196,106,.14)';
-      g.beginPath(); g.arc(X - (CFG.wardHp-1)*5 + k*10, Y + 34, 3, 0, 6.284); g.fill();
+      g.beginPath(); g.arc(X - (wardMax()-1)*5 + k*10, Y + 34, 3, 0, 6.284); g.fill();
     }
 
     const tgt = target();
@@ -697,6 +758,14 @@ LAYER = STYLE + r"""
           const written = k < m.ci, cur = k === m.ci;
           g.fillStyle = written ? '#ffe9a8' : cur ? (isT ? '#bdf0e6' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
           g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
+        }
+      }
+      // how much more it takes: one pip per hit still owed, above the bubble
+      // (under it is the farang's own head)
+      if (m.hp > 1){
+        g.fillStyle = isT ? 'rgba(233,196,106,.95)' : 'rgba(233,196,106,.6)';
+        for (let k = 0; k < m.hp; k++){
+          g.beginPath(); g.arc(p.x - (m.hp-1)*4 + k*8, by - 23, 2.4, 0, 6.284); g.fill();
         }
       }
       // a lit character: its own wisp will answer this one
@@ -812,14 +881,37 @@ LAYER = STYLE + r"""
     g.fillStyle = 'rgba(233,196,106,.55)';
     g.font = '12px ui-sans-serif,system-ui'; g.textAlign = 'left';
     g.textBaseline = 'alphabetic';
-    g.fillText(`banished ${killed}`, 12, 20);
+    // Bottom left: the workshop strip has the top, and a tally under buttons
+    // is a tally nobody can read. The wave sits with it, because how far a run
+    // got is what a run is for.
+    g.fillText(`banished ${killed} · wave ${wave}`, 12, FH - 12);
   }
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
+    ink = 0; upg = { quick:0, bright:0, shove:0, mend:0 };
     ward = CFG.wardHp; over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
+    renderUpg();
   }
+
+  // ---- the workshop strip
+  // DOM, not canvas: it is redrawn when something changes rather than every
+  // frame, and a button is a button to a screen reader and to a finger.
+  const strip = document.createElement('div');
+  strip.className = 'upg'; strip.id = 'upg';
+  let upgMarkup = '';
+  function renderUpg(){
+    strip.innerHTML = upgMarkup = `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${ink}</div>`
+      + Object.entries(UPG).map(([id, u]) => {
+          const maxed = upg[id] >= u.max, c = costOf(id);
+          return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && ink >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
+            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'as far as it goes' : '墨 ' + c + ' · ' + u.blurb}</small></button>`;
+        }).join('');
+    if (strip.querySelectorAll) for (const b of strip.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
+  }
+  wrap.appendChild(strip);
+  renderUpg();
 
   // ---- the start page
   const start = document.createElement('div');
@@ -929,6 +1021,9 @@ LAYER = STYLE + r"""
     base: BASE, setDifficulty, setSign, begin, openStart, openCredits, signOf: sign,
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
+    get ink(){ return ink; }, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get upgHtml(){ return upgMarkup; },
+    earn, buy, costOf, hpFor, castMs, hit, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
     charge, kindle, quench, autocast, tidy, casting,
     touch(){ penAt = performance.now(); },
@@ -1011,6 +1106,15 @@ def config(pack, deck=None):
         f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"
         f"speed:{f.get('speed', 0.055)},"
         f"wardHp:{int(f.get('wardHp', 5))},"
+        f"hpEvery:{int(f.get('hpEvery', 10))},"
+        f"hpMax:{int(f.get('hpMax', 5))},"
+        f"inkTrace:{int(f.get('inkTrace', 2))},"
+        f"inkClean:{int(f.get('inkClean', 2))},"
+        f"inkKill:{int(f.get('inkKill', 1))},"
+        f"inkMastered:{int(f.get('inkMastered', 6))},"
+        f"shoveStep:{float(f.get('shoveStep', 0.025))},"
+        f"upgradeRamp:{float(f.get('upgradeRamp', 1.6))},"
+        f"upgradeCost:{js({**{'quick': 8, 'bright': 14, 'shove': 6, 'mend': 10}, **(f.get('upgradeCost') or {})})},"
         f"spawnMs:{int(f.get('spawnMs', 5200))},"
         f"spawnRamp:{int(f.get('spawnRamp', 140))},"
         f"spawnMin:{int(f.get('spawnMin', 1800))},"

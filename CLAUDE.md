@@ -143,7 +143,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.38.html`
+### Hiragana — `dist/hiragana-v0.1.39.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -255,7 +255,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.1.html`
+### Katakana — `dist/katakana-game-v0.1.2.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -276,7 +276,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.16.html`
+### Vocab — `dist/vocab-v0.1.17.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -511,6 +511,58 @@ the shape as a flat centreline at the ink width, one path per stroke
 (v0.1.33 — the tolerance-width band before it was a fifth of the glyph wide
 and unreadable as a shape). The field holds still while
 the page is up, and the name in the header reopens it.
+
+**The run (v0.1.39)** is the first piece of The Tower in play, which is the
+shape the maintainer wants the game to grow into: the ward is the tower, the
+farang close from every side, and a lit character already fires by itself.
+Single characters take more hits as the waves climb; tracing earns ink (墨),
+clean tracing most; and ink buys four upgrades from a strip at the top of the
+field, all of which end with the run. See `scripts/PACK.md`.
+
+**DECIDED — nothing draws for you.** This is the one rule The Tower does not
+have, and the maintainer's words for it were "it is important that we keep
+tracing". The idle half of the game is *the characters you charged*: a wisp
+only ever flies from a character the hand has written. Every upgrade
+multiplies what a trace is worth — how fast its lights are thrown, how many it
+kindles, how hard a hit shoves — and none of them lights a character, skips a
+kana, or answers a farang whose character is dark.
+
+**DECIDED in direction, not built — the farang grow up.** As the stage climbs
+they stop carrying characters and start carrying words, then names, then
+sentences. How that plays, as far as it has been thought through:
+
+- *A long farang is answered by your whole arsenal, and the pen goes to the
+  holes.* A word is a row of slots. Each slot whose kana you hold lit is
+  answered by that kana's own wisp, spending a charge; the hand is only needed
+  for the kana that are dark. So a sentence is mostly dissolved by what you
+  already know, and what is left for the pen is exactly the characters you are
+  forgetting — the spaced-repetition design, scaled up rather than replaced.
+  This needs charges keyed by **character** for words too. Today the word game
+  keys them by word (`key()` in the field), which was right for a flashcard
+  and is wrong for this.
+- *In order.* The wisp for slot 3 waits for slots 1 and 2. A dark kana at the
+  front of a word holds up everything lit behind it, which is the right
+  pressure, and it keeps "writing the word" meaning writing it.
+- *Common kana drain first.* ん い う ー are in everything, so their charges go
+  fastest and they come back to the pen most often. Practice ends up weighted
+  by how often the language uses a character, without anyone scheduling it.
+- *Names belong to the farang.* They are foreigners; their names are katakana.
+  A named farang (マイケル, サラ) is a natural mid-boss, and Thotsakan's
+  generals are the named ones at the end of a stage.
+- *Sentences are where grammar gets in.* A sentence is words joined by
+  particles, and particles are what a learner gets wrong. Proposed, not
+  decided: **particles are never thrown for you** — は を に で are always
+  blank and always by hand, even when everything else is lit. The arsenal
+  handles vocabulary; the hand handles grammar.
+- *Row resonance*, as the set bonus: all five of a row lit and that row's
+  wisps fly harder. It rewards breadth and teaches the rows, which is the
+  DECIDED affinity rule paying out. It must not light a sibling that was not
+  traced — that would be a character learned by standing near one that was.
+
+Permanent upgrades between runs, research that ticks in real time (Hanuman's
+army), and tiers (Honnō-ji) are the rest of The Tower's loop and the rest of
+the economy section below. They are persistent, so they are where
+client-authority starts to matter; the run is not, which is why it came first.
 
 **The current single-canvas screen is the workshop, not the game.** Everything
 in `dist/hiragana-*.html` today — the gojūon chart, the stroke controls, the
