@@ -63,6 +63,7 @@ hito/
     test/vocab.test.mjs     a word is walked through the seam
     test/words.test.mjs     the farang carry words (the katakana game)
   vocab/                 decks: class content, not realm data (genki-i.json, katakana.json)
+  agents/                the multi-agent layer (Strands): reads the events table, never runs at play time; see agents/README.md
   dist/                built single-file outputs, one per script, versioned
   server/sync/         the Appwrite function behind sync.endpoint (see server/README.md)
   appwrite.config.json the Appwrite project: table schema and function settings, no secrets

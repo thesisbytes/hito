@@ -888,3 +888,66 @@ Running log. Append at the bottom, don't rewrite history.
   a run that ended after a zap and restarted on the same character counted the
   new run's first trace as unclean. `restart()` clears it. Suite run three
   times clean before shipping, because one green run had stopped meaning much.
+
+## 2026-09-23 — The agents: Strands wired up (agents/)
+
+- **Why there is an `agents/` directory.** The maintainer's multi-agent
+  systems class (Strands Agents SDK, OpenRouter) wants a project, and hito is
+  the one they like. The semester's scope is **tracing only**; typing,
+  speaking and reading layers wait until it ends. Each piece is meant to map
+  to a named idea from the course — harness, hooks, memory, context window —
+  so the writeup (LaTeX, later) can point at code.
+- **The rule that shapes it: agents never run at play time.** A build opens
+  offline from a double-click and no farang waits on OpenRouter. The agents
+  read a pull of the events table from disk and write under `agents/out`.
+  Nothing in `build/` or `dist/` knows they exist.
+- **System 1 and System 2, in Kahneman's sense.** The tracer's scorer is
+  already a System 1: deterministic, sub-millisecond, judging every pen
+  sample. The plan is a fast decision model (Laya, the open-source Jev-
+  compatible one: JSON state and typed questions in, calibrated probabilities
+  out, ~33 ms, no text, runs locally via ONNX) labelling every trace row —
+  honest, stopped short, poked, scribble, gave up — with the LLM called only
+  when its confidence is low. Strands' `BeforeModelCallEvent` can `cancel` a
+  model call, which is where that gate will sit. Not built. Laya reads
+  numbers, not ink, so it never replaces the scorer; and it is a few hundred
+  megabytes, so it never ships in a build.
+- **Geometry in a script, judgment in a model.** `events.py` is pure Python:
+  overview, per-character summary, hardest characters, and *consistency* —
+  the mean chamfer distance between a hand's landed attempts at one
+  character as a fraction of its size, the same measure the hand's
+  `quality()` uses between ink and shape. An agent reads what it computed
+  and never invents a number. The ground truth for any labelling is the
+  `flag` events, the only human verdicts; there are none in the table yet.
+- **Two hooks, both about trust.** `Ledger` writes one line per model and
+  tool call to a file (nothing lives only in the terminal; it caught the
+  first live failure, a 402, before anything else did). `Fence` cancels any
+  tool call whose `name` or `path` lands outside `agents/out`; the test
+  asks the agent to overwrite `build/engine.html` and checks the bytes.
+- **Tested without a key.** A scripted `Model` plays the LLM's part, so the
+  suite exercises tool dispatch, the ledger and the fence offline. `run.sh`
+  runs it when `agents/.venv` exists.
+- **Live, once.** With the class account's key (in the environment, from the
+  course folder — never here) the analyst read the pull, called two tools
+  and wrote a fair summary: 286 traces over 78 characters on 4 devices in two
+  days, ふ the only character with enough attempts to trust, and — its one
+  complaint — no trace carrying a quality score. That complaint was right and
+  the fault was ours: the hand stores the score as `q`, the run record as
+  `quality`, and the arithmetic looked for the second. Fixed. OpenRouter also
+  refuses a request that reserves the model's whole output window against a
+  small balance, so `max_tokens` defaults to 2000 (`HITO_MAX_TOKENS`).
+- **Trust asymmetry, for later.** The game holds no key and only writes,
+  through the sync function. The pipeline is the first process that reads
+  events and will write something back (a derived table, one row per player,
+  overwritten each run; never `hito.saves`, which merges by max; never a
+  ranking). So it is the first holder of a real API key. Environment only,
+  scopes limited, experiments against the file on disk.
+- **Two tracer reports from the maintainer, diagnosed, not yet fixed.** (1)
+  Easy mode: a poke a third of the way into a stroke lights the first third,
+  because `startSlack` grants that much free progress and the lit paint
+  follows the progress index rather than `hit[]`. Paint from what the pen
+  touched; the allowance is a threshold to tune separately. (2) A hand that
+  stops at the last visible ember can be up to three path points short of
+  the scored end, which exceeds the 0.02 floor on a short stroke. Needs a
+  running build to confirm it is the embers and not the finger. Both are
+  drawing bugs before they are thresholds, and worth fixing by hand first so
+  the labelling experiment has a before and after.

@@ -34,3 +34,8 @@ vocab/attempts.jsonl
 # publish.
 .agents/
 .claude/skills/
+
+# The agents' own venv, the pulled table, and what they write
+agents/.venv/
+agents/data/
+agents/out/

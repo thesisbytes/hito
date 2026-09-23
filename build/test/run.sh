@@ -161,4 +161,17 @@ for href in $(grep -o 'href="[^"]*"' index.html | sed 's/href="//;s/"$//' | grep
 done
 
 echo
+# The agents (agents/) are a separate Python package with their own venv and
+# no network in their tests. Checked here when the venv exists, so that a
+# change to the events they read is caught before it ships.
+if [ -x agents/.venv/bin/python ]; then
+  echo
+  echo "── agents (the wiring, offline) ────────────────────"
+  if out=$(agents/.venv/bin/python -m unittest discover -s agents/test 2>&1); then
+    echo "$out" | tail -1 | sed 's/^/  /'
+  else
+    echo "$out" | sed 's/^/  /'; fail=1
+  fi
+fi
+
 [ "$fail" = 0 ] && echo "all checks passed" || { echo "FAILURES above"; exit 1; }
