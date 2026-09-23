@@ -1061,3 +1061,36 @@ Running log. Append at the bottom, don't rewrite history.
   LLM does the labelling, which costs more and is what the gate was meant
   to avoid. `HITO_LAYA_STATE` picks json or prose; prose is the default,
   being the natural input and a third faster.
+
+## 2026-09-23 — The hand's first 24 verdicts (agents/labels/)
+
+- **A private page instead of a local gallery.** `agents/verdicts_page.py`
+  renders the 24-trace sample (every fizzle to date, eleven landed) as ink
+  over the shape asked for, with the geometry, Laya's guess and six
+  verdict buttons; the verdicts live in the page's own store and
+  `agents/verdicts.py` reads them back. The maintainer judged all 24 on
+  their phone. They are in `agents/labels/`, ids and verdicts only.
+- **What the hand said.** Every fizzle: *stopped short*, thirteen of
+  thirteen. Landed: eight fair, two scribbles (け at 2.18x travel with a
+  redrawn stroke; す), one stopped short — ら, which turned out to be a
+  guided trace from v0.1.41 holding only its last stroke, the old capture
+  bug. Those are filtered out of labelling now (`partial()`); the table
+  has 24 of them.
+- **I was wrong about ふ, and the number was wrong first.** The five ふ
+  fizzles I called fair had an end gap of 7-14% *of the character*. The
+  engine judges a stroke's end against the stroke's own length (endTol),
+  and against ふ's tick those gaps are 28-52% of the stroke: the hand
+  stopped a third to a half of a tick short, and said so. `end_gap_stroke`
+  is a feature now and the prose says both. This is the maintainer's
+  "traced to the end I see, but the template sticks out further" report,
+  measured: on the ticks of ふ, the visible end and the scored end
+  disagree by a third of the tick. Fix the drawing before the threshold.
+- **Laya against the hand: 8 of 24**, all from saying honest to
+  everything. A one-line rule on the geometry would do far better, which
+  is the baseline any tuned Laya has to beat.
+- **The maintainer's second report: fizzling should clear the ink.** A
+  fizzle halves progress and leaves the ink, so a redrawn stroke lands on
+  top of the old one and the recorded trace is both. け's "scribble" is
+  that. Whether a fizzle clears only the ink or restarts the character is
+  a game-feel decision, open; the recording should in any case start fresh
+  at a fizzle, or the labels are labels of a mess.

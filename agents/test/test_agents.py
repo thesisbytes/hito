@@ -379,6 +379,20 @@ class SystemOne(unittest.TestCase):
         self.assertLess(poke["ink_span"], 0.05)
         self.assertGreater(scribble["travel_ratio"], 4)
         self.assertEqual(whole["strokes_expected"], 1)
+        # a short last stroke: a small gap against the character is a large one against the stroke
+        tick_book = {"ふ": [[(200.0, 200.0), (800.0, 800.0)], [(700.0, 300.0), (740.0, 340.0)]]}
+        f = system1.features({"glyph": "ふ", "ok": False, "s": ink([(200, 200), (800, 800)], [(700, 300), (705, 305)])}, tick_book)
+        self.assertLess(f["end_gap"], 0.06)
+        self.assertGreater(f["end_gap_stroke"], 0.8)
+
+    def test_old_partial_captures_are_left_out(self):
+        self.assertTrue(system1.partial({"diff": "guided", "v": "0.1.41"}))
+        self.assertFalse(system1.partial({"diff": "guided", "v": "0.1.43"}))
+        self.assertFalse(system1.partial({"diff": "easy", "v": "0.1.41"}))
+        rows = [{"$id": "old", "kind": "trace", "body": {"glyph": "一", "ok": True, "diff": "guided", "v": "0.1.41", "s": ink([(200, 500), (800, 500)])}},
+                {"$id": "new", "kind": "trace", "body": {"glyph": "一", "ok": True, "diff": "guided", "v": "0.1.45", "s": ink([(200, 500), (800, 500)])}}]
+        fake = lambda s, q: {"answers": {"verdict": {"choice": "honest", "probabilities": {}, "confidence": 0.5}, "accept": {"noul": 0.5, "confidence": 0.5}}}
+        self.assertEqual([l["id"] for l in system1.label(rows, predictor=fake, book=self.book)], ["new"])
 
     def test_unknown_character_or_no_ink_keeps_the_plain_fields(self):
         f = system1.features({"glyph": "龍", "ok": False, "zaps": 2, "ms": 300, "s": [stroke([(1, 1), (2, 2)])]}, self.book)

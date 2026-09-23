@@ -85,7 +85,7 @@ def narrate(f):
     if "coverage" in f:
         parts.append(f"The ink came near {int(f['coverage'] * 100)}% of the path and {int(f['start_covered'] * 100)}% of the first stroke's start.")
         parts.append(f"It started {int(f['start_gap'] * 100)}% of the character's size from where the stroke starts and stopped "
-                     f"{int(f['end_gap'] * 100)}% from where the stroke ends.")
+                     f"{int(f['end_gap'] * 100)}% from where the stroke ends, which is {int(f['end_gap_stroke'] * 100)}% of that stroke's own length.")
         parts.append(f"There was {f['travel_ratio']:.2f} times as much ink as path, spanning {f['ink_span']:.2f} of the character's extent.")
     if f.get("q") is not None:
         parts.append(f"Recognisability was scored {f['q']:.2f} out of 1.")
@@ -150,15 +150,31 @@ def features(body, book):
     P = [p for s in exp for p in events.resample(s, 24)]
     first = events.resample(exp[0], 24)[:8]
     k = min(len(ink), len(exp)) - 1
+    last_len = length(exp[k]) or 1.0
+    end = math.dist(ink[-1][-1], exp[k][-1])
     f.update({
         "travel_ratio": round(sum(length(s) for s in ink) / path, 2),
         "coverage": round(sum(map(near, P)) / len(P), 2),
         "start_covered": round(sum(map(near, first)) / len(first), 2),
         "start_gap": round(math.dist(ink[0][0], exp[0][0]) / D, 3),
-        "end_gap": round(math.dist(ink[-1][-1], exp[k][-1]) / D, 3),
+        "end_gap": round(end / D, 3),
+        # The engine judges a stroke's end against the stroke's own length
+        # (endTol, PACK.md): 7% of the character is most of one of ふ's ticks.
+        # The hand's verdicts (2026-09-23) said so before the number did.
+        "end_gap_stroke": round(end / last_len, 2),
         "ink_span": round(diag(I) / D, 2),
     })
     return f
+
+
+def partial(body):
+    """Guided traces from builds before v0.1.43 hold only their last stroke
+    (a capture bug, fixed). They are not attempts and must not be labelled."""
+    try:
+        v = tuple(int(x) for x in str(body.get("v", "")).split("."))
+    except ValueError:
+        return False
+    return body.get("diff") == "guided" and v < (0, 1, 43)
 
 
 class Laya:
@@ -207,6 +223,7 @@ def label(rows, predictor=None, book=None, glyph=None, log=None, style=None, onl
     book = book or load_book()
     t0 = time.time()
     ts = [r for r in events.traces(rows) if not glyph or (r["body"].get("glyph") or r.get("glyph")) == glyph]
+    ts = [r for r in ts if not partial(r["body"])]
     if only is not None:
         ts = [r for r in ts if r.get("$id") in only]
     feats = [features(r["body"], book) for r in ts]
