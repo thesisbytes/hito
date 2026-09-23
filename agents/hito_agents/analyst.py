@@ -30,8 +30,8 @@ You have a pull of that table and tools that compute over it. Rules:
 
 def build(model=None, hooks=None, **kw):
     if model is None:
-        from .model import openrouter
-        model = openrouter()
+        from .model import pick
+        model = pick()
     return Agent(model=model, tools=ALL, system_prompt=SYSTEM, name="analyst",
                  hooks=hooks if hooks is not None else [Ledger(), Fence()], **kw)
 

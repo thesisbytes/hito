@@ -15,12 +15,19 @@ writes), **memory** and **context** (to come; see the notes for 2026-09-23).
 ```
 python3 -m venv agents/.venv
 agents/.venv/bin/pip install -e agents          # strands, and hito_agents on the path
-export OPENROUTER_API_KEY=...        # the environment, never the repo
 ```
 
-The model is OpenRouter through Strands' OpenAI-compatible provider.
-`HITO_MODEL` picks the model (default `anthropic/claude-sonnet-5`);
-`HITO_LLM_BASE_URL` points at any other OpenAI-compatible gateway.
+Then one model provider, from the environment and never the repo:
+
+| provider | set | notes |
+|---|---|---|
+| **Bedrock** (default when found) | `AWS_BEARER_TOKEN_BEDROCK`, `AWS_REGION` | a Bedrock API key from the console; `~/.aws` credentials work too. Anthropic models need access enabled once, per region. |
+| **OpenRouter** (the class account) | `OPENROUTER_API_KEY` | through Strands' OpenAI-compatible provider; `HITO_LLM_BASE_URL` points it at any other gateway |
+
+`HITO_LLM=bedrock|openrouter` forces one. `HITO_MODEL` overrides the model id
+(Strands' own Bedrock default for the region, or `anthropic/claude-sonnet-5`
+on OpenRouter). `HITO_MAX_TOKENS` caps output (default 2000: a provider
+reserves the whole window against a small balance otherwise).
 
 ## Run
 
@@ -43,7 +50,7 @@ agents/
     events.py             arithmetic over a pull: overview, per-character summary, consistency, hardest
     tools.py              what an agent may call: the numbers above, and one write under agents/out
     hooks.py              Ledger (every call, one line each) and Fence (no writes outside agents/out)
-    model.py              OpenRouter, from the environment
+    model.py              Bedrock or OpenRouter, from the environment
     analyst.py            the first agent: reads the pull and answers questions
   test/test_agents.py     the wiring, offline: a scripted model plays the LLM's part
   data/                   the pull (ignored by git)

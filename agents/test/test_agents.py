@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from strands.models.model import Model  # noqa: E402
 
-from hito_agents import analyst, events, tools  # noqa: E402
+from hito_agents import analyst, events, model, tools  # noqa: E402
 from hito_agents.hooks import Fence, Ledger  # noqa: E402
 
 
@@ -185,12 +185,42 @@ class Wiring(unittest.TestCase):
         self.assertEqual((self.out / "note.md").read_text(encoding="utf-8"), "つ is fine")
         self.assertEqual(fence.refused, [])
 
+    KEYS = ("OPENROUTER_API_KEY", "HITO_LLM_API_KEY", "AWS_BEARER_TOKEN_BEDROCK", "HITO_LLM", "HITO_MODEL",
+            "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_PROFILE", "AWS_REGION")
+
+    def env(self, **extra):
+        env = {k: v for k, v in os.environ.items() if k not in self.KEYS}
+        env.update(extra)
+        return unittest.mock.patch.dict(os.environ, env, clear=True)
+
     def test_no_key_means_no_agent_and_a_plain_message(self):
-        env = {k: v for k, v in os.environ.items() if k not in ("OPENROUTER_API_KEY", "HITO_LLM_API_KEY")}
-        with unittest.mock.patch.dict(os.environ, env, clear=True):
+        with self.env(), unittest.mock.patch.object(model, "aws_credentials", return_value=False):
             with self.assertRaises(SystemExit) as cm:
                 analyst.build()
+        self.assertIn("AWS_BEARER_TOKEN_BEDROCK", str(cm.exception))
         self.assertIn("OPENROUTER_API_KEY", str(cm.exception))
+
+    def test_a_bedrock_key_picks_bedrock(self):
+        from strands.models.bedrock import BedrockModel
+        with self.env(AWS_BEARER_TOKEN_BEDROCK="not-a-real-key", AWS_REGION="us-west-2"):
+            m = model.pick()
+        self.assertIsInstance(m, BedrockModel)
+        self.assertEqual(m.get_config()["max_tokens"], model.DEFAULT_MAX_TOKENS)
+
+    def test_only_an_openrouter_key_picks_openrouter(self):
+        from strands.models.openai import OpenAIModel
+        with self.env(OPENROUTER_API_KEY="not-a-real-key"), \
+                unittest.mock.patch.object(model, "aws_credentials", return_value=False):
+            m = model.pick()
+        self.assertIsInstance(m, OpenAIModel)
+        self.assertEqual(m.get_config()["model_id"], model.OPENROUTER_MODEL)
+
+    def test_hito_llm_forces_a_provider(self):
+        from strands.models.openai import OpenAIModel
+        with self.env(AWS_BEARER_TOKEN_BEDROCK="x", OPENROUTER_API_KEY="y", HITO_LLM="openrouter"):
+            self.assertIsInstance(model.pick(), OpenAIModel)
+        with self.env(HITO_LLM="bedrock", AWS_BEARER_TOKEN_BEDROCK="x", OPENROUTER_API_KEY="y", HITO_MODEL="us.anthropic.something"):
+            self.assertEqual(model.pick().get_config()["model_id"], "us.anthropic.something")
 
 
 if __name__ == "__main__":
