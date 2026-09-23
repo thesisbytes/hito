@@ -196,6 +196,23 @@ for (const file of process.argv.slice(2)){
     F.spawn(); F.retarget(true);
     ok(P.SHADOW_MODE === 'strokes', `after the boss the shape did not come back (${P.SHADOW_MODE}; ${F.monsters.length} farang, tracer on ${P.LETTERS[P.idx][0]}, boss was ${P.LETTERS[boss.i][0]})`);
   }
+  // ---- past the end without reaching it: the stroke starts over, not the character
+  {
+    const { P, g, fire, tick, px, along } = rig(file);
+    const [a, b] = P.SEGS[0];
+    const s = px(a); fire('pointerdown', s.x, s.y, 'pen');
+    for (let k = a + 1; k <= b - 3; k++){ tick(8); const q = px(k); fire('pointermove', q.x, q.y, 'pen'); }
+    ok(P.prog >= b - 6 && P.awaitLift === false, `did not get near the end (prog ${P.prog} of ${b})`);
+    // then on past the end along its direction, a little to one side, outside the end tolerance
+    const e = px(b), f = px(b - 3), tx = e.x - f.x, ty = e.y - f.y, tl = Math.hypot(tx, ty) || 1;
+    const R = P.R * P.W, side = { x: -ty / tl, y: tx / tl };
+    for (let k = 1; k <= 8; k++){ tick(8); fire('pointermove', e.x + tx / tl * R * 0.45 * k + side.x * R * 0.6, e.y + ty / tl * R * 0.45 * k + side.y * R * 0.6, 'pen'); }
+    ok(P.prog === a && P.strayed === true, `passing the end did not start the stroke over (prog ${P.prog}, strayed ${P.strayed})`);
+    fire('pointerup', e.x, e.y, 'pen');
+    ok(P.strokes.length === 0, 'the discarded stroke stayed on the canvas');
+    along(a, b);
+    ok(P.awaitLift === true, 'the stroke drawn again did not complete');
+  }
   // ---- keep: the old rule, every stroke stays
   {
     const { P, H, nowhere } = rig(file);

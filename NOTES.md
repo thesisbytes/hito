@@ -1406,3 +1406,36 @@ Running log. Append at the bottom, don't rewrite history.
 - "My own game is beating me": no run since the pull reached a boss. The
   stage's twelve farang at 46dvh by finger is a starting position, not a
   tuning; the numbers above are what to tune from.
+
+## 2026-09-24 — Past the end, the stroke starts over; the ring goes (hiragana v0.1.53, katakana-game v0.1.16, vocab v0.1.31)
+
+- **The maintainer, after rounds on v0.1.52:** the boss's faint template is
+  enough; "that circle is annoying"; "ふ feels way better"; and "sometimes
+  I'll mistrace some chars slightly, like just below or just above the end
+  point, and then I poke to finish it. Maybe we could make them start the
+  stroke over if on the first attempt passes beyond the end point and
+  still is not complete."
+- **The rule.** Near a stroke's end (the high-water mark within two slacks
+  of it), then beyond the end along the stroke's own direction by more than
+  `pastEnd` (1.5) end tolerances without having reached it: the stroke
+  starts over. Progress back to its start, its coverage cleared, the stroke
+  in hand dropped at the lift and not recorded, a zap and a toast. Not the
+  character — the strokes before it stand. Guided is exempt: its end is
+  reach. The stray test drives a pen to three points short of あ's first
+  end, then past it to one side, and checks the stroke restarts, the ink
+  is discarded, and the stroke drawn again completes.
+- **The ring is gone.** The frame flash stays; the shine along the stroke
+  stays. A signal that annoys is worse than none.
+- **What the agents are doing, asked point blank.** Nothing in this loop
+  until asked. The arithmetic the analysis has run on all day is the
+  agents' own module (`events.py`, `system1.py`), called by hand; the
+  analyst agent was run once over this pull and quoted the tools' numbers
+  correctly (ふ 39% fizzle, 2.81 zaps; も, え, さ, せ; き the least
+  consistent), then dressed them in explanations it could not know
+  ("finger-width contact blurs the close-loop endpoints") and correctly
+  refused the before/after question because the v0.1.52 traces are not in
+  the table yet. Laya's labels are stale and uninformative. mem0 holds
+  four notes. The honest accounting for the report: the harness paid for
+  itself as a measuring instrument and a labelling loop; the LLM as
+  analyst is a narrator of numbers a script produced; the System 1 seat is
+  still empty.

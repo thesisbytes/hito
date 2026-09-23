@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.52.html`
+### Hiragana — `dist/hiragana-v0.1.53.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -205,6 +205,9 @@ What the tracing enforces, all of it learned by finding it broken:
   ふ's hook the maintainer had to poke the end to be let on. A stroke
   shorter than a fingertip is a flick for a finger, and the tail guard's
   80% rule is not modelled for it.
+- **Past the end, the stroke starts over (v0.1.53).** Near the end and
+  then beyond it along the stroke's direction without reaching it, and the
+  stroke restarts rather than waiting to be poked. `pastEnd` in the pack.
 
 Presentation: one stroke lit at a time. Finished strokes stay shining, the
 current one is drawn by the pen, later ones have not caught light yet.
@@ -329,7 +332,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.15.html`
+### Katakana — `dist/katakana-game-v0.1.16.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -350,7 +353,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.30.html`
+### Vocab — `dist/vocab-v0.1.31.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -638,9 +641,9 @@ more hits and is traced with less help, the shape faint and the start dot
 kept ("boss fights are when the trace disappears ... perhaps not completely
 blank, just less help"). The path is still enforced underneath, so this is
 recall of where a stroke goes, not the hard-mode scorer, which is still not
-built. **A finished stroke is unmissable**: a ring wider than a fingertip
-from the stroke's end and a flash of the sketchbook's frame, because the
-maintainer relies on haptics and not every device has them. Every landed trace is scored for how recognisable it is
+built. **A finished stroke is unmissable**: a flash of the sketchbook's frame,
+because the maintainer relies on haptics and not every device has them (a
+ring from the stroke's end was tried and taken out: "that circle is annoying"). Every landed trace is scored for how recognisable it is
 (`quality()` in the hand: the mean distance between the ink and the shape asked
 for, both ways, over the glyph's own size) and pays between half and half
 again by that score. Medium pays double.

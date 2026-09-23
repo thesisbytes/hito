@@ -308,7 +308,9 @@ def main():
               "strayed=false,down_=null,hiMark=0,fizzleWhy='';"
               # Progress only advances the way the stroke goes: see the heading
               # gate in follow().
-              f"let HEADING_GATE={'true' if pack.get('headingGate', True) else 'false'},mvx=0,mvy=0,moving=false;")
+              f"let HEADING_GATE={'true' if pack.get('headingGate', True) else 'false'},mvx=0,mvy=0,moving=false;"
+              # how far beyond a stroke's end, in end tolerances, is "past it"
+              f"let PAST_END={pack.get('pastEnd', 1.5)};")
 
         s.sub("build segments",
               r"if\(rec\)\{ rec\.forEach\(st=>\{ const R=resample\(st,"
@@ -563,6 +565,20 @@ def main():
               "function pos(e){const r=iC.getBoundingClientRect(); let sx=0,sy=0;\n"
               "  try{ const m=getComputedStyle(stage).transform; if(m&&m!=='none'){ const v=m.match(/matrix\\(([^)]+)\\)/); if(v){ const a=v[1].split(',').map(Number); sx=a[4]||0; sy=a[5]||0; } } }catch(_){}\n"
               "  return{x:e.clientX-r.left+sx,y:e.clientY-r.top+sy,")
+        # Past the end without reaching it. The hand traced the stroke and
+        # missed its end a little above or below, and used to poke the end to
+        # be let on ("sometimes I'll mistrace some chars slightly, like just
+        # below or just above the end point, and then I poke to finish it.
+        # maybe we could make them start the stroke over"). So: near the end,
+        # then beyond it along the stroke's own direction by more than the
+        # tolerance, and the stroke starts over — not the character.
+        s.sub("past the end, the stroke starts over",
+              r"  // off the path: the spell leaks — bzzt!\n",
+              "  if(!DRAG_FOLLOW&&!awaitLift&&PAST_END>0&&hiMark>=seg[1]-2*SEGSLACK[segIdx]){\n"
+              "    const e=PATH[seg[1]], f=PATH[Math.max(seg[0],seg[1]-3)], tx=e.x-f.x, ty=e.y-f.y, tl=Math.hypot(tx,ty)||1;\n"
+              "    const along=((n.x-e.x)*tx+(n.y-e.y)*ty)/tl;\n"
+              "    if(along>endTol(segIdx)*PAST_END){ strokeAgain(q); return; } }\n"
+              "  // off the path: the spell leaks — bzzt!\n")
         s.sub("snapshot at pen down",
               r"    follow\(pos\(e\),true\); \}",
               "    down_={prog,seg:segIdx,travel,segTravel,started:segStarted,smudge,hit:hit?hit.slice():null};"
@@ -570,6 +586,15 @@ def main():
               "    follow(pos(e),true); }")
         s.sub("stray check at pen up",
               r"function endStroke\(e\)\{",
+              "function strokeAgain(q){\n"
+              "  const seg=SEGS[segIdx];\n"
+              "  prog=seg[0]; segBase=prog; segTravel=0; segStarted=false; segNagged=false; hiMark=prog;\n"
+              "  if(hit) for(let i=seg[0];i<=seg[1];i++) hit[i]=0;\n"
+              "  offCount=0; smudge=Math.max(0,smudge-2);\n"
+              "  strayed=true;   // the stroke in hand is discarded at the lift, and the hand does not record it\n"
+              "  dropPen(); redrawInk(); runeUI(); drawGuide(); zap(q);\n"
+              "  toast('past the end ✦ start the stroke again');\n"
+              "}\n"
               "function strayCheck(){\n"
               "  if(done||!down_||!SEGS.length) return;\n"
               "  const d=down_; down_=null;\n"
@@ -702,7 +727,8 @@ def main():
               "  // maintainer: 'I really rely on haptics.. without it, I wouldn't know\n"
               "  // if the stroke is complete'). So the end of the stroke also throws a\n"
               "  // ring wider than a finger, and the sketchbook's frame flashes.\n"
-              "  const e=denorm(PATH[b]); rings.push({x:e.x,y:e.y,t:0});\n"
+              "  // (a ring from the stroke's end was tried in v0.1.51 and taken out in\n"
+              "  // v0.1.53 — 'that circle is annoying'; the frame flash stays)\n"
               "  stage.classList.remove('lift'); void stage.offsetWidth; stage.classList.add('lift');\n"
               "  if(navigator.vibrate) navigator.vibrate(12);\n"
               "  loop(); }\n"
