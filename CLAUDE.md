@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.53.html`
+### Hiragana — `dist/hiragana-v0.1.54.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -332,7 +332,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.16.html`
+### Katakana — `dist/katakana-game-v0.1.17.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -353,7 +353,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.31.html`
+### Vocab — `dist/vocab-v0.1.32.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -603,6 +603,16 @@ another go. The run is written to the hand's ledger (the last twenty, and the
 furthest wave per realm for good), travels with a signed-in player's save, and
 goes to the events table as a `run`. These are the player's record of
 themselves, never a score anyone is ranked by.
+
+**Superseded by the tower (v0.1.54) — kept for the reasoning.** The stages
+below became a wall (stage 8 was 33 farang by finger) and every fall was
+nothing. The maintainer: "there is no completing a level. You just keep going
+until the swarm consumes you." Waves do not end; the furthest wave is the
+record; a row of the chart opens every ten waves counted from that record, so
+the curriculum gate survives keyed to distance; every tenth wave is a boss,
+and while it lives every character is traced with less help. Tama still buys
+the lanterns; the gate is no longer for sale. Guided pays nothing and sets no
+record. See `scripts/PACK.md`, "The tower".
 
 **DECIDED — you cannot advance without unlocking (v0.1.44).** The
 maintainer: "make it impossible to advance without unlocking stuff. so there

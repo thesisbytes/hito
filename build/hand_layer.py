@@ -327,10 +327,10 @@ LAYER = r"""
   // not a score anyone else will ever be ranked by.
   const cleanRun = r => ({ at:+r.at||0, realm:String(r.realm||'').slice(0,24), wave:+r.wave||0, banished:+r.banished||0,
     traced:+r.traced||0, clean:+r.clean||0, sumi:+r.sumi||0, cast:+r.cast||0, ms:+r.ms||0,
-    difficulty:String(r.difficulty||'').slice(0,12) });
+    difficulty:String(r.difficulty||'').slice(0,12), practice: r.practice ? true : undefined });
   function bestOf(realm, r){
     const b = LEDGER.best[realm];
-    if (!b || r.wave > b.wave || (r.wave === b.wave && r.banished > b.banished)){ LEDGER.best[realm] = { wave:r.wave, banished:r.banished, at:r.at }; return true; }
+    if (!r.practice && (!b || r.wave > b.wave || (r.wave === b.wave && r.banished > b.banished))){ LEDGER.best[realm] = { wave:r.wave, banished:r.banished, at:r.at }; return true; }
     return false;
   }
   function run(rec){
@@ -339,7 +339,7 @@ LAYER = r"""
     LEDGER.runs.push(r); LEDGER.runs = LEDGER.runs.slice(-20);
     save();
     const total = Object.values(LEDGER.g).reduce((a, e) => a + (e.n || 0), 0);
-    return { isBest, wave: LEDGER.best[r.realm].wave, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
+    return { isBest, wave: (LEDGER.best[r.realm] || {}).wave || 0, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
   }
   // ---- 魂 tama: what a run leaves behind ----------------------------------
   // Spent between rounds, on things that last. It has to survive being merged

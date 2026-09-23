@@ -843,59 +843,62 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   fresh();
 }
 
-// ---- stages, 魂, and the workshop between rounds
-// "make it impossible to advance without unlocking stuff." The checks that
-// matter are the ones about what cannot be done: a gate bought without holding
-// the stage before it, a purchase on credit, a character on the field that the
-// stage has not reached, a guided run paid like a hard one.
+// ---- the tower, 魂, and the workshop between rounds
+// "There is no completing a level. You just keep going until the swarm
+// consumes you." The checks that matter: a character on the field from a row
+// the run has not reached, a purchase on credit, a run that ends in a win, a
+// boss that does not dim the shape for everyone, a guided run that sets a record.
 {
   const H = globalThis.__hand; H.reset();
   fresh(); F.setDifficulty('medium');
   const realm = 'hiragana';
-  ok(F.stage === 1 && F.stageMax === 1, `a new player starts at stage ${F.stage} of ${F.stageMax}`);
-  // only the rows this stage has reached are ever on the field
+  const tw = JSON.parse(html.match(/tower:(\{[^}]*\})/)[1]);
+  ok(F.bestWave === 0 && F.rowsOpen() === tw.rows, `a new player starts with ${F.rowsOpen()} rows open (furthest wave ${F.bestWave})`);
+  // only the open rows are ever on the field
   const allowed = new Set(F.roster());
-  ok(allowed.size > 0 && allowed.size < P.LETTERS.length, `stage 1 puts ${allowed.size} of ${P.LETTERS.length} characters on the field`);
-  ok([...allowed].every(i => (P.LETTERS[i][6] || 1) <= F.stageRows(1)), 'the roster reaches past the stage\'s rows');
-  let stray = 0; for (let k = 0; k < 150; k++){ F.spawn(); if (!allowed.has(F.monsters[F.monsters.length-1].i)) stray++; }
-  ok(stray === 0, `${stray} of 150 farang carried a character this stage has not reached`);
+  ok(allowed.size > 0 && allowed.size < P.LETTERS.length, `the first rows put ${allowed.size} of ${P.LETTERS.length} characters on the field`);
+  ok([...allowed].every(i => (P.LETTERS[i][6] || 1) <= tw.rows), 'the roster reaches past the open rows');
+  let stray = 0; for (let k = 0; k < tw.rowWaves - 1; k++){ F.spawn(); if (!allowed.has(F.monsters[F.monsters.length-1].i)) stray++; }
+  ok(stray === 0, `${stray} farang carried a character from a row the run has not reached`);
+  // and a row opens as the run goes deeper
+  F.spawn();
+  ok(F.wave >= tw.rowWaves && F.rowsOpen() === tw.rows + 1 && F.roster().length > allowed.size, `wave ${tw.rowWaves} did not open the next row (${F.rowsOpen()} rows, ${F.roster().length} characters)`);
+  // there is no win: answer everything for a long while and the run is still on
+  for (let g = 0; g < 300 && !F.over; g++){ for (const m of [...F.monsters]){ m.hp = 1; F.hit(m, false, false); } advance(60); }
+  ok(!F.over, 'the run ended without the ward falling');
 
-  // nothing is for sale to an empty purse, and the gate is not for sale at all yet
+  // a boss every bossEvery waves, and while it lives every character gets less help
+  fresh(); F.setDifficulty('medium');
+  for (let k = 0; k < tw.bossEvery; k++) F.spawn();
+  // (a fresh field has already spawned once, so the tenth wave is the ninth of these)
+  const bosses = F.monsters.filter(m => m.boss);
+  ok(bosses.length === 1, `${tw.bossEvery} waves brought ${bosses.length} boss(es)`);
+  ok(bosses[0].hp >= 1 + tw.bossHp, `the boss takes ${bosses[0].hp} hits`);
+  ok(F.bossAlive() && P.SHADOW_MODE === 'faint', `a boss on the field did not dim the shape for everyone (${P.SHADOW_MODE})`);
+  bosses[0].hp = 1; F.hit(bosses[0], false, false);
+  ok(!F.bossAlive() && P.SHADOW_MODE === 'strokes', `the shape did not come back when the boss fell (${P.SHADOW_MODE})`);
+
+  // nothing is for sale to an empty purse
   fresh();
-  ok(H.tama.balance === 0 && F.buyLantern('heart') === false && F.buyGate() === false, 'something was bought with nothing');
-  H.tama.earn(100000);
-  ok(F.buyGate() === false && F.stageMax === 1, 'the gate was bought without holding the stage before it');
+  ok(H.tama.balance === 0 && F.buyLantern('heart') === false, 'something was bought with nothing');
 
-  // lose: it pays, and it does not clear
+  // lose: it pays, and the furthest wave is kept for good
   fresh(); F.begin();
   globalThis.conjure(); advance(cfg.advanceMs + 60);
   const bal0 = H.tama.balance;
   for (let g = 0; !F.over && g < 400; g++){ for (const m of F.monsters) m.d = 0.061; advance(40); }
-  ok(F.over && !F.won && F.ended.pay > 0 && H.tama.balance === bal0 + F.ended.pay, `a lost run paid ${F.ended && F.ended.pay} and the purse moved by ${H.tama.balance - bal0}`);
-  ok(H.tama.cleared(realm) === 0, 'losing a stage cleared it');
-  ok(F.buyGate() === false, 'the gate was for sale after a loss');
-
-  // win: every farang the stage sends is answered, and the ward held
-  fresh(); F.begin();
-  const need = F.stageCount(1);
-  for (let g = 0; !F.over && g < 4000; g++){ for (const m of [...F.monsters]){ m.hp = 1; F.hit(m, false, false); } advance(60); }
-  ok(F.over && F.won, `stage 1 did not end in a win after its ${need} farang (wave ${F.run && 0}, over ${F.over})`);
-  ok(F.ended.rec.won === true && F.ended.rec.stage === 1 && F.ended.rec.wave === need, `the winning run's record is ${JSON.stringify(F.ended.rec).slice(0,160)}`);
-  ok(H.tama.cleared(realm) === 1, 'holding stage 1 to the end did not clear it');
+  ok(F.over && F.ended.pay > 0 && H.tama.balance === bal0 + F.ended.pay, `a lost run paid ${F.ended && F.ended.pay} and the purse moved by ${H.tama.balance - bal0}`);
+  ok(H.ledger.best[realm] && H.ledger.best[realm].wave === F.ended.rec.wave, 'the furthest wave was not kept');
   advance(900);
-  ok(/the ward held/.test(F.startHtml) && /gate to stage 2/.test(F.startHtml) && /\+ 魂/.test(F.startHtml), 'the ending does not say the ward held, what was paid, or offer the gate');
-
-  // now the gate can be bought, once, and the field grows by a row
-  const before = H.tama.balance, cost = F.gateCost();
-  ok(F.buyGate() === true && F.stageMax === 2 && H.tama.balance === before - cost, 'buying the gate did not open stage 2 or did not cost what it said');
-  ok(F.buyGate() === false, 'the gate to stage 3 was for sale without holding stage 2');
-  ok(F.gateCost() > cost, 'the second gate costs no more than the first');
-  F.setStage(2);
-  ok(F.roster().length > allowed.size && F.stageCount(2) > need, 'stage 2 has no more characters or no more farang than stage 1');
-  ok(F.setStage(99) === 2, 'a stage that is not unlocked could be selected');
+  ok(/the ward fell/.test(F.startHtml) && /\+ 魂/.test(F.startHtml) && !/gate to stage/.test(F.startHtml), 'the ending does not say the ward fell and what was paid, or still sells a gate');
+  // and the furthest wave opens rows for every run after
+  H.ledger.best[realm].wave = tw.rowWaves * 3;
+  fresh();
+  ok(F.rowsOpen() === tw.rows + 3 && F.roster().length > allowed.size, `a furthest wave of ${tw.rowWaves * 3} opened ${F.rowsOpen()} rows`);
+  H.ledger.best[realm].wave = 0;
+  fresh(); H.tama.earn(100000);
 
   // what lasts, lasts: into the next run and the one after
-  F.setStage(1);
   const hearts = F.wardMax, cap = F.capNow();
   ok(F.buyLantern('heart') && F.buyLantern('lamp') && F.buyLantern('inkwell'), 'a full purse could not buy the lanterns');
   fresh(); F.begin();
@@ -935,25 +938,19 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   fresh(); F.begin(); P.strokes.length = 0; globalThis.conjure();
   ok(Math.abs(F.run.pay - cfg.tamaClean) < 1e-9, `a trace with nothing to judge paid ${F.run.pay}, par is ${cfg.tamaClean}`);
 
-  // guided only gets you so far
-  const st = JSON.parse(html.match(/stages:(\{[^}]*\})/)[1]);
-  ok(F.needs(1) === 'medium' && F.needs(8) === 'medium', `stages ask for ${F.needs(1)} and ${F.needs(8)}: the game is medium, guided is a sandbox`);
-  H.reset(); H.tama.earn(1e7);
-  // every stage counts at medium now, so the first one is the one to test
-  ok(F.stageMax === 1, `a fresh save is not at stage 1 (at ${F.stageMax})`);
-  const win = d => { fresh(); F.setDifficulty(d); F.setStage(1); F.begin();
-    for (let g = 0; !F.over && g < 6000; g++){ for (const m of [...F.monsters]){ m.hp = 1; F.hit(m, false, false); } advance(60); } advance(900); return F.ended; };
-  const g = win('guided');
-  ok(g && g.won && g.held === false && H.tama.cleared('hiragana') === 0, `a stage was held in guided (cleared ${H.tama.cleared('hiragana')})`);
-  ok(g.pay === 0, `practice in guided paid ${g.pay}: it is a sandbox and pays nothing`);
-  ok(/only counts toward the gate at <b>medium<\/b>/.test(F.startHtml), 'the ending does not say why the stage did not count');
-  ok(F.buyGate() === false, 'the next gate was for sale after a guided hold');
-  const e = win('medium');
-  ok(e && e.won && e.held === true && H.tama.cleared('hiragana') === 1, 'the same stage held at medium did not count');
-  ok(F.buyGate() === true, 'the gate was not for sale after holding the stage properly');
-  fresh(); F.setDifficulty('guided'); F.setStage(1); F.openStart();   // a live run, so the page is the start page and not the ending
-  ok(/counts at medium or harder/.test(F.startHtml), 'the start page does not say what the stage asks for');
-  F.setDifficulty('medium'); F.setStage(1); H.reset(); fresh();
+  // guided is a sandbox: it pays nothing, and its waves are no record
+  H.reset();
+  const fall = d => { fresh(); F.setDifficulty(d); F.begin(); globalThis.conjure(); advance(cfg.advanceMs + 60);
+    for (let g = 0; !F.over && g < 400; g++){ for (const m of F.monsters) m.d = 0.061; advance(40); } advance(900); return F.ended; };
+  const g = fall('guided');
+  ok(g && g.pay === 0 && g.rec.practice === true, `practice in guided paid ${g && g.pay}: it is a sandbox and pays nothing`);
+  ok(!H.ledger.best.hiragana, 'a guided run set the furthest wave');
+  ok(/guided is practice/.test(F.startHtml), 'the ending does not say guided is practice');
+  const e = fall('medium');
+  ok(e && e.pay > 0 && H.ledger.best.hiragana && H.ledger.best.hiragana.wave === e.rec.wave, 'the same run at medium did not count');
+  fresh(); F.setDifficulty('guided'); F.openStart();
+  ok(/practice: nothing counts/.test(F.startHtml), 'the start page does not say guided counts for nothing');
+  F.setDifficulty('medium'); H.reset(); fresh();
 }
 
 // every conjure in this file went through the hand; none of its notes may have thrown

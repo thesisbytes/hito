@@ -1534,3 +1534,33 @@ Running log. Append at the bottom, don't rewrite history.
   timestamp), and away gains are the server's to compute, never the
   client's to claim. The gauge only ever fills by hand.
 - None of it built. Recorded so the reasoning survives.
+
+## 2026-09-24 — The tower (hiragana v0.1.54, katakana-game v0.1.17, vocab v0.1.32)
+
+- **The maintainer:** "Should we go in the tower direction then? There is no
+  completing a level. You just keep going until the swarm consumes you." And,
+  on the boss: "throughout round 10, all the characters you stroke are
+  affected by the debuff from the boss."
+- **What changed.** The stage table, its count and gate, `stageNo`, the
+  win, `held`, `needs`/`counts` and the stage buttons are gone. A run is
+  waves without end until the ward falls. Rows of the chart open every
+  `rowWaves` (10) waves, counted from the furthest wave the realm has ever
+  reached (the hand's ledger already kept it) or the current run's,
+  whichever is further — so the curriculum gate is distance now, and it
+  opens live during a deep run. Every tenth wave is a boss with `bossHp`
+  extra hits, and while any boss lives the shape is faint for every
+  character; `applyShadow()` decides it from `bossAlive()` on retarget, on
+  spawn and on a kill. Tama pays by traces and waves, with no "held" bonus;
+  the lantern workshop is unchanged; the gate is not for sale. A guided run
+  is kept in the ledger as `practice` and never a furthest wave. The ending
+  says "the ward fell · wave N · your furthest yet"; the start page says the
+  furthest wave and when the next row opens.
+- **Why the data said so.** The last eight medium runs fell at 30 and 33
+  farang, with one held stage among them. As waves those are a record that
+  only rises. And no run had reached a boss because the boss was the last
+  farang of a stage nobody finished; now one arrives at wave 10.
+- The field test's stage and gate blocks are tower blocks now: rows open by
+  wave and by record, no win, one boss per ten waves that dims the shape for
+  all and lifts it when it falls, a lost run pays and keeps its wave, guided
+  pays nothing and sets no record. The config key is `tower`; `stages` is
+  read as an alias.

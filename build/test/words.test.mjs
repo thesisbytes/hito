@@ -275,8 +275,9 @@ fresh();
 // ---- a deck is not staged: it is class content with its own order
 fresh();
 {
-  ok(F.stageMax === 1 && F.roster().length === P.LETTERS.length, 'the word game put a stage gate on a deck');
-  ok(F.stageCount(1) === Infinity, 'a deck run has a farang count: it would end in a "win" mid-lesson');
+  ok(F.rowsOpen() === Infinity && F.roster().length === P.LETTERS.length, 'the word game put a row gate on a deck');
+  for (let k = 0; k < 12; k++) F.spawn();
+  ok(!F.bossAlive(), 'a deck run has a boss: a word is long enough');
 }
 
 if (fail){ console.log(`  ${fail} failure(s) in ${target}`); process.exit(1); }
