@@ -45,8 +45,11 @@ def max_tokens():
 
 OPENROUTER_URL = os.environ.get("HITO_LLM_BASE_URL", "https://openrouter.ai/api/v1")
 OPENROUTER_MODEL = "anthropic/claude-sonnet-5"
-# The cross-region inference profile: Bedrock will not serve the bare id.
-BEDROCK_MODEL = "us.anthropic.claude-sonnet-5"
+# A cross-region inference profile: Bedrock will not serve the bare id. The
+# global Sonnet 4.6 profile is what a fresh account can invoke on the day it
+# is verified (2026-09-23); Sonnet 5 and Opus 5 answered "not available for
+# this account", and the us. profile of 4.6 wanted the use-case form first.
+BEDROCK_MODEL = "global.anthropic.claude-sonnet-4-6"
 
 
 def aws_credentials():

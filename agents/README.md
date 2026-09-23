@@ -32,8 +32,8 @@ mem0's LLM, and Titan on Bedrock for embeddings; OpenRouter serves no
 embeddings, so with it set `GEMINI_API_KEY` (`pip install -e "agents[gemini]"`).
 `HITO_MEMORY=0` runs without memory; `HITO_MEMORY_USER` scopes it (default
 `maintainer`; a device id scopes what was learned about one hand). `HITO_MODEL` overrides the model id
-(`us.anthropic.claude-sonnet-5` on Bedrock, `anthropic/claude-sonnet-5` on
-OpenRouter). `HITO_MAX_TOKENS` caps output (default 2000: a provider
+(`global.anthropic.claude-sonnet-4-6` on Bedrock, `anthropic/claude-sonnet-5`
+on OpenRouter). `HITO_MAX_TOKENS` caps output (default 2000: a provider
 reserves the whole window against a small balance otherwise).
 
 ## Run
