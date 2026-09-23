@@ -8,6 +8,7 @@ agents/out — and the arithmetic in events.py against rows built here.
 import contextlib
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -18,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from strands.models.model import Model  # noqa: E402
 
-from hito_agents import analyst, events, memory, model, tools  # noqa: E402
+from hito_agents import analyst, events, memory, model, system1, tools  # noqa: E402
 from hito_agents.hooks import Fence, Ledger  # noqa: E402
 
 
@@ -346,6 +347,103 @@ class Memory(unittest.TestCase):
 
 
 import asyncio  # noqa: E402
+
+def line_book():
+    """One character, 一: a single stroke from (200,500) to (800,500)."""
+    return {"一": [[(200.0, 500.0), (800.0, 500.0)]]}
+
+
+def ink(*strokes):
+    return [stroke(s) for s in strokes]
+
+
+class SystemOne(unittest.TestCase):
+    def setUp(self):
+        self.book = line_book()
+
+    def feat(self, s, **kw):
+        body = {"glyph": "一", "ok": True, "ms": 500, "zaps": 0, "size": 0.5, "diff": "easy", "prof": "pen", "s": s}
+        body.update(kw)
+        return system1.features(body, self.book)
+
+    def test_geometry_tells_the_stories_apart(self):
+        whole = self.feat(ink([(200, 500), (400, 500), (600, 500), (800, 500)]))
+        short = self.feat(ink([(200, 500), (350, 500), (500, 500)]))
+        poke = self.feat(ink([(500, 500), (505, 502)]), ms=80)
+        scribble = self.feat(ink([(200, 500), (800, 480), (200, 520), (800, 500), (200, 500), (800, 500)]))
+        self.assertEqual((whole["coverage"], whole["end_gap"]), (1.0, 0.0))
+        self.assertAlmostEqual(whole["travel_ratio"], 1.0)
+        self.assertGreater(short["end_gap"], 0.4)              # stopped halfway along a 600-wide stroke
+        self.assertLess(short["coverage"], 0.7)
+        self.assertLess(poke["coverage"], 0.3)
+        self.assertLess(poke["ink_span"], 0.05)
+        self.assertGreater(scribble["travel_ratio"], 4)
+        self.assertEqual(whole["strokes_expected"], 1)
+
+    def test_unknown_character_or_no_ink_keeps_the_plain_fields(self):
+        f = system1.features({"glyph": "龍", "ok": False, "zaps": 2, "ms": 300, "s": [stroke([(1, 1), (2, 2)])]}, self.book)
+        self.assertEqual((f["glyph"], f["landed"], f["zaps"], f["strokes_expected"]), ("龍", False, 2, None))
+        self.assertNotIn("coverage", f)
+        g = system1.features({"glyph": "一", "ok": True}, self.book)
+        self.assertEqual(g["strokes_drawn"], 0)
+        self.assertNotIn("end_gap", g)
+
+    def test_labels_read_layas_answer_and_the_flags_compare(self):
+        def fake(state, questions):
+            self.assertIsInstance(state, str)            # prose by default
+            self.assertIn("near", state)
+            self.assertEqual(set(questions), {"verdict", "accept"})
+            gap = int(re.search(r"stopped (\d+)% from where the stroke ends", state).group(1))
+            v = "stopped_short" if gap > 30 else "honest"
+            return {"answers": {
+                "verdict": {"type": "choice", "choice": v, "probabilities": {v: 0.8, "scribble": 0.2}, "confidence": 0.61},
+                "accept": {"type": "noul", "noul": 0.9, "confidence": 0.7}}}
+        rows = [
+            {"$id": "a", "device": "d1", "kind": "trace", "at": "t", "body": {"glyph": "一", "ok": True, "size": 0.5,
+             "s": ink([(200, 500), (500, 500), (800, 500)])}},
+            {"$id": "b", "device": "d1", "kind": "trace", "at": "t", "body": {"glyph": "一", "ok": False, "size": 0.5,
+             "s": ink([(200, 500), (400, 500)])}},
+        ]
+        labels = system1.label(rows, predictor=fake, book=self.book)
+        self.assertEqual([l["verdict"] for l in labels], ["honest", "stopped_short"])
+        self.assertEqual(labels[1]["p"]["stopped_short"], 0.8)
+        self.assertEqual(labels[0]["accept"], 0.9)
+        s = system1.summary(labels)
+        self.assertEqual(s["totals"], {"honest": 1, "stopped_short": 1})
+        self.assertEqual(s["characters"]["一"]["traces"], 2)
+        # no flags: no verdict, only the note
+        self.assertEqual(system1.agree(labels, rows)["flags"], 0)
+        # a flag at this size on this device: both traces near it read as fair, so Laya agrees with the hand
+        flagged = rows + [{"kind": "flag", "device": "d1", "glyph": "一", "body": {"glyph": "一", "size": 0.52}}]
+        a = system1.agree(labels, flagged)
+        self.assertEqual((a["flags"], a["agreed"]), (1, 1))
+        self.assertEqual(a["per_flag"][0]["traces_near"], 2)
+
+    def test_prose_says_what_the_numbers_say(self):
+        f = self.feat(ink([(200, 500), (350, 500), (500, 500)]), ok=False, zaps=2)
+        text = system1.narrate(f)
+        self.assertIn("rejected it after 2 zaps", text)
+        self.assertIn("has 1 strokes; the learner drew 1", text)
+        self.assertIn(f"stopped {int(f['end_gap'] * 100)}% from where the stroke ends", text)
+        self.assertIn("legend", system1.state_of(f, "json"))
+
+    def test_the_real_book_loads_every_kana(self):
+        book = system1.load_book()
+        self.assertGreaterEqual(len(book), 164)
+        self.assertEqual(len(book["ふ"]), 4)
+        self.assertTrue(all(0 < p[0] < 1000 for s in book["あ"] for p in s))
+
+    def test_triage_says_so_when_there_are_no_labels(self):
+        with unittest.mock.patch.object(system1, "load_labels", return_value=None):
+            self.assertIn("note", tools.triage())
+        fake_labels = [{"id": "x", "glyph": "ふ", "device": "d", "size": 0.4, "verdict": "poked", "p": {}, "confidence": 0.5,
+                        "accept": 0.3, "accept_confidence": 0.5}]
+        tools.use(parsed(rows()))
+        with unittest.mock.patch.object(system1, "load_labels", return_value=fake_labels):
+            t = tools.triage(glyph="ふ")
+            self.assertEqual(t["verdicts"], {"poked": 1})
+            self.assertEqual(tools.triage()["totals"], {"poked": 1})
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,6 +7,7 @@ dependencies = ["strands-agents[openai]==1.57.0", "mem0ai==2.1.0"]
 
 [project.optional-dependencies]
 gemini = ["google-genai"]   # embeddings when the provider is OpenRouter, which serves none
+laya = ["laya"]             # the System 1 model (pulls in torch); the tests do not need it
 
 [build-system]
 requires = ["setuptools>=69"]

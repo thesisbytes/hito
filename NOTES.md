@@ -1014,3 +1014,50 @@ Running log. Append at the bottom, don't rewrite history.
 - The whole loop — pull, analyst, hooks, memory — now runs on one provider
   with credit behind it. Next is the experiment the layer was built for:
   Laya's labels against the flag events, once there are flags.
+
+## 2026-09-23 — Laya, zero-shot, does not read trace geometry (agents/system1.py)
+
+- **What was built.** `system1.py`: per-trace geometry in the stroke book's
+  space (coverage of the path by the ink's segments, start and end gap as a
+  fraction of the character's size, ink over path length, ink span, strokes
+  drawn against strokes expected), Laya's typed questions over it (a
+  five-way verdict — honest, stopped_short, poked, scribble, gave_up — and a
+  yes/no "would a teacher accept this"), a batch labeller writing
+  `agents/out/labels.jsonl`, a `triage` tool for the analyst, and
+  `agree()`, the comparison against the flag events. Tests use a fake
+  predictor; the model never loads in the suite.
+- **The geometry separates the populations on its own.** Over 286 traces:
+  landed ones cover a median 97% of the path with an end gap of 8%; fizzled
+  ones cover 64% with a gap of 16% and travel 0.75 of the path — a hand that
+  followed the line and stopped, not a scribble. The "template sticks out
+  further" report is visible before any model looks.
+- **Laya, zero-shot, is uninformative here.** Given the features as JSON it
+  called all 286 traces honest; given them as prose it called the same
+  sample all scribble. In both, the probabilities sat near uniform, the
+  fizzled and landed rows drew the same label, and the median confidence
+  was 0.02 (JSON) and 0.09 (prose). An エ trace covering 28% of the path
+  and stopping two thirds of the character short was "honest" at 0.28. The
+  model card says it ships over-confident and wants temperature scaling on
+  your own data; on this data the trouble is not confidence but signal. It
+  was trained on tickets, email and moderation, and it does not transfer to
+  numbers about ink, however they are phrased. 286 rows took 555 s on this
+  CPU with both questions, not 33 ms.
+- **System 2 reads the same prose fine.** Sonnet 4.6 on Bedrock, one call,
+  the same 24 narrations: the fizzles came back stopped_short, gave_up and
+  honest, the landed ones honest, and each label matches its geometry. So
+  the prose is separable and the gap is Laya's, not the features'.
+- **The finding the baseline turned up.** Five of the thirteen fizzles are
+  ふ with coverage 0.88–0.99, end gap 0.07–0.14 and travel 1.02–1.18: by
+  the geometry, fair traces of all four strokes that the tracer rejected.
+  That is the tick strokes of ふ (CLAUDE.md, "A stroke begins where it
+  begins") refusing honest hands, and it is the first thing this layer has
+  said that the maintainer did not already know. Worth a real look.
+- **What the class experiment becomes.** Zero-shot failed; that is a
+  result, not the end. Laya ships the pieces for the honest next step —
+  `RLAgent`, `proper_reward`, `ece_score`: train or calibrate its heads on
+  labels of our own under a proper scoring rule and measure calibration.
+  The labels are the flag events (none yet) and the maintainer's own
+  verdicts on the gallery. Until then the System 1 seat is empty and the
+  LLM does the labelling, which costs more and is what the gate was meant
+  to avoid. `HITO_LAYA_STATE` picks json or prose; prose is the default,
+  being the natural input and a third faster.

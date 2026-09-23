@@ -8,7 +8,7 @@ from pathlib import Path
 
 from strands import tool
 
-from . import events
+from . import events, system1
 from .hooks import OUT
 
 _rows = None
@@ -62,4 +62,20 @@ def save_report(name: str, text: str) -> str:
     return f"wrote {p.relative_to(Path(__file__).resolve().parents[2])} ({len(text)} chars)"
 
 
-ALL = [trace_overview, glyph_summary, hardest_glyphs, save_report]
+@tool
+def triage(glyph: str = "") -> dict:
+    """Laya's System 1 labels on every trace (honest, stopped_short, poked, scribble, gave_up),
+    with a probability per option and a confidence, from agents/out/labels.jsonl. Per character
+    when glyph is given, else totals plus the least confident rows, which are the ones worth a
+    closer look. Says so if the labels have not been computed yet."""
+    labels = system1.load_labels()
+    if labels is None:
+        return {"note": "no labels yet: run `python -m hito_agents.system1` first (it loads the model; a minute or two)"}
+    s = system1.summary([l for l in labels if not glyph or l["glyph"] == glyph])
+    if glyph:
+        return {"glyph": glyph, **s["characters"].get(glyph, {"traces": 0}), "least_confident": s["least_confident"][:5]}
+    return {"traces": len(labels), "totals": s["totals"], "least_confident": s["least_confident"],
+            "against_the_hand": system1.agree(labels, rows())}
+
+
+ALL = [trace_overview, glyph_summary, hardest_glyphs, triage, save_report]
