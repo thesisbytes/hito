@@ -16,12 +16,12 @@ ENV_FILES = (Path(__file__).resolve().parents[2] / ".env",   # the repo root
              Path(__file__).resolve().parents[1] / ".env")   # agents/
 
 
-def load_env(files=ENV_FILES):
+def load_env(files=None):
     """KEY=value lines from .env files into the environment, never overriding
     what is already set. Both files are ignored by git. A shell `export` only
     lives in the terminal it was typed in; a file is what survives."""
     loaded = []
-    for f in files:
+    for f in ENV_FILES if files is None else files:
         if not f.is_file():
             continue
         for line in f.read_text(encoding="utf-8").splitlines():
@@ -45,6 +45,8 @@ def max_tokens():
 
 OPENROUTER_URL = os.environ.get("HITO_LLM_BASE_URL", "https://openrouter.ai/api/v1")
 OPENROUTER_MODEL = "anthropic/claude-sonnet-5"
+# The cross-region inference profile: Bedrock will not serve the bare id.
+BEDROCK_MODEL = "us.anthropic.claude-sonnet-5"
 
 
 def aws_credentials():
@@ -60,10 +62,8 @@ def bedrock(model_id=None, **params):
     from strands.models.bedrock import BedrockModel
     key = os.environ.get("AWS_BEARER_TOKEN_BEDROCK")
     kw = {"api_key": key} if key else {}
-    mid = model_id or os.environ.get("HITO_MODEL")
-    if mid:
-        kw["model_id"] = mid      # otherwise Strands' own default for the region
     return BedrockModel(region_name=os.environ.get("AWS_REGION"),
+                        model_id=model_id or os.environ.get("HITO_MODEL", BEDROCK_MODEL),
                         max_tokens=max_tokens(), **kw, **params)
 
 

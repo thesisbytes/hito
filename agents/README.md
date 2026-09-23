@@ -27,8 +27,8 @@ are set:
 | **OpenRouter** (the class account) | `OPENROUTER_API_KEY` | through Strands' OpenAI-compatible provider; `HITO_LLM_BASE_URL` points it at any other gateway |
 
 `HITO_LLM=bedrock|openrouter` forces one. `HITO_MODEL` overrides the model id
-(Strands' own Bedrock default for the region, or `anthropic/claude-sonnet-5`
-on OpenRouter). `HITO_MAX_TOKENS` caps output (default 2000: a provider
+(`us.anthropic.claude-sonnet-5` on Bedrock, `anthropic/claude-sonnet-5` on
+OpenRouter). `HITO_MAX_TOKENS` caps output (default 2000: a provider
 reserves the whole window against a small balance otherwise).
 
 ## Run

@@ -5,6 +5,7 @@ agents/out — and the arithmetic in events.py against rows built here.
 
     agents/.venv/bin/python -m unittest discover -s agents/test -v
 """
+import contextlib
 import json
 import os
 import sys
@@ -189,9 +190,14 @@ class Wiring(unittest.TestCase):
             "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_PROFILE", "AWS_REGION")
 
     def env(self, **extra):
+        """A clean environment, and no real .env files: the tests must not
+        pick up whichever key the maintainer has on this machine."""
         env = {k: v for k, v in os.environ.items() if k not in self.KEYS}
         env.update(extra)
-        return unittest.mock.patch.dict(os.environ, env, clear=True)
+        stack = contextlib.ExitStack()
+        stack.enter_context(unittest.mock.patch.dict(os.environ, env, clear=True))
+        stack.enter_context(unittest.mock.patch.object(model, "ENV_FILES", ()))
+        return stack
 
     def test_no_key_means_no_agent_and_a_plain_message(self):
         with self.env(), unittest.mock.patch.object(model, "aws_credentials", return_value=False):
