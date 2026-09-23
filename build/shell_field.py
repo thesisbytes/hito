@@ -237,7 +237,12 @@ LAYER = STYLE + r"""
   const stageMax = () => ST ? 1 + own('gate') : 1;
   const gateCost = () => ST ? Math.round(ST.gate * Math.pow(ST.gateRamp, own('gate'))) : 0;
   // Guided only gets you so far, and then the tracing happens. Any stage can be
-  // PLAYED in any mode, and pays; but from `easyFrom` a stage is only HELD —
+  // Guided is a sandbox (the maintainer, 2026-09-23: "guided is a lost cause
+  // for grading ... guided should not allow the player to progress the
+  // game"): it holds no stage and pays no 魂, and `easyFrom` is 1 so that
+  // the rule below says so from the first stage. The handwriting is still
+  // recorded, which is what practice is for.
+  // PLAYED in any mode; but from `easyFrom` a stage is only HELD —
   // only counts toward its gate — if it was held at easy or harder, and from
   // `mediumFrom`, at medium. Guided teaches the motion; the chart past the
   // first rows has to be earned with ink.
@@ -314,7 +319,7 @@ LAYER = STYLE + r"""
     // stroke sets a pace, and the hand starts following its speed instead
     // of dragging the light at its own. The road ahead already shows where
     // to go; guided does not need to be shown how fast.
-    guided: { tama:.5, kana:'導', blurb:'follow the light. no ink, no zaps, one big size, every row — just take it to the end of each stroke.',
+    guided: { tama:0, kana:'導', blurb:'follow the light. no ink, no zaps, one big size, every row. practice only: nothing here counts toward a stage or 魂.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
               guide:true, numbers:true, comet:false, shadow:'none', stray:'drop', allRows:true },
@@ -1204,7 +1209,7 @@ LAYER = STYLE + r"""
         <div><b>${mins}</b><small>held</small></div>
       </div>
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
-      ${e.won && ST && !e.held ? `<p class="over-line warn">held — but from stage ${r.stage >= ST.mediumFrom ? ST.mediumFrom : ST.easyFrom} it only counts toward the gate at <b>${e.needs}</b> or harder. ${difficulty} is practice here, and it still pays.</p>` : ''}
+      ${e.won && ST && !e.held ? `<p class="over-line warn">held — but from stage ${r.stage >= ST.mediumFrom ? ST.mediumFrom : ST.easyFrom} it only counts toward the gate at <b>${e.needs}</b> or harder. ${difficulty === 'guided' ? 'guided is practice: nothing here counts toward the gate or 魂.' : difficulty + ' is practice here, and it still pays.'}</p>` : ''}
       ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}${e.won ? 'held to the end: half again' : 'clean, readable traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
       ${workshopHtml()}
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
@@ -1357,7 +1362,7 @@ def config(pack, deck=None):
         f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"
         f"speed:{f.get('speed', 0.055)},"
         f"wardHp:{int(f.get('wardHp', 5))},"
-        f"stages:{js({**{'rows': 2, 'count': 12, 'countStep': 3, 'gate': 30, 'gateRamp': 1.45, 'hpEvery': 4, 'speedStep': 0.03, 'easyFrom': 3, 'mediumFrom': 8}, **(f.get('stages') or {})}) if f.get('stages', True) else 'null'},"
+        f"stages:{js({**{'rows': 2, 'count': 12, 'countStep': 3, 'gate': 30, 'gateRamp': 1.45, 'hpEvery': 4, 'speedStep': 0.03, 'easyFrom': 1, 'mediumFrom': 8}, **(f.get('stages') or {})}) if f.get('stages', True) else 'null'},"
         f"tamaClean:{int(f.get('tamaClean', 2))},"
         f"tamaTrace:{int(f.get('tamaTrace', 1))},"
         f"tamaWaves:{int(f.get('tamaWaves', 3))},"

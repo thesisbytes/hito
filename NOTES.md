@@ -1314,3 +1314,25 @@ Running log. Append at the bottom, don't rewrite history.
   loop. It makes the scorer honest about it. Whether the loops of ぬ め は
   ほ are traceable by finger on a phone at all is now a question for the
   hand, and the ratings page will say.
+
+## 2026-09-23 — Guided is a sandbox; the finger after the heading gate (hiragana v0.1.50, katakana-game v0.1.13, vocab v0.1.28)
+
+- **The maintainer, after a second finger session:** "guided is a lost cause
+  for grading based on what I'm seeing. Maybe in terms of game dynamics, we
+  leave that in the realm of sandbox practice. Guided should not allow the
+  player to progress the game. But we're seeing a bit better results."
+- **The better results, measured.** Finger on the loop characters (ぬ め は
+  ほ ね よ ま む): before the heading gate, overshoot 0.61 of a stroke and
+  travel 1.38x the path; on v0.1.49, overshoot 0.08, travel 0.99, coverage a
+  median 1.00. Finger in medium on v0.1.49: 98 traces, 13 fizzles, coverage
+  1.00, overshoot 0.11 — the finger now traces medium about as cleanly as
+  the pen did. Guided by finger stayed where it was (overshoot 0.34,
+  travel 0.98, a third of records missing strokes the drop rule took): the
+  light is dragged, not drawn, and grading a drag was never going to say
+  much about a hand.
+- **So guided holds no stage and pays no 魂.** `easyFrom` is 1, guided's
+  `tama` is 0, the start page says "practice only", the ending says nothing
+  here counts. Any stage can still be practised in it, from every row, and
+  the handwriting is still recorded. Easy is the first mode that counts.
+- The CLAUDE.md decision of v0.1.45 ("guided only gets you so far") becomes
+  "guided gets you nowhere in the game, and everywhere in practice".

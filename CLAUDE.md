@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.49.html`
+### Hiragana — `dist/hiragana-v0.1.50.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -323,7 +323,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.12.html`
+### Katakana — `dist/katakana-game-v0.1.13.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -344,7 +344,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.27.html`
+### Vocab — `dist/vocab-v0.1.28.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -617,7 +617,11 @@ ante." Any stage can be *played* in any mode and pays; but from stage 3 a stage
 is only *held* — only counts toward its gate — at easy or harder, and from
 stage 8, at medium. Guided teaches the motion; the chart past its first rows
 is earned with ink. Guided itself draws from every row (v0.1.47): holding no
-stage past the second, it could never meet half the chart under the gate. Every landed trace is scored for how recognisable it is
+stage past the second, it could never meet half the chart under the gate.
+**As of v0.1.50 guided is a sandbox**: it holds no stage at all and pays no
+魂. The maintainer, after two sessions of finger data: "guided is a lost cause
+for grading ... we leave that in the realm of sandbox practice. guided should
+not allow the player to progress the game." The handwriting is still recorded. Every landed trace is scored for how recognisable it is
 (`quality()` in the hand: the mean distance between the ink and the shape asked
 for, both ways, over the glyph's own size) and pays between half and half
 again by that score. Medium pays double.

@@ -936,7 +936,7 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
 
   // guided only gets you so far
   const st = JSON.parse(html.match(/stages:(\{[^}]*\})/)[1]);
-  ok(F.needs(1) === 'guided' && F.needs(st.easyFrom) === 'easy' && F.needs(st.mediumFrom) === 'medium', `stages ask for ${F.needs(1)}, ${F.needs(st.easyFrom)}, ${F.needs(st.mediumFrom)}`);
+  ok(F.needs(1) === 'easy' && F.needs(st.easyFrom) === 'easy' && F.needs(st.mediumFrom) === 'medium', `stages ask for ${F.needs(1)}, ${F.needs(st.easyFrom)}, ${F.needs(st.mediumFrom)}: guided is a sandbox and holds none`);
   H.reset(); H.tama.earn(1e7);
   for (let k = 1; k < st.easyFrom; k++){ H.tama.clear('hiragana', k); F.buyGate(); }
   ok(F.stageMax === st.easyFrom, `could not reach stage ${st.easyFrom} to test it (at ${F.stageMax})`);
@@ -944,7 +944,7 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
     for (let g = 0; !F.over && g < 6000; g++){ for (const m of [...F.monsters]){ m.hp = 1; F.hit(m, false, false); } advance(60); } advance(900); return F.ended; };
   const g = win('guided');
   ok(g && g.won && g.held === false && H.tama.cleared('hiragana') === st.easyFrom - 1, `a stage that asks for easy was held in guided (cleared ${H.tama.cleared('hiragana')})`);
-  ok(g.pay > 0 || g.rec.traced === 0, 'practice in guided paid nothing');
+  ok(g.pay === 0, `practice in guided paid ${g.pay}: it is a sandbox and pays nothing`);
   ok(/only counts toward the gate at <b>easy<\/b>/.test(F.startHtml), 'the ending does not say why the stage did not count');
   ok(F.buyGate() === false, 'the next gate was for sale after a guided hold');
   const e = win('easy');
