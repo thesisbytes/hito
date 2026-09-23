@@ -1479,3 +1479,35 @@ Running log. Append at the bottom, don't rewrite history.
   been reached because the boss is the last farang of the stage.
   `stages.count` 12 and `countStep` 3 are the numbers that make stage 8 a
   33-farang wall for a finger; they were set by arithmetic, not by a hand.
+
+## 2026-09-24 — Direction, from the maintainer, not decided: the gauge, the queue, farang that learn
+
+- On game feel after v0.1.53: "I like that I'm focused on writing script.
+  But I'd like to look up once in a while to be visually stimulated by my
+  character turning farang. Maybe the tracing fills up an energy gauge. Not
+  necessarily the order of the closest farang with the script, but in the
+  order of our analyst feedback of which chars make me struggle. We can
+  even make tiered levels of farang. At first yes, they are only capable of
+  shouting the character out incorrectly. They start being able to shout
+  small words with the learned hiragana. Still farangy, but they're
+  learning."
+- **The gauge.** The run's ink already accrues per trace but lives in the
+  upgrade strip nobody watches mid-trace. As a gauge on the seam, filling
+  per landed stroke, with a *release* when full — every lit character
+  throws at once, the field pauses a beat — it makes the look-up moment a
+  reward and a rhythm: trace, look, trace. Fits "nothing draws for you":
+  the release only spends what the hand lit.
+- **The queue by struggle.** `biteRate` (v0.1.52) already draws half the
+  spawns from the ledger's shaky characters. The next step is the
+  sketchbook queuing by struggle rather than by the nearest farang; since
+  what is drawn hits whichever farang carries it, proximity stops
+  mattering, and the field becomes a display of what the analyst thinks
+  the hand should practise.
+- **Farang that learn what you learn.** A twist on "the farang grow up"
+  (CLAUDE.md, decided in direction): tier one shouts single characters,
+  wrongly; tier two shouts small words made only of kana the player has
+  kindled — learning from the player, accent intact. The decks exist, so
+  this is a filter over them, and it guarantees a farang never carries a
+  word the hand could not answer. Tiers keyed to the player's lit set
+  rather than to the stage number.
+- None of it built. Recorded so the reasoning survives.

@@ -695,6 +695,13 @@ sentences. How that plays, as far as it has been thought through:
   decided: **particles are never thrown for you** — は を に で are always
   blank and always by hand, even when everything else is lit. The arsenal
   handles vocabulary; the hand handles grammar.
+- *The farang learn what you learn* (sketched 2026-09-24, not decided). Tier
+  one shouts single characters, wrongly; tier two shouts small words made
+  only of kana the player has kindled. Tiers keyed to the player's lit set,
+  not the stage. With it, a gauge on the seam that fills per landed stroke
+  and releases every lit character at once, the beat in which the hand may
+  look up; and the sketchbook queuing by the ledger's struggle list rather
+  than by the nearest farang. See NOTES.md.
 - *Row resonance*, as the set bonus: all five of a row lit and that row's
   wisps fly harder. It rewards breadth and teaches the rows, which is the
   DECIDED affinity rule paying out. It must not light a sibling that was not
