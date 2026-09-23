@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.51.html`
+### Hiragana — `dist/hiragana-v0.1.52.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -199,6 +199,12 @@ What the tracing enforces, all of it learned by finding it broken:
   and no size fixes that: the canvas is the phone's width. Progress now
   advances only through points whose direction agrees with the pen's
   motion, so a loop is drawn by going round it. `headingGate` in the pack.
+- **A stroke's end is the hand's to reach (v0.1.52).** The floor under the
+  end tolerance is per hand (`hand.pen.endFloor` 0.02, `hand.finger.endFloor`
+  0.045): a pen lands within 2% of the canvas, a fingertip cannot, and on
+  ふ's hook the maintainer had to poke the end to be let on. A stroke
+  shorter than a fingertip is a flick for a finger, and the tail guard's
+  80% rule is not modelled for it.
 
 Presentation: one stroke lit at a time. Finished strokes stay shining, the
 current one is drawn by the pen, later ones have not caught light yet.
@@ -323,7 +329,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.14.html`
+### Katakana — `dist/katakana-game-v0.1.15.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -344,7 +350,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.29.html`
+### Vocab — `dist/vocab-v0.1.30.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke

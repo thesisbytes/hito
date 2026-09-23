@@ -129,6 +129,11 @@ for (const file of process.argv.slice(2)){
     ok(P.done === true, 'tracing every stroke did not conjure あ');
     g.__field.restart();
     ok(P.done === false && P.prog === 0 && P.strokes.length === 0, `a restart left the engine celebrating (done ${P.done}, prog ${P.prog})`);
+    // and a run that restarts mid-stroke starts the character clean too ("again" after the ward fell)
+    along(P.SEGS[0][0], P.SEGS[0][1]);
+    ok(P.prog > 0, 'the stroke after the restart did not register');
+    g.__field.restart();
+    ok(P.prog === 0 && P.strokes.length === 0, `a restart mid-trace kept the half-traced character (prog ${P.prog})`);
   }
   // ---- the heading gate: a loop is drawn by going round it, not by crossing it
   {

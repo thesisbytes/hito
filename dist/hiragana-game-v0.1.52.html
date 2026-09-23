@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.51</title>
+<title>hito 人 · hiragana · v0.1.52</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -164,7 +164,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.51';
+const APP_VERSION='0.1.52';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -197,7 +197,7 @@ let TEACHER={version:2,activeFont:'klee-one',fonts:JSON.parse(JSON.stringify(DEF
 let strokes=[],cur=null,drawing=false,activeId=null,t0=0;
 let glyphPts=[],endPts=[],fullMask=null;  // fallback (no recording) scoring + outline mask
 let PATH=[],SEGEND=new Set(),prog=0,offCount=0;
-let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;let SEGLEN=[],SEGSLACK=[];let COVER_MIN=0.85,END_SLACK=4,MAX_TRAVEL=2.5,TRAVEL_EPS=0.006,TAIL_FRAC=0.12,END_MIN=0.02;let SEG_FREE=0.3,segTravel=0,segBase=0,segStarted=false,segNagged=false;let DRAG_FOLLOW=false;let STRAY_MODE='drop',STRAY_SKID=3,strayed=false,down_=null,hiMark=0,fizzleWhy='';let HEADING_GATE=true,mvx=0,mvy=0,moving=false; // practice: teacher path (dense, normalized), progress index
+let SEGS=[],segIdx=0,hit=null,awaitLift=false,travel=0,lastN=null,PATHLEN=0;let SEGLEN=[],SEGSLACK=[];let COVER_MIN=0.85,END_SLACK=4,MAX_TRAVEL=2.5,TRAVEL_EPS=0.006,TAIL_FRAC=0.12,END_MIN=0.02,HAND_END=0.02;let SEG_FREE=0.3,segTravel=0,segBase=0,segStarted=false,segNagged=false;let DRAG_FOLLOW=false;let STRAY_MODE='drop',STRAY_SKID=3,strayed=false,down_=null,hiMark=0,fizzleWhy='';let HEADING_GATE=true,mvx=0,mvy=0,moving=false; // practice: teacher path (dense, normalized), progress index
 let lit=[];
 let ghostAnim=null;                       // guide animation handle
 const trail=document.createElement('canvas'); const tr=trail.getContext('2d'); let trailProg=-1;
@@ -443,7 +443,9 @@ function ghostTick(){ if(!ghostAnim) return; if(!W||!H){ requestAnimationFrame(g
   requestAnimationFrame(ghostTick); }
 
 // ---------- pointer input
-function pos(e){const r=iC.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top,p:e.pointerType==='pen'?Math.max(.15,e.pressure||.5):.5,t:Math.round(performance.now()-t0)};}
+function pos(e){const r=iC.getBoundingClientRect(); let sx=0,sy=0;
+  try{ const m=getComputedStyle(stage).transform; if(m&&m!=='none'){ const v=m.match(/matrix\(([^)]+)\)/); if(v){ const a=v[1].split(',').map(Number); sx=a[4]||0; sy=a[5]||0; } } }catch(_){}
+  return{x:e.clientX-r.left+sx,y:e.clientY-r.top+sy,p:e.pointerType==='pen'?Math.max(.15,e.pressure||.5):.5,t:Math.round(performance.now()-t0)};}
 function accept(e){ if(done) return false; if(penOnly) return e.pointerType==='pen'; return e.pointerType!=='mouse'||e.buttons===1; }
 iC.addEventListener('pointerdown',e=>{ if(!accept(e)||activeId!==null) return; if(PATH.length&&mode==='practice'){
     // A lift is what separates one stroke from the next, so the
@@ -491,9 +493,13 @@ function covered(){ if(!hit) return 0; let c=0; for(let i=0;i<hit.length;i++) c+
 // shrinking the target and the tolerance together in lockstep is what
 // made level 4 unpassable before. Proportional above the floor, absolute
 // below it, and never looser than the general tolerance.
+// The floor is the hand's: a pen lands within 2% of the canvas, a
+// fingertip does not (the maintainer, of ふ's hook: 'it always takes me
+// a trace, and poke until it allows me to get to the next stroke').
+// The hand layer sets HAND_END from its profile; the pen keeps END_MIN.
 function endTol(i){
   const L=SEGLEN[i]; if(!L) return R_ON();
-  return Math.max(END_MIN, Math.min(R_ON(), TAIL_FRAC*L));
+  return Math.max(HAND_END, Math.min(R_ON(), TAIL_FRAC*L));
 }
 // A stroke has a start the way it has an end. The pen may begin up
 // to startSlack of the stroke's length in — the same fraction that
@@ -503,7 +509,7 @@ function endTol(i){
 // shorter than a jab's skid cannot be finished from its far end.
 function startTol(i){
   const L=SEGLEN[i]; if(!L) return R_ON();
-  return Math.max(END_MIN, Math.min(R_ON(), SEG_FREE*L));
+  return Math.max(HAND_END, Math.min(R_ON(), SEG_FREE*L));
 }
 function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];
   if(!seg) return;
@@ -832,7 +838,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.51');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.52');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1126,7 +1132,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
 })();
 </script>
-<script>window.__HAND_CFG={maxPoints:64,keep:60,minStep:4,qualitySpan:0.09,pen:{"size":[0.52,0.52],"ease":1.0,"trail":1.0,"halo":0},finger:{"size":[0.62,0.62],"ease":1.3,"trail":2.2,"halo":36}};</script>
+<script>window.__HAND_CFG={maxPoints:64,keep:60,minStep:4,qualitySpan:0.09,pen:{"size":[0.52,0.52],"ease":1.0,"trail":1.0,"halo":0,"endFloor":0.02},finger:{"size":[0.62,0.62],"ease":1.3,"trail":2.2,"halo":36,"endFloor":0.045}};</script>
 <style>
   .hand-btn{ background:transparent; color:rgba(108,184,255,.8); border:1px solid #1e2f3e;
     border-radius:7px; padding:4px 9px; font:12px ui-sans-serif,system-ui; cursor:pointer;
@@ -1185,7 +1191,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
    Pen or finger, what was drawn, and how it has been going. Writes down what
    the tracer decided; decides nothing itself.                              */
 (function(){
-  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0}, finger:{size:[0.62,0.62],ease:1.5,trail:2.2,halo:36}, qualitySpan:0.09};
+  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0,endFloor:0.02}, finger:{size:[0.62,0.62],ease:1.3,trail:2.2,halo:36,endFloor:0.045}, qualitySpan:0.09};
   const K_INPUT = 'hito-input', K_LEDGER = 'hito-ledger', K_HANDS = 'hito-hands';
   const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch(_){ return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(_){ return false; } };
@@ -1236,6 +1242,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const on = roomy(), p = prof();
     try { HAND_EASE = p.ease; HAND_TRAIL = p.trail; HAND_HALO = p.halo;
           trailProg = -1; } catch(_){}   // the road ahead is cached; a new width is a new road
+    // where a stroke's end (and start) is judged to be reached: a fingertip
+    // cannot land inside a pen's floor
+    try { if (typeof HAND_END !== 'undefined') HAND_END = p.endFloor; } catch(_){}
     try { const c = document.body.classList; c[on ? 'add' : 'remove']('hand-finger'); c[on ? 'remove' : 'add']('hand-pen'); c[on ? 'add' : 'remove']('roomy'); } catch(_){}
     return on;
   }
@@ -1740,7 +1749,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[{"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."}, {"label": "katakana", "kana": "片", "file": "katakana-game.html", "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."}],speed:0.055,wardHp:5,stages:{"rows":2,"count":12,"countStep":3,"gate":30,"gateRamp":1.45,"hpEvery":4,"speedStep":0.03,"bossHp":2},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15},hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[{"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."}, {"label": "katakana", "kana": "片", "file": "katakana-game.html", "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."}],speed:0.055,wardHp:5,stages:{"rows":2,"count":12,"countStep":3,"gate":30,"gateRamp":1.45,"hpEvery":4,"speedStep":0.03,"bossHp":2},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15},hpEvery:10,biteRate:0.5,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -2190,7 +2199,12 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       i = AT[w.chars[0]];
     } else {
       const pool = roster();
-      do { i = pool[Math.floor(Math.random()*pool.length)]; tries++; }
+      // Half the time, a character this hand keeps getting wrong: "I always
+      // mess up も ... I feel like that reflection should be used against me".
+      // A monster is a character you are forgetting, and the ledger knows which.
+      const biting = pool.filter(k => shaky(LETTERS[k][0]));
+      if (biting.length && Math.random() < CFG.biteRate){ i = biting[Math.floor(Math.random()*biting.length)]; }
+      else do { i = pool[Math.floor(Math.random()*pool.length)]; tries++; }
       while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && !shaky(LETTERS[i][0]) && Math.random() < 0.7);
     }
     // The last farang of a stage is its boss: it takes more hits, and its
@@ -2766,7 +2780,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // already loaded, retarget() has nothing to change and that lit path is
     // what the player starts on ("an already traced path comes up, typically
     // when I'm progressing to the next round"). A run begins on a clean glyph.
-    if (done){ loading = true; try { _load(idx); } finally { loading = false; } }
+    // ... and a half-traced one is no better: "again" after the ward fell
+    // mid-stroke kept the lit half of the character (the maintainer,
+    // reproduced once in a session). A run begins on a clean glyph, always.
+    if (done || prog > 0 || strokes.length){ loading = true; try { _load(idx); } finally { loading = false; } }
     renderUpg();
   }
 
@@ -3051,6 +3068,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.51</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.52</div>
 </body>
 </html>

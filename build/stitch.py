@@ -299,7 +299,7 @@ def main():
               f"let COVER_MIN={pack.get('coverThreshold', 0.85)},END_SLACK=4,"
               f"MAX_TRAVEL={pack.get('maxTravel', 2.5)},TRAVEL_EPS=0.006,"
               f"TAIL_FRAC={pack.get('tailFraction', 0.12)},"
-              f"END_MIN={pack.get('minEndTolerance', 0.02)};"
+              f"END_MIN={pack.get('minEndTolerance', 0.02)},HAND_END={pack.get('minEndTolerance', 0.02)};"
               f"let SEG_FREE={pack.get('startSlack', 0.3)},segTravel=0,segBase=0,segStarted=false,segNagged=false;"
               "let DRAG_FOLLOW=false;"
               # A stroke that went nowhere: what to do with it, and how little
@@ -354,9 +354,13 @@ def main():
               "// shrinking the target and the tolerance together in lockstep is what\n"
               "// made level 4 unpassable before. Proportional above the floor, absolute\n"
               "// below it, and never looser than the general tolerance.\n"
+              "// The floor is the hand's: a pen lands within 2% of the canvas, a\n"
+              "// fingertip does not (the maintainer, of ふ's hook: 'it always takes me\n"
+              "// a trace, and poke until it allows me to get to the next stroke').\n"
+              "// The hand layer sets HAND_END from its profile; the pen keeps END_MIN.\n"
               "function endTol(i){\n"
               "  const L=SEGLEN[i]; if(!L) return R_ON();\n"
-              "  return Math.max(END_MIN, Math.min(R_ON(), TAIL_FRAC*L));\n"
+              "  return Math.max(HAND_END, Math.min(R_ON(), TAIL_FRAC*L));\n"
               "}\n"
               "// A stroke has a start the way it has an end. The pen may begin up\n"
               "// to startSlack of the stroke's length in — the same fraction that\n"
@@ -366,7 +370,7 @@ def main():
               "// shorter than a jab's skid cannot be finished from its far end.\n"
               "function startTol(i){\n"
               "  const L=SEGLEN[i]; if(!L) return R_ON();\n"
-              "  return Math.max(END_MIN, Math.min(R_ON(), SEG_FREE*L));\n"
+              "  return Math.max(HAND_END, Math.min(R_ON(), SEG_FREE*L));\n"
               "}\n"
               "function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];\n"
               "  if(!seg) return;\n"
@@ -549,6 +553,16 @@ def main():
         # and up, where the start of a stroke is what is being tested).
         # After the lift has advanced to the next stroke, before the first
         # sample is scored: a dropped stray restores exactly this.
+        # fizzle() shakes the sketchbook with a transform, and a pen that comes
+        # down during the 0.4s of it read its position through the shifted
+        # rect: the ink landed a few pixels from the finger for that stroke
+        # (the maintainer: "when I fizzle out, sometimes my finger drawing
+        # would be offset away from where my actual finger is drawing").
+        s.sub("position ignores the shake",
+              r"function pos\(e\)\{const r=iC\.getBoundingClientRect\(\);return\{x:e\.clientX-r\.left,y:e\.clientY-r\.top,",
+              "function pos(e){const r=iC.getBoundingClientRect(); let sx=0,sy=0;\n"
+              "  try{ const m=getComputedStyle(stage).transform; if(m&&m!=='none'){ const v=m.match(/matrix\\(([^)]+)\\)/); if(v){ const a=v[1].split(',').map(Number); sx=a[4]||0; sy=a[5]||0; } } }catch(_){}\n"
+              "  return{x:e.clientX-r.left+sx,y:e.clientY-r.top+sy,")
         s.sub("snapshot at pen down",
               r"    follow\(pos\(e\),true\); \}",
               "    down_={prog,seg:segIdx,travel,segTravel,started:segStarted,smudge,hit:hit?hit.slice():null};"

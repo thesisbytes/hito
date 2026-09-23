@@ -1371,3 +1371,38 @@ Running log. Append at the bottom, don't rewrite history.
   takes three hits, is shown faint when targeted, and the shape returns
   after it) and sets the drop rule explicitly, since the games now open on
   medium, whose rule is restart.
+
+## 2026-09-24 — The hook, the shake, the retry, and the reflection (hiragana v0.1.52, katakana-game v0.1.15, vocab v0.1.30)
+
+- **The session's numbers.** 386 finger traces in medium on v0.1.50-51, 65
+  fizzles. ふ fizzled 19 of 41 times, then き 8 of 30, え 8 of 18, も 6 of
+  24. The commonest fizzle is two strokes of four: ふ's hook. "It always
+  takes me a trace, and poke until it allows me to get to the next stroke."
+- **The hook was the end floor.** A stroke's end counts as reached within
+  `max(END_MIN, min(R, 12% of the stroke))`, and END_MIN is 2% of the canvas
+  — 8px on a phone. A pen lands there; a fingertip does not, so the finger
+  traced the tick, watched it light, and had to poke its end. The floor is
+  per hand now (`endFloor`: pen 0.02, finger 0.045 — the same 18px the
+  reach floors at), for the start as well as the end. A tick shorter than a
+  fingertip is a flick for a finger: it must be started, travelled in its
+  direction past the heading gate, and reached; it cannot be required to be
+  drawn to 80%, and the tail guard's eased copy does not model the finger
+  floor. That guard covers the pen. Said plainly here so nobody reads the
+  green run as covering a finger on ふ.
+- **The offset after a fizzle was the shake.** `fizzle()` animates the
+  sketchbook with a translate, and a pen that came down during the 0.4s of
+  it read its position through the shifted rect. `pos()` now adds the
+  stage's current transform back. "Sometimes" was "within 0.4s of the buzz".
+- **The lit path after "again" was the half-traced character.** Reproduced
+  once by the maintainer on the retry of a lost round: the ward fell
+  mid-stroke, `restart()` retargeted to the same character with `done`
+  false, and nothing reloaded. A run now starts on a clean character
+  whenever anything was in progress, and the stray test restarts mid-trace.
+- **The reflection, used against them.** "I always mess up も ... I feel
+  like that reflection should be used against me." Half of spawns
+  (`biteRate`) come from the characters the ledger marks shaky, which is
+  the spaced-repetition design of the lore finally steering the roster
+  rather than only avoiding mastered characters.
+- "My own game is beating me": no run since the pull reached a boss. The
+  stage's twelve farang at 46dvh by finger is a starting position, not a
+  tuning; the numbers above are what to tune from.

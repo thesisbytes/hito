@@ -485,7 +485,12 @@ LAYER = STYLE + r"""
       i = AT[w.chars[0]];
     } else {
       const pool = roster();
-      do { i = pool[Math.floor(Math.random()*pool.length)]; tries++; }
+      // Half the time, a character this hand keeps getting wrong: "I always
+      // mess up も ... I feel like that reflection should be used against me".
+      // A monster is a character you are forgetting, and the ledger knows which.
+      const biting = pool.filter(k => shaky(LETTERS[k][0]));
+      if (biting.length && Math.random() < CFG.biteRate){ i = biting[Math.floor(Math.random()*biting.length)]; }
+      else do { i = pool[Math.floor(Math.random()*pool.length)]; tries++; }
       while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && !shaky(LETTERS[i][0]) && Math.random() < 0.7);
     }
     // The last farang of a stage is its boss: it takes more hits, and its
@@ -1061,7 +1066,10 @@ LAYER = STYLE + r"""
     // already loaded, retarget() has nothing to change and that lit path is
     // what the player starts on ("an already traced path comes up, typically
     // when I'm progressing to the next round"). A run begins on a clean glyph.
-    if (done){ loading = true; try { _load(idx); } finally { loading = false; } }
+    // ... and a half-traced one is no better: "again" after the ward fell
+    // mid-stroke kept the lit half of the character (the maintainer,
+    // reproduced once in a session). A run begins on a clean glyph, always.
+    if (done || prog > 0 || strokes.length){ loading = true; try { _load(idx); } finally { loading = false; } }
     renderUpg();
   }
 
@@ -1393,6 +1401,7 @@ def config(pack, deck=None):
         f"lanternRamp:{float(f.get('lanternRamp', 1.6))},"
         f"lanternCost:{js({**{'heart': 20, 'lamp': 30, 'inkwell': 15}, **(f.get('lanternCost') or {})})},"
         f"hpEvery:{int(f.get('hpEvery', 10))},"
+        f"biteRate:{float(f.get('biteRate', 0.5))},"
         f"hpMax:{int(f.get('hpMax', 5))},"
         f"inkTrace:{int(f.get('inkTrace', 2))},"
         f"inkClean:{int(f.get('inkClean', 2))},"
