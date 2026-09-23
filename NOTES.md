@@ -1525,4 +1525,12 @@ Running log. Append at the bottom, don't rewrite history.
   upgrade shows itself in the moment the hand looks up. Urgency has to
   come from the seam too — a gauge that drains on a breach, or a release
   needed before the next wave.
+- "So we got hit points and mana" — the ward and the gauge, hearts and
+  墨. And: "if a user wanted to farm a level, they would have to make sure
+  their energy gauge is big enough to last the time they are away?" Yes,
+  in spirit: active fills, idle spends, the candle of the lore. Two rules
+  from before the gauge hold it: nothing happens while the app is closed
+  (a run is live; away is between runs, computed on return from a
+  timestamp), and away gains are the server's to compute, never the
+  client's to claim. The gauge only ever fills by hand.
 - None of it built. Recorded so the reasoning survives.
