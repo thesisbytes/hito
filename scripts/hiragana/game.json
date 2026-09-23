@@ -1,6 +1,6 @@
 {
   "script": "hiragana",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "title": "hito 人 · hiragana · v0.1.29",
   "brand": "hito 人",
   "fontDir": "fonts",
@@ -43,6 +43,7 @@
     0.32,
     0.62
   ],
+  "hand": { "pen": { "size": [0.52, 0.52] } },
   "mode": "easy",
   "grid": "cross",
   "shell": "field",

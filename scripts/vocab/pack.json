@@ -1,6 +1,6 @@
 {
   "script": "vocab",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "title": "hito 人 · vocab · v0.1.2",
   "brand": "hito 人 · vocab",
   "fontDir": "fonts",
@@ -43,6 +43,7 @@
     0.46,
     0.62
   ],
+  "hand": { "pen": { "size": [0.52, 0.52] } },
   "mode": "easy",
   "grid": "cross",
   "shell": "vocab",

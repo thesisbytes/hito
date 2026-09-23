@@ -96,6 +96,29 @@ for (const file of process.argv.slice(2)){
     const r = H.note(false);
     ok(r && r.strokes === 2, `taken between the engine's lift and the hand's, the note has ${r && r.strokes} stroke(s), not 2`);
   }
+  // ---- guided: covering the end closes the stroke; stopping well short does not
+  if (rig(file).g.__field) {
+    const { P, g, along, px, fire, tick } = rig(file);
+    g.__field.setDifficulty('guided'); g.resize();
+    g.__field.target.i = P.LETTERS.findIndex(l => l[0] === 'あ'); g.load(g.__field.target.i);
+    ok(P.DRAG === true, 'guided did not switch the engine to dragging');
+    const [a, b] = P.SEGS[0], sp = P.SEGLEN[0] / (b - a), R = P.R;
+    const short = b - Math.round(0.6 * R / sp);          // the light 0.6R from the end: the finger covers it
+    const far   = b - Math.round(1.6 * R / sp);          // 1.6R: it does not
+    if (short > a + 2 && far > a + 2){
+      along(a, far);
+      ok(P.awaitLift === false, 'a finger 1.6 reaches short of the end closed the stroke');
+      const { P: Q, g: h, along: go } = rig(file);
+      h.__field.setDifficulty('guided'); h.resize();
+      h.__field.target.i = Q.LETTERS.findIndex(l => l[0] === 'あ'); h.load(h.__field.target.i);
+      go(a, short);
+      ok(Q.awaitLift === true, `a finger covering the end (0.6R short) did not close the stroke (prog ${Q.prog} of ${b})`);
+    }
+    // and guided draws from every row, where easy at stage 1 does not
+    ok(g.__field.roster().length === P.LETTERS.length, `guided offers ${g.__field.roster().length} of ${P.LETTERS.length} characters`);
+    g.__field.setDifficulty('easy');
+    ok(g.__field.roster().length < P.LETTERS.length, 'easy at stage 1 offers the whole chart');
+  }
   // ---- keep: the old rule, every stroke stays
   {
     const { P, H, nowhere } = rig(file);

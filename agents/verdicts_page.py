@@ -8,7 +8,8 @@ which is the number the hand's own quality() estimates and hard mode's
 2026-09-23); the page keeps them in its own store and `agents/verdicts.py`
 reads them back into agents/data/verdicts.jsonl.
 
-    agents/.venv/bin/python agents/verdicts_page.py out.html   # the 24-trace sample
+    agents/.venv/bin/python agents/verdicts_page.py out.html                     # unrated traces
+    agents/.venv/bin/python agents/verdicts_page.py out.html --since 2026-09-23  # a fresh batch
 
 The output is somebody's handwriting; it goes to a private page, never the
 repository, so the default output is the scratch directory.
@@ -24,11 +25,16 @@ from hito_agents import events, system1  # noqa: E402
 STEP = 10   # the slider moves in tens: a phone thumb cannot place a unit
 
 
-def sample(rows):
-    ts = events.traces(rows)
+def sample(rows, rated=(), since=None, n_land=17):
+    """Every fizzle not yet rated, then a spread of unrated landed traces —
+    from `since` (an ISO time) when given, so a batch is the traces the
+    hand has not seen. The old capture bug's partial traces are left out."""
+    ts = [r for r in events.traces(rows) if r["$id"] not in rated and not system1.partial(r["body"])
+          and (since is None or r["at"] > since)]
     fizz = [r for r in ts if not r["body"].get("ok")]
-    land = [r for r in ts if r["body"].get("ok")][::25][:11]
-    return fizz + land
+    land = [r for r in ts if r["body"].get("ok")]
+    step = max(1, len(land) // n_land)
+    return fizz + land[::step][:n_land]
 
 
 def svg_path(pts):
@@ -58,11 +64,19 @@ def card(r, f, lab, book):
 
 
 def main():
-    out = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("scratch") / "verdicts.html"
+    argv = sys.argv[1:]
+    since = argv[argv.index("--since") + 1] if "--since" in argv else None
+    out = Path(next((a for a in argv if not a.startswith("--") and a != since), "scratch/verdicts.html"))
     rows = events.load()
     book = system1.load_book()
     labels = {l["id"]: l for l in (system1.load_labels() or [])}
-    cards = [card(r, system1.features(r["body"], book), labels.get(r["$id"]), book) for r in sample(rows)]
+    # what the hand has rated already, from the label files
+    rated = set()
+    for f in (Path(__file__).with_name("labels")).glob("*.jsonl"):
+        for line in f.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                rated.add(json.loads(line)["id"])
+    cards = [card(r, system1.features(r["body"], book), labels.get(r["$id"]), book) for r in sample(rows, rated, since)]
     n = len(cards)
     page = f'''<title>Hito Verdicts</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap">
@@ -94,7 +108,7 @@ h1{{font-family:"Klee One","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;fo
 .ro.set{{color:var(--green)}}
 </style>
 <h1>Hito Verdicts</h1>
-<p class="lede">{n} traces from the table: every fizzle so far, and a spread of landed ones. Grey is the shape that was asked for, blue landed, red fizzled, same coordinate space, no fitting. Slide to how readable each one is: 100 means you could read it, 0 means not close. These ratings are the labels Laya will be tuned on.</p>
+<p class="lede">{n} traces from the table you have not rated: every fizzle, and a spread of landed ones. Grey is the shape that was asked for, blue landed, red fizzled, same coordinate space, no fitting. Slide to how readable each one is: 100 means you could read it, 0 means not close. These ratings are the labels Laya will be tuned on.</p>
 <div class="bar"><span><b id="done">0</b> of {n} rated</span><span class="note" id="note">A rating saves when you let go of the slider.</span></div>
 <div class="grid">{"".join(cards)}</div>
 <script>

@@ -53,6 +53,7 @@ which a kana-only subset does not contain, so every font reported as blocked.
 | `sequentialReveal` | `false` | Light one stroke at a time. Requires `strictFollow`. |
 | `strayMode` | `drop` | What happens to a stroke that went nowhere — lifted without finishing its stroke or advancing the path more than `straySkid` points, having started off it. `drop`: it never happened; the ink and the scorer go back to the pen-down, and the hand does not record it. `restart`: the character starts again, as on a fizzle. `keep`: the old rule, every stroke stays. The game shells set it per difficulty (`stray` in their table: guided and easy drop, medium restarts). Requires `strictFollow`. |
 | `straySkid` | `3` | How many path points a stroke may advance and still count as nowhere. A jab that grazes the start is nowhere; a stroke lifted early after real progress is not. |
+| *(guided)* | | When the light is dragged, a stroke's end is within reach rather than within `tailFraction`: the light within `R` of the end along the stroke and the pen within `R` of it. A fingertip hides the end it is steering to; covering it is reaching it. Elsewhere the end test is unchanged. |
 
 A stroke's tail is where its hook is, and forgiving hooks is the reason this
 pack takes stroke data from KanjiVG rather than a font. v0.1.9 replaced a flat
@@ -103,6 +104,7 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 | `realms` | `[]` | Other builds to offer on the start page, as `{label, file, kana?, blurb?}`. `file` is a sibling filename (`vocab.html`), never a path or URL: the link works on Pages and in any folder holding both files, and is simply a dead link where the other file is absent — nothing waits on it. Use the stable unversioned names so the link survives a bump. |
 | `credits` | `[]` | Lines for the credits page behind the start page's "who this leans on" button, one paragraph each. The pack's `credit` (the licence line) is appended after them, so the KanjiVG attribution is on that page as well as in the footer. Name people here, by role or by name, as they prefer. |
 | `field.holdMs` | `1500` | How long after the pen last touched the pad the tracer still counts as busy. A retarget queued in that window waits, so a wisp or a breach elsewhere cannot swap the glyph under a hand that has lifted to think, or that has started a stroke which has not yet found the path. |
+| *(guided)* | | The field's guided difficulty sets `allRows`: its farang carry every row of the chart, not only the rows the stage has reached. Guided holds no stage past the second, so under the gate its rows never grew. |
 | `field.tidyStrays` | `true` | Erase a stroke that never touched the path when the pen lifts. Cosmetic only: travel and coverage are accumulated live, so the scribble guard is unaffected. Stops the board filling with orange runs of every miss. |
 | `field.fizzleRestarts` | `true` | Reload the glyph after a fizzle. Since v0.1.46 `fizzle()` itself restarts the character in every build; this reload on top of it re-rolls the size and clears the field's own zap counter, which is why it stays. |
 | `deck` | *(required by `vocab`, optional for `field`)* | Path to the deck file, relative to the repo root. A deck is class content rather than realm data, so it lives outside `scripts/` (`vocab/genki-i.json`, `vocab/katakana.json`). `{deck, source, sections:[{id, title, words:[{ja, romaji, en, note?}]}]}`. The stitch refuses a deck that uses a character the pack has no glyph or no stroke data for — that is a build failure, not a runtime toast. Under the `field` shell a deck makes the farang carry its words (every section, flattened, each word once): the tracer walks a word's kana one at a time, the bubble shows a slot strip filling in, each kana knocks the farang back, the last banishes it, and the ghost light is kept by the word. `scripts/vocab/katakana.json` is that: the vocab pack's kana and strokes under the field shell with the katakana deck. |
@@ -365,7 +367,7 @@ calls and the provider's redirect are both refused. See `server/README.md`.
 
 ```json
 "hand": { "maxPoints": 64, "keep": 60, "minStep": 4,
-          "pen":    { "size": null,         "stage": "34dvh", "ease": 1,   "trail": 1,   "halo": 0 },
+          "pen":    { "size": [0.52, 0.52], "stage": "34dvh", "ease": 1,   "trail": 1,   "halo": 0 },
           "finger": { "size": [0.62, 0.62], "stage": "42dvh", "ease": 1.5, "trail": 2.2, "halo": 36 } }
 ```
 
@@ -376,7 +378,7 @@ pen/finger switch, the handwriting, and the ledger.
 |---|---|---|
 | `maxPoints` | 64 | most points kept per stroke in a stored trace. Ends are always kept. |
 | `keep` | 24 | how many recent traces stay on the device, for the thumbnails |
-| `pen`, `finger` | see above | the two hands, tuned apart. `size` is a `[min, max]` glyph size for that hand, or `null` to leave the pack's own rule alone (a size a difficulty pins, like guided's, is never overridden). `stage` is the sketchbook's size in the games. `ease` multiplies the path's forgiveness (1–2; the scorer caps the result and every end-of-stroke guard is still bound by the stroke's own length). `trail` widens the road ahead, and `halo` is the radius in px of a ring around the light — both so a fingertip does not hide what it is steering by. The finger profile applies in finger mode on a touch screen, and lets go while a pen is down. |
+| `pen`, `finger` | see above | the two hands, tuned apart. `size` is a `[min, max]` glyph size for that hand, or `null` to leave the pack's own rule alone (a size a difficulty pins, like guided's, is never overridden). The packs pin the pen at 0.52 since v0.1.47: over 239 medium traces the 0.48–0.56 band had the fewest zaps and the most clean traces, and the maintainer found the random sizes an annoyance. `stage` is the sketchbook's size in the games. `ease` multiplies the path's forgiveness (1–2; the scorer caps the result and every end-of-stroke guard is still bound by the stroke's own length). `trail` widens the road ahead, and `halo` is the radius in px of a ring around the light — both so a fingertip does not hide what it is steering by. The finger profile applies in finger mode on a touch screen, and lets go while a pen is down. |
 | `minStep` | 4 | points closer than this (thousandths of the stroke book's box) to the last kept one are dropped, so a slow stroke is not all samples from its first centimetre |
 
 **Pen or finger.** `pen` is the engine's `penOnly`: fingers, palms and mice

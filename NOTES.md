@@ -1162,3 +1162,37 @@ Running log. Append at the bottom, don't rewrite history.
 - Twenty-four ratings from one hand is a starting position, not a
   calibration set. The page can take another batch any time; the next
   should be a fresh sample rather than the fizzles again.
+
+## 2026-09-23 — One size per hand, guided reaches the end, guided sees the chart (hiragana v0.1.47, katakana-game v0.1.10, vocab v0.1.25)
+
+- **The maintainer, after a session on v0.1.46:** the random pen sizes are
+  an annoyance ("one size canvas for stylus, and one size for finger");
+  guided "recorded my stroke even after I dragged it too far" because
+  "once I thought I reached the end point, it would not trigger the next
+  stroke"; and under the stage gate guided never shows the whole chart.
+- **The session's numbers.** 96 traces, all v0.1.46. Medium with the pen:
+  63 traces, 7 fizzles, 3 with a redrawn stroke (it was 19 of 164 before
+  the stray rule). Guided with the finger: 33, and 10 still carried a
+  redrawn stroke, because a stroke that moved the light is not a stray. 54
+  of 88 guided strokes ran on past the end, a median third of the stroke,
+  against none in medium: the finger's centre had to land inside a pen's
+  end tolerance while the finger visibly covered the end.
+- **The pen at 0.52.** 239 medium traces by size band: 0.48-0.56 had the
+  fewest zaps (0.85 a trace), the most clean traces (81%) and quality 0.69;
+  larger was slightly worse, smaller clearly. `hand.pen.size` is
+  `[0.52, 0.52]` in every pack; the finger stays at its largest. The random
+  rule remains for packs that want it, and CLAUDE.md's "size is its own
+  axis" still holds — it is just no longer sampled.
+- **Guided closes a stroke when the finger covers its end.** In drag mode
+  the end test is reach: the light within R of the end along the stroke,
+  the pen within R of it; the light then snaps to the end. Elsewhere the
+  end test is exactly as before, and the tail guard on the eased copy still
+  passes. The stray test drives a finger to 0.6R and 1.6R short of あ's
+  first end and checks one closes and the other does not.
+- **Guided draws from every row** (`allRows` on the field's guided
+  difficulty). It holds no stage past the second and earns no gate, so
+  showing it the chart costs the progression nothing.
+- **Left for later.** A tick's start in guided still asks for a landing
+  within the floor of 2% of the canvas, which a finger cannot do on purpose;
+  and the ten guided strokes redrawn after the light moved are the honest
+  case of the rule, not strays, so they stay in the record.

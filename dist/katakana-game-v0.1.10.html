@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · katakana · v0.1.9</title>
+<title>hito 人 · katakana · v0.1.10</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -162,7 +162,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.9';
+const APP_VERSION='0.1.10';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"A"],["い","あ行","i","","a-row",2,1,"I"],["う","あ行","u","","a-row",3,1,"U"],["え","あ行","e","","a-row",4,1,"E"],["お","あ行","o","","a-row",5,1,"O"],["か","か行","ka","","ka-row",1,2,"KA"],["き","か行","ki","","ka-row",2,2,"KI"],["く","か行","ku","","ka-row",3,2,"KU"],["け","か行","ke","","ka-row",4,2,"KE"],["こ","か行","ko","","ka-row",5,2,"KO"],["さ","さ行","sa","","sa-row",1,3,"SA"],["し","さ行","shi","","sa-row",2,3,"SHI"],["す","さ行","su","","sa-row",3,3,"SU"],["せ","さ行","se","","sa-row",4,3,"SE"],["そ","さ行","so","","sa-row",5,3,"SO"],["た","た行","ta","","ta-row",1,4,"TA"],["ち","た行","chi","","ta-row",2,4,"CHI"],["つ","た行","tsu","","ta-row",3,4,"TSU"],["て","た行","te","","ta-row",4,4,"TE"],["と","た行","to","","ta-row",5,4,"TO"],["な","な行","na","","na-row",1,5,"NA"],["に","な行","ni","","na-row",2,5,"NI"],["ぬ","な行","nu","","na-row",3,5,"NU"],["ね","な行","ne","","na-row",4,5,"NE"],["の","な行","no","","na-row",5,5,"NO"],["は","は行","ha","","ha-row",1,6,"HA"],["ひ","は行","hi","","ha-row",2,6,"HI"],["ふ","は行","fu","","ha-row",3,6,"FU"],["へ","は行","he","","ha-row",4,6,"HE"],["ほ","は行","ho","","ha-row",5,6,"HO"],["ま","ま行","ma","","ma-row",1,7,"MA"],["み","ま行","mi","","ma-row",2,7,"MI"],["む","ま行","mu","","ma-row",3,7,"MU"],["め","ま行","me","","ma-row",4,7,"ME"],["も","ま行","mo","","ma-row",5,7,"MO"],["や","や行","ya","","ya-row",1,8,"YA"],["ゆ","や行","yu","","ya-row",3,8,"YU"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RA"],["り","ら行","ri","","ra-row",2,9,"RI"],["る","ら行","ru","","ra-row",3,9,"RU"],["れ","ら行","re","","ra-row",4,9,"RE"],["ろ","ら行","ro","","ra-row",5,9,"RO"],["わ","わ行","wa","","wa-row",1,10,"WA"],["を","わ行","wo","","wa-row",5,10,"WO"],["ん","","n","","",1,37,"N"],["が","が行","ga","","ga-row",1,12,"GA"],["ぎ","が行","gi","","ga-row",2,12,"GI"],["ぐ","が行","gu","","ga-row",3,12,"GU"],["げ","が行","ge","","ga-row",4,12,"GE"],["ご","が行","go","","ga-row",5,12,"GO"],["ざ","ざ行","za","","za-row",1,13,"ZA"],["じ","ざ行","ji","","za-row",2,13,"JI"],["ず","ざ行","zu","","za-row",3,13,"ZU"],["ぜ","ざ行","ze","","za-row",4,13,"ZE"],["ぞ","ざ行","zo","","za-row",5,13,"ZO"],["だ","だ行","da","","da-row",1,14,"DA"],["ぢ","だ行","ji","","da-row",2,14,"JI"],["づ","だ行","zu","","da-row",3,14,"ZU"],["で","だ行","de","","da-row",4,14,"DE"],["ど","だ行","do","","da-row",5,14,"DO"],["ば","ば行","ba","","ba-row",1,15,"BA"],["び","ば行","bi","","ba-row",2,15,"BI"],["ぶ","ば行","bu","","ba-row",3,15,"BU"],["べ","ば行","be","","ba-row",4,15,"BE"],["ぼ","ば行","bo","","ba-row",5,15,"BO"],["ぱ","ぱ行","pa","","pa-row",1,16,"PA"],["ぴ","ぱ行","pi","","pa-row",2,16,"PI"],["ぷ","ぱ行","pu","","pa-row",3,16,"PU"],["ぺ","ぱ行","pe","","pa-row",4,16,"PE"],["ぽ","ぱ行","po","","pa-row",5,16,"PO"],["ぁ","ぁ行","xa","","small-row",1,17,"XA"],["ぃ","ぁ行","xi","","small-row",2,17,"XI"],["ぅ","ぁ行","xu","","small-row",3,17,"XU"],["ぇ","ぁ行","xe","","small-row",4,17,"XE"],["ぉ","ぁ行","xo","","small-row",5,17,"XO"],["ゃ","ぁ行","xya","","small-row",1,17,"XYA"],["ゅ","ぁ行","xyu","","small-row",3,17,"XYU"],["ょ","ぁ行","xyo","","small-row",5,17,"XYO"],["っ","ぁ行","xtsu","","small-row",3,17,"XTSU"],["ゎ","ぁ行","xwa","","small-row",1,17,"XWA"],["ア","ア行","a","","Ka-row",1,18,"A"],["イ","ア行","i","","Ka-row",2,18,"I"],["ウ","ア行","u","","Ka-row",3,18,"U"],["エ","ア行","e","","Ka-row",4,18,"E"],["オ","ア行","o","","Ka-row",5,18,"O"],["カ","カ行","ka","","Kka-row",1,19,"KA"],["キ","カ行","ki","","Kka-row",2,19,"KI"],["ク","カ行","ku","","Kka-row",3,19,"KU"],["ケ","カ行","ke","","Kka-row",4,19,"KE"],["コ","カ行","ko","","Kka-row",5,19,"KO"],["サ","サ行","sa","","Ksa-row",1,20,"SA"],["シ","サ行","shi","","Ksa-row",2,20,"SHI"],["ス","サ行","su","","Ksa-row",3,20,"SU"],["セ","サ行","se","","Ksa-row",4,20,"SE"],["ソ","サ行","so","","Ksa-row",5,20,"SO"],["タ","タ行","ta","","Kta-row",1,21,"TA"],["チ","タ行","chi","","Kta-row",2,21,"CHI"],["ツ","タ行","tsu","","Kta-row",3,21,"TSU"],["テ","タ行","te","","Kta-row",4,21,"TE"],["ト","タ行","to","","Kta-row",5,21,"TO"],["ナ","ナ行","na","","Kna-row",1,22,"NA"],["ニ","ナ行","ni","","Kna-row",2,22,"NI"],["ヌ","ナ行","nu","","Kna-row",3,22,"NU"],["ネ","ナ行","ne","","Kna-row",4,22,"NE"],["ノ","ナ行","no","","Kna-row",5,22,"NO"],["ハ","ハ行","ha","","Kha-row",1,23,"HA"],["ヒ","ハ行","hi","","Kha-row",2,23,"HI"],["フ","ハ行","fu","","Kha-row",3,23,"FU"],["ヘ","ハ行","he","","Kha-row",4,23,"HE"],["ホ","ハ行","ho","","Kha-row",5,23,"HO"],["マ","マ行","ma","","Kma-row",1,24,"MA"],["ミ","マ行","mi","","Kma-row",2,24,"MI"],["ム","マ行","mu","","Kma-row",3,24,"MU"],["メ","マ行","me","","Kma-row",4,24,"ME"],["モ","マ行","mo","","Kma-row",5,24,"MO"],["ヤ","ヤ行","ya","","Kya-row",1,25,"YA"],["ユ","ヤ行","yu","","Kya-row",3,25,"YU"],["ヨ","ヤ行","yo","","Kya-row",5,25,"YO"],["ラ","ラ行","ra","","Kra-row",1,26,"RA"],["リ","ラ行","ri","","Kra-row",2,26,"RI"],["ル","ラ行","ru","","Kra-row",3,26,"RU"],["レ","ラ行","re","","Kra-row",4,26,"RE"],["ロ","ラ行","ro","","Kra-row",5,26,"RO"],["ワ","ワ行","wa","","Kwa-row",1,27,"WA"],["ヲ","ワ行","wo","","Kwa-row",5,27,"WO"],["ン","","n","","",1,37,"N"],["ガ","ガ行","ga","","Kga-row",1,29,"GA"],["ギ","ガ行","gi","","Kga-row",2,29,"GI"],["グ","ガ行","gu","","Kga-row",3,29,"GU"],["ゲ","ガ行","ge","","Kga-row",4,29,"GE"],["ゴ","ガ行","go","","Kga-row",5,29,"GO"],["ザ","ザ行","za","","Kza-row",1,30,"ZA"],["ジ","ザ行","ji","","Kza-row",2,30,"JI"],["ズ","ザ行","zu","","Kza-row",3,30,"ZU"],["ゼ","ザ行","ze","","Kza-row",4,30,"ZE"],["ゾ","ザ行","zo","","Kza-row",5,30,"ZO"],["ダ","ダ行","da","","Kda-row",1,31,"DA"],["ヂ","ダ行","ji","","Kda-row",2,31,"JI"],["ヅ","ダ行","zu","","Kda-row",3,31,"ZU"],["デ","ダ行","de","","Kda-row",4,31,"DE"],["ド","ダ行","do","","Kda-row",5,31,"DO"],["バ","バ行","ba","","Kba-row",1,32,"BA"],["ビ","バ行","bi","","Kba-row",2,32,"BI"],["ブ","バ行","bu","","Kba-row",3,32,"BU"],["ベ","バ行","be","","Kba-row",4,32,"BE"],["ボ","バ行","bo","","Kba-row",5,32,"BO"],["パ","パ行","pa","","Kpa-row",1,33,"PA"],["ピ","パ行","pi","","Kpa-row",2,33,"PI"],["プ","パ行","pu","","Kpa-row",3,33,"PU"],["ペ","パ行","pe","","Kpa-row",4,33,"PE"],["ポ","パ行","po","","Kpa-row",5,33,"PO"],["ァ","ァ行","xa","","Ksmall-row",1,34,"XA"],["ィ","ァ行","xi","","Ksmall-row",2,34,"XI"],["ゥ","ァ行","xu","","Ksmall-row",3,34,"XU"],["ェ","ァ行","xe","","Ksmall-row",4,34,"XE"],["ォ","ァ行","xo","","Ksmall-row",5,34,"XO"],["ャ","ァ行","xya","","Ksmall-row",1,34,"XYA"],["ュ","ァ行","xyu","","Ksmall-row",3,34,"XYU"],["ョ","ァ行","xyo","","Ksmall-row",5,34,"XYO"],["ッ","ァ行","xtsu","","Ksmall-row",3,34,"XTSU"],["ヮ","ァ行","xwa","","Ksmall-row",1,34,"XWA"],["ヴ","ヴ行","vu","","Kvu-row",3,35,"VU"],["ー","ー行","-","","long-row",1,36,"-"]];
 
 // ---------- state
@@ -585,8 +585,19 @@ function follow(q,down){ const n=norm(q); const seg=SEGS[segIdx];
     // level 0 and 67% by level 12: the smaller the glyph, the
     // more of the hook could be skipped. A distance is
     // scale-invariant; an index count is not.
-    if(prog>=seg[1]-SEGSLACK[segIdx]
-       && Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y)<endTol(segIdx)){ prog=seg[1];
+    //
+    // Dragging the light (guided) has no ink to judge, and the light
+    // rests on the nearest point to a fingertip that hides the end.
+    // Asking that fingertip's centre to land inside a pen's end
+    // tolerance left 54 of the maintainer's 88 guided strokes
+    // dragging on past the end, a third of the stroke on average,
+    // waiting for a close that came only when the centre crossed the
+    // point. There the test is reach: the light within R of the end
+    // along the stroke, the finger within R of it. Covering the end
+    // closes the stroke, which is what the hand thought it was doing.
+    const _end=Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y);
+    if(DRAG_FOLLOW ? ((seg[1]-prog)*(SEGLEN[segIdx]/Math.max(1,seg[1]-seg[0]))<R && _end<R)
+                   : (prog>=seg[1]-SEGSLACK[segIdx] && _end<endTol(segIdx))){ prog=seg[1];
       if(segIdx>=SEGS.length-1){
         const cov=covered(), eff=PATHLEN?travel/PATHLEN:1;
         if(cov>=COVER_MIN&&eff<=MAX_TRAVEL){ runeUI(); drawGuide(); conjure(); return; }
@@ -781,7 +792,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.9');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.10');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1075,7 +1086,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
 })();
 </script>
-<script>window.__HAND_CFG={maxPoints:64,keep:60,minStep:4,qualitySpan:0.09,pen:{"size":null,"ease":1.0,"trail":1.0,"halo":0},finger:{"size":[0.62,0.62],"ease":1.5,"trail":2.2,"halo":36}};</script>
+<script>window.__HAND_CFG={maxPoints:64,keep:60,minStep:4,qualitySpan:0.09,pen:{"size":[0.52,0.52],"ease":1.0,"trail":1.0,"halo":0},finger:{"size":[0.62,0.62],"ease":1.5,"trail":2.2,"halo":36}};</script>
 <style>
   .hand-btn{ background:transparent; color:rgba(108,184,255,.8); border:1px solid #1e2f3e;
     border-radius:7px; padding:4px 9px; font:12px ui-sans-serif,system-ui; cursor:pointer;
@@ -1900,7 +1911,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   const stageRows  = k => ST ? ST.rows + (k - 1) : Infinity;
   const stageCount = k => ST ? ST.count + ST.countStep * (k - 1) : Infinity;
   const lastStage  = () => ST ? Math.max(1, Math.max(...LETTERS.map(L => L[6] || 1)) - ST.rows + 1) : 1;
-  const roster = () => { const r = stageRows(stageNo); const a = []; LETTERS.forEach((L, i) => { if ((L[6] || 1) <= r) a.push(i); }); return a.length ? a : LETTERS.map((_, i) => i); };
+  // Guided holds no stage past the second, so under the gate its rows never
+  // grew and a guided player could not meet half the chart. Guided teaches
+  // the motion and earns no gate; it draws from every row.
+  const roster = () => { if (DIFF[difficulty] && DIFF[difficulty].allRows) return LETTERS.map((_, i) => i);
+    const r = stageRows(stageNo); const a = []; LETTERS.forEach((L, i) => { if ((L[6] || 1) <= r) a.push(i); }); return a.length ? a : LETTERS.map((_, i) => i); };
   function setStage(k){ k = Math.max(1, Math.min(stageMax(), Math.floor(+k) || 1)); if (k !== stageNo){ stageNo = k; saveStart(); } return stageNo; }
   function buyLantern(id){
     const p = purse(); if (!p || !LANTERN[id]) return false;
@@ -1962,10 +1977,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // stroke sets a pace, and the hand starts following its speed instead
     // of dragging the light at its own. The road ahead already shows where
     // to go; guided does not need to be shown how fast.
-    guided: { tama:.5, kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
+    guided: { tama:.5, kana:'導', blurb:'follow the light. no ink, no zaps, one big size, every row — just take it to the end of each stroke.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
-              guide:true, numbers:true, comet:false, shadow:'none', stray:'drop' },
+              guide:true, numbers:true, comet:false, shadow:'none', stray:'drop', allRows:true },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
@@ -2960,6 +2975,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.9</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.10</div>
 </body>
 </html>

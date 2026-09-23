@@ -248,7 +248,11 @@ LAYER = STYLE + r"""
   const stageRows  = k => ST ? ST.rows + (k - 1) : Infinity;
   const stageCount = k => ST ? ST.count + ST.countStep * (k - 1) : Infinity;
   const lastStage  = () => ST ? Math.max(1, Math.max(...LETTERS.map(L => L[6] || 1)) - ST.rows + 1) : 1;
-  const roster = () => { const r = stageRows(stageNo); const a = []; LETTERS.forEach((L, i) => { if ((L[6] || 1) <= r) a.push(i); }); return a.length ? a : LETTERS.map((_, i) => i); };
+  // Guided holds no stage past the second, so under the gate its rows never
+  // grew and a guided player could not meet half the chart. Guided teaches
+  // the motion and earns no gate; it draws from every row.
+  const roster = () => { if (DIFF[difficulty] && DIFF[difficulty].allRows) return LETTERS.map((_, i) => i);
+    const r = stageRows(stageNo); const a = []; LETTERS.forEach((L, i) => { if ((L[6] || 1) <= r) a.push(i); }); return a.length ? a : LETTERS.map((_, i) => i); };
   function setStage(k){ k = Math.max(1, Math.min(stageMax(), Math.floor(+k) || 1)); if (k !== stageNo){ stageNo = k; saveStart(); } return stageNo; }
   function buyLantern(id){
     const p = purse(); if (!p || !LANTERN[id]) return false;
@@ -310,10 +314,10 @@ LAYER = STYLE + r"""
     // stroke sets a pace, and the hand starts following its speed instead
     // of dragging the light at its own. The road ahead already shows where
     // to go; guided does not need to be shown how fast.
-    guided: { tama:.5, kana:'導', blurb:'follow the light. no ink, no zaps, one big size — just take it to the end of each stroke.',
+    guided: { tama:.5, kana:'導', blurb:'follow the light. no ink, no zaps, one big size, every row — just take it to the end of each stroke.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
-              guide:true, numbers:true, comet:false, shadow:'none', stray:'drop' },
+              guide:true, numbers:true, comet:false, shadow:'none', stray:'drop', allRows:true },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
