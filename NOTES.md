@@ -1516,4 +1516,13 @@ Running log. Append at the bottom, don't rewrite history.
   about rhythm rather than power: capacity and charge per stroke within
   the run, like quick and bright; what a full gauge releases as a lantern
   that lasts, like hearts and lights.
+- And: "the other upgrades I didn't even notice much. Like ok the health
+  one cool. But the more ink or whatever didn't really make me more
+  urgent." Quick, bright and shove act above the seam while the eyes are
+  below it; nobody sees them work, so buying one feels like nothing. Mend
+  acts on hearts, the one number that hurts. So the strip should fold
+  into the gauge: those three become what a full gauge releases, and the
+  upgrade shows itself in the moment the hand looks up. Urgency has to
+  come from the seam too — a gauge that drains on a breach, or a release
+  needed before the next wave.
 - None of it built. Recorded so the reasoning survives.
