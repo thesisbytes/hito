@@ -201,8 +201,10 @@ for (const file of process.argv.slice(2)){
     const { P, g, fire, tick, px, along } = rig(file);
     const [a, b] = P.SEGS[0];
     const s = px(a); fire('pointerdown', s.x, s.y, 'pen');
-    for (let k = a + 1; k <= b - 3; k++){ tick(8); const q = px(k); fire('pointermove', q.x, q.y, 'pen'); }
-    ok(P.prog >= b - 6 && P.awaitLift === false, `did not get near the end (prog ${P.prog} of ${b})`);
+    // six points short: the window can credit a few points ahead of the pen, and
+    // three short was inside the end tolerance on some strokes, which closed it
+    for (let k = a + 1; k <= b - 6; k++){ tick(8); const q = px(k); fire('pointermove', q.x, q.y, 'pen'); }
+    ok(P.prog >= b - 9 && P.awaitLift === false, `did not get near the end, or closed early (prog ${P.prog} of ${b}, lift ${P.awaitLift})`);
     // then on past the end along its direction, a little to one side, outside the end tolerance
     const e = px(b), f = px(b - 3), tx = e.x - f.x, ty = e.y - f.y, tl = Math.hypot(tx, ty) || 1;
     const R = P.R * P.W, side = { x: -ty / tl, y: tx / tl };
