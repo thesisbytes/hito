@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from strands.models.model import Model  # noqa: E402
 
-from hito_agents import analyst, events, model, tools  # noqa: E402
+from hito_agents import analyst, events, memory, model, tools  # noqa: E402
 from hito_agents.hooks import Fence, Ledger  # noqa: E402
 
 
@@ -59,7 +59,8 @@ class Scripted(Model):
 
     def __init__(self, turns):
         self.turns = list(turns)
-        self.seen = []
+        self.seen = []    # roles per call
+        self.msgs = []    # the full messages per call
 
     def update_config(self, **config):
         pass
@@ -69,6 +70,7 @@ class Scripted(Model):
 
     async def stream(self, messages, tool_specs=None, system_prompt=None, **kw):
         self.seen.append([m["role"] for m in messages])
+        self.msgs.append(messages)
         turn = self.turns.pop(0)
         yield {"messageStart": {"role": "assistant"}}
         if "tool" in turn:
@@ -136,6 +138,22 @@ class Arithmetic(unittest.TestCase):
         self.assertEqual(got[0]["body"]["glyph"], "つ")
 
 
+KEYS = ("OPENROUTER_API_KEY", "HITO_LLM_API_KEY", "AWS_BEARER_TOKEN_BEDROCK", "HITO_LLM", "HITO_MODEL",
+        "HITO_MEMORY", "GEMINI_API_KEY", "GOOGLE_API_KEY",
+        "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_PROFILE", "AWS_REGION")
+
+
+def clean_env(**extra):
+    """A clean environment, and no real .env files: the tests must not pick
+    up whichever key the maintainer has on this machine."""
+    env = {k: v for k, v in os.environ.items() if k not in KEYS}
+    env.update(extra)
+    stack = contextlib.ExitStack()
+    stack.enter_context(unittest.mock.patch.dict(os.environ, env, clear=True))
+    stack.enter_context(unittest.mock.patch.object(model, "ENV_FILES", ()))
+    return stack
+
+
 class Wiring(unittest.TestCase):
     def setUp(self):
         tools.use(parsed(rows()))
@@ -148,7 +166,7 @@ class Wiring(unittest.TestCase):
     def run_agent(self, turns, question="how is it going?"):
         model = Scripted(turns)
         ledger, fence = Ledger(self.out / "ledger.jsonl"), Fence(self.out)
-        agent = analyst.build(model=model, hooks=[ledger, fence], callback_handler=None)
+        agent = analyst.build(model=model, hooks=[ledger, fence], callback_handler=None, memory=False)
         result = agent(question)
         return str(result), model, ledger, fence
 
@@ -186,23 +204,13 @@ class Wiring(unittest.TestCase):
         self.assertEqual((self.out / "note.md").read_text(encoding="utf-8"), "つ is fine")
         self.assertEqual(fence.refused, [])
 
-    KEYS = ("OPENROUTER_API_KEY", "HITO_LLM_API_KEY", "AWS_BEARER_TOKEN_BEDROCK", "HITO_LLM", "HITO_MODEL",
-            "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_PROFILE", "AWS_REGION")
-
     def env(self, **extra):
-        """A clean environment, and no real .env files: the tests must not
-        pick up whichever key the maintainer has on this machine."""
-        env = {k: v for k, v in os.environ.items() if k not in self.KEYS}
-        env.update(extra)
-        stack = contextlib.ExitStack()
-        stack.enter_context(unittest.mock.patch.dict(os.environ, env, clear=True))
-        stack.enter_context(unittest.mock.patch.object(model, "ENV_FILES", ()))
-        return stack
+        return clean_env(**extra)
 
     def test_no_key_means_no_agent_and_a_plain_message(self):
         with self.env(), unittest.mock.patch.object(model, "aws_credentials", return_value=False):
             with self.assertRaises(SystemExit) as cm:
-                analyst.build()
+                analyst.build(memory=False)
         self.assertIn("AWS_BEARER_TOKEN_BEDROCK", str(cm.exception))
         self.assertIn("OPENROUTER_API_KEY", str(cm.exception))
 
@@ -239,6 +247,105 @@ class Wiring(unittest.TestCase):
         with self.env(HITO_LLM="bedrock", AWS_BEARER_TOKEN_BEDROCK="x", OPENROUTER_API_KEY="y", HITO_MODEL="us.anthropic.something"):
             self.assertEqual(model.pick().get_config()["model_id"], "us.anthropic.something")
 
+
+class FakeMem0:
+    """mem0's add / search / get_all, in memory, by substring."""
+
+    def __init__(self):
+        self.rows = []
+        self.adds = []
+
+    def add(self, messages, *, user_id=None, metadata=None, infer=True, **kw):
+        self.adds.append({"messages": messages, "user_id": user_id, "infer": infer})
+        texts = [messages] if isinstance(messages, str) else [m["content"] for m in messages]
+        for t in texts:
+            self.rows.append({"id": f"m{len(self.rows)}", "memory": t, "user_id": user_id})
+        return {"results": [{"event": "ADD"}]}
+
+    def search(self, query, *, filters=None, top_k=5, **kw):
+        assert "user_id" not in kw, "mem0 2.x rejects a top-level user_id on search"
+        user_id = (filters or {}).get("user_id")
+        words = [w for w in query.lower().split() if len(w) > 3]
+        hits = [r for r in self.rows if r["user_id"] == user_id and any(w in r["memory"].lower() for w in words)]
+        return {"results": [{**r, "score": 0.9} for r in hits[:top_k]]}
+
+    def get_all(self, *, filters=None, top_k=100, **kw):
+        assert "user_id" not in kw, "mem0 2.x rejects a top-level user_id on get_all"
+        user_id = (filters or {}).get("user_id")
+        return {"results": [r for r in self.rows if r["user_id"] == user_id][:top_k]}
+
+
+class Memory(unittest.TestCase):
+    def setUp(self):
+        tools.use(parsed(rows()))
+        self.tmp = tempfile.TemporaryDirectory()
+        self.out = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_config_follows_the_provider(self):
+        with clean_env(AWS_BEARER_TOKEN_BEDROCK="x", AWS_REGION="eu-west-1"):
+            c = memory.mem0_config()
+        self.assertEqual((c["llm"]["provider"], c["embedder"]["provider"]), ("aws_bedrock", "aws_bedrock"))
+        self.assertEqual(c["llm"]["config"]["aws_region"], "eu-west-1")
+        self.assertEqual(c["vector_store"]["config"]["embedding_model_dims"], 1024)
+        with clean_env(OPENROUTER_API_KEY="y", GEMINI_API_KEY="z"), \
+                unittest.mock.patch.object(model, "aws_credentials", return_value=False):
+            c2 = memory.mem0_config()
+        self.assertEqual((c2["llm"]["provider"], c2["embedder"]["provider"]), ("openai", "gemini"))
+        self.assertEqual(c2["llm"]["config"]["openrouter_base_url"], model.OPENROUTER_URL)
+        # vectors from different embedders never share a collection
+        self.assertNotEqual(c["vector_store"]["config"]["collection_name"], c2["vector_store"]["config"]["collection_name"])
+        with clean_env(OPENROUTER_API_KEY="y"), \
+                unittest.mock.patch.object(model, "aws_credentials", return_value=False):
+            with self.assertRaises(SystemExit) as cm:
+                memory.mem0_config()
+        self.assertIn("GEMINI_API_KEY", str(cm.exception))
+
+    def test_the_store_speaks_both_dialects(self):
+        fake = FakeMem0()
+        store = memory.Mem0Store(client=fake, scope="maintainer")
+        asyncio.run(store.add("The poke bug in easy mode is known and unfixed."))
+        self.assertEqual(fake.adds[-1]["infer"], False)     # written as written
+        asyncio.run(store.add_messages([
+            {"role": "user", "content": [{"text": "how is ふ going?"}]},
+            {"role": "assistant", "content": [{"toolUse": {"name": "x"}}]},   # no text: dropped
+            {"role": "assistant", "content": [{"text": "ふ fizzles a third of the time."}]},
+        ]))
+        self.assertEqual(fake.adds[-1]["infer"], True)      # mem0 distils a conversation
+        self.assertEqual([m["role"] for m in fake.adds[-1]["messages"]], ["user", "assistant"])
+        hits = asyncio.run(store.search("is the poke bug known?"))
+        self.assertEqual([h.content for h in hits], ["The poke bug in easy mode is known and unfixed."])
+        self.assertEqual(hits[0].metadata["id"], "m0")
+        self.assertEqual(len(store.everything()), 3)
+        # a different scope sees nothing of this
+        self.assertEqual(asyncio.run(memory.Mem0Store(client=fake, scope="d123").search("poke bug")), [])
+
+    def test_memory_reaches_the_model_and_the_turn_reaches_memory(self):
+        fake = FakeMem0()
+        store = memory.Mem0Store(client=fake, scope="maintainer")
+        asyncio.run(store.add("The maintainer plays guided, by finger, on a phone."))
+        scripted = Scripted([{"text": "Finger, guided, phone: noted."}])
+        mm = memory.manager(store)
+        agent = analyst.build(model=scripted, hooks=[Ledger(self.out / "l.jsonl"), Fence(self.out)],
+                              callback_handler=None, memory=mm)
+        self.assertIn("search_memory", agent.tool_names)
+        self.assertIn("add_memory", agent.tool_names)
+        agent("how does the maintainer play, and does the finger struggle?")
+        shown = json.dumps(scripted.msgs[0], ensure_ascii=False)
+        self.assertIn("<memory>", shown)
+        self.assertIn("plays guided, by finger", shown)
+        # the durable history is untouched by the injection
+        self.assertNotIn("<memory>", json.dumps(agent.messages, ensure_ascii=False))
+        # extraction ran after the invocation: the turn went to mem0 to distil
+        asyncio.run(mm.flush())
+        distilled = [a for a in fake.adds if a["infer"]]
+        self.assertEqual(len(distilled), 1)
+        self.assertIn("how does the maintainer play", distilled[0]["messages"][0]["content"])
+
+
+import asyncio  # noqa: E402
 
 if __name__ == "__main__":
     unittest.main()

@@ -951,3 +951,48 @@ Running log. Append at the bottom, don't rewrite history.
   running build to confirm it is the embers and not the finger. Both are
   drawing bugs before they are thresholds, and worth fixing by hand first so
   the labelling experiment has a before and after.
+
+## 2026-09-23 — Bedrock, and mem0 as memory (agents/)
+
+- **Bedrock by default.** The maintainer has credit there and Strands is
+  AWS's SDK. A Bedrock API key in `.env` at the repo root (ignored by git,
+  read by the agents themselves, never overriding the environment) picks it;
+  the class's OpenRouter key stays as the fallback; `HITO_LLM` forces one.
+  The key lists Sonnet 5 through its cross-region profile, which is the
+  default id. The first real call was refused: the new account is under
+  AWS verification ("normally less than 2 hours"). The ledger has the
+  refusal, and the fallback ran meanwhile.
+- **mem0 is a Strands memory store, not a tool bolted on.** Strands 1.57
+  has a `MemoryManager` with pluggable stores; `Mem0Store` is one. The
+  harness searches it with the question and prepends a `<memory>` block
+  before each model call (the durable history is untouched), hands each
+  finished turn to mem0 to distil with its own LLM, and registers
+  `search_memory` / `add_memory` for when the model wants to look something
+  up or write a decision down. This is the course's "memory" concept sitting
+  in the harness where it belongs.
+- **Scoped by `user_id`.** `maintainer` is the analyst's own notes across
+  sessions; a device id is what was learned about one hand. mem0 2.x takes
+  the scope as `user_id` on add and as `filters={"user_id": ...}` on search
+  and list, which the first live run found the hard way (Strands logged the
+  failed search and carried on, which is the right failure).
+- **Embeddings are the awkward part.** Titan on Bedrock once verified;
+  OpenRouter serves none, so the fallback is Gemini's embedding model with
+  the key already on this machine. One Qdrant collection per embedder, on
+  disk under `agents/out/memory`, because vectors from two models must never
+  be searched together. `python -m hito_agents.memory` prints everything
+  remembered: nothing lives only in a vector store.
+- **Live, on the fallback.** Run one: the analyst stored the maintainer's
+  play style and the known poke bug through `add_memory`, then answered
+  from the table. Run two, a fresh process, was refused by OpenRouter's
+  in-flight budget, and stayed refused on every retry: the class account
+  is spent. So the live recall is not yet demonstrated; what is on disk is
+  three memories — the two notes, and a third mem0 distilled by itself from
+  the turn (む fizzles most, four traces, too thin to call). The recall
+  itself is proven offline against the fake, and will be shown live on
+  Bedrock once the account is verified. mem0's telemetry is switched off
+  and its import-time warnings about optional extras are silenced.
+- **Tests stay offline.** A fake mem0 with the 2.x calling convention
+  (asserting that a top-level `user_id` is never passed to search) stands
+  in; the suite checks the config follows the provider, both write paths
+  (verbatim for `add`, distilled for a turn), scoping, that memory reaches
+  the model and the turn reaches memory. Sixteen tests.

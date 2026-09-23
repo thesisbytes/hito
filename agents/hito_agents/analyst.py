@@ -6,6 +6,7 @@ game; it is a reader of observations.
 
     agents/.venv/bin/python -m hito_agents.analyst "which characters fizzle most, and why might that be?"
 """
+import os
 import sys
 
 from strands import Agent
@@ -25,15 +26,23 @@ You have a pull of that table and tools that compute over it. Rules:
 - A trace is an observation about one hand. It is never a claim about anyone else, and nothing
   you write is a ranking of players.
 - Be brief, concrete, and a little affectionate about the whole thing. The project's tone is silly.
-- If asked to save a report, use save_report with a plain file name."""
+- If asked to save a report, use save_report with a plain file name.
+- You have a long-term memory. What earlier sessions learned arrives in a <memory> block; trust it as
+  background, not as data. Use add_memory for a decision or a fact worth keeping, in one plain sentence."""
 
 
-def build(model=None, hooks=None, **kw):
+def build(model=None, hooks=None, memory=None, **kw):
+    """memory: a MemoryManager, None for the default mem0 one, False for none
+    (HITO_MEMORY=0 does the same from the environment)."""
     if model is None:
         from .model import pick
         model = pick()
+    if memory is None and os.environ.get("HITO_MEMORY", "1") != "0":
+        from .memory import manager
+        memory = manager()
     return Agent(model=model, tools=ALL, system_prompt=SYSTEM, name="analyst",
-                 hooks=hooks if hooks is not None else [Ledger(), Fence()], **kw)
+                 hooks=hooks if hooks is not None else [Ledger(), Fence()],
+                 memory_manager=memory or None, **kw)
 
 
 def main(argv=None):

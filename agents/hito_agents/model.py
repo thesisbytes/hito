@@ -79,17 +79,22 @@ def openrouter(model_id=None, **params):
     )
 
 
-def pick(model_id=None, **params):
+def provider():
+    """Which provider the environment points at: bedrock or openrouter."""
     load_env()
     which = os.environ.get("HITO_LLM", "").lower()
-    if not which:
-        if os.environ.get("AWS_BEARER_TOKEN_BEDROCK") or aws_credentials():
-            which = "bedrock"
-        elif os.environ.get("OPENROUTER_API_KEY") or os.environ.get("HITO_LLM_API_KEY"):
-            which = "openrouter"
-        else:
-            raise SystemExit("No model: set AWS_BEARER_TOKEN_BEDROCK (Bedrock) or OPENROUTER_API_KEY (OpenRouter). "
-                             "Keys live in the environment, never in the repo.")
+    if which:
+        return which
+    if os.environ.get("AWS_BEARER_TOKEN_BEDROCK") or aws_credentials():
+        return "bedrock"
+    if os.environ.get("OPENROUTER_API_KEY") or os.environ.get("HITO_LLM_API_KEY"):
+        return "openrouter"
+    raise SystemExit("No model: set AWS_BEARER_TOKEN_BEDROCK (Bedrock) or OPENROUTER_API_KEY (OpenRouter). "
+                     "Keys live in the environment, never in the repo.")
+
+
+def pick(model_id=None, **params):
+    which = provider()
     if which == "bedrock":
         return bedrock(model_id, **params)
     if which == "openrouter":

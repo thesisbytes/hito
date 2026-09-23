@@ -8,7 +8,8 @@ double-click, and nothing here weakens that (see CLAUDE.md).
 This is also a class project in multi-agent systems, so each piece maps to a
 named idea: a **harness** (Strands' agent loop with the project's own
 arithmetic as tools), **hooks** (a ledger of every call and a fence around
-writes), **memory** and **context** (to come; see the notes for 2026-09-23).
+writes), **memory** (mem0, as a Strands memory store: injected before a call,
+distilled after one), and **context** (to come; see the notes for 2026-09-23).
 
 ## Setup
 
@@ -26,7 +27,11 @@ are set:
 | **Bedrock** (default when found) | `AWS_BEARER_TOKEN_BEDROCK`, `AWS_REGION` | a Bedrock API key from the console; `~/.aws` credentials work too. Anthropic models need access enabled once, per region. |
 | **OpenRouter** (the class account) | `OPENROUTER_API_KEY` | through Strands' OpenAI-compatible provider; `HITO_LLM_BASE_URL` points it at any other gateway |
 
-`HITO_LLM=bedrock|openrouter` forces one. `HITO_MODEL` overrides the model id
+`HITO_LLM=bedrock|openrouter` forces one. Memory uses the same provider for
+mem0's LLM, and Titan on Bedrock for embeddings; OpenRouter serves no
+embeddings, so with it set `GEMINI_API_KEY` (`pip install -e "agents[gemini]"`).
+`HITO_MEMORY=0` runs without memory; `HITO_MEMORY_USER` scopes it (default
+`maintainer`; a device id scopes what was learned about one hand). `HITO_MODEL` overrides the model id
 (`us.anthropic.claude-sonnet-5` on Bedrock, `anthropic/claude-sonnet-5` on
 OpenRouter). `HITO_MAX_TOKENS` caps output (default 2000: a provider
 reserves the whole window against a small balance otherwise).
@@ -53,6 +58,7 @@ agents/
     tools.py              what an agent may call: the numbers above, and one write under agents/out
     hooks.py              Ledger (every call, one line each) and Fence (no writes outside agents/out)
     model.py              Bedrock or OpenRouter, from the environment
+    memory.py             mem0 as a Strands memory store; `python -m hito_agents.memory` lists everything remembered
     analyst.py            the first agent: reads the pull and answers questions
   test/test_agents.py     the wiring, offline: a scripted model plays the LLM's part
   data/                   the pull (ignored by git)
