@@ -1510,4 +1510,10 @@ Running log. Append at the bottom, don't rewrite history.
   this is a filter over them, and it guarantees a farang never carries a
   word the hand could not answer. Tiers keyed to the player's lit set
   rather than to the stage number.
+- Then: "maybe like all strokes fill an energy gauge. Something like that
+  is upgradable." Every stroke charges it, landed or not — the hand did
+  the work either way. The gauge is a fifth axis for the upgrade strip,
+  about rhythm rather than power: capacity and charge per stroke within
+  the run, like quick and bright; what a full gauge releases as a lantern
+  that lasts, like hearts and lights.
 - None of it built. Recorded so the reasoning survives.
