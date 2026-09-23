@@ -1261,3 +1261,25 @@ Running log. Append at the bottom, don't rewrite history.
   conjure with no ink, but the record is cleared now. `field.test.mjs` still
   fails about one run in six on the 3-hit farang, alone or under the suite;
   that one is timing in the test's own clock and stays on the list.
+
+## 2026-09-23 — Stroke order and the font, checked against the textbook
+
+- The maintainer, with Genki I's charts (hiragana p.296, katakana p.300):
+  "we should probably check if the stroke order is correct and the font
+  type is what we are learning in this class."
+- **Order and direction: 92 of 92 agree.** Counts were compared by script
+  (all 46 + 46 match the chart's numbering); order and direction by eye,
+  from `build/book_chart.py`'s rendering of our book beside the pages. The
+  cells that textbooks differ on were looked at one by one: そ (Genki: one
+  stroke, ours one), ふ (four, four), き and さ (the hook separate, as
+  KanjiVG has it), も (vertical first), よ (the short stroke first), and in
+  katakana シ/ツ and ソ/ン (the direction of the long stroke), ヒ (the
+  short stroke first, right to left), ネ (four), ホ (four), ヲ (three).
+- **The font.** Genki's charts are set in a textbook face (教科書体). What
+  the tracer asks the hand to follow is not a font at all but KanjiVG's
+  centrelines, which follow textbook forms (CLAUDE.md, "the hook problem");
+  that is why the book agrees with the chart. Klee One, the trace font
+  drawn beside it, is the closest textbook-like face on Google Fonts, and
+  Noto Sans JP is shown small as the print form. No change needed.
+- `book_chart.py` stays for the next realm: a kanji pack's book gets the
+  same chart before it is trusted.
