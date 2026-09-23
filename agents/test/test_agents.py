@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from strands.models.model import Model  # noqa: E402
 
-from hito_agents import analyst, events, memory, model, system1, tools  # noqa: E402
+from hito_agents import analyst, events, factcheck, memory, model, system1, tools  # noqa: E402
 from hito_agents.hooks import Fence, Ledger  # noqa: E402
 
 
@@ -465,6 +465,56 @@ class SystemOne(unittest.TestCase):
             t = tools.triage(glyph="ふ")
             self.assertEqual(t["verdicts"], {"poked": 1})
             self.assertEqual(tools.triage()["totals"], {"poked": 1})
+
+
+class FactCheck(unittest.TestCase):
+    RESULTS = ['{"ふ": {"traces": 41, "fizzle_rate": 0.46, "zaps_per_trace": 3.1}, "き": {"spread": 0.063}}']
+
+    def test_sentences_and_figures(self):
+        ss = factcheck.sentences("ふ fizzled 19 of 41 times. **Behind it:** き.\n- a bullet about も that is long enough\nok")
+        self.assertEqual(len(ss), 3)
+        self.assertEqual(factcheck.figures("46 % fizzle, 3.1 zaps"), {46.0, 0.46, 3.1})
+
+    def test_grounding_allows_the_tools_forms_and_catches_invention(self):
+        pool = factcheck.pool_from(self.RESULTS)
+        self.assertEqual(factcheck.grounded("ふ fizzles 46% of the time, 3.1 zaps a trace, over 41 traces", pool), [])
+        self.assertEqual(factcheck.grounded("き's spread is 0.06", pool), [])          # rounding
+        self.assertEqual(factcheck.grounded("it fizzled 55 times in two rounds", pool), [55.0])   # 55 invented; two is ordinal
+
+    def test_the_rule_sorts_the_kinds(self):
+        rows = factcheck.check("ふ fizzled 46% of the time. That is because the finger is wide. "
+                               "The data cannot say why. You should pull again. も is the next worst after ふ.", self.RESULTS)
+        self.assertEqual([r["kind"] for r in rows], ["measurement", "cause", "caveat", "suggestion", "comparison"])
+        marked = factcheck.annotate("ふ fizzled 46% of the time. That is because the finger is wide.", rows[:2])
+        self.assertIn("(guess) That is because", marked)
+        self.assertNotIn("because", factcheck.annotate("That is because the finger is wide.", rows[1:2], "strict"))
+        self.assertEqual(factcheck.tally(rows)["cause"], 1)
+
+    def test_the_fence_marks_the_answer_and_refuses_a_cause_in_memory(self):
+        tools.use(parsed(rows()))
+        fake = FakeMem0(); store = memory.Mem0Store(client=fake, scope="t")
+        scripted = Scripted([
+            {"tool": ("glyph_summary", {"glyph": "つ"})},
+            {"tool": ("add_memory", {"entries": ["つ fizzles because the pen slips on the curve."]})},
+            {"tool": ("add_memory", {"entries": ["つ fizzled 1 of 3 traces."]})},
+            {"text": "つ fizzled 1 of 3 traces. That is because the pen slips. It fizzled 55 times."},
+        ])
+        out = Path(self.__class__.__name__ + "_tmp"); out.mkdir(exist_ok=True)
+        try:
+            ledger = Ledger(out / "l.jsonl"); fence = factcheck.FactFence(predictor=factcheck.Rule(), ledger=ledger)
+            agent = analyst.build(model=scripted, hooks=[ledger, Fence(out), fence], callback_handler=None, memory=memory.manager(store))
+            agent("how is つ?")
+            self.assertEqual(fence.refused, ["つ fizzles because the pen slips on the curve."])
+            # the tool's own writes (the manager's after-turn extraction writes too, with infer on)
+            self.assertEqual([a["messages"] for a in fake.adds if not a["infer"]], ["つ fizzled 1 of 3 traces."])
+            self.assertEqual([r["kind"] for r in fence.rows], ["measurement", "cause", "measurement"])
+            self.assertEqual(fence.rows[2]["missing"], [55.0])
+            self.assertIn("(guess) That is because", fence.marked)
+            self.assertIn("(unverified: 55)", fence.marked)
+            notes = [e for e in ledger.entries if e["what"] == "factcheck"]
+            self.assertEqual((notes[-1]["cause"], notes[-1]["unverified"]), (1, 1))
+        finally:
+            import shutil; shutil.rmtree(out, ignore_errors=True)
 
 
 if __name__ == "__main__":

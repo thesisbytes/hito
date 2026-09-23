@@ -9,8 +9,9 @@ This is also a class project in multi-agent systems, so each piece maps to a
 named idea: a **harness** (Strands' agent loop with the project's own
 arithmetic as tools), **hooks** (a ledger of every call and a fence around
 writes), **memory** (mem0, as a Strands memory store: injected before a call,
-distilled after one), **System 1 / System 2** (Laya labels every trace in one
-forward pass; the LLM is for the rows it is unsure about), and **context** (to
+distilled after one), **System 1 / System 2** (Laya, where it fits: a fact fence on the
+analyst's prose — measured or made up, sentence by sentence — since it read
+nothing in the ink), and **context** (to
 come; see the notes for 2026-09-23).
 
 ## Setup
@@ -67,6 +68,7 @@ agents/
     model.py              Bedrock or OpenRouter, from the environment
     memory.py             mem0 as a Strands memory store; `python -m hito_agents.memory` lists everything remembered
     system1.py            geometry per trace, Laya's typed questions, the labels, and the check against the flags
+    factcheck.py          the fact fence: what the analyst measured vs. made up; figures checked against the tools; memory refuses causes
     analyst.py            the first agent: reads the pull and answers questions
   test/test_agents.py     the wiring, offline: a scripted model plays the LLM's part
   data/                   the pull (ignored by git)
@@ -85,4 +87,9 @@ agents/
   `system1.agree()` is the comparison. No flags, no conclusions.
 - **Agents write under `agents/out` and nowhere else.** The fence enforces
   it; a refused call goes back to the model as an error so it can say so.
+- **Say what was measured.** Every analyst answer is checked sentence by
+  sentence: figures against the tool results, kind by a rule (or Laya, with
+  `HITO_FACTCHECK_MODEL=laya`). Causes are marked "(guess)", invented figures
+  "(unverified)", and a memory write that explains rather than measures is
+  refused. `HITO_FACTCHECK=off|mark|strict`.
 - **Nothing lives only in the terminal.** The ledger is a file.

@@ -1439,3 +1439,31 @@ Running log. Append at the bottom, don't rewrite history.
   itself as a measuring instrument and a labelling loop; the LLM as
   analyst is a narrator of numbers a script produced; the System 1 seat is
   still empty.
+
+## 2026-09-24 — The fact fence: what the analyst measured, and what it made up (agents/hito_agents/factcheck.py)
+
+- **The maintainer: "we can fact check the analyst."** The one place Laya
+  fits is the analyst's prose, not the ink. Every answer is split into
+  sentences and each is sorted — measurement, comparison, caveat, cause,
+  suggestion, other — and every figure in it is checked, with no model,
+  against the numbers the tools returned this invocation (39% for 0.39,
+  rounding allowed, small integers pass as ordinal talk). Causes are marked
+  "(guess)", figures the tools never returned "(unverified)", and the ledger
+  keeps the tally per answer. A memory write that is a cause is refused at
+  the hook: memory takes what was measured. The analyst is told so, and
+  told to mark its own guesses.
+- **Laya against a rule, on prose.** On the eight sentences of the first
+  answer checked, Laya agreed with the hand's labels four times, a keyword
+  rule seven — but the rule was written after reading those sentences.
+  Unlike on the ink, Laya's probabilities carry signal here: 0.99 on the
+  sentence that says "because", 0.3 where the kind is arguable; it reads
+  table rows as caveats. So the rule decides by default, Laya decides with
+  `HITO_FACTCHECK_MODEL=laya`, and either way both verdicts are logged for
+  every sentence of every answer. Live on Bedrock, first run with Laya
+  deciding: model Laya, 3 of 12 sentences agree with the rule; causes 2, unverified 0. Both causes were caught, the analyst marked one of them
+  as a guess itself, and what reached memory was "ふ medium-finger fizzle
+  rate = 39%" and nothing else.
+- This is the course's hooks and System 1 in one piece, doing a job the
+  session showed needed doing. The comparison it logs is the experiment:
+  when there are a few hundred sentences, Laya's kinds and the rule's kinds
+  against a hand's can be scored, and calibrated against `ece_score`.

@@ -11,6 +11,7 @@ import sys
 
 from strands import Agent
 
+from .factcheck import FactFence, report, tally
 from .hooks import Fence, Ledger
 from .tools import ALL
 
@@ -28,7 +29,12 @@ You have a pull of that table and tools that compute over it. Rules:
 - Be brief, concrete, and a little affectionate about the whole thing. The project's tone is silly.
 - If asked to save a report, use save_report with a plain file name.
 - You have a long-term memory. What earlier sessions learned arrives in a <memory> block; trust it as
-  background, not as data. Use add_memory for a decision or a fact worth keeping, in one plain sentence."""
+  background, not as data. Use add_memory for a figure worth keeping, in one plain sentence; a memory
+  that explains WHY is refused, because nothing here can measure a reason.
+- Say what was measured. If you offer a reason, mark it as a guess yourself."""
+
+
+FENCE = {}
 
 
 def build(model=None, hooks=None, memory=None, **kw):
@@ -40,9 +46,14 @@ def build(model=None, hooks=None, memory=None, **kw):
     if memory is None and os.environ.get("HITO_MEMORY", "1") != "0":
         from .memory import manager
         memory = manager()
+    if hooks is None:
+        ledger = Ledger()
+        hooks = [ledger, Fence()]
+        if os.environ.get("HITO_FACTCHECK", "mark") != "off":
+            FENCE["last"] = FactFence(ledger=ledger)
+            hooks.append(FENCE["last"])
     return Agent(model=model, tools=ALL, system_prompt=SYSTEM, name="analyst",
-                 hooks=hooks if hooks is not None else [Ledger(), Fence()],
-                 memory_manager=memory or None, **kw)
+                 hooks=hooks, memory_manager=memory or None, **kw)
 
 
 def main(argv=None):
@@ -51,6 +62,12 @@ def main(argv=None):
     agent = build()
     agent(question)
     print()
+    fence = FENCE.get("last")
+    if fence and fence.rows:
+        print("── fact fence ──", tally(fence.rows))
+        print(report(fence.rows))
+        if fence.refused:
+            print("  refused memory:", fence.refused)
 
 
 if __name__ == "__main__":
