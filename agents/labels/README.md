@@ -10,4 +10,5 @@ back with `agents/verdicts.py`.
 
 | file | traces | who | notes |
 |---|---|---|---|
-| `verdicts-2026-09-23.jsonl` | 24 | the maintainer | every fizzle to date and 11 landed traces; the 24-trace sample of NOTES.md 2026-09-23 |
+| `verdicts-2026-09-23.jsonl` | 24 | the maintainer | every fizzle to date and 11 landed traces; the 24-trace sample of NOTES.md 2026-09-23; five categories |
+| `readable-2026-09-23.jsonl` | 24 | the maintainer | the same 24, rated 0-100 for readability ("100: I could read it; 0: not close"), joined to the category, the geometry, the hand's `q` and Laya's accept |

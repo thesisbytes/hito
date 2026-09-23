@@ -1138,3 +1138,27 @@ Running log. Append at the bottom, don't rewrite history.
   katakana and kanji". The loop is keyed by character and stroke book, not
   by realm: a kanji pack is a glyph list and a KanjiVG-converted book, and
   the agents, the verdict page and the labels find it by existing.
+
+## 2026-09-23 — The hand rates readability, 0 to 100 (agents/labels/readable-2026-09-23.jsonl)
+
+- The maintainer: the five categories went unused; "I can 100% say I
+  could read it, 0% not close at all". The page is a slider now, and the
+  same 24 traces were rated. The ratings agree with the earlier verdicts:
+  fair attempts 80-100, stopped short 0-50, scribbles 0. ふ's five fizzles
+  sit at 30-50: half-read, which is what a tick missing a third of its
+  length looks like.
+- **What predicts the hand's rating.** Coverage of the path by the ink,
+  Spearman +0.69 over all 24. The hand's own `quality()` score, +0.26 over
+  the ten traces that have one — and the reason is す: the scorer's best
+  trace of the sample (q 0.83, coverage 0.98) and the hand's 0, "scribble".
+  Chamfer distance between ink and shape says the ink is on the shape; it
+  cannot see that it got there the wrong way. That is the thing hard mode's
+  "is this あ?" scorer has to be checked against, and the first evidence
+  that distance alone will not do it. Laya's accept probability: −0.28,
+  uninformative, as before.
+- Ten of 24 have a `q` at all: the hand scores quality only for landed
+  traces from v0.1.45. Scoring fizzles too would give the comparison its
+  other half.
+- Twenty-four ratings from one hand is a starting position, not a
+  calibration set. The page can take another batch any time; the next
+  should be a fresh sample rather than the fizzles again.
