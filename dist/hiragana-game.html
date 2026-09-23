@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.50</title>
+<title>hito 人 · hiragana · v0.1.51</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -72,6 +72,8 @@
   .grid button.rec{color:var(--gold);border-color:rgba(108,184,255,.45)}
   .grid button.cur{background:rgba(108,184,255,.16)}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#stage.lift{animation:lift .45s ease-out}
+@keyframes lift{0%{box-shadow:0 0 0 0 rgba(95,227,161,.0)}25%{box-shadow:0 0 0 6px rgba(95,227,161,.85),0 0 28px rgba(95,227,161,.7)}100%{box-shadow:0 0 0 0 rgba(95,227,161,0)}}
 .credit{max-width:min(92vw,520px);margin:0 auto 26px;font-size:11px;line-height:1.5;color:var(--ash);opacity:.65;text-align:center}
 </style>
 </head>
@@ -162,7 +164,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.50';
+const APP_VERSION='0.1.51';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -173,7 +175,7 @@ const cover=document.createElement('canvas'),cv=cover.getContext('2d'),COV=160; 
 const FONT=()=>`"${curFont().family}","Noto Sans Thai Looped","Thonburi","Leelawadee UI","Tahoma",sans-serif`;
 let W=0,H=0,DPR=1,idx=0,mode='practice',done=false,penOnly=true,guideOn=true;
 let MASTERY={};                                        // letter → times conjured
-const BASE_F=0.62;const SHADOW_SCALE=2.4;let DOT_SCALE=1;let GRID_MODE='cross';let SHADOW_MODE='none';let GUIDE_ON=true,GUIDE_NUMBERS=true,COMET_ON=true;
+const BASE_F=0.62;const SHADOW_SCALE=2.4;let DOT_SCALE=1;let GRID_MODE='cross';let SHADOW_MODE='strokes';let GUIDE_ON=false,GUIDE_NUMBERS=false,COMET_ON=true;
 const glyphF=le=>Math.max(0.32,BASE_F*Math.pow(0.93,MASTERY[le]||0)); // shrinks 12% per conjure
 let curF=BASE_F,curS=1,curShrink=q=>q;
 let SIZE_MODE='random',SIZE_MIN=0.32,SIZE_MAX=0.62,SIZE_PIN=null;
@@ -345,7 +347,7 @@ function drawGuide(){ if(!W||!H) return;
     // cover it, and the stacked glows read as blur.
     if(done){
       paintPath(g,0,PATH.length-1,{alpha:.5,blur:28,scale:SHADOW_SCALE,nocore:true,color:'rgba(226,243,255,.95)'});
-    } else if(SHADOW_MODE==='strokes'){
+    } else if(SHADOW_MODE==='strokes'||SHADOW_MODE==='faint'){
       // The shape, as a textbook would print it: a flat line down
       // the centre of each stroke at the ink's own width, one path
       // per stroke. It has been a 2.4x glowing shadow (a blur) and
@@ -356,7 +358,11 @@ function drawGuide(){ if(!W||!H) return;
       // is where the stroke actually goes. The tolerance is the
       // scorer's business; the shape is the learner's.
       g.save(); g.lineCap='round'; g.lineJoin='round';
-      g.strokeStyle='#6cb8ff'; g.globalAlpha=.34; g.lineWidth=widthFor(.5);
+      // 'faint' is a boss: the same shape at a third of the light, with
+      // the start dot kept — less help, not none (the maintainer:
+      // 'otherwise I'd be stroking over and over for no reason but to
+      // fill the template').
+      g.strokeStyle='#6cb8ff'; g.globalAlpha=SHADOW_MODE==='faint'?.11:.34; g.lineWidth=widthFor(.5);
       let open=false;
       for(let i=0;i<PATH.length;i++){ const p=denorm(PATH[i]);
         if(!open){ g.beginPath(); g.moveTo(p.x,p.y); open=true; } else g.lineTo(p.x,p.y);
@@ -418,6 +424,7 @@ function ghostTick(){ if(!ghostAnim) return; if(!W||!H){ requestAnimationFrame(g
   const _g=SEGS[_gi]||[0,PATH.length-1], _a=_g[0], end=_g[1];
   const rem=end-_a, dur=1500+rem*17, now=performance.now(), ph=((now-ghostAnim.t)%dur)/dur;
   fx.clearRect(0,0,W,H);
+  drawRings();   // the stroke-complete ring rides this frame too
   if(GUIDE_ON){
     fx.save(); fx.globalAlpha=.85+.15*Math.sin(now/600); fx.drawImage(trail,0,0,W,H); fx.drawImage(trailLive,0,0,W,H); fx.restore();
     // The comet runs the rest of the stroke on a loop. It is a
@@ -425,6 +432,8 @@ function ghostTick(){ if(!ghostAnim) return; if(!W||!H){ requestAnimationFrame(g
     // keeps racing to the end of the stroke sets a pace, and the
     // hand starts chasing it instead of dragging its own.
     if(COMET_ON){ const n=_a+Math.max(2,Math.floor(ph*(end-_a))); paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); } // comet
+  }
+  if(GUIDE_ON||SHADOW_MODE==='faint'){   // the start dot: guided, and a boss's one hint
     const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)?SEGS[segIdx+1][0]:prog]), pulse=.5+.5*Math.sin(now/260);
     fx.save(); fx.fillStyle=`rgba(226,243,255,${.5+.4*pulse})`; fx.shadowColor='#e2f3ff'; fx.shadowBlur=16+10*pulse;
     fx.beginPath(); fx.arc(s0.x,s0.y,(4+3*pulse)*DOT_SCALE,0,7); fx.fill(); fx.restore();
@@ -653,8 +662,21 @@ function shine(a,b){ const step=Math.max(1,Math.round((b-a)/16));
     for(let k=0;k<3;k++){ const ang=Math.random()*6.28, v=.3+Math.random()*1.4;
       parts.push({x:q.x,y:q.y,vx:Math.cos(ang)*v,vy:Math.sin(ang)*v,
         life:1,r:1+Math.random()*2,c:'226,243,255'}); } }
+  // A fingertip covers the shine and not every device buzzes (the
+  // maintainer: 'I really rely on haptics.. without it, I wouldn't know
+  // if the stroke is complete'). So the end of the stroke also throws a
+  // ring wider than a finger, and the sketchbook's frame flashes.
+  const e=denorm(PATH[b]); rings.push({x:e.x,y:e.y,t:0});
+  stage.classList.remove('lift'); void stage.offsetWidth; stage.classList.add('lift');
   if(navigator.vibrate) navigator.vibrate(12);
   loop(); }
+let rings=[];
+function drawRings(){ if(!rings.length) return false;
+  rings=rings.filter(r=>r.t<1);
+  for(const r of rings){ r.t+=0.06; const rad=18+r.t*70;
+    fx.save(); fx.globalAlpha=(1-r.t)*.9; fx.lineWidth=5*(1-r.t)+1.5; fx.strokeStyle='rgba(95,227,161,1)';
+    fx.shadowColor='rgba(95,227,161,.9)'; fx.shadowBlur=14; fx.beginPath(); fx.arc(r.x,r.y,rad,0,6.283); fx.stroke(); fx.restore(); }
+  return rings.length>0; }
 function fizzle(){ smudge=0; offCount=0; prog=0;
   // A fizzle restarts the character (the maintainer, 2026-09-23).
   // It used to rewind progress by half and clear the ink, which left
@@ -705,8 +727,8 @@ function burst(){ for(let i=0;i<140;i++){const a=Math.random()*Math.PI*2,v=1.5+M
 function stepParts(){ parts=parts.filter(p=>p.life>0);
   for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.03;p.vx*=.98;p.life-=.025;fx.beginPath();fx.shadowBlur=0;fx.fillStyle=`rgba(${p.c},${Math.max(0,p.life)})`;fx.arc(p.x,p.y,p.r*Math.max(0,p.life),0,7);fx.fill();} }
 function loop(){ if(rafOn||ghostAnim) return; rafOn=true; requestAnimationFrame(tick); }
-function tick(){ if(ghostAnim){rafOn=false;return;} fx.clearRect(0,0,W,H); stepParts();
-  if(parts.length) requestAnimationFrame(tick); else {rafOn=false; fx.clearRect(0,0,W,H);} }
+function tick(){ if(ghostAnim){rafOn=false;return;} fx.clearRect(0,0,W,H); stepParts(); const more=drawRings();
+  if(parts.length||more) requestAnimationFrame(tick); else {rafOn=false; fx.clearRect(0,0,W,H);} }
 function dropPen(){ if(activeId!==null){ try{iC.releasePointerCapture(activeId);}catch(_){} } drawing=false; activeId=null; cur=null; }
 function conjure(){ dropPen(); const le=LETTERS[idx][0]; MASTERY[le]=(MASTERY[le]||0)+1; persistM();
   done=true; stopGhost(); stage.classList.add('done'); drawGuide(); burst(); $('pct').textContent=`conjured ✦ next time it shrinks (lv ${MASTERY[LETTERS[idx][0]]})`; if(navigator.vibrate) navigator.vibrate([20,40,60]); setTimeout(()=>{if(done) load(idx+1);},1900); }
@@ -810,7 +832,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.50');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.51');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1718,7 +1740,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"easy",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[{"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."}, {"label": "katakana", "kana": "片", "file": "katakana-game.html", "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."}],speed:0.055,wardHp:5,stages:{"rows":2,"count":12,"countStep":3,"gate":30,"gateRamp":1.45,"hpEvery":4,"speedStep":0.03,"easyFrom":1,"mediumFrom":8},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15},hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[{"label": "vocab", "kana": "語", "file": "vocab.html", "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."}, {"label": "katakana", "kana": "片", "file": "katakana-game.html", "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."}],speed:0.055,wardHp:5,stages:{"rows":2,"count":12,"countStep":3,"gate":30,"gateRamp":1.45,"hpEvery":4,"speedStep":0.03,"bossHp":2},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15},hpEvery:10,hpMax:5,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"quick":8,"bright":14,"shove":6,"mend":10},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -1929,8 +1951,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // only counts toward its gate — if it was held at easy or harder, and from
   // `mediumFrom`, at medium. Guided teaches the motion; the chart past the
   // first rows has to be earned with ink.
-  const RANK = { guided:0, easy:1, medium:2, hard:3 };
-  const needs = k => !ST ? 'guided' : k >= ST.mediumFrom ? 'medium' : k >= ST.easyFrom ? 'easy' : 'guided';
+  // Easy is gone (the maintainer, 2026-09-23: "noticed how crappy easy mode
+  // is, and it's pretty much guided mode"): the game is medium, guided is
+  // practice, and hard is what a boss asks. So every stage counts at medium.
+  const RANK = { guided:0, medium:2, hard:3 };
+  const needs = k => !ST ? 'guided' : 'medium';
   const counts = k => (RANK[difficulty] || 0) >= RANK[needs(k)];
   let stageNo = 1;
   const stageRows  = k => ST ? ST.rows + (k - 1) : Infinity;
@@ -2006,15 +2031,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
               guide:true, numbers:true, comet:false, shadow:'none', stray:'drop', allRows:true },
-    easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
-              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
-              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
-              guide:true, numbers:true, shadow:'none', stray:'drop' },
     medium: { tama:2, kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:false, numbers:false, shadow:'strokes', stray:'restart' },
-    hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
+    hard:   { kana:'難', blurb:'nothing shown. this is what a boss asks of you at the end of a stage.',
               locked:true },
   };
   // With words the joke turns around: the loanword is already English in a
@@ -2031,7 +2052,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
   // A word realm remembers its own sign: what "gaijin" means differs.
   const SKEY = WORDS ? 'hito-start-' + CFG.deck.deck : 'hito-start';
-  let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'easy';
+  let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'medium';
   try {
     const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {};
     if (s.difficulty in DIFF && !DIFF[s.difficulty].locked) difficulty = s.difficulty;
@@ -2172,10 +2193,18 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       do { i = pool[Math.floor(Math.random()*pool.length)]; tries++; }
       while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && !shaky(LETTERS[i][0]) && Math.random() < 0.7);
     }
+    // The last farang of a stage is its boss: it takes more hits, and its
+    // character is traced with less help — the shape faint, the start dot
+    // kept. The path is still there under the pen, so the start, the order
+    // and the coverage are judged as ever; the eyes get a hint, not a
+    // template. (The maintainer, 2026-09-23: "boss fights are when the
+    // trace disappears ... perhaps not completely blank, just less help.")
+    // Words are not bossed: a word is long enough.
+    const boss = !!(ST && !w && wave === stageCount(stageNo) - 1);
     monsters.push({
-      i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
+      i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05, boss,
       speed: CFG.speed * (0.8 + Math.random()*0.5) * (ST ? 1 + ST.speedStep*(stageNo - 1) : 1),
-      hp: hpFor(wave) + (ST ? Math.floor((stageNo - 1) / ST.hpEvery) : 0), wob: Math.random()*6.28, born: performance.now(),
+      hp: hpFor(wave) + (ST ? Math.floor((stageNo - 1) / ST.hpEvery) : 0) + (boss ? ST.bossHp : 0), wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
@@ -2310,6 +2339,16 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // happens to carry the same character the old early return left the
     // tracer sitting in its celebration until the engine's own 1.9s timer
     // fired — a dead spot precisely when two of the same arrive together.
+    // A boss gets less help: its shape faint with the start dot kept, and
+    // the full shape back for the next farang. Decided from who carries the
+    // character, whether or not a reload follows: the farang after a boss
+    // can carry the same character, and then nothing reloads.
+    if (t !== null){
+      const carrier = (locked && locked.i === t) ? locked : monsters.find(m => m.i === t);
+      const shown = (DIFF[difficulty] && DIFF[difficulty].shadow) || 'none';
+      const want = (carrier && carrier.boss && shown !== 'none') ? 'faint' : shown;
+      if (want !== SHADOW_MODE){ SHADOW_MODE = want; if (t === idx) drawGuide(); }
+    }
     if (t === null || (t === idx && !done)) { pendingRetarget = false; return; }
     if (!force && tracing()){ pendingRetarget = true; return; }
     pendingRetarget = false;
@@ -2579,6 +2618,12 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
           g.fillStyle = written ? '#bfe3ff' : held ? 'rgba(95,227,161,.95)' : cur ? (isT ? '#c3f7dc' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
           g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
         }
+      }
+      // a boss says so, above its pips
+      if (m.boss){
+        g.font = '700 12px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        g.fillStyle = isT ? 'rgba(108,184,255,.95)' : 'rgba(108,184,255,.6)';
+        g.fillText('将 · less help', p.x, by - (m.hp > 1 ? 34 : 24));
       }
       // how much more it takes: one pip per hit still owed, above the bubble
       // (under it is the farang's own head)
@@ -2892,7 +2937,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         <div><b>${mins}</b><small>held</small></div>
       </div>
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
-      ${e.won && ST && !e.held ? `<p class="over-line warn">held — but from stage ${r.stage >= ST.mediumFrom ? ST.mediumFrom : ST.easyFrom} it only counts toward the gate at <b>${e.needs}</b> or harder. ${difficulty === 'guided' ? 'guided is practice: nothing here counts toward the gate or 魂.' : difficulty + ' is practice here, and it still pays.'}</p>` : ''}
+      ${e.won && ST && !e.held ? `<p class="over-line warn">held — but a stage only counts toward the gate at <b>${e.needs}</b>. guided is practice: nothing here counts toward the gate or 魂.</p>` : ''}
       ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}${e.won ? 'held to the end: half again' : 'clean, readable traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
       ${workshopHtml()}
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
@@ -3006,6 +3051,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.50</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.51</div>
 </body>
 </html>

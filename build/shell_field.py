@@ -246,8 +246,11 @@ LAYER = STYLE + r"""
   // only counts toward its gate — if it was held at easy or harder, and from
   // `mediumFrom`, at medium. Guided teaches the motion; the chart past the
   // first rows has to be earned with ink.
-  const RANK = { guided:0, easy:1, medium:2, hard:3 };
-  const needs = k => !ST ? 'guided' : k >= ST.mediumFrom ? 'medium' : k >= ST.easyFrom ? 'easy' : 'guided';
+  // Easy is gone (the maintainer, 2026-09-23: "noticed how crappy easy mode
+  // is, and it's pretty much guided mode"): the game is medium, guided is
+  // practice, and hard is what a boss asks. So every stage counts at medium.
+  const RANK = { guided:0, medium:2, hard:3 };
+  const needs = k => !ST ? 'guided' : 'medium';
   const counts = k => (RANK[difficulty] || 0) >= RANK[needs(k)];
   let stageNo = 1;
   const stageRows  = k => ST ? ST.rows + (k - 1) : Infinity;
@@ -323,15 +326,11 @@ LAYER = STYLE + r"""
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, cast:false, reveal:true,
               guide:true, numbers:true, comet:false, shadow:'none', stray:'drop', allRows:true },
-    easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
-              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
-              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
-              guide:true, numbers:true, shadow:'none', stray:'drop' },
     medium: { tama:2, kana:'中', blurb:'the shape only, drawn as wide as you are allowed to stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, cast:true,
               guide:false, numbers:false, shadow:'strokes', stray:'restart' },
-    hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
+    hard:   { kana:'難', blurb:'nothing shown. this is what a boss asks of you at the end of a stage.',
               locked:true },
   };
   // With words the joke turns around: the loanword is already English in a
@@ -348,7 +347,7 @@ LAYER = STYLE + r"""
   };
   // A word realm remembers its own sign: what "gaijin" means differs.
   const SKEY = WORDS ? 'hito-start-' + CFG.deck.deck : 'hito-start';
-  let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'easy';
+  let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'medium';
   try {
     const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {};
     if (s.difficulty in DIFF && !DIFF[s.difficulty].locked) difficulty = s.difficulty;
@@ -489,10 +488,18 @@ LAYER = STYLE + r"""
       do { i = pool[Math.floor(Math.random()*pool.length)]; tries++; }
       while (tries < 8 && (MASTERY[LETTERS[i][0]]||0) > 2 && !shaky(LETTERS[i][0]) && Math.random() < 0.7);
     }
+    // The last farang of a stage is its boss: it takes more hits, and its
+    // character is traced with less help — the shape faint, the start dot
+    // kept. The path is still there under the pen, so the start, the order
+    // and the coverage are judged as ever; the eyes get a hint, not a
+    // template. (The maintainer, 2026-09-23: "boss fights are when the
+    // trace disappears ... perhaps not completely blank, just less help.")
+    // Words are not bossed: a word is long enough.
+    const boss = !!(ST && !w && wave === stageCount(stageNo) - 1);
     monsters.push({
-      i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05,
+      i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05, boss,
       speed: CFG.speed * (0.8 + Math.random()*0.5) * (ST ? 1 + ST.speedStep*(stageNo - 1) : 1),
-      hp: hpFor(wave) + (ST ? Math.floor((stageNo - 1) / ST.hpEvery) : 0), wob: Math.random()*6.28, born: performance.now(),
+      hp: hpFor(wave) + (ST ? Math.floor((stageNo - 1) / ST.hpEvery) : 0) + (boss ? ST.bossHp : 0), wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
@@ -627,6 +634,16 @@ LAYER = STYLE + r"""
     // happens to carry the same character the old early return left the
     // tracer sitting in its celebration until the engine's own 1.9s timer
     // fired — a dead spot precisely when two of the same arrive together.
+    // A boss gets less help: its shape faint with the start dot kept, and
+    // the full shape back for the next farang. Decided from who carries the
+    // character, whether or not a reload follows: the farang after a boss
+    // can carry the same character, and then nothing reloads.
+    if (t !== null){
+      const carrier = (locked && locked.i === t) ? locked : monsters.find(m => m.i === t);
+      const shown = (DIFF[difficulty] && DIFF[difficulty].shadow) || 'none';
+      const want = (carrier && carrier.boss && shown !== 'none') ? 'faint' : shown;
+      if (want !== SHADOW_MODE){ SHADOW_MODE = want; if (t === idx) drawGuide(); }
+    }
     if (t === null || (t === idx && !done)) { pendingRetarget = false; return; }
     if (!force && tracing()){ pendingRetarget = true; return; }
     pendingRetarget = false;
@@ -896,6 +913,12 @@ LAYER = STYLE + r"""
           g.fillStyle = written ? '#ffe9a8' : held ? 'rgba(127,209,196,.95)' : cur ? (isT ? '#bdf0e6' : 'rgba(226,232,240,.8)') : 'rgba(226,232,240,.35)';
           g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
         }
+      }
+      // a boss says so, above its pips
+      if (m.boss){
+        g.font = '700 12px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        g.fillStyle = isT ? 'rgba(233,196,106,.95)' : 'rgba(233,196,106,.6)';
+        g.fillText('将 · less help', p.x, by - (m.hp > 1 ? 34 : 24));
       }
       // how much more it takes: one pip per hit still owed, above the bubble
       // (under it is the farang's own head)
@@ -1209,7 +1232,7 @@ LAYER = STYLE + r"""
         <div><b>${mins}</b><small>held</small></div>
       </div>
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
-      ${e.won && ST && !e.held ? `<p class="over-line warn">held — but from stage ${r.stage >= ST.mediumFrom ? ST.mediumFrom : ST.easyFrom} it only counts toward the gate at <b>${e.needs}</b> or harder. ${difficulty === 'guided' ? 'guided is practice: nothing here counts toward the gate or 魂.' : difficulty + ' is practice here, and it still pays.'}</p>` : ''}
+      ${e.won && ST && !e.held ? `<p class="over-line warn">held — but a stage only counts toward the gate at <b>${e.needs}</b>. guided is practice: nothing here counts toward the gate or 魂.</p>` : ''}
       ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}${e.won ? 'held to the end: half again' : 'clean, readable traces pay the most'}${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
       ${workshopHtml()}
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
@@ -1356,13 +1379,13 @@ def config(pack, deck=None):
         f"deck:{deck_js},"
         f"knockback:{float(f.get('knockback', 0.07))},"
         f"sign:{json.dumps(sign)},"
-        f"mode:{json.dumps(pack.get('mode', 'easy'))},"
+        f"mode:{json.dumps(pack.get('mode', 'medium'))},"
         f"credit:{json.dumps(pack.get('credit', ''), ensure_ascii=False)},"
         f"credits:{json.dumps(list(pack.get('credits', [])), ensure_ascii=False)},"
         f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"
         f"speed:{f.get('speed', 0.055)},"
         f"wardHp:{int(f.get('wardHp', 5))},"
-        f"stages:{js({**{'rows': 2, 'count': 12, 'countStep': 3, 'gate': 30, 'gateRamp': 1.45, 'hpEvery': 4, 'speedStep': 0.03, 'easyFrom': 1, 'mediumFrom': 8}, **(f.get('stages') or {})}) if f.get('stages', True) else 'null'},"
+        f"stages:{js({**{'rows': 2, 'count': 12, 'countStep': 3, 'gate': 30, 'gateRamp': 1.45, 'hpEvery': 4, 'speedStep': 0.03, 'bossHp': 2}, **(f.get('stages') or {})}) if f.get('stages', True) else 'null'},"
         f"tamaClean:{int(f.get('tamaClean', 2))},"
         f"tamaTrace:{int(f.get('tamaTrace', 1))},"
         f"tamaWaves:{int(f.get('tamaWaves', 3))},"

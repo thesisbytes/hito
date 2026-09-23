@@ -174,10 +174,6 @@ LAYER = STYLE + r"""
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, reveal:true,
               guide:true, numbers:true, comet:false, shadow:'none', stray:'drop' },
-    easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
-              R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
-              COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, reveal:false,
-              guide:true, numbers:true, shadow:'none', stray:'drop' },
     medium: { kana:'中', blurb:'the shape only, as wide as you may stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, reveal:false,
@@ -193,7 +189,7 @@ LAYER = STYLE + r"""
     kana:   { blurb:'"だいがく" — copy it. handwriting, not recall.' },
   };
   const SKEY = 'hito-vocab-start';
-  let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'easy';
+  let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'medium';
   let prompt = CFG.prompt in PROMPTS ? CFG.prompt : 'en';
   let chosen = new Set(DECK.sections.map(s => s.id));
   try {
@@ -737,7 +733,7 @@ def config(pack, deck):
         "<script>window.__VOCAB_CFG={"
         f"deck:{js(slim)},"
         f"prompt:{json.dumps(prompt)},"
-        f"mode:{json.dumps(pack.get('mode', 'easy'))},"
+        f"mode:{json.dumps(pack.get('mode', 'medium'))},"
         f"credit:{json.dumps(pack.get('credit', ''), ensure_ascii=False)},"
         f"credits:{json.dumps(list(pack.get('credits', [])), ensure_ascii=False)},"
         f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"

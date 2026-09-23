@@ -136,17 +136,18 @@ if (stageCss){
      'medium is not shape-only with the pack penalties');
   ok(!F.setDifficulty('hard'), 'hard is selectable, and there is no scorer for it');
   ok(F.difficulty === 'medium', 'a refused difficulty changed the current one');
-  ok(F.setDifficulty('easy') && P.R_ON0 === B.R_ON0 && P.DRAIN === B.DRAIN && P.FIZZ === B.FIZZ
-     && P.GUIDE_ON && P.COMET_ON && P.SHADOW_MODE === 'none', 'easy did not restore the pack values');
+  ok(!F.setDifficulty('easy'), 'easy is still selectable: it was removed, being guided with ink');
+  ok(F.setDifficulty('medium') && P.R_ON0 === B.R_ON0 && P.DRAIN === B.DRAIN && P.FIZZ === B.FIZZ
+     && !P.GUIDE_ON && P.SHADOW_MODE === 'strokes', 'medium did not restore the pack values');
   ok(P.COVER_MIN === B.COVER_MIN && P.MAX_TRAVEL === B.MAX_TRAVEL && P.DOT_SCALE === 1,
-     'easy did not restore the end-of-glyph checks or the light');
-  ok(P.SIZE_PIN === null, 'easy is still pinned to one size');
-  ok(P.DRAG_FOLLOW === false && F.casting(), 'easy inherited guided\'s drag or lost its wisps');
-  { const n = P.parts.length; globalThis.zap({x:10,y:10}); ok(P.parts.length > n, 'easy no longer zaps'); }
+     'medium did not restore the end-of-glyph checks or the light');
+  ok(P.SIZE_PIN === null, 'medium is still pinned to one size');
+  ok(P.DRAG_FOLLOW === false && F.casting(), 'medium inherited guided\'s drag or lost its wisps');
+  { const n = P.parts.length; globalThis.zap({x:10,y:10}); ok(P.parts.length > n, 'medium no longer zaps'); }
   // medium's shape is a flat centreline at the ink width, one path per
   // stroke — not the glowing shadow, and not the tolerance band, which was
   // a fifth of the glyph wide and unreadable as a shape
-  ok(/SHADOW_MODE==='strokes'\)\{[^]*?g\.lineWidth=widthFor\(\.5\);[^]*?if\(SEGEND\.has\(i\)\)\{ g\.stroke\(\); open=false; \}/.test(html)
+  ok(/SHADOW_MODE==='strokes'(?:\|\|SHADOW_MODE==='faint')?\)\{[^]*?g\.lineWidth=widthFor\(\.5\);[^]*?if\(SEGEND\.has\(i\)\)\{ g\.stroke\(\); open=false; \}/.test(html)
      && !/width:2\*R_ON\(\)\*W/.test(html),
      'medium does not draw the shape as a flat centreline, one path per stroke');
   ok(!/menu-btn/.test(html), 'the ☰ button is back');
@@ -248,7 +249,7 @@ F.retarget(true);
 // the smallest; the travel cap asks for 58% of that, and a jab with a wiggle
 // covers it. So travel counts only once the pen has been near the stroke's
 // start — a stroke has a start the way it has an end.
-fresh(); F.setDifficulty('easy'); globalThis.resize();
+fresh(); F.setDifficulty('medium'); globalThis.resize();
 F.target.i = P.LETTERS.findIndex(l => l[0] === 'ふ');
 F.retarget(true);
 ok(P.LETTERS[P.idx][0] === 'ふ' && !P.done, 'could not load ふ');
@@ -306,7 +307,7 @@ ok(P.LETTERS[P.idx][0] === 'ふ' && !P.done, 'could not load ふ');
   ok(F.charge(drew) === 0, 'a guided trace kindled the character');
   F.quench();
 }
-F.setDifficulty('easy');
+F.setDifficulty('medium');
 
 // ---- the workshop's practice controls and hint are gone from the game
 ok(/body\.field[^{]*\.only-p[^{]*\{ display:none/.test(html),
@@ -703,7 +704,7 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   let threw = null;
   try { globalThis.redrawInk(); } catch (e) { threw = e; }
   ok(!threw, `guided cannot repaint: ${threw && threw.message}`);
-  F.setDifficulty('easy');
+  F.setDifficulty('medium');
 }
 
 // ---- the run: ink, the workshop strip, and farang that take more than one hit
@@ -713,7 +714,7 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
 // worth, and a tough farang still needs the hand before the lights can finish
 // it. If any of that slips, the idle half quietly becomes the whole game.
 {
-  fresh(); F.setDifficulty('easy');
+  fresh(); F.setDifficulty('medium');
   ok(F.ink === 0 && Object.values(F.upgrades).every(v => v === 0), 'a fresh run did not start with no ink and no upgrades');
   ok(F.hpFor(0) === 1 && F.hpFor(cfg.hpEvery - 1) === 1, 'the first farang take more than one hit');
   ok(F.hpFor(cfg.hpEvery) === 2, `farang did not toughen at wave ${cfg.hpEvery}`);
@@ -849,7 +850,7 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
 // stage has not reached, a guided run paid like a hard one.
 {
   const H = globalThis.__hand; H.reset();
-  fresh(); F.setDifficulty('easy');
+  fresh(); F.setDifficulty('medium');
   const realm = 'hiragana';
   ok(F.stage === 1 && F.stageMax === 1, `a new player starts at stage ${F.stage} of ${F.stageMax}`);
   // only the rows this stage has reached are ever on the field
@@ -910,15 +911,15 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   // guided cannot be zapped, so it pays less for the same hand
   const payFor = d => { H.reset(); fresh(); F.setDifficulty(d); F.begin(); for (let k = 0; k < 4; k++){ globalThis.conjure(); advance(cfg.advanceMs + 60); }
     for (let g = 0; !F.over && g < 400; g++){ for (const m of F.monsters) m.d = 0.061; advance(40); } return F.ended.pay; };
-  const easy = payFor('easy'), guided = payFor('guided'), medium = payFor('medium');
-  ok(guided < easy && easy < medium, `four clean traces paid guided ${guided}, easy ${easy}, medium ${medium}`);
-  F.setDifficulty('easy'); H.reset(); fresh();
+  const guided = payFor('guided'), medium = payFor('medium');
+  ok(guided === 0 && medium > 0, `four clean traces paid guided ${guided}, medium ${medium}`);
+  F.setDifficulty('medium'); H.reset(); fresh();
 }
 
 // ---- recognisable pays more, and guided only gets you so far
 {
   const H = globalThis.__hand; H.reset();
-  F.setDifficulty('easy');
+  F.setDifficulty('medium');
   // the book's own shape, drawn dx to the side of where it belongs
   const ink = dx => { P.strokes.length = 0; for (const [a, b] of P.SEGS) P.strokes.push(P.PATH.slice(a, b + 1).map((q, i) => ({x:(q.x + dx)*P.W, y:q.y*P.H, p:.5, t:i*10}))); };
   const payOf = dx => { fresh(); F.begin(); ink(dx); globalThis.conjure(); const r = { pay: F.run.pay, q: H.last && H.last.q }; advance(cfg.advanceMs + 60); return r; };
@@ -936,23 +937,23 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
 
   // guided only gets you so far
   const st = JSON.parse(html.match(/stages:(\{[^}]*\})/)[1]);
-  ok(F.needs(1) === 'easy' && F.needs(st.easyFrom) === 'easy' && F.needs(st.mediumFrom) === 'medium', `stages ask for ${F.needs(1)}, ${F.needs(st.easyFrom)}, ${F.needs(st.mediumFrom)}: guided is a sandbox and holds none`);
+  ok(F.needs(1) === 'medium' && F.needs(8) === 'medium', `stages ask for ${F.needs(1)} and ${F.needs(8)}: the game is medium, guided is a sandbox`);
   H.reset(); H.tama.earn(1e7);
-  for (let k = 1; k < st.easyFrom; k++){ H.tama.clear('hiragana', k); F.buyGate(); }
-  ok(F.stageMax === st.easyFrom, `could not reach stage ${st.easyFrom} to test it (at ${F.stageMax})`);
-  const win = d => { fresh(); F.setDifficulty(d); F.setStage(st.easyFrom); F.begin();
+  // every stage counts at medium now, so the first one is the one to test
+  ok(F.stageMax === 1, `a fresh save is not at stage 1 (at ${F.stageMax})`);
+  const win = d => { fresh(); F.setDifficulty(d); F.setStage(1); F.begin();
     for (let g = 0; !F.over && g < 6000; g++){ for (const m of [...F.monsters]){ m.hp = 1; F.hit(m, false, false); } advance(60); } advance(900); return F.ended; };
   const g = win('guided');
-  ok(g && g.won && g.held === false && H.tama.cleared('hiragana') === st.easyFrom - 1, `a stage that asks for easy was held in guided (cleared ${H.tama.cleared('hiragana')})`);
+  ok(g && g.won && g.held === false && H.tama.cleared('hiragana') === 0, `a stage was held in guided (cleared ${H.tama.cleared('hiragana')})`);
   ok(g.pay === 0, `practice in guided paid ${g.pay}: it is a sandbox and pays nothing`);
-  ok(/only counts toward the gate at <b>easy<\/b>/.test(F.startHtml), 'the ending does not say why the stage did not count');
+  ok(/only counts toward the gate at <b>medium<\/b>/.test(F.startHtml), 'the ending does not say why the stage did not count');
   ok(F.buyGate() === false, 'the next gate was for sale after a guided hold');
-  const e = win('easy');
-  ok(e && e.won && e.held === true && H.tama.cleared('hiragana') === st.easyFrom, 'the same stage held at easy did not count');
+  const e = win('medium');
+  ok(e && e.won && e.held === true && H.tama.cleared('hiragana') === 1, 'the same stage held at medium did not count');
   ok(F.buyGate() === true, 'the gate was not for sale after holding the stage properly');
-  fresh(); F.setDifficulty('guided'); F.setStage(st.easyFrom); F.openStart();   // a live run, so the page is the start page and not the ending
-  ok(/counts at easy or harder/.test(F.startHtml), 'the start page does not say what the stage asks for');
-  F.setDifficulty('easy'); F.setStage(1); H.reset(); fresh();
+  fresh(); F.setDifficulty('guided'); F.setStage(1); F.openStart();   // a live run, so the page is the start page and not the ending
+  ok(/counts at medium or harder/.test(F.startHtml), 'the start page does not say what the stage asks for');
+  F.setDifficulty('medium'); F.setStage(1); H.reset(); fresh();
 }
 
 // every conjure in this file went through the hand; none of its notes may have thrown

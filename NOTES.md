@@ -1336,3 +1336,38 @@ Running log. Append at the bottom, don't rewrite history.
   the handwriting is still recorded. Easy is the first mode that counts.
 - The CLAUDE.md decision of v0.1.45 ("guided only gets you so far") becomes
   "guided gets you nowhere in the game, and everywhere in practice".
+
+## 2026-09-23 — Two modes, bosses, and a stroke you can see finish (hiragana v0.1.51, katakana-game v0.1.14, vocab v0.1.29)
+
+- **Easy is gone from the games.** The maintainer, after rounds on medium:
+  "noticed how crappy easy mode is, and it's pretty much guided mode.. so..
+  let's just remove it. only score you can get is from medium." The shells'
+  tables have guided (practice) and medium (the game); hard stays locked as
+  the name for what a boss asks. The engine's own easy mode remains for
+  the workshop. A saved start page that said easy falls back to medium.
+  Every stage counts at medium (`needs()` says so; `easyFrom` and
+  `mediumFrom` are gone from the config).
+- **Bosses.** "Boss fights are when the trace disappears ... perhaps not
+  completely blank canvas, just less help. Otherwise I feel like I'd be
+  stroking over and over for no reason but to fill the template." The last
+  farang of a stage is its boss: `bossHp` (2) more hits, a "将 · less help"
+  label, and its character shown as `SHADOW_MODE` `faint` — the medium
+  centreline at a third of the light, with the start dot of the current
+  stroke kept, which the guide used to draw only in guided. The path is
+  enforced underneath as ever; what the eyes lose is where the stroke goes
+  after it starts. The full shape returns for the next farang, decided from
+  who carries the character rather than on a reload, because the farang
+  after a boss can carry the same character and then nothing reloads.
+  Words are not bossed. This is not hard mode's scorer, which is still not
+  built; it is medium with less to look at.
+- **A finished stroke is unmissable.** "I really rely on haptics.. without
+  it, I wouldn't know if the stroke is complete. maybe we should add
+  something visually obvious." The shine along a finished stroke sat under
+  the fingertip and the buzz is 12ms on devices that have one. Now the
+  stroke's end throws a ring (18 → 88px, teal, on the fx canvas, riding the
+  particle frame and the comet frame) and the sketchbook's frame flashes
+  (`#stage.lift`, .45s). Both are bigger than a finger.
+- The stray test gained a boss block (the last of twelve spawns is the boss,
+  takes three hits, is shown faint when targeted, and the shape returns
+  after it) and sets the drop rule explicitly, since the games now open on
+  medium, whose rule is restart.

@@ -246,7 +246,7 @@ def main():
               "    if(done){\n"
               "      paintPath(g,0,PATH.length-1,{alpha:.5,blur:28,"
               "scale:SHADOW_SCALE,nocore:true,color:'rgba(255,241,184,.95)'});\n"
-              "    } else if(SHADOW_MODE==='strokes'){\n"
+              "    } else if(SHADOW_MODE==='strokes'||SHADOW_MODE==='faint'){\n"
               "      // The shape, as a textbook would print it: a flat line down\n"
               "      // the centre of each stroke at the ink's own width, one path\n"
               "      // per stroke. It has been a 2.4x glowing shadow (a blur) and\n"
@@ -257,7 +257,11 @@ def main():
               "      // is where the stroke actually goes. The tolerance is the\n"
               "      // scorer's business; the shape is the learner's.\n"
               "      g.save(); g.lineCap='round'; g.lineJoin='round';\n"
-              "      g.strokeStyle='#e9c46a'; g.globalAlpha=.34; g.lineWidth=widthFor(.5);\n"
+              "      // 'faint' is a boss: the same shape at a third of the light, with\n"
+              "      // the start dot kept — less help, not none (the maintainer:\n"
+              "      // 'otherwise I'd be stroking over and over for no reason but to\n"
+              "      // fill the template').\n"
+              "      g.strokeStyle='#e9c46a'; g.globalAlpha=SHADOW_MODE==='faint'?.11:.34; g.lineWidth=widthFor(.5);\n"
               "      let open=false;\n"
               "      for(let i=0;i<PATH.length;i++){ const p=denorm(PATH[i]);\n"
               "        if(!open){ g.beginPath(); g.moveTo(p.x,p.y); open=true; } else g.lineTo(p.x,p.y);\n"
@@ -680,9 +684,30 @@ def main():
               "    for(let k=0;k<3;k++){ const ang=Math.random()*6.28, v=.3+Math.random()*1.4;\n"
               "      parts.push({x:q.x,y:q.y,vx:Math.cos(ang)*v,vy:Math.sin(ang)*v,\n"
               "        life:1,r:1+Math.random()*2,c:'255,241,184'}); } }\n"
+              "  // A fingertip covers the shine and not every device buzzes (the\n"
+              "  // maintainer: 'I really rely on haptics.. without it, I wouldn't know\n"
+              "  // if the stroke is complete'). So the end of the stroke also throws a\n"
+              "  // ring wider than a finger, and the sketchbook's frame flashes.\n"
+              "  const e=denorm(PATH[b]); rings.push({x:e.x,y:e.y,t:0});\n"
+              "  stage.classList.remove('lift'); void stage.offsetWidth; stage.classList.add('lift');\n"
               "  if(navigator.vibrate) navigator.vibrate(12);\n"
               "  loop(); }\n"
+              "let rings=[];\n"
+              "function drawRings(){ if(!rings.length) return false;\n"
+              "  rings=rings.filter(r=>r.t<1);\n"
+              "  for(const r of rings){ r.t+=0.06; const rad=18+r.t*70;\n"
+              "    fx.save(); fx.globalAlpha=(1-r.t)*.9; fx.lineWidth=5*(1-r.t)+1.5; fx.strokeStyle='rgba(127,209,196,1)';\n"
+              "    fx.shadowColor='rgba(127,209,196,.9)'; fx.shadowBlur=14; fx.beginPath(); fx.arc(r.x,r.y,rad,0,6.283); fx.stroke(); fx.restore(); }\n"
+              "  return rings.length>0; }\n"
               "function fizzle(){")
+        s.sub("rings ride the particle frame",
+              r"fx\.clearRect\(0,0,W,H\); stepParts\(\);\n  if\(parts\.length\) requestAnimationFrame\(tick\);",
+              "fx.clearRect(0,0,W,H); stepParts(); const more=drawRings();\n  if(parts.length||more) requestAnimationFrame(tick);")
+        s.sub("lift flash css",
+              r"</style>",
+              "#stage.lift{animation:lift .45s ease-out}\n"
+              "@keyframes lift{0%{box-shadow:0 0 0 0 rgba(127,209,196,.0)}25%{box-shadow:0 0 0 6px rgba(127,209,196,.85),0 0 28px rgba(127,209,196,.7)}100%{box-shadow:0 0 0 0 rgba(127,209,196,0)}}\n"
+              "</style>")
         s.sub("call shine",
               r"      awaitLift=true;   // hooks are separate strokes, so prove it",
               "      shine(seg[0],seg[1]);\n"
@@ -715,6 +740,7 @@ def main():
               r" fx\.save\(\); fx\.fillStyle=`rgba\(255,241,184,\$\{\.5\+\.4\*pulse\}\)`;"
               r" fx\.shadowColor='#fff1b8'; fx\.shadowBlur=16\+10\*pulse;\n"
               r"  fx\.beginPath\(\); fx\.arc\(s0\.x,s0\.y,4\+3\*pulse,0,7\); fx\.fill\(\); fx\.restore\(\);",
+              "  drawRings();   // the stroke-complete ring rides this frame too\n"
               "  if(GUIDE_ON){\n"
               "    fx.save(); fx.globalAlpha=.85+.15*Math.sin(now/600);"
               " fx.drawImage(trail,0,0,W,H); fx.drawImage(trailLive,0,0,W,H); fx.restore();\n"
@@ -724,6 +750,8 @@ def main():
               "    // hand starts chasing it instead of dragging its own.\n"
               "    if(COMET_ON){ const n=_a+Math.max(2,Math.floor(ph*(end-_a)));"
               " paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); } // comet\n"
+              "  }\n"
+              "  if(GUIDE_ON||SHADOW_MODE==='faint'){   // the start dot: guided, and a boss's one hint\n"
               "    const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)"
               "?SEGS[segIdx+1][0]:prog]), pulse=.5+.5*Math.sin(now/260);\n"
               "    fx.save(); fx.fillStyle=`rgba(255,241,184,${.5+.4*pulse})`;"

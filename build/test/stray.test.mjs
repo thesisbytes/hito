@@ -48,8 +48,9 @@ function rig(file, opts){
 for (const file of process.argv.slice(2)){
   // ---- drop: the stray never happened, on the canvas or in the record
   {
-    const { P, H, along, nowhere } = rig(file);
-    ok(P.stray === 'drop', `${file}: the workshop's rule is ${P.stray}, not drop`);
+    const { P, H, g, along, nowhere } = rig(file);
+    if (!g.__field) ok(P.stray === 'drop', `${file}: the workshop's rule is ${P.stray}, not drop`);
+    P.stray = 'drop';    // the games open on medium, whose rule is restart; drop is checked here
     nowhere();
     ok(P.strokes.length === 0, 'a stroke that went nowhere stayed on the canvas');
     ok(P.prog === 0 && P.segIdx === 0, `a stroke that went nowhere moved progress (prog ${P.prog}, seg ${P.segIdx})`);
@@ -116,8 +117,8 @@ for (const file of process.argv.slice(2)){
     }
     // and guided draws from every row, where easy at stage 1 does not
     ok(g.__field.roster().length === P.LETTERS.length, `guided offers ${g.__field.roster().length} of ${P.LETTERS.length} characters`);
-    g.__field.setDifficulty('easy');
-    ok(g.__field.roster().length < P.LETTERS.length, 'easy at stage 1 offers the whole chart');
+    g.__field.setDifficulty('medium');
+    ok(g.__field.roster().length < P.LETTERS.length, 'medium at stage 1 offers the whole chart');
   }
   // ---- a run that restarts on the character the engine is still celebrating starts it clean
   if (rig(file).g.__field) {
@@ -171,6 +172,24 @@ for (const file of process.argv.slice(2)){
         fire('pointerup', px(b).x, px(b).y, 'pen');
       }
     }
+  }
+  // ---- the last farang of a stage is a boss: tougher, and traced with the shape hidden
+  if (rig(file).g.__field) {
+    const { P, g } = rig(file);
+    const F = g.__field; F.setDifficulty('medium'); g.resize();
+    F.restart();
+    const n = F.stageCount(1);
+    while (F.monsters.length < n) F.spawn();
+    const boss = F.monsters[F.monsters.length - 1];
+    ok(boss.boss === true && F.monsters.slice(0, -1).every(m => !m.boss), 'the last farang of the stage is not the boss, or another is');
+    ok(boss.hp >= 3, `the boss takes ${boss.hp} hits`);
+    F.monsters.splice(0, F.monsters.length - 1);   // leave only the boss, and aim at it
+    F.retarget(true);
+    ok(P.LETTERS[P.idx][0] === P.LETTERS[boss.i][0], 'the tracer is not on the boss');
+    ok(P.SHADOW_MODE === 'faint', `the boss shows its full shape or none (${P.SHADOW_MODE})`);
+    boss.hp = 1; F.hit(boss, false, false);
+    F.spawn(); F.retarget(true);
+    ok(P.SHADOW_MODE === 'strokes', `after the boss the shape did not come back (${P.SHADOW_MODE}; ${F.monsters.length} farang, tracer on ${P.LETTERS[P.idx][0]}, boss was ${P.LETTERS[boss.i][0]})`);
   }
   // ---- keep: the old rule, every stroke stays
   {

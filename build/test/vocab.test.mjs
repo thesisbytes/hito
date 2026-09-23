@@ -108,8 +108,9 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   ok(V.setDifficulty('medium') && !P.GUIDE_ON && P.SHADOW_MODE === 'strokes' && P.SIZE_PIN === null,
      'medium did not switch the engine');
   ok(!V.setDifficulty('hard') && V.difficulty === 'medium', 'hard was accepted, and there is no scorer for it');
-  ok(V.setDifficulty('easy') && P.R_ON0 === B.R_ON0 && P.GUIDE_ON && P.COMET_ON && P.SHADOW_MODE === 'none',
-     'easy did not restore the pack values');
+  ok(!V.setDifficulty('easy'), 'easy is still selectable on the cards: it was removed');
+  ok(V.setDifficulty('medium') && P.R_ON0 === B.R_ON0 && !P.GUIDE_ON && P.SHADOW_MODE === 'strokes',
+     'medium did not restore the pack values');
   ok(V.setPrompt('romaji') && V.prompt === 'romaji' && !V.setPrompt('klingon') && V.prompt === 'romaji',
      'the prompt axis misbehaves');
   V.setPrompt('en');
@@ -296,8 +297,8 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   const n = P.parts.length; globalThis.zap({x:10,y:10}); ok(P.parts.length === n, 'guided still zaps');
   P.strokes.push([{x:1,y:1,on:false},{x:2,y:2,on:false}]);
   V.tidy(); ok(P.strokes.length === 0, 'guided keeps strokes on the board');
-  V.setDifficulty('easy');
-  ok(/＿/.test(V.cardHtml), 'easy shows the kana after guided');
+  V.setDifficulty('medium');
+  ok(/＿/.test(V.cardHtml), 'medium shows the kana after guided');
 }
 
 // ---- progress travels
@@ -337,7 +338,7 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
   ok(P.LETTERS[P.idx][0] === 'プ' && P.PATH.length > 0, `could not put プ on the card (tracer on ${P.LETTERS[P.idx][0]})`);
   globalThis.resize();
   const den = P.denorm, fol = P.follow;
-  for (const mode of ['guided', 'easy']){
+  for (const mode of ['guided', 'medium']){
     V.setDifficulty(mode);
     ok(P.LETTERS[P.idx][0] === 'プ' && !P.done, `${mode}: プ was not reloaded live`);
     // the segment is found after the reload: a new size resamples the path
@@ -366,7 +367,7 @@ ok(stageCss && /aspect-ratio:\s*1/.test(stageCss[1]), 'the sketchbook is not squ
     }
     ok(P.done, `${mode}: drawing プ with its circle did not finish it (prog ${P.prog} of ${P.PATH.length-1})`);
   }
-  V.setDifficulty('easy');
+  V.setDifficulty('medium');
 }
 
 // ---- the workshop's furniture is hidden
