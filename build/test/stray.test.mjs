@@ -119,6 +119,16 @@ for (const file of process.argv.slice(2)){
     g.__field.setDifficulty('easy');
     ok(g.__field.roster().length < P.LETTERS.length, 'easy at stage 1 offers the whole chart');
   }
+  // ---- a run that restarts on the character the engine is still celebrating starts it clean
+  if (rig(file).g.__field) {
+    const { P, g, along } = rig(file);
+    g.__field.setDifficulty('medium'); g.resize();
+    g.__field.target.i = P.LETTERS.findIndex(l => l[0] === 'あ'); g.load(g.__field.target.i);
+    for (const [x, y] of P.SEGS) along(x, y);
+    ok(P.done === true, 'tracing every stroke did not conjure あ');
+    g.__field.restart();
+    ok(P.done === false && P.prog === 0 && P.strokes.length === 0, `a restart left the engine celebrating (done ${P.done}, prog ${P.prog})`);
+  }
   // ---- keep: the old rule, every stroke stays
   {
     const { P, H, nowhere } = rig(file);

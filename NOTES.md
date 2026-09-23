@@ -1224,3 +1224,40 @@ Running log. Append at the bottom, don't rewrite history.
   scorer that answers "is this あ?" needs, at least: coverage, overshoot,
   the lift count, and the stroke-relative end gap — the four things the
   hand's ratings track — before any distance.
+
+## 2026-09-23 — A finger's band, and a clean start to a run (hiragana v0.1.48, katakana-game v0.1.11, vocab v0.1.26)
+
+- **The maintainer, after tracing medium with thumb, pointer and pinky:**
+  "the canvas is likely too small, since our strokes don't seem to register
+  with what I'm touching ... they're so cluttered together that I could do
+  like a quarter to half circle and it'll pass as path completed". And:
+  "an already traced path comes up once in a while on medium, typically
+  when I'm progressing to the next round".
+- **The band, measured.** On an 844px phone the sketchbook is 354px and a
+  0.62 glyph 219px. With the finger's ease at 1.5 the scorer's radius is
+  37px: a band 74px wide, 34% of the glyph. A pen at 0.52 gets 25%. Both
+  the band and the glyph are fractions of the canvas, so a bigger canvas
+  leaves the ratio alone; it shrinks the fingertip and its touch offset
+  against the glyph, which is the other half of the report. So both
+  levers, gently: `ease` 1.5 → 1.3 (28%), `stage` 42 → 46dvh. Guided is
+  barely touched (its own 1.5x meets the 0.15 cap either way). A starting
+  position for the next session, not a tuning.
+- **The lit path at the start of a run.** Not reproduced in the stub: the
+  engine's state after a same-character reload is clean, the trail cache
+  is reset on load (a bug fixed long ago), and the engine's delayed advance
+  is guarded by `done`. What remains is the hand-off: the last banish of a
+  stage leaves the engine celebrating with the whole path lit, and if the
+  new run's first target is the character already loaded, `retarget()` has
+  nothing to change. `restart()` now reloads a celebrating engine, and the
+  stray test conjures あ then restarts on it. If the path shows up again, a
+  screenshot is the next step.
+- The engine's own advance after a conjure — `if(done) load(idx+1)` after
+  1.9s — was checked on the way: the field's reload clears `done` first, so
+  a stroke begun on the next character within those 1.9s is safe.
+- **A stale score, found by the flake.** When the hand had nothing to note
+  (a conjure with no ink) it left the previous record in place, and the
+  field, which pays a landed trace by the hand's last record when the
+  character matches, paid from the previous trace's score. Only a test can
+  conjure with no ink, but the record is cleared now. `field.test.mjs` still
+  fails about one run in six on the 3-hit farang, alone or under the suite;
+  that one is timing in the test's own clock and stays on the list.

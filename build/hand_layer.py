@@ -278,7 +278,9 @@ LAYER = r"""
     const live = cur && cur.length ? [began !== null ? shift(cur, downAt) : cur] : lifted;
     const raw = (mine.length ? mine : strokes).concat(live);
     fresh();
-    if (!raw.length || !ch){ if (ok) finished = true; return null; }
+    // Nothing to judge: say so, rather than leave the previous record where
+    // the field would read it as this trace's score.
+    if (!raw.length || !ch){ if (ok) finished = true; lastRec = null; return null; }
     const last = raw[raw.length - 1], first = raw[0];
     const ms = Math.max(0, Math.round(last[last.length - 1].t - first[0].t));
     const rec = {
@@ -640,7 +642,7 @@ LAYER = r"""
 
 
 PEN = {"size": None, "stage": "34dvh", "ease": 1.0, "trail": 1.0, "halo": 0}
-FINGER = {"size": [0.62, 0.62], "stage": "42dvh", "ease": 1.5, "trail": 2.2, "halo": 36}
+FINGER = {"size": [0.62, 0.62], "stage": "46dvh", "ease": 1.3, "trail": 2.2, "halo": 36}
 
 
 def profiles(pack):

@@ -1028,6 +1028,12 @@ LAYER = STYLE + r"""
     sumi = own('inkwell') * CFG.inkwellStep;
     ward = wardMax(); over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
+    // The last banish of a stage leaves the engine celebrating: the whole path
+    // lit, `done` set. If the first target of the new run is the character
+    // already loaded, retarget() has nothing to change and that lit path is
+    // what the player starts on ("an already traced path comes up, typically
+    // when I'm progressing to the next round"). A run begins on a clean glyph.
+    if (done){ loading = true; try { _load(idx); } finally { loading = false; } }
     renderUpg();
   }
 

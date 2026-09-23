@@ -368,7 +368,7 @@ calls and the provider's redirect are both refused. See `server/README.md`.
 ```json
 "hand": { "maxPoints": 64, "keep": 60, "minStep": 4,
           "pen":    { "size": [0.52, 0.52], "stage": "34dvh", "ease": 1,   "trail": 1,   "halo": 0 },
-          "finger": { "size": [0.62, 0.62], "stage": "42dvh", "ease": 1.5, "trail": 2.2, "halo": 36 } }
+          "finger": { "size": [0.62, 0.62], "stage": "46dvh", "ease": 1.3, "trail": 2.2, "halo": 36 } }
 ```
 
 `build/hand_layer.py`, appended to every build. It owns three things: the
@@ -378,7 +378,7 @@ pen/finger switch, the handwriting, and the ledger.
 |---|---|---|
 | `maxPoints` | 64 | most points kept per stroke in a stored trace. Ends are always kept. |
 | `keep` | 24 | how many recent traces stay on the device, for the thumbnails |
-| `pen`, `finger` | see above | the two hands, tuned apart. `size` is a `[min, max]` glyph size for that hand, or `null` to leave the pack's own rule alone (a size a difficulty pins, like guided's, is never overridden). The packs pin the pen at 0.52 since v0.1.47: over 239 medium traces the 0.48–0.56 band had the fewest zaps and the most clean traces, and the maintainer found the random sizes an annoyance. `stage` is the sketchbook's size in the games. `ease` multiplies the path's forgiveness (1–2; the scorer caps the result and every end-of-stroke guard is still bound by the stroke's own length). `trail` widens the road ahead, and `halo` is the radius in px of a ring around the light — both so a fingertip does not hide what it is steering by. The finger profile applies in finger mode on a touch screen, and lets go while a pen is down. |
+| `pen`, `finger` | see above | the two hands, tuned apart. `size` is a `[min, max]` glyph size for that hand, or `null` to leave the pack's own rule alone (a size a difficulty pins, like guided's, is never overridden). The packs pin the pen at 0.52 since v0.1.47: over 239 medium traces the 0.48–0.56 band had the fewest zaps and the most clean traces, and the maintainer found the random sizes an annoyance. `stage` is the sketchbook's size in the games. `ease` multiplies the path's forgiveness (1–2; the scorer caps the result and every end-of-stroke guard is still bound by the stroke's own length). `trail` widens the road ahead, and `halo` is the radius in px of a ring around the light — both so a fingertip does not hide what it is steering by. The finger profile applies in finger mode on a touch screen, and lets go while a pen is down. The finger's `ease` went 1.5 → 1.3 and its `stage` 42 → 46dvh in v0.1.48 after the maintainer traced medium with three different fingers: at 1.5 the band the scorer forgives was 34% of the glyph wide (a quarter circle passed for a loop); at 1.3 it is 28%, against a pen's 25%. A bigger sketchbook leaves that ratio alone — the band and the glyph are both fractions of the canvas — but shrinks the fingertip and its touch offset relative to the glyph, which is what "my strokes don't register where I'm touching" is. |
 | `minStep` | 4 | points closer than this (thousandths of the stroke book's box) to the last kept one are dropped, so a slow stroke is not all samples from its first centimetre |
 
 **Pen or finger.** `pen` is the engine's `penOnly`: fingers, palms and mice
