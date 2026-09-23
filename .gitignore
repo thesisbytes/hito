@@ -40,3 +40,8 @@ agents/.venv/
 agents/data/
 agents/out/
 agents/*.egg-info/
+
+# Keys for the agents (Bedrock, OpenRouter). The agents read these files
+# themselves; nothing else in the repo holds or needs a secret.
+.env
+agents/.env

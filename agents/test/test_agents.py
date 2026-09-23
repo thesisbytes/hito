@@ -200,12 +200,23 @@ class Wiring(unittest.TestCase):
         self.assertIn("AWS_BEARER_TOKEN_BEDROCK", str(cm.exception))
         self.assertIn("OPENROUTER_API_KEY", str(cm.exception))
 
+    def test_an_env_file_is_read_but_never_overrides(self):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / ".env"
+            f.write_text("# keys\nAWS_BEARER_TOKEN_BEDROCK='from-file'\nexport AWS_REGION=eu-west-1\nHITO_MAX_TOKENS=5\n", encoding="utf-8")
+            with self.env(AWS_REGION="us-west-2"):
+                loaded = model.load_env([f, Path(d) / "missing.env"])
+                self.assertEqual(loaded, ["AWS_BEARER_TOKEN_BEDROCK", "HITO_MAX_TOKENS"])
+                self.assertEqual(os.environ["AWS_BEARER_TOKEN_BEDROCK"], "from-file")
+                self.assertEqual(os.environ["AWS_REGION"], "us-west-2")
+                self.assertEqual(model.max_tokens(), 5)
+
     def test_a_bedrock_key_picks_bedrock(self):
         from strands.models.bedrock import BedrockModel
         with self.env(AWS_BEARER_TOKEN_BEDROCK="not-a-real-key", AWS_REGION="us-west-2"):
             m = model.pick()
         self.assertIsInstance(m, BedrockModel)
-        self.assertEqual(m.get_config()["max_tokens"], model.DEFAULT_MAX_TOKENS)
+        self.assertEqual(m.get_config()["max_tokens"], 2000)
 
     def test_only_an_openrouter_key_picks_openrouter(self):
         from strands.models.openai import OpenAIModel

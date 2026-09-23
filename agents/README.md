@@ -17,7 +17,9 @@ python3 -m venv agents/.venv
 agents/.venv/bin/pip install -e agents          # strands, and hito_agents on the path
 ```
 
-Then one model provider, from the environment and never the repo:
+Then one model provider. Keys go in `.env` at the repo root (or `agents/.env`),
+which git ignores and the agents read themselves; the environment wins if both
+are set:
 
 | provider | set | notes |
 |---|---|---|

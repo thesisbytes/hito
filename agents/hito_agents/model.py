@@ -10,11 +10,38 @@ Bedrock, the simple way: a Bedrock API key from the console in
 work too. OpenRouter: `OPENROUTER_API_KEY`.
 """
 import os
+from pathlib import Path
+
+ENV_FILES = (Path(__file__).resolve().parents[2] / ".env",   # the repo root
+             Path(__file__).resolve().parents[1] / ".env")   # agents/
+
+
+def load_env(files=ENV_FILES):
+    """KEY=value lines from .env files into the environment, never overriding
+    what is already set. Both files are ignored by git. A shell `export` only
+    lives in the terminal it was typed in; a file is what survives."""
+    loaded = []
+    for f in files:
+        if not f.is_file():
+            continue
+        for line in f.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            k = k.strip().removeprefix("export ").strip()
+            v = v.strip().strip("'\"")
+            if k and k not in os.environ:
+                os.environ[k] = v
+                loaded.append(k)
+    return loaded
+
 
 # Left unset, a provider reserves the model's whole output window against
 # the account's balance before answering, and a class account with a few
 # dollars on it is refused outright (402). The analyst writes notes.
-DEFAULT_MAX_TOKENS = int(os.environ.get("HITO_MAX_TOKENS", "2000"))
+def max_tokens():
+    return int(os.environ.get("HITO_MAX_TOKENS", "2000"))
 
 OPENROUTER_URL = os.environ.get("HITO_LLM_BASE_URL", "https://openrouter.ai/api/v1")
 OPENROUTER_MODEL = "anthropic/claude-sonnet-5"
@@ -37,7 +64,7 @@ def bedrock(model_id=None, **params):
     if mid:
         kw["model_id"] = mid      # otherwise Strands' own default for the region
     return BedrockModel(region_name=os.environ.get("AWS_REGION"),
-                        max_tokens=DEFAULT_MAX_TOKENS, **kw, **params)
+                        max_tokens=max_tokens(), **kw, **params)
 
 
 def openrouter(model_id=None, **params):
@@ -48,11 +75,12 @@ def openrouter(model_id=None, **params):
     return OpenAIModel(
         client_args={"api_key": key, "base_url": OPENROUTER_URL},
         model_id=model_id or os.environ.get("HITO_MODEL", OPENROUTER_MODEL),
-        params={"max_tokens": DEFAULT_MAX_TOKENS, **params},
+        params={"max_tokens": max_tokens(), **params},
     )
 
 
 def pick(model_id=None, **params):
+    load_env()
     which = os.environ.get("HITO_LLM", "").lower()
     if not which:
         if os.environ.get("AWS_BEARER_TOKEN_BEDROCK") or aws_credentials():
