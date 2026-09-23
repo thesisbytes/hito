@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.54.html`
+### Hiragana — `dist/hiragana-v0.1.55.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -332,7 +332,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.17.html`
+### Katakana — `dist/katakana-game-v0.1.18.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -353,7 +353,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.32.html`
+### Vocab — `dist/vocab-v0.1.33.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -613,6 +613,13 @@ the curriculum gate survives keyed to distance; every tenth wave is a boss,
 and while it lives every character is traced with less help. Tama still buys
 the lanterns; the gate is no longer for sale. Guided pays nothing and sets no
 record. See `scripts/PACK.md`, "The tower".
+
+**The dashboard (v0.1.55).** Hearts, 墨, 魂 and the wave on the seam between
+field and sketchbook, where the eyes already are, with two tabs: 技, this
+run's skills bought with ink (the strip that used to sit at the top of the
+field), and 灯, the lanterns bought with 魂. A tab does not pause the run.
+The maintainer: "the crazy part of the game is knowing when you can relax the
+stroke practice and tab out into your upgrades."
 
 **DECIDED — you cannot advance without unlocking (v0.1.44).** The
 maintainer: "make it impossible to advance without unlocking stuff. so there

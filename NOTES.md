@@ -1564,3 +1564,22 @@ Running log. Append at the bottom, don't rewrite history.
   all and lifts it when it falls, a lost run pays and keeps its wave, guided
   pays nothing and sets no record. The config key is `tower`; `stages` is
   read as an alias.
+
+## 2026-09-24 — The dashboard (hiragana v0.1.55, katakana-game v0.1.18, vocab v0.1.33)
+
+- **The maintainer:** "Instead of having the gauges show right at the center,
+  create a dashboard for the hp and mana. We could even start our tabs for
+  the different kinds of upgrades ... The crazy part of the game is knowing
+  when you can relax the stroke practice and tab out into your upgrades."
+- **Built.** A bar on the seam between field and sketchbook: hearts (the
+  ward, with the empty ones dimmed), 墨 (the run's ink), 魂 (the purse) and
+  the wave, and two tabs. 技 opens this run's skills — the upgrade strip
+  that used to sit across the top of the field, where nobody looked. 灯
+  opens the lantern workshop that was only on the ending page, so what
+  lasts can be bought mid-run from the 魂 already in hand. The panel covers
+  the field, not the sketchbook, and the run does not pause: the waves keep
+  coming while you shop. The hitodama dash on the canvas moved up to sit
+  above the bar. The 技 tab lights up when something is affordable.
+- Mana proper — the gauge every stroke fills, and the release — is still
+  the note of 2026-09-24. The bar has its place kept: 墨 sits where mana
+  will, and the release is what 技 should become.

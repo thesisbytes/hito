@@ -68,13 +68,28 @@ STYLE = """
   /* The workshop strip: ink and what it buys. At the top of the field, as far
      from the hand as the screen allows — a button under a resting palm is a
      button that presses itself. */
-  .upg{ position:absolute; left:8px; right:8px; top:8px; z-index:2; display:flex; gap:6px;
-        align-items:stretch; font:12px ui-sans-serif,system-ui; pointer-events:none; }
-  .upg > *{ pointer-events:auto; }
+  .upg{ display:flex; flex-wrap:wrap; gap:6px; align-items:stretch; font:12px ui-sans-serif,system-ui; }
+  /* The dashboard: hearts and ink on the seam, where the eyes already are, and
+     tabs to duck into while the waves keep coming. The run does not pause for
+     a tab; knowing when you can afford to look is the game. */
+  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:9px;
+             padding:5px 9px; border-radius:10px; background:rgba(22,20,17,.88); border:1px solid #3d3324;
+             font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
+  .dash-bar .hp{ color:#e9c46a; font-size:13px; letter-spacing:1px; } .dash-bar .hp i{ font-style:normal; color:rgba(232,224,204,.28); }
+  .dash-bar .n{ font-weight:700; color:#e9c46a; white-space:nowrap; } .dash-bar .n small{ font-weight:400; color:rgba(232,224,204,.55); }
+  .dash-bar .tabs{ margin-left:auto; display:flex; gap:4px; }
+  .dash-bar .tabs button{ font:700 13px ui-sans-serif,system-ui; padding:3px 10px; border-radius:8px; background:transparent;
+                          border:1px solid #3d3324; color:#e8e0cc; cursor:pointer; }
+  .dash-bar .tabs button.can{ border-color:#7fd1c4; color:#bdf0e6; }
+  .dash-bar .tabs button[aria-pressed="true"]{ background:rgba(127,209,196,.14); border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 10px rgba(127,209,196,.25); }
+  .panel{ position:absolute; left:8px; right:8px; top:8px; bottom:46px; z-index:2; overflow:auto; border-radius:12px; padding:10px;
+          background:rgba(22,20,17,.93); border:1px solid #3d3324; font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
+  .panel .panel-h{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:rgba(232,224,204,.55); margin:0 0 8px; }
+  .panel .start-h, .panel .start-row{ margin-top:0; }
   .upg-ink{ display:flex; align-items:center; gap:5px; padding:0 9px; border-radius:9px;
         background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e9c46a; font-weight:700; }
   .upg-ink i{ font-style:normal; color:rgba(232,224,204,.55); font-weight:400; }
-  .upg button{ flex:1 1 0; min-width:0; text-align:left; padding:5px 7px; border-radius:9px; cursor:pointer;
+  .upg button{ flex:1 1 44%; min-width:0; text-align:left; padding:6px 8px; border-radius:9px; cursor:pointer;
         background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e8e0cc; font:inherit; line-height:1.25; }
   .upg button b{ color:#e9c46a; margin-right:4px; }
   .upg button small{ display:block; color:rgba(232,224,204,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -84,7 +99,7 @@ STYLE = """
   /* At phone width four buttons are 80px each: a cost fits, a sentence does
      not, and half a sentence is worse than none. The title attribute and the
      start page still say what each one does. */
-  @media (max-width:560px){ .upg button small i{ display:none; } .upg{ gap:4px; left:6px; right:6px; } }
+  @media (max-width:560px){ .upg button small i{ display:none; } .upg{ gap:4px; } }
   .upg button small i{ font-style:normal; }
 
   /* The start page. A lacquer sheet over everything, with the two axes the
@@ -403,7 +418,7 @@ LAYER = STYLE + r"""
   // swarm of three ぬ is answered visibly rather than vanishing in a frame.
   // Never at the monster the hand is answering right now: that one is yours.
   let castAt = 0;
-  function dash(){ return { x: cx(), y: FH - 14 }; }
+  function dash(){ return { x: cx(), y: FH - 48 }; }   // above the dashboard
   const casting = () => !DIFF[difficulty] || DIFF[difficulty].cast !== false;
   function autocast(now){
     if (!casting()) return null;
@@ -1106,9 +1121,41 @@ LAYER = STYLE + r"""
             + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
         }).join('');
     if (strip.querySelectorAll) for (const b of strip.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
+    if (typeof renderDash === 'function') renderDash();
   }
-  wrap.appendChild(strip);
-  renderUpg();
+  // ---- the dashboard, and the tabs behind it
+  const bar = document.createElement('div'); bar.className = 'dash-bar'; bar.id = 'dashbar';
+  const panel = document.createElement('div'); panel.className = 'panel'; panel.id = 'panel'; panel.hidden = true;
+  const panelSkills = document.createElement('div'); panelSkills.innerHTML = '<p class="panel-h">技 · this run · bought with 墨</p>'; panelSkills.appendChild(strip);
+  const panelLanterns = document.createElement('div');
+  panel.appendChild(panelSkills); panel.appendChild(panelLanterns);
+  wrap.appendChild(panel); wrap.appendChild(bar);
+  let tab = null, dashMarkup = '';
+  const hearts = () => { const max = wardMax(), n = Math.max(0, Math.min(max, ward)); return '♥'.repeat(n) + (max > n ? '<i>' + '♥'.repeat(max - n) + '</i>' : ''); };
+  const canBuyAny = () => Object.entries(UPG).some(([id, u]) => upg[id] < u.max && sumi >= costOf(id));
+  function renderDash(){
+    const p = purse();
+    const m = `<span class="hp" title="the ward">${hearts()}</span>`
+      + `<span class="n" title="ink — earned by tracing, spent on this run's skills">墨 ${sumi}</span>`
+      + (p ? `<span class="n" title="魂 — earned by runs, spent on what lasts">魂 ${p.balance}</span>` : '')
+      + `<span class="n"><small>wave</small> ${wave}</span>`
+      + `<span class="tabs"><button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny() ? 'can' : ''}" title="this run's skills">技</button>`
+      + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="what lasts">灯</button>` : '') + `</span>`;
+    if (m === dashMarkup) return;
+    dashMarkup = m; bar.innerHTML = m;
+    if (bar.querySelectorAll) for (const b of bar.querySelectorAll('button[data-tab]')) b.onclick = () => openTab(tab === b.dataset.tab ? null : b.dataset.tab);
+  }
+  function renderLanterns(){ panelLanterns.innerHTML = `<p class="panel-h">灯 · what lasts · bought with 魂</p>` + workshopHtml(); wireWorkshop(renderLanterns, panelLanterns); renderDash(); }
+  // A tab does not pause the run. That is the point: the waves keep coming
+  // while you shop, and knowing when you can afford to is the game.
+  function openTab(name){
+    tab = name || null;
+    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelLanterns.hidden = tab !== 'lanterns';
+    if (tab === 'lanterns') renderLanterns();
+    renderDash();
+    return tab;
+  }
+  renderUpg(); renderDash();
 
   // ---- the start page
   const start = document.createElement('div');
@@ -1194,8 +1241,8 @@ LAYER = STYLE + r"""
     const gate = '';   // the gate was bought with 魂 until v0.1.54; rows open by distance now
     return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
   }
-  function wireWorkshop(again){
-    for (const b of start.querySelectorAll('button[data-lantern]')) b.onclick = () => {
+  function wireWorkshop(again, root){
+    for (const b of (root || start).querySelectorAll('button[data-lantern]')) b.onclick = () => {
       const id = b.dataset.lantern;
       if (buyLantern(id)) again();
     };
@@ -1278,7 +1325,7 @@ LAYER = STYLE + r"""
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN,
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
-    get upgHtml(){ return upgMarkup; },
+    get upgHtml(){ return upgMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; },
     earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
     charge, kindle, quench, autocast, tidy, casting,
@@ -1286,7 +1333,7 @@ LAYER = STYLE + r"""
     bearer,
     spawn, restart, retarget, pick,
     posOf: px,
-    frame(now){ step(now); },
+    frame(now){ step(now); renderDash(); },
   };
 
   // A fizzle already clears the ink, but only rewound prog by half — so the

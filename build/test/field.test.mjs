@@ -799,6 +799,13 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   fresh();
   ok(F.ink === 0 && F.upgrades.quick === 0 && F.wardMax === cfg.wardHp, 'ink or upgrades survived the ward falling');
   ok(/墨 0/.test(F.upgHtml) && /data-upg="quick"/.test(F.upgHtml), 'the workshop strip is missing or stale after a restart');
+  // the dashboard on the seam: hearts, ink, 魂, the wave, and tabs that do not pause the run
+  advance(20);
+  ok(/♥/.test(F.dashHtml) && /墨 0/.test(F.dashHtml) && /data-tab="skills"/.test(F.dashHtml), `the dashboard is missing something: ${F.dashHtml.slice(0, 160)}`);
+  ok((F.dashHtml.match(/♥/g) || []).length === F.wardMax, `the dashboard shows ${(F.dashHtml.match(/♥/g) || []).length} hearts for a ward of ${F.wardMax}`);
+  ok(F.openTab('skills') === 'skills' && F.tab === 'skills' && !F.paused, 'opening a tab paused the run, or did not open');
+  ok(/aria-pressed="true"/.test(F.dashHtml), 'the open tab is not shown as open');
+  ok(F.openTab(null) === null && F.tab === null, 'the tab did not close');
 }
 
 // ---- the run ends, says what it was, and is written down
