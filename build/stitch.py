@@ -301,7 +301,10 @@ def main():
               # A stroke that went nowhere: what to do with it, and how little
               # progress still counts as nowhere (in path points).
               f"let STRAY_MODE='{pack.get('strayMode', 'drop')}',STRAY_SKID={pack.get('straySkid', 3)},"
-              "strayed=false,down_=null,hiMark=0,fizzleWhy='';")
+              "strayed=false,down_=null,hiMark=0,fizzleWhy='';"
+              # Progress only advances the way the stroke goes: see the heading
+              # gate in follow().
+              f"let HEADING_GATE={'true' if pack.get('headingGate', True) else 'false'},mvx=0,mvy=0,moving=false;")
 
         s.sub("build segments",
               r"if\(rec\)\{ rec\.forEach\(st=>\{ const R=resample\(st,"
@@ -368,14 +371,32 @@ def main():
               "  // and that is the one thing a scribble cannot disguise. Single\n"
               "  // stroke glyphs have no lift barrier, so without this they let\n"
               "  // a dense scribble through on coverage alone.\n"
-              "  if(down) lastN=null;\n"
+              "  if(down){ lastN=null; mvx=0; mvy=0; moving=false; }\n"
               "  if(!segStarted&&Math.hypot(n.x-PATH[seg[0]].x,n.y-PATH[seg[0]].y)<startTol(segIdx)) segStarted=true;\n"
               "  if(!lastN){ lastN={x:n.x,y:n.y}; }\n"
               "  else { const step=Math.hypot(n.x-lastN.x,n.y-lastN.y);\n"
               "    // Sub-threshold movement is digitizer noise, not travel.\n"
               "    // Summing every raw sample would let a jittery pen inflate\n"
               "    // the ratio and fail an honest trace.\n"
-              "    if(step>=TRAVEL_EPS){ travel+=step; if(segStarted) segTravel+=step; lastN={x:n.x,y:n.y}; } }\n"
+              "    if(step>=TRAVEL_EPS){ travel+=step; if(segStarted) segTravel+=step;\n"
+              "      mvx=.5*mvx+.5*(n.x-lastN.x); mvy=.5*mvy+.5*(n.y-lastN.y); moving=true; lastN={x:n.x,y:n.y}; }\n"
+              "    else moving=false; }\n"
+              "  // The heading gate. A fingertip's reach is as wide as the loops of\n"
+              "  // ぬ, め, は and ほ on a phone (18-26px against 35-43px), so every point\n"
+              "  // of a loop is in reach at once and a finger heading for the loop had\n"
+              "  // the far side credited before it got there — 'it'll track multiple\n"
+              "  // points and jump to complete'. No size fixes that: the canvas is the\n"
+              "  // phone's width. So progress only advances through points whose\n"
+              "  // direction agrees with the pen's own motion. Sitting still advances\n"
+              "  // nothing; crossing a loop advances only its near half; going round\n"
+              "  // it advances all of it, which is the only way a loop gets drawn.\n"
+              "  // Pen-down is let in a few points ahead, so a lift mid-stroke lands\n"
+              "  // without a zap.\n"
+              "  const heading=i=>{ if(!HEADING_GATE||i<=prog) return true;\n"
+              "    if(down) return i<=prog+SEGSLACK[segIdx];\n"
+              "    if(!moving) return false;\n"
+              "    const a=PATH[Math.max(seg[0],i-1)], b=PATH[Math.min(seg[1],i+1)];\n"
+              "    return (b.x-a.x)*mvx+(b.y-a.y)*mvy>0; };\n"
               "  if(awaitLift){   // stroke finished — the pen must come up first\n"
               "    // Overshooting the end slightly is just finishing the stroke,\n"
               "    // not an error. Only complain once the pen leaves the end and\n"
@@ -413,9 +434,9 @@ def main():
               "    let dl=Math.hypot(n.x-PATH[lo].x,n.y-PATH[lo].y);\n"
               "    if(dl<R){ best=lo; bd=dl;\n"
               "      for(let i=lo;i<seg[1];i++){ const e=Math.hypot(n.x-PATH[i+1].x,n.y-PATH[i+1].y);\n"
-              "        if(e>=R) break; if(e<bd){ bd=e; best=i+1; } } }\n"
+              "        if(e>=R||!heading(i+1)) break; if(e<bd){ bd=e; best=i+1; } } }\n"
               "  } else\n"
-              "  for(let i=lo;i<=hi;i++){ const d=Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y);\n"
+              "  for(let i=lo;i<=hi;i++){ if(!heading(i)) continue; const d=Math.hypot(n.x-PATH[i].x,n.y-PATH[i].y);\n"
               "    if(d<bd){bd=d;best=i;} }\n"
               "  if(best>=0){ q.on=true; prog=Math.max(prog,best); offCount=0;"
               " smudge=Math.max(0,smudge-2); spark(q.x,q.y,q.p);\n"

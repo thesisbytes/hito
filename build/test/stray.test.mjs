@@ -129,6 +129,49 @@ for (const file of process.argv.slice(2)){
     g.__field.restart();
     ok(P.done === false && P.prog === 0 && P.strokes.length === 0, `a restart left the engine celebrating (done ${P.done}, prog ${P.prog})`);
   }
+  // ---- the heading gate: a loop is drawn by going round it, not by crossing it
+  {
+    const { P, g, fire, tick, px } = rig(file);
+    const want = P.LETTERS.findIndex(l => l[0] === 'め');
+    if (want >= 0){
+      if (g.__field) g.__field.target.i = want;
+      g.load(want);
+      // the loop: the first stroke that crosses itself, and where
+      const cross = (a, b, c, d) => { const x = (o, p, q) => (p.x-o.x)*(q.y-o.y) - (p.y-o.y)*(q.x-o.x); return x(a,b,c)*x(a,b,d) < 0 && x(c,d,a)*x(c,d,b) < 0; };
+      let loop = null;
+      for (const [a, b] of P.SEGS){
+        for (let i = a; i < b && !loop; i++) for (let j = i + 2; j < b; j++)
+          if (cross(P.PATH[i], P.PATH[i+1], P.PATH[j], P.PATH[j+1])){ loop = {a, b, i, j}; break; }
+        if (loop) break;
+      }
+      ok(loop, 'め has no loop in the book');
+      if (loop){
+        const { a, b, i, j } = loop;
+        // the strokes before the loop's, drawn properly, so the loop's stroke is the one in play
+        const before_ = P.SEGS.filter(([x]) => x < a);
+        const upTo = () => { for (const [x, y] of before_){ const s0 = px(x); fire('pointerdown', s0.x, s0.y, 'pen'); for (let k = x + 1; k <= y; k++){ tick(8); const q = px(k); fire('pointermove', q.x, q.y, 'pen'); } fire('pointerup', px(y).x, px(y).y, 'pen'); tick(200); } };
+        upTo();
+        // to the mouth of the loop along the path, then straight across it to where it closes
+        const s = px(a); fire('pointerdown', s.x, s.y, 'pen');
+        for (let k = a + 1; k <= i; k++){ tick(8); const q = px(k); fire('pointermove', q.x, q.y, 'pen'); }
+        const from = px(i), to = px(j + 1);
+        for (let k = 1; k <= 6; k++){ tick(8); fire('pointermove', from.x + (to.x-from.x)*k/6, from.y + (to.y-from.y)*k/6, 'pen'); }
+        ok(P.prog < j - 2, `cutting across め's loop credited it (prog ${P.prog}, loop ${i}..${j})`);
+        // sitting still on the far side advances nothing either
+        const before = P.prog;
+        for (let k = 0; k < 8; k++){ tick(8); fire('pointermove', to.x, to.y, 'pen'); }
+        ok(P.prog === before, `a still pen advanced from ${before} to ${P.prog}`);
+        fire('pointerup', to.x, to.y, 'pen');
+        // and going round it, the loop is drawn (a fizzle restarts the same character at the same size;
+        // a reload could roll another, and the loop's indices with it)
+        g.fizzle(); upTo();
+        const s2 = px(a); fire('pointerdown', s2.x, s2.y, 'pen');
+        for (let k = a + 1; k <= b; k++){ tick(8); const q = px(k); fire('pointermove', q.x, q.y, 'pen'); }
+        ok(P.prog >= b - 4, `going round the loop did not draw the stroke (prog ${P.prog} of ${b})`);
+        fire('pointerup', px(b).x, px(b).y, 'pen');
+      }
+    }
+  }
   // ---- keep: the old rule, every stroke stays
   {
     const { P, H, nowhere } = rig(file);

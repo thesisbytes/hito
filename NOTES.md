@@ -1283,3 +1283,34 @@ Running log. Append at the bottom, don't rewrite history.
   Noto Sans JP is shown small as the print form. No change needed.
 - `book_chart.py` stays for the next realm: a kanji pack's book gets the
   same chart before it is trusted.
+
+## 2026-09-23 — Progress goes the way the stroke goes (hiragana v0.1.49, katakana-game v0.1.12, vocab v0.1.27)
+
+- **The maintainer, on v0.1.48 with a finger:** "I still think this size
+  isn't suitable for fat fingers. I am headed towards a loop, it'll track
+  multiple points and jump to complete."
+- **Measured, and size cannot fix it.** On a 390px phone the sketchbook is
+  the phone's width whatever its height. At today's largest size the ink of
+  あ is 105px and the loops of ね, は and ほ are 18px; at 60dvh and size 0.9
+  they are 26px. A fingertip is 50px and its reach 35-43px, growing with
+  the size. Every point of a loop is in reach at once, so the scorer could
+  not see whether the loop was drawn, and the LOOK window credited its far
+  side the moment the finger approached.
+- **The heading gate.** The pen's motion, smoothed over its last samples, is
+  kept beside travel. Progress advances only through points whose tangent
+  agrees with it (dot product above zero). A still pen advances nothing.
+  Cutting across a loop advances only its near half; going round it
+  advances all of it. Pen-down is let in a few points ahead, so a lift
+  mid-stroke lands without a zap. Both the drag walk (guided) and the
+  window search (everything else) honour it. `headingGate` in the pack,
+  on by default, because the pen on a phone has the same problem at a
+  smaller scale (reach 25px, loops 15px).
+- **Checked.** Honest traces at every size (the size test's wobble did not
+  trip it), the tail guard plain and eased, and a new check on め: the pen
+  drawn to the mouth of the loop and then straight across it is credited
+  less than the loop; a still pen on the far side advances nothing; the
+  same pen going round the loop draws the stroke.
+- What the gate cannot do is make a fingertip place a point inside an 18px
+  loop. It makes the scorer honest about it. Whether the loops of ぬ め は
+  ほ are traceable by finger on a phone at all is now a question for the
+  hand, and the ratings page will say.

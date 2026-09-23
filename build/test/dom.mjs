@@ -65,7 +65,8 @@ export function boot(file, { stored = {}, touchPoints = 0, fine = false, coarse 
     get TEACHER(){ return TEACHER; }, setStrokes(v){ strokes = v; }, setSize(f){ curF = f; curS = f/BASE_F; }, get W(){ return W; }, get H(){ return H; },
     get prog(){ return prog; }, get segIdx(){ return segIdx; }, get awaitLift(){ return awaitLift; }, get PATH(){ return PATH; },
     get SEGS(){ return SEGS; }, denorm(p){ return denorm(p); }, get stray(){ return STRAY_MODE; }, set stray(v){ STRAY_MODE = v; },
-    get strayed(){ return strayed; }, get R(){ return R_ON(); }, get SEGLEN(){ return SEGLEN; }, get DRAG(){ return DRAG_FOLLOW; } };`;
+    get strayed(){ return strayed; }, get R(){ return R_ON(); }, get SEGLEN(){ return SEGLEN; }, get DRAG(){ return DRAG_FOLLOW; },
+    get moving(){ return moving; }, get mv(){ return [mvx, mvy]; }, get lastN(){ return lastN; } };`;
   new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
   g.resize();
   if (g.__field) g.__field.begin();
