@@ -996,3 +996,21 @@ Running log. Append at the bottom, don't rewrite history.
   in; the suite checks the config follows the provider, both write paths
   (verbatim for `add`, distilled for a turn), scoping, that memory reaches
   the model and the turn reaches memory. Sixteen tests.
+
+## 2026-09-23 — Bedrock answers, and memory recalls (agents/)
+
+- **The gates, in the order a fresh account meets them:** account
+  verification (about an hour, no email came), then Anthropic's use-case
+  form, which the Bedrock API key cannot submit (its policy is invoke-only;
+  `PutUseCaseForModelAccess` was refused), so it was filled in the console.
+  About ten minutes after that the model answered. Titan embeddings needed
+  nothing. Sonnet 5 and Opus 5 still say "not available for this account";
+  Sonnet 4.6 through the global profile is the default.
+- **Recall, live.** Run one stored two notes through `add_memory` and
+  answered from the table. Run two, a fresh process, asked for memory only
+  and got both back word for word: the maintainer plays guided by finger
+  on a phone; the poke bug is known and unfixed. The Bedrock collection is
+  separate from the Gemini one, as designed, so it started empty.
+- The whole loop — pull, analyst, hooks, memory — now runs on one provider
+  with credit behind it. Next is the experiment the layer was built for:
+  Laya's labels against the flag events, once there are flags.
