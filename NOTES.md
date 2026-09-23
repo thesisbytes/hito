@@ -1467,3 +1467,15 @@ Running log. Append at the bottom, don't rewrite history.
   session showed needed doing. The comparison it logs is the experiment:
   when there are a few hundred sentences, Laya's kinds and the rule's kinds
   against a hand's can be scored, and calibrated against `ece_score`.
+- **Late arrival, and the ふ before-and-after.** The maintainer's v0.1.52
+  rounds reached the table an hour after they were played — the outbox
+  flushes when it can, and no sign-in is involved. Finger in medium, all
+  characters: v0.1.50 386 traces, 17% fizzled, 1.47 zaps a trace, overshoot
+  0.13; v0.1.52 62 traces, 10% fizzled, 0.87 zaps, overshoot 0.08. ふ on
+  v0.1.52: three of three landed with no zaps, against 19 of 41 fizzled
+  before — three is not a verdict, but it is the right direction. も still
+  fizzles one in four. The runs: stage 7 with 30 farang fell four times
+  and was held once; stage 8 with 33 farang fell three times. No boss has
+  been reached because the boss is the last farang of the stage.
+  `stages.count` 12 and `countStep` 3 are the numbers that make stage 8 a
+  33-farang wall for a finger; they were set by arithmetic, not by a hand.
