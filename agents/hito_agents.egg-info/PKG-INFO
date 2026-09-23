@@ -1,6 +1,0 @@
-Metadata-Version: 2.4
-Name: hito-agents
-Version: 0.1.0
-Summary: hito 人 — the multi-agent layer: reads the game's observations, never runs at play time
-Requires-Python: >=3.12
-Requires-Dist: strands-agents[openai]==1.57.0

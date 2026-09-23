@@ -39,3 +39,4 @@ vocab/attempts.jsonl
 agents/.venv/
 agents/data/
 agents/out/
+agents/*.egg-info/
