@@ -384,6 +384,14 @@ class SystemOne(unittest.TestCase):
         f = system1.features({"glyph": "ふ", "ok": False, "s": ink([(200, 200), (800, 800)], [(700, 300), (705, 305)])}, tick_book)
         self.assertLess(f["end_gap"], 0.06)
         self.assertGreater(f["end_gap_stroke"], 0.8)
+        # a hook run long: ink past the end, as a fraction of the stroke
+        long = self.feat(ink([(200, 500), (800, 500), (1100, 500)]))
+        self.assertAlmostEqual(long["overshoot"], 0.5, places=1)
+        self.assertEqual(whole["overshoot"], 0.0)
+        # two strokes drawn as one: joined counts the missing lift
+        two = {"二": [[(200.0, 300.0), (800.0, 300.0)], [(200.0, 700.0), (800.0, 700.0)]]}
+        j = system1.features({"glyph": "二", "ok": True, "s": ink([(200, 300), (800, 300), (200, 700), (800, 700)])}, two)
+        self.assertEqual((j["joined"], j["strokes_drawn"]), (1, 1))
 
     def test_old_partial_captures_are_left_out(self):
         self.assertTrue(system1.partial({"diff": "guided", "v": "0.1.41"}))

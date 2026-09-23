@@ -91,6 +91,10 @@ def narrate(f):
         parts.append(f"It started {int(f['start_gap'] * 100)}% of the character's size from where the stroke starts and stopped "
                      f"{int(f['end_gap'] * 100)}% from where the stroke ends, which is {int(f['end_gap_stroke'] * 100)}% of that stroke's own length.")
         parts.append(f"There was {f['travel_ratio']:.2f} times as much ink as path, spanning {f['ink_span']:.2f} of the character's extent.")
+        if f.get("overshoot", 0) >= 0.15:
+            parts.append(f"One stroke ran on {int(f['overshoot'] * 100)}% of its length past its end.")
+        if f.get("joined"):
+            parts.append(f"{f['joined']} of the character's strokes were joined to another without a lift.")
     if f.get("q") is not None:
         parts.append(f"Recognisability was scored {f['q']:.2f} out of 1.")
     return " ".join(parts)
@@ -171,8 +175,26 @@ def features(body, book):
         # The hand's verdicts (2026-09-23) said so before the number did.
         "end_gap_stroke": round(end / last_len, 2),
         "ink_span": round(diag(I) / D, 2),
+        # The hand's own words for a low finger score (2026-09-23): "the hook
+        # was too long", "the strokes connected when they were not supposed
+        # to". Overshoot: ink drawn after the point nearest a stroke's end, as
+        # a fraction of that stroke, the worst stroke. Joined: strokes the
+        # character has that the hand did not lift for.
+        "overshoot": round(max(overshoots(ink, exp)), 2),
+        "joined": max(0, len(exp) - len(ink)),
     })
     return f
+
+
+def overshoots(ink, exp):
+    """Per stroke, the ink drawn after the point nearest the stroke's end,
+    over the stroke's length. A hook run long is a big number here."""
+    out = []
+    for k in range(min(len(ink), len(exp))):
+        s, e = ink[k], exp[k][-1]
+        j = min(range(len(s)), key=lambda i: math.dist(s[i], e))
+        out.append(length(s[j:]) / (length(exp[k]) or 1.0))
+    return out or [0.0]
 
 
 def partial(body):

@@ -1196,3 +1196,31 @@ Running log. Append at the bottom, don't rewrite history.
   within the floor of 2% of the canvas, which a finger cannot do on purpose;
   and the ten guided strokes redrawn after the light moved are the honest
   case of the rule, not strays, so they stay in the record.
+
+## 2026-09-23 — Batch 2 of the hand's ratings: the hook, and the lift (agents/labels/readable-2026-09-23-b.jsonl)
+
+- 24 traces from the v0.1.46 session, rated on the page. The maintainer,
+  on the finger ones: "I failed all the ones that look like scribbles, and
+  gave low percentages when they almost got it, but the hook was too long
+  or the strokes connected when they were not supposed to." Both are
+  measurable and are features now: `overshoot`, the ink drawn after the
+  point nearest a stroke's end over the stroke's length (the worst stroke);
+  `joined`, strokes the character has that the hand did not lift for.
+- **Pen (19).** Coverage predicts the rating again (+0.73), the
+  stroke-relative end gap (−0.60), then joined (−0.43) and overshoot
+  (−0.39). The hand's own `q`: +0.08 on twelve traces. Two traces the tracer
+  *landed* were rated 0: an あ with 26 zaps and an overshoot of 2.08 strokes,
+  and a し with 46% coverage. The scorer let both through; the hand would
+  not have.
+- **Finger (5, all guided, all before the v0.1.47 end fix).** Coverage is
+  high on every one (0.62-0.99) and says nothing (−0.30). Overshoot says
+  it all: the four rated 0-20 ran on by 0.82-1.11 of a stroke past the end,
+  the one rated 80 ran on by nothing. That is the "dragged it too far"
+  report in the ratings, and it is what v0.1.47's end-within-reach should
+  remove. The next guided batch is the test.
+- **What this means for hard mode.** `quality()` is a chamfer distance:
+  ink on the shape scores well however it got there and however much of
+  it there is. Twice now the hand has rated its best-scoring traces 0. The
+  scorer that answers "is this あ?" needs, at least: coverage, overshoot,
+  the lift count, and the stroke-relative end gap — the four things the
+  hand's ratings track — before any distance.
