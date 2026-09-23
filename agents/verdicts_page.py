@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """A page of traces for the hand to judge: the ink over the shape asked for,
-the geometry, Laya's guess, and a row of verdict buttons. The verdicts are
-the first labels of our own (NOTES.md, 2026-09-23), so the page keeps them
-in its own store and `agents/verdicts.py` reads them back into
-agents/data/verdicts.jsonl.
+the geometry, Laya's guess, and a slider for how readable it is — 100 is
+"I could read it", 0 is "not close". The maintainer asked for that instead
+of the five categories, which went unused: the hand judges recognisability,
+which is the number the hand's own quality() estimates and hard mode's
+"is this あ?" needs. The ratings are labels of our own (NOTES.md,
+2026-09-23); the page keeps them in its own store and `agents/verdicts.py`
+reads them back into agents/data/verdicts.jsonl.
 
     agents/.venv/bin/python agents/verdicts_page.py out.html   # the 24-trace sample
 
@@ -18,8 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from hito_agents import events, system1  # noqa: E402
 
-VERDICTS = [("honest", "fair attempt"), ("stopped_short", "stopped short"), ("poked", "poked, not travelled"),
-            ("scribble", "scribble"), ("gave_up", "gave up"), ("unsure", "can't tell")]
+STEP = 10   # the slider moves in tens: a phone thumb cannot place a unit
 
 
 def sample(rows):
@@ -43,13 +45,16 @@ def card(r, f, lab, book):
     geo = (f"covered <b>{int(f['coverage'] * 100)}%</b> · stopped <b>{int(f['end_gap'] * 100)}%</b> short · ink <b>{f['travel_ratio']:.2f}×</b> path · strokes <b>{f['strokes_drawn']}/{f['strokes_expected']}</b>"
            if "coverage" in f else "no geometry")
     laya = f"Laya: {lab['verdict'].replace('_', ' ')} {lab['p'].get(lab['verdict'], 0):.2f}, confidence {lab['confidence']:.2f}" if lab else "Laya: not run"
-    btns = "".join(f'<button type="button" class="v" data-id="{r["$id"]}" data-v="{k}" id="b-{r["$id"][:8]}-{k}">{html.escape(t)}</button>' for k, t in VERDICTS)
+    sid = r["$id"][:8]
+    btns = (f'<label class="rate" for="s-{sid}"><span class="rl">readable</span>'
+            f'<input type="range" class="v" id="s-{sid}" data-id="{r["$id"]}" min="0" max="100" step="{STEP}" value="50" aria-label="how readable is this {html.escape(ch)}">'
+            f'<output class="ro" for="s-{sid}" id="o-{sid}">–</output></label>')
     return (f'<article class="card {status}" data-id="{r["$id"]}"><div class="pic"><svg viewBox="150 150 700 760" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="trace of {html.escape(ch)}">'
             f'<g class="ref" stroke-width="46">{ref}</g><g class="ink" stroke-width="18">{ink}</g></svg></div>'
             f'<div class="meta"><div class="head"><span class="glyph">{html.escape(ch)}</span><span class="chip {status}">{status}</span>'
             f'{"<span class=\"chip zaps\">" + str(f["zaps"]) + " zaps</span>" if f.get("zaps") else ""}</div>'
             f'<p class="tags">{html.escape(tags)} · {(f["ms"] or 0) / 1000:.1f}s</p><p class="geo">{geo}</p><p class="laya">{html.escape(laya)}</p>'
-            f'<div class="verdicts" role="group" aria-label="your verdict">{btns}</div></div></article>')
+            f'<div class="verdicts">{btns}</div></div></article>')
 
 
 def main():
@@ -80,49 +85,57 @@ h1{{font-family:"Klee One","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;fo
 .chip{{font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}}
 .chip.landed{{color:var(--blue);border-color:var(--blue)}} .chip.fizzled{{color:var(--red);border-color:var(--red)}}
 .tags,.geo,.laya{{margin:4px 0 0;font-size:13px;color:var(--dim)}} .geo b{{color:var(--ink);font-weight:600}}
-.verdicts{{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}}
-.v{{font:inherit;font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}}
-.v:hover{{border-color:var(--blue)}} .v:focus-visible{{outline:2px solid var(--blue);outline-offset:2px}}
-.v[aria-pressed="true"]{{background:var(--green-soft);border-color:var(--green);color:var(--green);font-weight:600}}
-.v:disabled{{opacity:.5;cursor:default}}
-@media (prefers-reduced-motion:no-preference){{.v{{transition:border-color .15s,background .15s}}}}
+.verdicts{{margin-top:10px}}
+.rate{{display:grid;grid-template-columns:auto 1fr 3.2em;align-items:center;gap:10px}}
+.rl{{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}}
+.v{{width:100%;accent-color:var(--green);height:28px;cursor:pointer}}
+.v:focus-visible{{outline:2px solid var(--blue);outline-offset:2px}}
+.ro{{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;color:var(--dim)}}
+.ro.set{{color:var(--green)}}
 </style>
 <h1>Hito Verdicts</h1>
-<p class="lede">{n} traces from the table: every fizzle so far, and a spread of landed ones. Grey is the shape that was asked for, blue landed, red fizzled, same coordinate space, no fitting. Say what the hand did. Your verdicts are the first labels Laya will be tuned on.</p>
-<div class="bar"><span><b id="done">0</b> of {n} judged</span><span class="note" id="note">Verdicts save as you tap.</span></div>
+<p class="lede">{n} traces from the table: every fizzle so far, and a spread of landed ones. Grey is the shape that was asked for, blue landed, red fizzled, same coordinate space, no fitting. Slide to how readable each one is: 100 means you could read it, 0 means not close. These ratings are the labels Laya will be tuned on.</p>
+<div class="bar"><span><b id="done">0</b> of {n} rated</span><span class="note" id="note">A rating saves when you let go of the slider.</span></div>
 <div class="grid">{"".join(cards)}</div>
 <script>
 (function(){{
-  const N = {n};
-  const state = {{}};
+  const state = {{}};   // trace id -> readable, 0..100
   let db = null, writable = true;
   const doneEl = document.getElementById("done"), noteEl = document.getElementById("note");
+  const out = id => document.getElementById("o-" + id.slice(0, 8));
   function paint(){{
-    document.querySelectorAll(".v").forEach(b => b.setAttribute("aria-pressed", String(state[b.dataset.id] === b.dataset.v)));
+    document.querySelectorAll(".v").forEach(s => {{
+      const v = state[s.dataset.id]; const o = out(s.dataset.id);
+      if (v === undefined){{ o.textContent = "–"; o.classList.remove("set"); return; }}
+      s.value = v; o.textContent = v + "%"; o.classList.add("set");
+    }});
     doneEl.textContent = Object.keys(state).length;
   }}
-  document.querySelectorAll(".v").forEach(b => b.addEventListener("click", async () => {{
-    const id = b.dataset.id, v = b.dataset.v;
-    if (state[id] === v) return;
-    state[id] = v; paint();
-    if (!db || !writable) return;
-    const card = b.closest(".card");
-    try {{
-      await db.doc("verdicts/" + id).set({{verdict: v, glyph: card.querySelector(".glyph").textContent, at: new Date().toISOString()}});
-    }} catch (e) {{
-      if (e && e.code === "invalid_argument") {{ writable = false; noteEl.textContent = "This view can't save verdicts; they stay on this screen only."; }}
-      else noteEl.textContent = "Couldn't save that one; tap it again in a moment.";
-    }}
-  }}));
+  document.querySelectorAll(".v").forEach(s => {{
+    s.addEventListener("input", () => {{ const o = out(s.dataset.id); o.textContent = s.value + "%"; }});
+    s.addEventListener("change", async () => {{
+      const id = s.dataset.id, v = Number(s.value);
+      if (state[id] === v) return;
+      state[id] = v; paint();
+      if (!db || !writable) return;
+      const card = s.closest(".card");
+      try {{
+        await db.doc("verdicts/" + id).set({{readable: v, glyph: card.querySelector(".glyph").textContent, at: new Date().toISOString()}});
+      }} catch (e) {{
+        if (e && e.code === "invalid_argument") {{ writable = false; noteEl.textContent = "This view can't save ratings; they stay on this screen only."; }}
+        else noteEl.textContent = "Couldn't save that one; move it again in a moment.";
+      }}
+    }});
+  }});
   paint();
   (async () => {{
     try {{ db = await window.claude.use("db"); }} catch (e) {{ db = null; }}
-    if (!db) {{ noteEl.textContent = "Verdicts can't be saved in this view; they stay on this screen only."; return; }}
+    if (!db) {{ noteEl.textContent = "Ratings can't be saved in this view; they stay on this screen only."; return; }}
     db.collection("verdicts").onSnapshot(snap => {{
-      snap.docs.forEach(d => {{ const x = d.data(); if (x && x.verdict) state[d.id] = x.verdict; }});
+      snap.docs.forEach(d => {{ const x = d.data(); if (x && typeof x.readable === "number") state[d.id] = x.readable; }});
       paint();
-      noteEl.textContent = Object.keys(state).length ? "Saved. Tap again to change one." : "Verdicts save as you tap.";
-    }}, err => {{ noteEl.textContent = "Saved verdicts can't be read right now."; }});
+      noteEl.textContent = Object.keys(state).length ? "Saved. Move a slider again to change it." : "A rating saves when you let go of the slider.";
+    }}, err => {{ noteEl.textContent = "Saved ratings can't be read right now."; }});
   }})();
 }})();
 </script>

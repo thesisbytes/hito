@@ -28,7 +28,7 @@ def main():
         d = json.loads(f.read_text(encoding="utf-8"))
         tid = f.stem
         t = by_id.get(tid)
-        rows.append({"id": tid, "verdict": d.get("verdict"), "at": d.get("at"),
+        rows.append({"id": tid, "verdict": d.get("verdict"), "readable": d.get("readable"), "at": d.get("at"),
                      "glyph": d.get("glyph") or (t and t["body"].get("glyph")),
                      "landed": bool(t and t["body"].get("ok")) if t else None, "device": t and t.get("device")})
     OUT.parent.mkdir(parents=True, exist_ok=True)
