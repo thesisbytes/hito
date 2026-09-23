@@ -77,6 +77,12 @@ node build/test/hand.test.mjs "dist/hiragana-v$ver.html" "dist/hiragana-game-v$v
 node build/test/hand.test.mjs "dist/vocab-v$vver.html" "dist/katakana-game-v$kver.html" | sed 's/^/  /' || fail=1
 
 echo
+echo "── stray (a stroke that went nowhere never happened) ──"
+# The workshop and the field: the card shells load no character until a
+# card is dealt, so there is nothing for the hand to note there.
+node build/test/stray.test.mjs "dist/hiragana-v$ver.html" "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── field (the game loop runs and the seam holds) ───"
 node build/test/field.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
 

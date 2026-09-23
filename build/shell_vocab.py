@@ -173,15 +173,15 @@ LAYER = STYLE + r"""
     guided: { kana:'導', blurb:'follow the light. no ink, no zaps, one big size, and the kana are shown — practice.',
               R_ON0: BASE.R_ON0*1.5, DRAIN: 0, FIZZ: Infinity, size: SIZE_MAX,
               COVER_MIN: 0, MAX_TRAVEL: Infinity, dot: 1, ink:false, drag:true, reveal:true,
-              guide:true, numbers:true, comet:false, shadow:'none' },
+              guide:true, numbers:true, comet:false, shadow:'none', stray:'drop' },
     easy:   { kana:'易', blurb:'ride the comet. stray and you leak, scrub and you fizzle.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, reveal:false,
-              guide:true, numbers:true, shadow:'none' },
+              guide:true, numbers:true, shadow:'none', stray:'drop' },
     medium: { kana:'中', blurb:'the shape only, as wide as you may stray. where each stroke starts, and in what order, is on you.',
               R_ON0: BASE.R_ON0, DRAIN: BASE.DRAIN, FIZZ: BASE.FIZZ, size: null,
               COVER_MIN: BASE.COVER_MIN, MAX_TRAVEL: BASE.MAX_TRAVEL, dot: 1, ink:true, drag:false, reveal:false,
-              guide:false, numbers:false, shadow:'strokes' },
+              guide:false, numbers:false, shadow:'strokes', stray:'restart' },
     hard:   { kana:'難', blurb:'nothing shown. the scribe has not written this page yet.',
               locked:true },
   };
@@ -217,6 +217,7 @@ LAYER = STYLE + r"""
     DRAG_FOLLOW = d.drag;
     GUIDE_ON = d.guide; GUIDE_NUMBERS = d.numbers; SHADOW_MODE = d.shadow;
     COMET_ON = d.comet !== false;   // the looping demonstration; guided turns it off
+    STRAY_MODE = d.stray || 'drop';   // a stroke that went nowhere: dropped, or the character restarts
     saveStart();
     return true;
   }

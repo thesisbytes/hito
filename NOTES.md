@@ -1094,3 +1094,47 @@ Running log. Append at the bottom, don't rewrite history.
   that. Whether a fizzle clears only the ink or restarts the character is
   a game-feel decision, open; the recording should in any case start fresh
   at a fizzle, or the labels are labels of a mess.
+
+## 2026-09-23 — A stroke that went nowhere never happened (hiragana v0.1.46, katakana-game v0.1.9, vocab v0.1.24)
+
+- **The maintainer: "we should clear when we fizzle"; then, given the
+  choice, "restart the character"; then, given the numbers, the third
+  option: drop strays in guided and easy, restart in medium and up.** The
+  game shells already restarted on a fizzle (`fizzleRestarts`); the
+  workshop halved progress. What made the recordings a mess was not
+  fizzles but strokes that never fizzled: a stroke started off the path
+  gets a zap, the hand lifts and redraws, and the first one stayed on the
+  canvas (workshop) and in the record (everywhere) — 61 of the first 286
+  traces, 30 of them in guided, where nothing zaps at all.
+- **The rule.** The pen coming down snapshots the scorer (after the lift
+  has advanced to the next stroke, before the first sample is scored). The
+  pen lifting asks whether the stroke got anywhere: finished its stroke, or
+  moved on, or advanced more than `straySkid` (3) path points. If not:
+  `drop` puts the ink and the scorer back to the snapshot and the hand does
+  not record it; `restart` fizzles; `keep` is the old rule. `strayMode` in
+  the pack (default `drop`), `stray` per difficulty in the shells (medium:
+  restart). And `fizzle()` restarts the character in every build now — the
+  stitch's strict-state reset sets progress to zero instead of half.
+- **The hand's note has a new case.** In a browser the engine's own
+  `fizzle()` is the hand's wrapper, so on a stray restart the note is taken
+  inside endStroke: the engine holds the stray, the hand has not heard the
+  lift. The engine holding one stroke more than the hand, with the pen
+  down, is now read as live. The stub cannot rebind the engine's internal
+  call, so `stray.test.mjs` plays that order by hand: the engine's listener
+  alone, then the note.
+- **The harness moved to `build/test/dom.mjs`** so the stray test could
+  share it. Two of the hand's tests draw strokes nowhere near the path on
+  purpose (they are about the clock); they set `keep`.
+- **Two flakes found on the way, both pre-existing.** `field.test.mjs`
+  fails under the suite's offline preload far more than alone (5 of 8 on
+  the previous build) on the 3-hit farang and the par checks; alone it
+  passes 8 of 8. And in the stub the engine's first load waits on a fonts
+  promise nobody awaits, so a field whose random first target is あ has an
+  engine that names あ and holds no strokes. Neither is fixed here; the
+  stray test loads explicitly to stay clear of the second.
+- **Every realm's stroke book.** The System 1 geometry read the vocab book
+  only; it now merges every `scripts/*/strokes.json`, as the gallery does.
+  The maintainer: "make sure we don't have to repeat this process for
+  katakana and kanji". The loop is keyed by character and stroke book, not
+  by realm: a kanji pack is a glyph list and a KanjiVG-converted book, and
+  the agents, the verdict page and the labels find it by existing.

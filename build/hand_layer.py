@@ -270,7 +270,12 @@ LAYER = r"""
   }
   function note(ok){
     attempt();
-    const live = cur && cur.length ? [began !== null ? shift(cur, downAt) : cur] : [];
+    // The pen is down: its stroke is the engine's `cur`. Or it has just lifted
+    // and the engine's endStroke has run but this layer's own pointerup has
+    // not — a stray restart is decided in between — so the engine holds one
+    // stroke more than this layer, and that one is live too.
+    const lifted = (down !== null && mine.length && strokes.length === mine.length + 1) ? [shift(strokes[strokes.length - 1], downAt)] : [];
+    const live = cur && cur.length ? [began !== null ? shift(cur, downAt) : cur] : lifted;
     const raw = (mine.length ? mine : strokes).concat(live);
     fresh();
     if (!raw.length || !ch){ if (ok) finished = true; return null; }
@@ -422,6 +427,8 @@ LAYER = r"""
   if (inkEl && inkEl.addEventListener) for (const ev of ['pointerup', 'pointercancel']) inkEl.addEventListener(ev, e => {
     if (e.pointerId !== down) return;
     down = null;
+    // The engine dropped that stroke as a stray (it went nowhere); it never happened.
+    if (typeof strayed !== 'undefined' && strayed) return;
     const s = strokes[strokes.length - 1];
     if (s && s.length) mine.push(shift(s, downAt));
   });

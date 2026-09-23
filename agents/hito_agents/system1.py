@@ -43,7 +43,11 @@ from pathlib import Path
 from . import events
 from .hooks import OUT
 
-BOOK = Path(__file__).resolve().parents[2] / "scripts" / "vocab" / "strokes.json"   # every kana
+# Every realm's stroke book, merged: hiragana, the kana of the vocab and
+# katakana realms, and whatever comes next (a kanji pack is a glyph list and
+# a KanjiVG-converted book, and it is picked up here by existing). Keyed by
+# character, so a trace from any realm finds its shape.
+BOOKS = sorted((Path(__file__).resolve().parents[2] / "scripts").glob("*/strokes.json"))
 LABELS = OUT / "labels.jsonl"
 MODEL = os.environ.get("HITO_LAYA_MODEL", "convaiinnovations/laya")
 SCALE = 1000.0      # the book is 0..1; the hand's ink is the same space x1000
@@ -92,10 +96,14 @@ def narrate(f):
     return " ".join(parts)
 
 
-def load_book(path=BOOK):
-    b = json.loads(Path(path).read_text(encoding="utf-8"))
-    letters = b["fonts"][b["activeFont"]]["letters"]
-    return {ch: [[(q["x"] * SCALE, q["y"] * SCALE) for q in s] for s in v["strokes"]] for ch, v in letters.items()}
+def load_book(paths=None):
+    book = {}
+    for path in (paths or BOOKS):
+        b = json.loads(Path(path).read_text(encoding="utf-8"))
+        letters = b["fonts"][b["activeFont"]]["letters"]
+        for ch, v in letters.items():
+            book.setdefault(ch, [[(q["x"] * SCALE, q["y"] * SCALE) for q in s] for s in v["strokes"]])
+    return book
 
 
 def length(pts):

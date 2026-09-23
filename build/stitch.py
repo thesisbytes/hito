@@ -297,7 +297,11 @@ def main():
               f"TAIL_FRAC={pack.get('tailFraction', 0.12)},"
               f"END_MIN={pack.get('minEndTolerance', 0.02)};"
               f"let SEG_FREE={pack.get('startSlack', 0.3)},segTravel=0,segBase=0,segStarted=false,segNagged=false;"
-              "let DRAG_FOLLOW=false;")
+              "let DRAG_FOLLOW=false;"
+              # A stroke that went nowhere: what to do with it, and how little
+              # progress still counts as nowhere (in path points).
+              f"let STRAY_MODE='{pack.get('strayMode', 'drop')}',STRAY_SKID={pack.get('straySkid', 3)},"
+              "strayed=false,down_=null,hiMark=0,fizzleWhy='';")
 
         s.sub("build segments",
               r"if\(rec\)\{ rec\.forEach\(st=>\{ const R=resample\(st,"
@@ -432,6 +436,7 @@ def main():
               "    { const _n=Math.max(1,seg[1]-seg[0]), _sp=SEGLEN[segIdx]/_n||0.008;\n"
               "      prog=Math.min(prog,segBase+Math.round(segTravel/_sp)"
               "+Math.max(SEGSLACK[segIdx],Math.round(SEG_FREE*_n))); }\n"
+              "    hiMark=Math.max(hiMark,prog);   // how far this stroke really got\n"
               "    // At the end without ever having been at the start: say so once,\n"
               "    // because otherwise the stroke simply refuses to finish.\n"
               "    if(!segStarted&&!segNagged&&Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y)<endTol(segIdx)){\n"
@@ -478,16 +483,58 @@ def main():
               r"function fizzle\(\)\{ smudge=0; offCount=0;"
               r" prog=Math\.max\(0,Math\.round\(prog\*0\.5\)\);",
               "function fizzle(){ smudge=0; offCount=0;"
-              " prog=Math.max(0,Math.round(prog*0.5));\n"
-              "  segIdx=0; while(segIdx<SEGS.length-1&&prog>SEGS[segIdx][1]) segIdx++;\n"
-              "  awaitLift=false; if(hit) for(let i=prog;i<hit.length;i++) hit[i]=0;\n"
+              " prog=0;\n"
+              "  // A fizzle restarts the character (the maintainer, 2026-09-23).\n"
+              "  // It used to rewind progress by half and clear the ink, which left\n"
+              "  // an empty canvas with credit for a path nobody could see, and the\n"
+              "  // game shells restarted on top of it anyway. Now every build does.\n"
+              "  segIdx=0; hiMark=0; down_=null; strayed=false;\n"
+              "  awaitLift=false; if(hit) hit.fill(0);\n"
               "  // Every per-attempt accumulator has to clear here, not just in\n"
               "  // load(). travel did not, so it carried across fizzles: one bad\n"
               "  // attempt pushed travel/PATHLEN past MAX_TRAVEL and every later\n"
               "  // attempt was rejected for wandering it had not done. The glyph\n"
               "  // became unpassable until something reloaded it.\n"
-              "  // the rewound point was reached from the start, so the stroke stays begun\n"
-              "  travel=0; lastN=null; segTravel=0; segBase=prog; segStarted=true; segNagged=false;")
+              "  travel=0; lastN=null; segTravel=0; segBase=0; segStarted=false; segNagged=false;")
+
+        s.sub("fizzle says why",
+              r"toast\('the spell fizzles ✦ back to the dot'\);",
+              "toast(fizzleWhy||'the spell fizzles ✦ the character starts again'); fizzleWhy='';")
+
+        # ---- a stroke that went nowhere
+        #
+        # A stroke that starts off the path gets a zap, the hand lifts and
+        # draws it again, and the first one stayed: on the canvas in the
+        # workshop, and in the hand's record everywhere (61 of the first 286
+        # traces carried a redrawn stroke). The pen coming down takes a
+        # snapshot of the scorer; the pen lifting asks whether the stroke got
+        # anywhere. If not, it is a stray: dropped as if it never happened
+        # (guided, easy, the workshop), or the character restarts (medium
+        # and up, where the start of a stroke is what is being tested).
+        # After the lift has advanced to the next stroke, before the first
+        # sample is scored: a dropped stray restores exactly this.
+        s.sub("snapshot at pen down",
+              r"    follow\(pos\(e\),true\); \}",
+              "    down_={prog,seg:segIdx,travel,segTravel,started:segStarted,smudge,hit:hit?hit.slice():null};"
+              " hiMark=prog; strayed=false;\n"
+              "    follow(pos(e),true); }")
+        s.sub("stray check at pen up",
+              r"function endStroke\(e\)\{",
+              "function strayCheck(){\n"
+              "  if(done||!down_||!SEGS.length) return;\n"
+              "  const d=down_; down_=null;\n"
+              "  if(STRAY_MODE==='keep') return;   // the old rule: every stroke stays\n"
+              "  if(awaitLift||segIdx!==d.seg||hiMark-d.prog>STRAY_SKID) return;   // it went somewhere\n"
+              "  if(STRAY_MODE==='restart'){ fizzleWhy='that stroke went nowhere ✦ the character starts again'; fizzle(); return; }\n"
+              "  strokes.pop(); redrawInk();\n"
+              "  prog=d.prog; travel=d.travel; segTravel=d.segTravel; segStarted=d.started; smudge=d.smudge; offCount=0; lastN=null;\n"
+              "  if(hit&&d.hit) hit.set(d.hit);\n"
+              "  strayed=true; runeUI(); paintLater();\n"
+              "}\n"
+              "function endStroke(e){")
+        s.sub("stray check runs after the stroke is kept",
+              r"if\(s&&s\.length\)\{ if\(mode==='practice'&&PATH\.length\)\{ strokes\.push\(s\); redrawInk\(\); \}",
+              "if(s&&s.length){ if(mode==='practice'&&PATH.length){ strokes.push(s); redrawInk(); strayCheck(); }")
 
     # ---- difficulty curve
     #
