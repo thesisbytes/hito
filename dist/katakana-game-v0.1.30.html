@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · katakana · v0.1.29</title>
+<title>hito 人 · katakana · v0.1.30</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -164,7 +164,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.29';
+const APP_VERSION='0.1.30';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"A"],["い","あ行","i","","a-row",2,1,"I"],["う","あ行","u","","a-row",3,1,"U"],["え","あ行","e","","a-row",4,1,"E"],["お","あ行","o","","a-row",5,1,"O"],["か","か行","ka","","ka-row",1,2,"KA"],["き","か行","ki","","ka-row",2,2,"KI"],["く","か行","ku","","ka-row",3,2,"KU"],["け","か行","ke","","ka-row",4,2,"KE"],["こ","か行","ko","","ka-row",5,2,"KO"],["さ","さ行","sa","","sa-row",1,3,"SA"],["し","さ行","shi","","sa-row",2,3,"SHI"],["す","さ行","su","","sa-row",3,3,"SU"],["せ","さ行","se","","sa-row",4,3,"SE"],["そ","さ行","so","","sa-row",5,3,"SO"],["た","た行","ta","","ta-row",1,4,"TA"],["ち","た行","chi","","ta-row",2,4,"CHI"],["つ","た行","tsu","","ta-row",3,4,"TSU"],["て","た行","te","","ta-row",4,4,"TE"],["と","た行","to","","ta-row",5,4,"TO"],["な","な行","na","","na-row",1,5,"NA"],["に","な行","ni","","na-row",2,5,"NI"],["ぬ","な行","nu","","na-row",3,5,"NU"],["ね","な行","ne","","na-row",4,5,"NE"],["の","な行","no","","na-row",5,5,"NO"],["は","は行","ha","","ha-row",1,6,"HA"],["ひ","は行","hi","","ha-row",2,6,"HI"],["ふ","は行","fu","","ha-row",3,6,"FU"],["へ","は行","he","","ha-row",4,6,"HE"],["ほ","は行","ho","","ha-row",5,6,"HO"],["ま","ま行","ma","","ma-row",1,7,"MA"],["み","ま行","mi","","ma-row",2,7,"MI"],["む","ま行","mu","","ma-row",3,7,"MU"],["め","ま行","me","","ma-row",4,7,"ME"],["も","ま行","mo","","ma-row",5,7,"MO"],["や","や行","ya","","ya-row",1,8,"YA"],["ゆ","や行","yu","","ya-row",3,8,"YU"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RA"],["り","ら行","ri","","ra-row",2,9,"RI"],["る","ら行","ru","","ra-row",3,9,"RU"],["れ","ら行","re","","ra-row",4,9,"RE"],["ろ","ら行","ro","","ra-row",5,9,"RO"],["わ","わ行","wa","","wa-row",1,10,"WA"],["を","わ行","wo","","wa-row",5,10,"WO"],["ん","","n","","",1,37,"N"],["が","が行","ga","","ga-row",1,12,"GA"],["ぎ","が行","gi","","ga-row",2,12,"GI"],["ぐ","が行","gu","","ga-row",3,12,"GU"],["げ","が行","ge","","ga-row",4,12,"GE"],["ご","が行","go","","ga-row",5,12,"GO"],["ざ","ざ行","za","","za-row",1,13,"ZA"],["じ","ざ行","ji","","za-row",2,13,"JI"],["ず","ざ行","zu","","za-row",3,13,"ZU"],["ぜ","ざ行","ze","","za-row",4,13,"ZE"],["ぞ","ざ行","zo","","za-row",5,13,"ZO"],["だ","だ行","da","","da-row",1,14,"DA"],["ぢ","だ行","ji","","da-row",2,14,"JI"],["づ","だ行","zu","","da-row",3,14,"ZU"],["で","だ行","de","","da-row",4,14,"DE"],["ど","だ行","do","","da-row",5,14,"DO"],["ば","ば行","ba","","ba-row",1,15,"BA"],["び","ば行","bi","","ba-row",2,15,"BI"],["ぶ","ば行","bu","","ba-row",3,15,"BU"],["べ","ば行","be","","ba-row",4,15,"BE"],["ぼ","ば行","bo","","ba-row",5,15,"BO"],["ぱ","ぱ行","pa","","pa-row",1,16,"PA"],["ぴ","ぱ行","pi","","pa-row",2,16,"PI"],["ぷ","ぱ行","pu","","pa-row",3,16,"PU"],["ぺ","ぱ行","pe","","pa-row",4,16,"PE"],["ぽ","ぱ行","po","","pa-row",5,16,"PO"],["ぁ","ぁ行","xa","","small-row",1,17,"XA"],["ぃ","ぁ行","xi","","small-row",2,17,"XI"],["ぅ","ぁ行","xu","","small-row",3,17,"XU"],["ぇ","ぁ行","xe","","small-row",4,17,"XE"],["ぉ","ぁ行","xo","","small-row",5,17,"XO"],["ゃ","ぁ行","xya","","small-row",1,17,"XYA"],["ゅ","ぁ行","xyu","","small-row",3,17,"XYU"],["ょ","ぁ行","xyo","","small-row",5,17,"XYO"],["っ","ぁ行","xtsu","","small-row",3,17,"XTSU"],["ゎ","ぁ行","xwa","","small-row",1,17,"XWA"],["ア","ア行","a","","Ka-row",1,18,"A"],["イ","ア行","i","","Ka-row",2,18,"I"],["ウ","ア行","u","","Ka-row",3,18,"U"],["エ","ア行","e","","Ka-row",4,18,"E"],["オ","ア行","o","","Ka-row",5,18,"O"],["カ","カ行","ka","","Kka-row",1,19,"KA"],["キ","カ行","ki","","Kka-row",2,19,"KI"],["ク","カ行","ku","","Kka-row",3,19,"KU"],["ケ","カ行","ke","","Kka-row",4,19,"KE"],["コ","カ行","ko","","Kka-row",5,19,"KO"],["サ","サ行","sa","","Ksa-row",1,20,"SA"],["シ","サ行","shi","","Ksa-row",2,20,"SHI"],["ス","サ行","su","","Ksa-row",3,20,"SU"],["セ","サ行","se","","Ksa-row",4,20,"SE"],["ソ","サ行","so","","Ksa-row",5,20,"SO"],["タ","タ行","ta","","Kta-row",1,21,"TA"],["チ","タ行","chi","","Kta-row",2,21,"CHI"],["ツ","タ行","tsu","","Kta-row",3,21,"TSU"],["テ","タ行","te","","Kta-row",4,21,"TE"],["ト","タ行","to","","Kta-row",5,21,"TO"],["ナ","ナ行","na","","Kna-row",1,22,"NA"],["ニ","ナ行","ni","","Kna-row",2,22,"NI"],["ヌ","ナ行","nu","","Kna-row",3,22,"NU"],["ネ","ナ行","ne","","Kna-row",4,22,"NE"],["ノ","ナ行","no","","Kna-row",5,22,"NO"],["ハ","ハ行","ha","","Kha-row",1,23,"HA"],["ヒ","ハ行","hi","","Kha-row",2,23,"HI"],["フ","ハ行","fu","","Kha-row",3,23,"FU"],["ヘ","ハ行","he","","Kha-row",4,23,"HE"],["ホ","ハ行","ho","","Kha-row",5,23,"HO"],["マ","マ行","ma","","Kma-row",1,24,"MA"],["ミ","マ行","mi","","Kma-row",2,24,"MI"],["ム","マ行","mu","","Kma-row",3,24,"MU"],["メ","マ行","me","","Kma-row",4,24,"ME"],["モ","マ行","mo","","Kma-row",5,24,"MO"],["ヤ","ヤ行","ya","","Kya-row",1,25,"YA"],["ユ","ヤ行","yu","","Kya-row",3,25,"YU"],["ヨ","ヤ行","yo","","Kya-row",5,25,"YO"],["ラ","ラ行","ra","","Kra-row",1,26,"RA"],["リ","ラ行","ri","","Kra-row",2,26,"RI"],["ル","ラ行","ru","","Kra-row",3,26,"RU"],["レ","ラ行","re","","Kra-row",4,26,"RE"],["ロ","ラ行","ro","","Kra-row",5,26,"RO"],["ワ","ワ行","wa","","Kwa-row",1,27,"WA"],["ヲ","ワ行","wo","","Kwa-row",5,27,"WO"],["ン","","n","","",1,37,"N"],["ガ","ガ行","ga","","Kga-row",1,29,"GA"],["ギ","ガ行","gi","","Kga-row",2,29,"GI"],["グ","ガ行","gu","","Kga-row",3,29,"GU"],["ゲ","ガ行","ge","","Kga-row",4,29,"GE"],["ゴ","ガ行","go","","Kga-row",5,29,"GO"],["ザ","ザ行","za","","Kza-row",1,30,"ZA"],["ジ","ザ行","ji","","Kza-row",2,30,"JI"],["ズ","ザ行","zu","","Kza-row",3,30,"ZU"],["ゼ","ザ行","ze","","Kza-row",4,30,"ZE"],["ゾ","ザ行","zo","","Kza-row",5,30,"ZO"],["ダ","ダ行","da","","Kda-row",1,31,"DA"],["ヂ","ダ行","ji","","Kda-row",2,31,"JI"],["ヅ","ダ行","zu","","Kda-row",3,31,"ZU"],["デ","ダ行","de","","Kda-row",4,31,"DE"],["ド","ダ行","do","","Kda-row",5,31,"DO"],["バ","バ行","ba","","Kba-row",1,32,"BA"],["ビ","バ行","bi","","Kba-row",2,32,"BI"],["ブ","バ行","bu","","Kba-row",3,32,"BU"],["ベ","バ行","be","","Kba-row",4,32,"BE"],["ボ","バ行","bo","","Kba-row",5,32,"BO"],["パ","パ行","pa","","Kpa-row",1,33,"PA"],["ピ","パ行","pi","","Kpa-row",2,33,"PI"],["プ","パ行","pu","","Kpa-row",3,33,"PU"],["ペ","パ行","pe","","Kpa-row",4,33,"PE"],["ポ","パ行","po","","Kpa-row",5,33,"PO"],["ァ","ァ行","xa","","Ksmall-row",1,34,"XA"],["ィ","ァ行","xi","","Ksmall-row",2,34,"XI"],["ゥ","ァ行","xu","","Ksmall-row",3,34,"XU"],["ェ","ァ行","xe","","Ksmall-row",4,34,"XE"],["ォ","ァ行","xo","","Ksmall-row",5,34,"XO"],["ャ","ァ行","xya","","Ksmall-row",1,34,"XYA"],["ュ","ァ行","xyu","","Ksmall-row",3,34,"XYU"],["ョ","ァ行","xyo","","Ksmall-row",5,34,"XYO"],["ッ","ァ行","xtsu","","Ksmall-row",3,34,"XTSU"],["ヮ","ァ行","xwa","","Ksmall-row",1,34,"XWA"],["ヴ","ヴ行","vu","","Kvu-row",3,35,"VU"],["ー","ー行","-","","long-row",1,36,"-"]];
 
 // ---------- state
@@ -853,7 +853,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.29');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.30');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1845,15 +1845,17 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .upg-ink i{ font-style:normal; color:rgba(220,232,242,.55); font-weight:400; }
   .upg button{ flex:1 1 44%; min-width:0; text-align:left; padding:6px 8px; border-radius:9px; cursor:pointer;
         background:rgba(13,19,26,.82); border:1px solid #1e2f3e; color:#dce8f2; font:inherit; line-height:1.25; }
-  .upg button b{ color:#6cb8ff; margin-right:4px; }
-  .upg button small{ display:block; color:rgba(220,232,242,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .upg button b{ color:#6cb8ff; margin-right:5px; display:inline-flex; align-items:center; gap:3px; vertical-align:-3px; }
+  .upg button b svg{ width:17px; height:17px; }
+  .upg button b i.k{ font-style:normal; font-size:10px; opacity:.6; }
+  .upg button small{ display:block; color:rgba(220,232,242,.6); white-space:normal; line-height:1.3; margin-top:2px; }
   .upg button.can{ border-color:#5fe3a1; box-shadow:0 0 10px rgba(95,227,161,.25); }
   .upg button.can small{ color:#c3f7dc; }
   .upg button[disabled]{ opacity:.5; cursor:default; }
   /* At phone width four buttons are 80px each: a cost fits, a sentence does
      not, and half a sentence is worse than none. The title attribute and the
      start page still say what each one does. */
-  @media (max-width:560px){ .upg button small i{ display:none; } .upg{ gap:4px; } }
+  @media (max-width:560px){ .upg{ gap:4px; } }
   .upg button small i{ font-style:normal; }
 
   /* The start page. A lacquer sheet over everything, with the two axes the
@@ -1877,6 +1879,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .start-row a{ min-height:0; }
   .start-row button b, .start-row a b{ display:block; font-size:15px; color:#6cb8ff; margin-bottom:3px; }
   .start-row button b i{ font-style:normal; color:#c3f7dc; margin-right:6px; }
+  .start-row button b svg{ width:16px; height:16px; vertical-align:-3px; margin-right:5px; }
   .start-row button small, .start-row a small{ display:block; color:rgba(220,232,242,.7); line-height:1.35; }
   .start-row button[aria-pressed="true"]{ border-color:#5fe3a1; background:#10241c;
                      box-shadow:0 0 0 1px rgba(95,227,161,.5), 0 0 22px rgba(95,227,161,.18); }
@@ -1985,6 +1988,26 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // banish pays more ink, and the fall pays more 魂 — 七転び八起き, what you
   // get up with. Three tabs, then, the way a tower is run: 技 cuts, 耐
   // lasts, 志 earns. None of them writes a character.
+  // A mark on every upgrade (the maintainer: "since I don't know any kanji
+  // it's hard for me to decide what to upgrade"). Inline, in the button's
+  // colour, drawn to read at 16px: what it does, not what it is called.
+  const svg = d => `<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const MARK = {
+    intent:  svg('<circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.4"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2"/>'),           // a bullseye: cuts deeper
+    quick:   svg('<path d="M9 1.5 4 9h4l-1 5.5L13 7H9z"/>'),                                                                          // a bolt: sooner
+    breath:  svg('<path d="M2 5h7a2 2 0 1 0-2-2M2 8.5h10a2 2 0 1 1-2 2M2 12h6a1.8 1.8 0 1 1-1.8 1.8"/>'),                            // wind: fills 気
+    shove:   svg('<path d="M2 8h9M8 4l4 4-4 4M14 3v10"/>'),                                                                            // an arrow into a wall: pushes back
+    mend:    svg('<path d="M8 14 3.2 9.3A3.1 3.1 0 0 1 8 5.2a3.1 3.1 0 0 1 4.8 4.1z"/><path d="M12.5 1v4M10.5 3h4"/>'),               // a heart and a plus: a life
+    wall:    svg('<rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 6.3h12M2 9.7h12M8 3v3.3M5 6.3v3.4M11 6.3v3.4M8 9.7V13"/>'),  // bricks
+    tend:    svg('<circle cx="8" cy="8" r="6"/><path d="M8 5v6M5 8h6"/>'),                                                              // a medic's cross: a life back
+    dilig:   svg('<path d="M8 1.5c2.5 3.5 4.5 5.6 4.5 8.3a4.5 4.5 0 0 1-9 0C3.5 7.1 5.5 5 8 1.5z"/><path d="M6 10.5a2 2 0 0 0 2 2"/>'),  // an ink drop: more 墨 per trace
+    harvest: svg('<path d="M13 3a7 7 0 0 1-9 9M4 12l-1.5 2.5M13 3l-1 1.5"/>'),                                                          // a sickle: more per banish
+    rise:    svg('<path d="M2 13h12M4.5 10.5a3.5 3.5 0 0 1 7 0M8 2v3M3.5 5.5 5 7M12.5 5.5 11 7"/>'),                                  // a sunrise: get up with more
+    heart:   svg('<path d="M8 14 2.6 8.8A3.4 3.4 0 0 1 8 4.4a3.4 3.4 0 0 1 5.4 4.4z"/>'),                                             // a heart: the ward starts with one more
+    lamp:    svg('<rect x="5" y="4" width="6" height="8" rx="1.5"/><path d="M8 1.5V4M6 14.5h4M8 12v2.5"/>'),                            // a lantern: one more light held
+    inkwell: svg('<path d="M3 6h10l-1 7.5H4zM6 6V3h4v3"/>'),                                                                            // an inkwell: ink at the start
+    vessel:  svg('<path d="M4.5 5h7l1.5 8.5H3zM6 5V2.5h4V5"/>'),                                                                        // a jar: a bigger bag of 気
+  };
   const UPG = {
     // Ceilings raised in v0.1.65 (the maintainer: "we end up maxing out the
     // upgrades so early"), with the pack's ramp steepened: a run should end
@@ -3033,7 +3056,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
           const maxed = upg[id] >= u.max, c = costOf(id);
           return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
-            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
+            + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i></b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
         }).join('');
   function renderUpg(){
     strip.innerHTML = upgMarkup = stripHtml('skills');
@@ -3181,7 +3204,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const items = Object.entries(LANTERN).map(([id, u]) => {
       const lv = own(id), maxed = lv >= u.max, c = lanternCost(id);
       return `<button data-lantern="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
-        + `<b><i>${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}</b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
+        + `<b>${MARK[id] || ''}<i>${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}</b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
     }).join('');
     const gate = '';   // the gate was bought with 魂 until v0.1.54; rows open by distance now
     return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
@@ -3272,7 +3295,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
-    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return panelLanterns.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -3334,6 +3357,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.29</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.30</div>
 </body>
 </html>

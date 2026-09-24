@@ -114,15 +114,17 @@ STYLE = """
   .upg-ink i{ font-style:normal; color:rgba(232,224,204,.55); font-weight:400; }
   .upg button{ flex:1 1 44%; min-width:0; text-align:left; padding:6px 8px; border-radius:9px; cursor:pointer;
         background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e8e0cc; font:inherit; line-height:1.25; }
-  .upg button b{ color:#e9c46a; margin-right:4px; }
-  .upg button small{ display:block; color:rgba(232,224,204,.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .upg button b{ color:#e9c46a; margin-right:5px; display:inline-flex; align-items:center; gap:3px; vertical-align:-3px; }
+  .upg button b svg{ width:17px; height:17px; }
+  .upg button b i.k{ font-style:normal; font-size:10px; opacity:.6; }
+  .upg button small{ display:block; color:rgba(232,224,204,.6); white-space:normal; line-height:1.3; margin-top:2px; }
   .upg button.can{ border-color:#7fd1c4; box-shadow:0 0 10px rgba(127,209,196,.25); }
   .upg button.can small{ color:#bdf0e6; }
   .upg button[disabled]{ opacity:.5; cursor:default; }
   /* At phone width four buttons are 80px each: a cost fits, a sentence does
      not, and half a sentence is worse than none. The title attribute and the
      start page still say what each one does. */
-  @media (max-width:560px){ .upg button small i{ display:none; } .upg{ gap:4px; } }
+  @media (max-width:560px){ .upg{ gap:4px; } }
   .upg button small i{ font-style:normal; }
 
   /* The start page. A lacquer sheet over everything, with the two axes the
@@ -146,6 +148,7 @@ STYLE = """
   .start-row a{ min-height:0; }
   .start-row button b, .start-row a b{ display:block; font-size:15px; color:#e9c46a; margin-bottom:3px; }
   .start-row button b i{ font-style:normal; color:#bdf0e6; margin-right:6px; }
+  .start-row button b svg{ width:16px; height:16px; vertical-align:-3px; margin-right:5px; }
   .start-row button small, .start-row a small{ display:block; color:rgba(232,224,204,.7); line-height:1.35; }
   .start-row button[aria-pressed="true"]{ border-color:#7fd1c4; background:#172422;
                      box-shadow:0 0 0 1px rgba(127,209,196,.5), 0 0 22px rgba(127,209,196,.18); }
@@ -256,6 +259,26 @@ LAYER = STYLE + r"""
   // banish pays more ink, and the fall pays more 魂 — 七転び八起き, what you
   // get up with. Three tabs, then, the way a tower is run: 技 cuts, 耐
   // lasts, 志 earns. None of them writes a character.
+  // A mark on every upgrade (the maintainer: "since I don't know any kanji
+  // it's hard for me to decide what to upgrade"). Inline, in the button's
+  // colour, drawn to read at 16px: what it does, not what it is called.
+  const svg = d => `<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const MARK = {
+    intent:  svg('<circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.4"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2"/>'),           // a bullseye: cuts deeper
+    quick:   svg('<path d="M9 1.5 4 9h4l-1 5.5L13 7H9z"/>'),                                                                          // a bolt: sooner
+    breath:  svg('<path d="M2 5h7a2 2 0 1 0-2-2M2 8.5h10a2 2 0 1 1-2 2M2 12h6a1.8 1.8 0 1 1-1.8 1.8"/>'),                            // wind: fills 気
+    shove:   svg('<path d="M2 8h9M8 4l4 4-4 4M14 3v10"/>'),                                                                            // an arrow into a wall: pushes back
+    mend:    svg('<path d="M8 14 3.2 9.3A3.1 3.1 0 0 1 8 5.2a3.1 3.1 0 0 1 4.8 4.1z"/><path d="M12.5 1v4M10.5 3h4"/>'),               // a heart and a plus: a life
+    wall:    svg('<rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 6.3h12M2 9.7h12M8 3v3.3M5 6.3v3.4M11 6.3v3.4M8 9.7V13"/>'),  // bricks
+    tend:    svg('<circle cx="8" cy="8" r="6"/><path d="M8 5v6M5 8h6"/>'),                                                              // a medic's cross: a life back
+    dilig:   svg('<path d="M8 1.5c2.5 3.5 4.5 5.6 4.5 8.3a4.5 4.5 0 0 1-9 0C3.5 7.1 5.5 5 8 1.5z"/><path d="M6 10.5a2 2 0 0 0 2 2"/>'),  // an ink drop: more 墨 per trace
+    harvest: svg('<path d="M13 3a7 7 0 0 1-9 9M4 12l-1.5 2.5M13 3l-1 1.5"/>'),                                                          // a sickle: more per banish
+    rise:    svg('<path d="M2 13h12M4.5 10.5a3.5 3.5 0 0 1 7 0M8 2v3M3.5 5.5 5 7M12.5 5.5 11 7"/>'),                                  // a sunrise: get up with more
+    heart:   svg('<path d="M8 14 2.6 8.8A3.4 3.4 0 0 1 8 4.4a3.4 3.4 0 0 1 5.4 4.4z"/>'),                                             // a heart: the ward starts with one more
+    lamp:    svg('<rect x="5" y="4" width="6" height="8" rx="1.5"/><path d="M8 1.5V4M6 14.5h4M8 12v2.5"/>'),                            // a lantern: one more light held
+    inkwell: svg('<path d="M3 6h10l-1 7.5H4zM6 6V3h4v3"/>'),                                                                            // an inkwell: ink at the start
+    vessel:  svg('<path d="M4.5 5h7l1.5 8.5H3zM6 5V2.5h4V5"/>'),                                                                        // a jar: a bigger bag of 気
+  };
   const UPG = {
     // Ceilings raised in v0.1.65 (the maintainer: "we end up maxing out the
     // upgrades so early"), with the pack's ramp steepened: a run should end
@@ -1304,7 +1327,7 @@ LAYER = STYLE + r"""
       + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
           const maxed = upg[id] >= u.max, c = costOf(id);
           return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
-            + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
+            + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i></b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
         }).join('');
   function renderUpg(){
     strip.innerHTML = upgMarkup = stripHtml('skills');
@@ -1452,7 +1475,7 @@ LAYER = STYLE + r"""
     const items = Object.entries(LANTERN).map(([id, u]) => {
       const lv = own(id), maxed = lv >= u.max, c = lanternCost(id);
       return `<button data-lantern="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
-        + `<b><i>${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}</b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
+        + `<b>${MARK[id] || ''}<i>${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}</b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
     }).join('');
     const gate = '';   // the gate was bought with 魂 until v0.1.54; rows open by distance now
     return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
@@ -1543,7 +1566,7 @@ LAYER = STYLE + r"""
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
-    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return panelLanterns.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,

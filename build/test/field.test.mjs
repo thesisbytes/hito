@@ -804,6 +804,12 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(/data-tab="guard"/.test(F.dashHtml), 'the dashboard has no 耐 tab');
   ok(/data-tab="skills"[^>]*>\s*<svg/.test(F.dashHtml) && /data-tab="guard"[^>]*>\s*<svg/.test(F.dashHtml) && /data-tab="drive"[^>]*>\s*<svg/.test(F.dashHtml), 'a shop tab has no mark on it');
   ok(/data-tab="trace"[^>]*aria-label="the sketchbook"/.test(F.dashHtml), 'the sketchbook tab is unlabelled');
+  // every upgrade wears a mark, and the lanterns too
+  { const all = F.upgHtml + F.guardHtml + F.driveHtml;
+    for (const id of Object.keys(F.UPG)) ok(new RegExp(`data-upg="${id}"[^>]*>\\s*<b>\\s*<svg`).test(all), `${id} has no mark`);
+    F.openTab('lanterns');
+    for (const id of Object.keys(F.LANTERN)) ok(new RegExp(`data-lantern="${id}"[^>]*>\\s*<b>\\s*<svg`).test(F.lanternHtml || ''), `lantern ${id} has no mark`);
+    F.openTab(null); }
   ok(F.openTab('guard') === 'guard' && F.tab === 'guard' && !F.paused, '耐 did not open, or paused the run');
   F.openTab(null);
 

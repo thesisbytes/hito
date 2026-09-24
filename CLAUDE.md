@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.66.html`
+### Hiragana — `dist/hiragana-v0.1.67.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -339,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.29.html`
+### Katakana — `dist/katakana-game-v0.1.30.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -592,6 +592,14 @@ queue — the one exception to "don't base what I trace on what enemies
 populate", because a breach is not a lesson. The maintainer: "the way our
 base attacks things is sort of boring. And it targets weirdly allowing the
 closer farang to attack it."
+
+**Every upgrade wears a mark (v0.1.67).** The maintainer: "since I don't know
+any kanji it's hard for me to decide what to upgrade." The kanji is flavour;
+the drawn mark (`MARK` in the field shell, inline SVG in the button's colour)
+says what it does — a bullseye cuts deeper, a bolt is sooner, bricks are a
+wall, a sunrise is getting up with more — and the description is shown on
+every width, since the shop has the sketchbook's room. New UI that names a
+thing in kanji names it in a mark too.
 
 **Hitodama (v0.1.21)** is the first piece of the economy in play. Every
 finished glyph kindles a ghost light (人魂) on its character, and a lit

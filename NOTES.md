@@ -1933,3 +1933,17 @@ Running log. Append at the bottom, don't rewrite history.
   is the lights' business and does not pull the pen.
 - `burst` is an engine name; the field's is `flareAt`. The shadow test
   caught it before the build shipped, again.
+
+## 2026-09-24 — Every upgrade wears a mark (hiragana v0.1.67, katakana-game v0.1.30)
+
+- The maintainer: "the upgrades should include an icon by its side too.
+  Since I don't know any kanji it's hard for me to decide what to upgrade."
+  Which is the hero who cannot read, at the shop counter. Fourteen marks in
+  `MARK`, inline SVG in `currentColor` (bullseye, bolt, wind, arrow into a
+  wall, heart with a plus, bricks, medic's cross, ink drop, sickle, sunrise;
+  heart, lantern, inkwell, jar). The mark leads, the kanji is 10px beside it,
+  the English name and the blurb follow. The blurb had been hidden under
+  560px since the strip sat at the top of the field; the shop has the
+  sketchbook's box now, so it shows everywhere.
+- Rule for the file: new UI that names a thing in kanji names it in a mark
+  too. The tabs got theirs the release before.
