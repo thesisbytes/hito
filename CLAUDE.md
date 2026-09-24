@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.71.html`
+### Hiragana — `dist/hiragana-v0.1.72.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -350,7 +350,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.34.html`
+### Katakana — `dist/katakana-game-v0.1.35.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -703,8 +703,11 @@ stands against it), 志, this run's motivation, which is currency gain
 魂 from the fall — 技 cuts, 耐 lasts, 志 earns), and 灯, the lanterns bought
 with 魂. A tab does not pause the run. **The sketchbook is a tab too** (筆,
 v0.1.62): a shop stands where it stood, nothing can be traced while one is
-open, and it does not open under a pen that is down — the maintainer: "the
-player has to wait for opportunities to switch out to upgrade." **The tab
+open, and it does not open under a pen that is down (a pen on the glass,
+`penDown()`, not the engine's `tracing()`, which holds for 1.5 s after every
+lift and made a tap right after a character fail silently until v0.1.72) —
+the maintainer: "the player has to wait for opportunities to switch out to
+upgrade." **The tab
 buttons were invisible from v0.1.55 to v0.1.60**: the shell hides the workshop's
 `.tabs` with an `!important` rule and the dashboard had borrowed the class
 name; the stubbed DOM has no stylesheet, so only a screenshot could see it.

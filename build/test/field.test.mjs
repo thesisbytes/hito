@@ -864,7 +864,7 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   F.ask(boss.i); F.retarget(true);            // ask for what it carries
   globalThis.conjure();                       // hit one, and the character is lit
   advance(cfg.castMs * 4 + 2000);
-  ok(!F.monsters.includes(boss), `a clean trace and its two lights did not finish a 3-hit farang (hp ${boss.hp})`);
+  ok(!F.monsters.includes(boss), `a clean trace and its two lights did not finish a 3-hit farang (hp ${boss.hp}, charge ${F.charge(P.LETTERS[boss.i][0])}, 気 ${F.energy}, shots ${F.shots.length}, same-character farang ${F.monsters.filter(m => m.i === boss.i).length}, tracer on ${P.LETTERS[P.idx][0]} vs ${P.LETTERS[boss.i][0]}, done ${P.done}, penDown ${F.penDown})`);
 
   // and all of it belongs to the run
   F.earn(50); F.buy('quick');
@@ -887,11 +887,12 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(typeof F.tap === 'function' && F.tap('button[data-tab="boosts"]') === true && F.tab === 'boosts', 'a pointerdown on the boosts tab did not open it');
   F.earn(1); advance(20);   // a re-render between
   ok(F.tap('button[data-tab="boosts"]') === true && F.tab === null, 'a second tap on the open tab, after a re-render, did not close it');
-  // and it does not open under a pen that is down: lift, and find the gap
+  // and a hand that has just lifted may open it at once: the engine's hold after a lift
+  // (the retarget's wait) is not a pen on the glass
   F.touch();
-  ok(F.openTab('boosts') === null && stageEl.hidden === false, 'a shop opened under a pen that was down');
-  advance(cfg.holdMs + 50);
-  ok(F.openTab('boosts') === 'boosts', 'a lifted pen could not open the shop');
+  ok(F.openTab('boosts') === 'boosts' && stageEl.hidden === true, 'a shop would not open in the hold after a lift: "gotta push it a couple times"');
+  F.openTab(null);
+  advance(cfg.holdMs + 50);   // let the hold pass: the lights leave the hand's own target alone while it lasts
   F.restart();
   ok(F.tab === null && stageEl.hidden === false, 'a new run began with the shop open');
 

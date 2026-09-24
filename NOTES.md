@@ -2061,3 +2061,28 @@ Running log. Append at the bottom, don't rewrite history.
   workshop button (to the start page, where the tabs are), a home link
   (`../index.html`, the level switcher), the run's handwriting under. The
   start page keeps the workshop and gains the same home link.
+
+## 2026-09-24 — The tabs, second cause (hiragana v0.1.72, katakana-game v0.1.35)
+
+- The maintainer, after v0.1.68's fix: "still happening with the tabs in
+  game. gotta push it a couple times before it changes."
+- The first cause was real (handlers on rebuilt buttons) and is fixed. The
+  second was a rule of mine: a shop refuses to open while `tracing()`, and
+  the engine's `tracing()` is true for `holdMs` (1.5 s) after every lift —
+  the hold the retarget waits on so a hand between strokes is not moved off
+  its character. So a tap on the seam right after finishing a character was
+  refused, silently, and the tap a moment later worked. The refusal is now
+  `penDown()` — a pointer captured on the sketchbook, or a stroke in
+  progress — which is what "under a pen that is down" meant.
+- Tests: the field test taps in the hold and expects the shop; the hand test
+  puts a real pointer down on the sketchbook and expects a refusal, lifts it
+  and expects the shop. The order of the field tests mattered once more: a
+  hold left running made a later light leave the hand's target alone.
+- **And a targeting bug the flake was pointing at.** The field test's
+  "3-hit farang" failed one run in six, and the instrumented copy showed
+  why: the hand's own hit flies as a shot, and while it was in the air the
+  lights skipped that farang ("a shot already in flight") and threw at a
+  farther one carrying the same character. `owed(m)` counts the hits in
+  flight against the farang's hp; a light is withheld only from one that
+  is already finished. Two effects: the flake is gone, and a light no
+  longer goes the long way round while the hand's hit is still flying.

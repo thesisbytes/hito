@@ -332,6 +332,23 @@ if (game){
   ok(F.paused === true, 'the hand sheet opened over a running field: the farang do not wait');
 }
 
-if (fail) { console.log(`  ${fail} hand check(s) failed`); process.exit(1); }
+if (fail) { console.log(`  ${fail} hand check(s) failed`); // ---- a shop opens for any hand that is not on the glass
+// The seam's tabs refused while the engine counted the hand as tracing, and it
+// counts a hand as tracing for 1.5 s after every lift. A pen on the glass is
+// the only thing that keeps a shop shut.
+{
+  const { P, g, fire, tick } = boot(game, {stored:{'hito-input':'pen', 'hito-share':'0'}});
+  const F = g.__field;
+  if (F && F.openTab){
+    F.begin(); F.openTab(null);
+    fire('pointerdown', 200, 200, 'pen');
+    ok(F.penDown === true && F.openTab('boosts') === null, 'a shop opened under a pen that was down');
+    fire('pointerup', 200, 200, 'pen');
+    ok(F.penDown === false && F.openTab('boosts') === 'boosts', 'a shop would not open the moment the pen lifted');
+    F.openTab(null);
+  }
+}
+
+process.exit(1); }
 console.log('  the switch reaches the engine and is remembered, a phone is not locked out, a finger gets room and a pen does not, every attempt is written '
   + 'down in book space without costing a glyph, shaky decays, sharing off means off, and the ledger exports and merges');

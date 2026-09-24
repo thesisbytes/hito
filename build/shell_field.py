@@ -546,6 +546,11 @@ LAYER = STYLE + r"""
   // can, whoever is tracing what. (The maintainer: "it targets weirdly,
   // allowing the closer farang to attack it.")
   const leftToHand = m => tracing() && !done && m === bearer(LETTERS[idx][0]) && m.d > CFG.rescue;
+  // What is already on its way to a farang. A light is not thrown at one
+  // that the shots in the air will finish; but one shot in the air is not a
+  // reason to throw the next light at a farther farang — that was a light
+  // going the long way round while the hand's own hit was still flying.
+  const owed = m => m.hp - shots.filter(s => s.to === m && !s.partial).length * (1 + lvl('intent'));
   function autocast(now){
     if (!casting()) return null;
     if (now - castAt < castMs()) return null;
@@ -553,7 +558,7 @@ LAYER = STYLE + r"""
     for (const m of monsters){
       if (charge(key(m)) < 1) continue;
       if (leftToHand(m)) continue;
-      if (shots.some(s => s.to === m)) continue;
+      if (owed(m) <= 0) continue;
       if (!best || m.d < best.d) best = m;
     }
     if (!best) return null;
@@ -573,7 +578,7 @@ LAYER = STYLE + r"""
     let n = 0;
     for (const m of monsters.slice().sort((a, b) => a.d - b.d)){
       if (energy < CFG.castCost) break;
-      if (charge(key(m)) < 1 || leftToHand(m) || shots.some(s => s.to === m)) continue;
+      if (charge(key(m)) < 1 || leftToHand(m) || owed(m) <= 0) continue;
       fire(m, now); n++;
     }
     if (n){ flareAt = performance.now(); if (navigator.vibrate) navigator.vibrate([30, 40, 30]); }
@@ -1444,9 +1449,14 @@ LAYER = STYLE + r"""
   // sketchbook is a tab too: while a shop is open there is nothing to trace
   // on, so a lit character's own lights are all that holds the ward. A shop
   // does not open under a pen that is down; lift, and find the gap.
+  // A shop opens for any hand that is not on the glass. Not tracing(): that
+  // holds for 1.5 s after every lift (the hold the retarget waits on), and a
+  // tap on the seam right after a character was refused without a word — the
+  // maintainer, twice: "gotta push it a couple times before it changes".
+  const penDown = () => (typeof activeId !== 'undefined' && activeId !== null) || (typeof cur !== 'undefined' && !!cur);
   function openTab(name){
     if (name === 'skills' || name === 'guard' || name === 'drive' || name === 'lanterns') name = 'boosts';   // the old tabs, one shop now
-    if (name && name !== 'trace' && tracing()) return tab;
+    if (name && name !== 'trace' && penDown()) return tab;
     tab = name && name !== 'trace' ? name : null;
     if (tab && !stageEl.hidden){ const r = stageEl.getBoundingClientRect(); if (r.width > 0){ panel.style.width = r.width + 'px'; panel.style.height = r.height + 'px'; } }
     stageEl.hidden = !!tab;
@@ -1654,7 +1664,7 @@ LAYER = STYLE + r"""
       const ev = { target: fake, preventDefault(){} };
       for (const h of (TAPS.get(bar) || [])) h(ev); for (const h of (TAPS.get(panel) || [])) h(ev);
       return true;
-    }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return workshopHtml('lanterns'); }, get inkHtml(){ return panelInk.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return workshopHtml('lanterns'); }, get inkHtml(){ return panelInk.innerHTML; }, get penDown(){ return penDown(); }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
