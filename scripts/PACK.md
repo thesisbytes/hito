@@ -226,7 +226,7 @@ above it.
 | `inkKill` | 1 | ink when a wisp finishes a farang. Small on purpose: the idle half earns its keep without outearning the pen. |
 | `shoveStep` | 0.025 | how far one level of shove pushes a farang back per hit (the field is 1 across) |
 | `upgradeCost` | see above | what level one costs |
-| `upgradeRamp` | 1.6 | each level costs this many times the last |
+| `upgradeRamp` | 1.6 | each level costs this many times the last. The hiragana game sets 1.85 (v0.1.65), and the ceilings went up with it (intent 5, quick 8, breath 5, shove 8, mend 8, wall 5, tend 5, diligence 8, harvest 8, rise 5): "we end up maxing out the upgrades so early". |
 
 Three tabs of upgrades bought with ink during a run and gone when the ward
 falls — 技 cuts, 耐 lasts, 志 earns. **技**, themed on intent — "we forge and sharpen our intent to cut

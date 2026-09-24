@@ -652,6 +652,59 @@ class Balance(unittest.TestCase):
         self.assertEqual(pack["version"], "0.0.0")
 
 
+class Loop(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.out = Path(self.tmp.name)
+        self.game = self.out / "game.json"
+        self.pack = self.out / "pack.json"
+        self.game.write_text(json.dumps({"version": "0.1.65", "field": {"spawnMin": 3400}}), encoding="utf-8")
+        self.pack.write_text(json.dumps({"version": "0.1.65"}), encoding="utf-8")
+        self.calls = 0
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def fake_argue(self, changes):
+        def argue_fn(out_dir=None):
+            self.calls += 1
+            return {"verdict": {"changes": changes, "end_before": 45, "end_after": 78}, "file": None}
+        return argue_fn
+
+    def played(self, n, v="0.1.65"):
+        return [dict(run_row(30 + i, traced=20), body=dict(run_row(30 + i)["body"], v=v)) for i in range(n)]
+
+    def go(self, rows_, changes=None):
+        return balance.auto(rows_, threshold=3, balance_dir=self.out / "balance", argue_fn=self.fake_argue(changes or {}),
+                            game=self.game, packs=[self.game, self.pack])
+
+    def test_too_few_runs_on_this_build_and_nobody_is_called(self):
+        r = self.go(self.played(2) + self.played(10, v="0.1.60"))
+        self.assertEqual(r["status"], "thin")
+        self.assertEqual(r["runs"], 2)
+        self.assertEqual(self.calls, 0)
+
+    def test_enough_runs_judge_apply_bump_and_never_twice(self):
+        r = self.go(self.played(3), {"spawnMin": 3800})
+        self.assertEqual(r["status"], "changed", r)
+        self.assertEqual((r["version"], r["new"]), ("0.1.65", "0.1.66"))
+        self.assertEqual(json.loads(self.game.read_text())["field"]["spawnMin"], 3800)
+        self.assertEqual(json.loads(self.game.read_text())["version"], "0.1.66")
+        self.assertEqual(json.loads(self.pack.read_text())["version"], "0.1.66")
+        rec = json.loads((self.out / "balance" / "v0.1.65.json").read_text())
+        self.assertEqual(rec["applied_as"], "0.1.66")
+        r2 = balance.auto(self.played(30), version="0.1.65", threshold=3, balance_dir=self.out / "balance",
+                          argue_fn=self.fake_argue({"spawnMin": 9}), game=self.game, packs=[self.game, self.pack])
+        self.assertEqual(r2["status"], "done")
+        self.assertEqual(self.calls, 1)
+
+    def test_a_verdict_with_nothing_to_change_is_still_a_verdict(self):
+        r = self.go(self.played(3), {})
+        self.assertEqual(r["status"], "unchanged")
+        self.assertTrue((self.out / "balance" / "v0.1.65.json").exists())
+        self.assertEqual(json.loads(self.game.read_text())["version"], "0.1.65")
+
+
 def parsed_runs():
     return [
         run_row(27, traced=20, ms=80000),

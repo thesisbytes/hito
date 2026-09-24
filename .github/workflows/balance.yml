@@ -1,0 +1,68 @@
+# The balance loop: once a build has been played enough, 仏 and 鬼 argue its
+# pace, the judge decides, and the verdict becomes the next build. Nothing
+# here runs at play time; the game stays a file that opens from a double-click.
+#
+# Secrets: APPWRITE_API_KEY (a key with rows read on hito.events, nothing
+# else) and AWS_BEARER_TOKEN_BEDROCK. Both live in the repository's secrets,
+# never in the repo. Without them the pull or the judge fails and nothing is
+# committed.
+name: balance
+on:
+  schedule:
+    - cron: "17 9 * * *"     # daily, a quiet hour UTC
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: balance
+  cancel-in-progress: false
+jobs:
+  balance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: the two venvs the repo expects
+        run: |
+          python -m venv .venv && .venv/bin/pip install -q -r requirements.txt
+          python -m venv agents/.venv && agents/.venv/bin/pip install -q -e agents
+      - name: pull the table (read-only)
+        env:
+          APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+        run: |
+          npm install -g appwrite-cli >/dev/null
+          appwrite client --endpoint https://sfo.cloud.appwrite.io/v1 --project-id 6ab079700020b092b857 --key "$APPWRITE_API_KEY" >/dev/null
+          agents/.venv/bin/python agents/pull.py
+      - name: judge this build, if it has been played enough
+        id: judge
+        env:
+          AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+          AWS_REGION: us-east-1
+          HITO_MEMORY: "0"
+        run: agents/.venv/bin/python -m hito_agents.balance --auto
+      - name: build and test the verdict
+        if: steps.judge.outputs.status == 'changed'
+        run: |
+          build/release.sh
+          build/test/run.sh
+      - name: commit the next build
+        if: steps.judge.outputs.status == 'changed' || steps.judge.outputs.status == 'unchanged'
+        env:
+          STATUS: ${{ steps.judge.outputs.status }}
+          VERSION: ${{ steps.judge.outputs.version }}
+          NEW: ${{ steps.judge.outputs.new }}
+        run: |
+          git config user.name "hito balance"
+          git config user.email "balance@users.noreply.github.com"
+          git add -A agents/balance scripts dist index.html
+          if [ "$STATUS" = changed ]; then
+            git commit -m "Balance: the judge's verdict on v$VERSION becomes v$NEW" -m "仏 and 鬼 argued over the runs on v$VERSION; the judge's changes are in agents/balance/v$VERSION.json. Built and tested by the balance workflow."
+          else
+            git commit -m "Balance: v$VERSION judged, nothing to change" -m "See agents/balance/v$VERSION.json."
+          fi
+          git push

@@ -1866,3 +1866,37 @@ Running log. Append at the bottom, don't rewrite history.
 - The pack's `hand` block came back from `--apply` re-indented (json.dumps);
   cosmetic. The judge's tests are pinned to a fixed base config, because
   the agents edit the pack the tests would otherwise read.
+
+## 2026-09-24 — The loop runs itself, and the ceilings go up (hiragana v0.1.65, katakana-game v0.1.28)
+
+- The maintainer: "I don't feel like running anything manually. Can't we
+  sort of set up a hook to balance the game after a valuable amount of data
+  has been provided? And in this state, we end up maxing out the upgrades
+  so early. And I can't make it to 100."
+- **The hook.** `balance --auto` and `.github/workflows/balance.yml`, daily.
+  A valuable amount of data is twelve medium runs on the *current* build —
+  runs now carry `v` — and a build is judged once: the verdict is committed
+  as `agents/balance/v<version>.json`, applied, bumped, rebuilt with
+  `build/release.sh`, checked with `run.sh`, pushed. Nothing to change is
+  still a verdict, so a build that is fine is not judged again tomorrow. The
+  Fence still holds: the agents write under `agents/out`; the applying and
+  the bumping are `auto()`, which is code with a test, not a tool a model
+  calls. Two repository secrets are needed (Appwrite rows-read key, Bedrock
+  key) and are the one manual step left; they are the maintainer's to add.
+  The v0.1.63 verdict is committed as the first entry so the ledger of
+  verdicts starts where the loop did.
+- **The ceilings.** upgradeRamp 1.85 in the hiragana game and every cap
+  raised (intent 5, quick 8, breath 5, shove 8, mend 8, wall 5, tend 5,
+  diligence 8, harvest 8, rise 5). At 1.6 with caps of 3-5 a long run bought
+  everything by its middle; now the top levels cost hundreds and a run ends
+  with choices left. Not modelled by the judge, which knows nothing of 墨;
+  it is the next thing pace.py should learn.
+- **100.** The judge's band aims a bare hand's predicted end at 55..120 and
+  the applied verdict predicts 78; the lanterns are meant to be the rest.
+  Nobody has played v0.1.64+ yet, so "I can't make it to 100" is about the
+  ramp before the verdict. If the next twelve runs still stop short, the
+  loop will move it again — and if they do not reach 100 with lanterns
+  either, the band's floor should rise, or the level gate should count
+  something a learner can accumulate.
+- `build/release.sh` exists now because the loop needed the release to be
+  one command; the hand gets it too.

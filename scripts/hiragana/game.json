@@ -1,6 +1,6 @@
 {
   "script": "hiragana",
-  "version": "0.1.64",
+  "version": "0.1.65",
   "title": "hito 人 · hiragana · v0.1.29",
   "brand": "hito 人",
   "fontDir": "fonts",
@@ -58,6 +58,7 @@
     "sign": "kana",
     "speed": 0.055,
     "wardHp": 5,
+    "upgradeRamp": 1.85,
     "spawnMs": 5800,
     "spawnRamp": 30,
     "spawnMin": 3400,

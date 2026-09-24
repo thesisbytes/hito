@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.64.html`
+### Hiragana — `dist/hiragana-v0.1.65.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -339,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.27.html`
+### Katakana — `dist/katakana-game-v0.1.28.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -863,7 +863,8 @@ per-character ledger. Save data must have export/import from day one.
 ## Conventions
 
 - **Versioning:** `dist/<script>-vX.Y.Z.html`. Bump on *every* change, even
-  one-liners. Stamp the version in `<title>`, the header, the footer and the
+  one-liners. `build/release.sh` rebuilds everything from the packs' versions
+  and drops the files they no longer name. Stamp the version in `<title>`, the header, the footer and the
   boot toast so a cached build is obvious.
 - **Stable links:** `dist/<script>.html` (`vocab.html`, `hiragana.html`,
   `hiragana-game.html`, `katakana-game.html`) is a byte-identical copy of the current versioned
@@ -911,8 +912,12 @@ per-character ledger. Save data must have export/import from day one.
   run ends and keeps that inside a band. The verdict is a file under
   `agents/out`; a human applies it to `scripts/hiragana/game.json` with
   `--apply`, then builds and tests as ever. Agents never touch a build. Every
-  run now records its frame counts (`frames`, `plat`) so the table can tell
-  an iPhone from a Pixel.
+  run now records its frame counts (`frames`, `plat`) and its build (`v`) so
+  the table can tell an iPhone from a Pixel and one build from the next.
+  **As of v0.1.65 the loop runs itself**: `.github/workflows/balance.yml`
+  judges a build once it has twelve medium runs, once only, and commits the
+  next build (see `agents/README.md`, "The loop"). `build/release.sh` is the
+  one command a release is, for a hand or for the loop.
 - **Look at a running build before shipping UI.** Headless Chrome is on this
   machine (`google-chrome --headless=new --screenshot`). Switch sharing off
   first (`hito-share` = `0`) or the run lands in the production table.

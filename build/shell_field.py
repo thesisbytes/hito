@@ -250,16 +250,19 @@ LAYER = STYLE + r"""
   // get up with. Three tabs, then, the way a tower is run: 技 cuts, 耐
   // lasts, 志 earns. None of them writes a character.
   const UPG = {
-    intent:{ tab:'skills', kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:3 },
-    quick: { tab:'skills', kana:'早', name:'quick',  blurb:'the lights are thrown sooner',                    max:5 },
-    breath:{ tab:'skills', kana:'息', name:'breath', blurb:'every stroke fills 気 by one more',                max:3 },
-    shove: { tab:'skills', kana:'押', name:'shove',  blurb:'every hit pushes them back',                      max:5 },
-    mend:  { tab:'guard',  kana:'守', name:'mend',   blurb:'the ward gains a life',                           max:5 },
-    wall:  { tab:'guard',  kana:'壁', name:'wall',   blurb:'a breach costs the ward one less',                max:3 },
-    tend:  { tab:'guard',  kana:'癒', name:'tend',   blurb:'a life back for every stretch of waves held',     max:3 },
-    dilig: { tab:'drive',  kana:'勤', name:'diligence', blurb:'every trace pays one more 墨',                 max:5 },
-    harvest:{tab:'drive',  kana:'収', name:'harvest',blurb:'every farang your lights finish pays one more 墨', max:5 },
-    rise:  { tab:'drive',  kana:'起', name:'rise',   blurb:'the fall pays more 魂: get up with more',         max:3 },
+    // Ceilings raised in v0.1.65 (the maintainer: "we end up maxing out the
+    // upgrades so early"), with the pack's ramp steepened: a run should end
+    // with things still worth buying, or the tabs stop being a decision.
+    intent:{ tab:'skills', kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:5 },
+    quick: { tab:'skills', kana:'早', name:'quick',  blurb:'the lights are thrown sooner',                    max:8 },
+    breath:{ tab:'skills', kana:'息', name:'breath', blurb:'every stroke fills 気 by one more',                max:5 },
+    shove: { tab:'skills', kana:'押', name:'shove',  blurb:'every hit pushes them back',                      max:8 },
+    mend:  { tab:'guard',  kana:'守', name:'mend',   blurb:'the ward gains a life',                           max:8 },
+    wall:  { tab:'guard',  kana:'壁', name:'wall',   blurb:'a breach costs the ward one less',                max:5 },
+    tend:  { tab:'guard',  kana:'癒', name:'tend',   blurb:'a life back for every stretch of waves held',     max:5 },
+    dilig: { tab:'drive',  kana:'勤', name:'diligence', blurb:'every trace pays one more 墨',                 max:8 },
+    harvest:{tab:'drive',  kana:'収', name:'harvest',blurb:'every farang your lights finish pays one more 墨', max:8 },
+    rise:  { tab:'drive',  kana:'起', name:'rise',   blurb:'the fall pays more 魂: get up with more',         max:5 },
   };
   const TABS = { skills:'技', guard:'耐', drive:'志' };
   const freshUpg = () => Object.fromEntries(Object.keys(UPG).map(id => [id, 0]));
@@ -1214,7 +1217,8 @@ LAYER = STYLE + r"""
                   quality: run.qn ? Math.round(100*run.q/run.qn)/100 : undefined, wave, banished: killed, traced: run.traced, clean: run.clean,
                   sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
                   difficulty, sign: CFG.sign, upgrades: {...upg},
-                  frames: {...frames}, plat: (navigator.platform || '').slice(0, 24) || undefined };
+                  frames: {...frames}, plat: (navigator.platform || '').slice(0, 24) || undefined,
+                  v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : undefined };
     let best = null;
     try { if (H && H.run) best = H.run(rec); } catch(_){}
     try { window.__sync && window.__sync.record('run', rec); } catch(_){}

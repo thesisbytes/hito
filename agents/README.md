@@ -47,6 +47,7 @@ agents/.venv/bin/python -m hito_agents.analyst "which characters fizzle most?"
 agents/.venv/bin/python -m hito_agents.system1              # Laya labels every trace -> agents/out/labels.jsonl
 agents/.venv/bin/python -m hito_agents.balance              # 仏 and 鬼 argue the tower's pace; the judge writes agents/out/balance-<date>.json
 agents/.venv/bin/python -m hito_agents.balance --apply agents/out/balance-<date>.json   # a human applies the verdict to the pack
+agents/.venv/bin/python -m hito_agents.balance --auto       # the loop: judge the current build once it has 12 medium runs, once per build
 agents/.venv/bin/python -m unittest discover -s agents/test # offline; no key, no model needed
 ```
 
@@ -57,6 +58,21 @@ never ships in a build.
 `pull.py` goes through the Appwrite CLI (`appwrite login` first) and is
 read-only. Experiments run against the file on disk, so they can be re-run
 offline and the live table only ever sees finished writes.
+
+## The loop
+
+`.github/workflows/balance.yml` runs `--auto` daily (and on demand from the
+Actions tab). It pulls the table; if the current hiragana build has twelve
+medium runs on it and no verdict yet, 仏 and 鬼 argue, the judge decides,
+the verdict is committed under `agents/balance/v<version>.json`, the pack is
+patched and bumped, `build/release.sh` rebuilds, `run.sh` checks, and the
+workflow pushes the next build. A build nobody has played enough is left
+alone, and no build is judged twice. It needs two repository secrets:
+
+- `APPWRITE_API_KEY` — an API key on the Appwrite project with **rows read
+  on `hito.events` and nothing else** (Appwrite console → the project →
+  Overview → API keys).
+- `AWS_BEARER_TOKEN_BEDROCK` — the same Bedrock key the agents use locally.
 
 ## Layout
 
@@ -73,7 +89,8 @@ agents/
     factcheck.py          the fact fence: what the analyst measured vs. made up; figures checked against the tools; memory refuses causes
     analyst.py            the first agent: reads the pull and answers questions
     pace.py               the tower's pace as arithmetic: need vs supply by wave, the wall, the predicted end; defaults read from the shell
-    balance.py            仏 hotoke (buff) and 鬼 oni (nerf) argue over the pace; the judge is pace.py, and the verdict is a file
+    balance.py            仏 hotoke (buff) and 鬼 oni (nerf) argue over the pace; the judge is pace.py, and the verdict is a file; --auto is the loop
+  balance/                the verdicts that were applied, one per judged build (committed; agents/out is not)
   test/test_agents.py     the wiring, offline: a scripted model plays the LLM's part
   data/                   the pull (ignored by git)
   out/                    reports and the ledger (ignored by git)

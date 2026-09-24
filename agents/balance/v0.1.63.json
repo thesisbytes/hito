@@ -1,0 +1,78 @@
+{
+ "date": "2026-09-23",
+ "hand": {
+  "runs": 48,
+  "s_per_trace": 3.81,
+  "strokes_per_trace": 2.5,
+  "wave_p50": 27,
+  "wave_max": 43,
+  "s_p50": 84,
+  "clean_rate": 0.74,
+  "assumed": false
+ },
+ "current": {
+  "hpEvery": 30,
+  "hpMax": 5,
+  "biteEvery": 30,
+  "biteMax": 4,
+  "spawnMs": 5200,
+  "spawnRamp": 45,
+  "spawnMin": 3400,
+  "hitodamaGain": 1,
+  "energyPerStroke": 1,
+  "castCost": 2,
+  "tower": {
+   "rows": 2,
+   "rowWaves": 10,
+   "bossEvery": 10,
+   "bossHp": 2,
+   "bossBite": 1,
+   "speedStep": 0.03
+  }
+ },
+ "hotoke": {
+  "changes": {
+   "hpEvery": 45,
+   "spawnMs": 5800,
+   "spawnRamp": 30
+  },
+  "because": "The measured hand stalls at wave 27 (median) and wave 43 (max), never reaching wave 100; raising hpEvery from 30 to 45 delays the hp-2 wall from wave 30 to wave 60, lifting spawnMs from 5200 to 5800 widens the initial breathing gap from 0.21 to 0.21 hits/s needed vs 0.52 supplied, and dropping spawnRamp from 45 to 30 keeps the gap above floor longer — together the model moves the predicted end from the current ~27 to wave 69, inside the required 55–120 window.",
+  "refused": {},
+  "wall": 60,
+  "end": 69,
+  "said": "Proposal locked! ✅ Here's the summary:\n\n**What I proposed:** Raise `hpEvery` from 30 → **45**, nudge `spawnMs` from 5200 → **5800**, and ease `spawnRamp` from 45 → **30** — gently stretching the runway so the farang don't bulk up quite so rudely.\n\n**Why:** Our dear learner was petering out at wave 27 (median) and wave 43 (best), never sniffing wave 100; these three small kindnesses push the predicted end to wave **69**, which means the later rows of the chart are no longer a myth and the tower is actually, affectionately, climbable. 🏯💕\n"
+ },
+ "oni": {
+  "changes": {
+   "biteEvery": 40,
+   "castCost": 3,
+   "hpEvery": 60
+  },
+  "because": "The hand sits at wave_p50=27 and wave_max=43 against a wall that currently never threatens it before the run just fizzles — pushing hpEvery from 30→60 and biteEvery from 30→40 moves the wall out to wave 60 (predicted end 59, inside 55–120), while castCost 2→3 trims supply from 0.52 to 0.48 so the lanterns have to be earned rather than gifted.",
+  "refused": {},
+  "wall": 60,
+  "end": 59,
+  "said": "---\n\nHere's what I found and what I filed:\n\n**The numbers:** The hand is clearing wave p50=27 and topping out at wave 43 — not because the tower bites, but because nothing has teeth yet. Under the current config the wall was sitting right at wave 30, meaning hp escalated to 2 exactly when the spawn gap floored out (~3.45 s), immediately overwhelming supply (0.52 hits/s needed vs. 0.52 available — zero headroom). Tightening spawnMs or biteEvery alone just moved the wall earlier without giving the hand any room to breathe into.\n\n**The proposal:** `hpEvery 30→60`, `biteEvery 30→40`, `castCost 2→3`. Doubling hpEvery pushes the wall all the way to wave 60 (predicted end: 59), biteEvery at 40 means the farang's chomp escalates with dignity rather than panic, and castCost 3 shaves supply from 0.52 to 0.48 so those beautiful lanterns cost something before they shine.\n\nThe tower should bite like a proud 鬼, not like a wet noodle — and the record at wave 43 is about to feel very nervous indeed. 👹\n"
+ },
+ "verdict": {
+  "changes": {
+   "hpEvery": 60,
+   "spawnMs": 5800,
+   "spawnRamp": 30,
+   "biteEvery": 40
+  },
+  "why": {
+   "hpEvery": "oni's 60: predicted end 59",
+   "spawnMs": "hotoke's 5800: predicted end 63",
+   "spawnRamp": "hotoke's 30: predicted end 72",
+   "biteEvery": "oni's 40: predicted end 78",
+   "castCost": "kept: no proposed value holds the predicted end in band, or none improves on it"
+  },
+  "end_before": 45,
+  "end_after": 78,
+  "band": [
+   55,
+   120
+  ]
+ }
+}

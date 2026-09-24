@@ -15,8 +15,19 @@ says it is.
 
     agents/.venv/bin/python -m hito_agents.balance            # argue, judge, write agents/out/balance-<date>.json
     agents/.venv/bin/python -m hito_agents.balance --apply agents/out/balance-<date>.json   # a human applies it
+    agents/.venv/bin/python -m hito_agents.balance --auto     # the loop: only once enough runs on this build, once per build
+
+The loop (the maintainer: "I don't feel like running anything manually. Can't
+we set up a hook to balance the game after a valuable amount of data has
+been provided?") lives in .github/workflows/balance.yml. It pulls the table,
+and if the current build has `THRESHOLD` medium runs and no verdict yet, the
+advocates argue, the judge decides, the verdict is committed under
+agents/balance/, the pack is patched and its version bumped, and the
+workflow builds, tests and pushes. A build the hand has not played enough
+gets no verdict, and no build gets two.
 """
 import json
+import os
 import sys
 from collections import Counter
 from datetime import date
@@ -26,6 +37,10 @@ from strands import Agent, tool
 
 from . import events, pace
 from .hooks import OUT, Fence, Ledger
+
+ROOT = Path(__file__).resolve().parents[2]
+BALANCE = ROOT / "agents" / "balance"     # verdicts that were applied, committed
+THRESHOLD = 12                            # medium runs on a build before it is judged
 
 # The band the judge holds the predicted end in, for a bare hand with no
 # lanterns. 100 is the next level: the hand and its lights should get near
@@ -228,10 +243,66 @@ def apply(verdict_file, game=pace.GAME):
     return changes
 
 
+def pack_version(game=pace.GAME):
+    return json.loads(Path(game).read_text(encoding="utf-8")).get("version")
+
+
+def bump(version):
+    a, b, c = version.split(".")
+    return f"{a}.{b}.{int(c) + 1}"
+
+
+def stamp(version, new, packs=None):
+    """The hiragana packs share one version; both move."""
+    packs = packs or [pace.GAME, pace.GAME.with_name("pack.json")]
+    for q in packs:
+        t = Path(q).read_text(encoding="utf-8")
+        assert t.count(f'"version": "{version}"') == 1, q
+        Path(q).write_text(t.replace(f'"version": "{version}"', f'"version": "{new}"'), encoding="utf-8")
+
+
+def auto(rows_=None, version=None, threshold=THRESHOLD, balance_dir=BALANCE, argue_fn=None, game=pace.GAME, packs=None):
+    """Judge this build once it has been played enough, and never twice.
+    Returns {status, ...}: thin (not enough runs), done (already judged),
+    unchanged (judged, nothing to change), changed (applied and bumped)."""
+    if rows_ is not None:
+        use(rows_)
+    version = version or pack_version(game)
+    played = [r for r in runs() if r.get("v") == version and r.get("difficulty") == "medium" and not r.get("practice")]
+    verdict_file = Path(balance_dir) / f"v{version}.json"
+    if verdict_file.exists():
+        return {"status": "done", "version": version, "runs": len(played), "file": str(verdict_file)}
+    if len(played) < threshold:
+        return {"status": "thin", "version": version, "runs": len(played), "threshold": threshold}
+    rec = (argue_fn or argue)(out_dir=OUT)
+    rec["judged_version"] = version
+    rec["runs_on_version"] = len(played)
+    Path(balance_dir).mkdir(parents=True, exist_ok=True)
+    changes = rec["verdict"]["changes"]
+    if not changes:
+        verdict_file.write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
+        return {"status": "unchanged", "version": version, "runs": len(played), "file": str(verdict_file)}
+    new = bump(version)
+    rec["applied_as"] = new
+    verdict_file.write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
+    apply(verdict_file, game=game)
+    stamp(version, new, packs)
+    return {"status": "changed", "version": version, "new": new, "runs": len(played), "changes": changes, "file": str(verdict_file),
+            "end": [rec["verdict"].get("end_before"), rec["verdict"].get("end_after")]}
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if argv[:1] == ["--apply"]:
         print("applied", apply(argv[1]))
+        return
+    if argv[:1] == ["--auto"]:
+        r = auto()
+        print(json.dumps(r, ensure_ascii=False))
+        out = os.environ.get("GITHUB_OUTPUT")
+        if out:
+            with open(out, "a", encoding="utf-8") as f:
+                f.write(f"status={r['status']}\nversion={r.get('version', '')}\nnew={r.get('new', '')}\n")
         return
     rec = argue()
     print()
