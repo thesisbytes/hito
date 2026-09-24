@@ -1677,3 +1677,6 @@ Running log. Append at the bottom, don't rewrite history.
   the layout had not settled at script time. Two questions went back to
   the hand: is the offset there from the first stroke or only after a
   fizzle or a zap, and is it the same direction every time.
+- On v0.1.59, played "as accurate as I can": the offset did not come back
+  ("might've been operator error. At least my hiragana is looking better").
+  Closed as not reproduced; the lag fix stands on its own.
