@@ -189,6 +189,8 @@ STYLE = """
   .start-h b.needs{ color:#e8a0a0; font-weight:600; letter-spacing:.04em; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(232,224,204,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
+  .start-links a{ flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; padding:9px; border-radius:9px; color:rgba(233,196,106,.75); border:1px solid #3d3324; font-size:13px; }
+  .start-links a svg, .start-links button svg{ width:14px; height:14px; margin-right:5px; vertical-align:-2px; }
   .start-links button{ flex:1; background:transparent; color:rgba(233,196,106,.75); border:1px solid #3d3324;
                        border-radius:9px; padding:9px; font:13px ui-sans-serif,system-ui; cursor:pointer; }
   .credits p{ line-height:1.55; color:rgba(232,224,204,.85); margin:10px 0; }
@@ -1287,6 +1289,11 @@ LAYER = STYLE + r"""
     zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
                   // and a run that restarts on the same character does not load one
     sumi = own('inkwell') * CFG.inkwellStep; energy = CFG.energyStart; credited = 0;
+    // The lights are the run's (v0.1.71). They survived the ward falling
+    // from v0.1.21 to v0.1.70, and a new run began with last run's arsenal
+    // — the maintainer: "my energy gauge should not persist between games."
+    // In the Tower nothing carries but the workshop; what lasts is bought.
+    quench();
     ward = wardMax(); over = false; wave = 0; killed = 0; locked = null; asked = null; queue = []; recent = [];
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; frames = { n:0, slow:0, jank:0 }; spawn(); retarget();
     // The last banish of a stage leaves the engine celebrating: the whole path
@@ -1529,6 +1536,7 @@ LAYER = STYLE + r"""
       ${ST ? `<div class="start-h">the tower · furthest wave ${bestWave()} · ${roster().length} characters on the field${nextRowAt() < Infinity ? ' · next row of the chart at wave ' + nextRowAt() : ' · every row of the chart'}${difficulty === 'guided' ? ' · <b class="needs">practice: nothing counts</b>' : ''}</div>` : ''}
       <button class="start-go">${over ? 'begin again' : 'begin'}</button>
       ${workshopHtml()}
+      <div class="start-links"><a class="start-home" href="../index.html">${ICON.flame}home</a></div>
       <div class="start-foot">${WORDS ? 'draw below · the farang come from above · write what they are saying, one kana at a time' : 'draw below · the farang come from above · the one you are answering is yours'}</div>
     </div>`;
     wirePage(renderStart);
@@ -1577,10 +1585,12 @@ LAYER = STYLE + r"""
       ${r.practice ? `<p class="over-line">guided is practice: nothing here counts toward the tower or 魂.</p>` : ''}
       ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}clean, readable traces pay the most${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
       <button class="start-go">again</button>
-      ${workshopHtml(null, hands)}
+      <div class="start-links"><button class="start-workshop">${ICON.sword}workshop</button><a class="start-home" href="../index.html">${ICON.flame}home</a></div>
+      ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
       <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
     </div>`;
     wirePage(renderOver);
+    const ws = start.querySelector('.start-workshop'); if (ws) ws.onclick = () => { view = 'start'; renderStart(); };
   }
   function openOver(){ openTab(null); paused = true; view = 'over'; renderStart(); start.hidden = false; showRedo(false); }
   function openStart(){ paused = true; view = over && ended ? 'over' : 'start'; renderStart(); start.hidden = false; showRedo(false); }

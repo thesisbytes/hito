@@ -652,6 +652,10 @@ fresh();
 {
   F.kindle('あ', 999);
   ok(F.charge('あ') === cfg.hitodamaCap, `charge went to ${F.charge('あ')}, cap is ${cfg.hitodamaCap}`);
+  // the lights are the run's: a new run begins dark
+  F.restart();
+  ok(F.charge('あ') === 0 && Object.keys(F.hitodama).length === 0, `a light carried into the next run (あ holds ${F.charge('あ')})`);
+  ok(F.energy === cfg.energyStart, `a run begins with ${F.energy} 気, expected ${cfg.energyStart}`);
 }
 
 // ---- monsters actually advance
@@ -976,6 +980,8 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(F.view === 'over' && F.paused, `after the ward fell the page shows "${F.view}"`);
   ok(/the ward fell/.test(F.startHtml) && /banished/.test(F.startHtml) && />again</.test(F.startHtml), 'the ending does not say what happened or offer another go');
   ok(/saved on this device/.test(F.startHtml), 'the ending does not say where the run was kept');
+  // the ending is its own page: the numbers, the pay, again, the workshop, home — no shop on it
+  ok(!/data-wtab=/.test(F.startHtml) && /class="start-workshop"/.test(F.startHtml) && /class="start-home" href="\.\.\/index\.html"/.test(F.startHtml), 'the ending should be separate from the workshop and offer a way home');
   // the page and back: still the ending, not a start page over a dead field
   F.openStart();
   ok(F.view === 'over', 'reopening the page after a fall showed the start page over a dead field');
@@ -1055,6 +1061,7 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(/data-wtab="attack"/.test(F.startHtml) && /data-wtab="defend"/.test(F.startHtml) && /data-wtab="earn"/.test(F.startHtml) && /data-wtab="lanterns"/.test(F.startHtml) && /data-wtab="more"/.test(F.startHtml), 'the workshop between runs is missing a tab');
   ok(/data-perm="intent"/.test(F.startHtml) && /data-perm="wall"/.test(F.startHtml) && /data-perm="rise"/.test(F.startHtml) && /data-lantern="heart"/.test(F.startHtml), 'the workshop does not sell what lasts');
   ok(/KanjiVG/.test(F.startHtml) && /draw with/.test(F.startHtml), 'the "more" tab has lost the credits or the settings');
+  ok(/class="start-home" href="\.\.\/index\.html"/.test(F.startHtml), 'the start page has no way home');
   ok(F.showWtab('defend') === undefined && F.wtab === 'defend', 'a workshop tab did not switch');
   { const own0 = F.own('intent'), bal0 = H.tama.balance, c = F.permCost('intent');
     ok(F.buyPerm('intent') === true && F.own('intent') === own0 + 1 && H.tama.balance === bal0 - c, `a permanent intent could not be bought (own ${F.own('intent')}, balance ${H.tama.balance}, was ${bal0}, cost ${c})`);

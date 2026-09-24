@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.70.html`
+### Hiragana — `dist/hiragana-v0.1.71.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -350,7 +350,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.33.html`
+### Katakana — `dist/katakana-game-v0.1.34.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -617,7 +617,10 @@ carries two tabs, 筆 write and 墨 boosts, and the boosts are one panel in
 three sections. The sketchbook's badge and the credit footer are hidden in
 the run; the sketchbook is 38dvh by pen and 50dvh by finger. Purchases and
 tab switches on the pages go through `tapOn(start, …)`, since a purchase
-re-renders the page.
+re-renders the page. **The ending is its own page (v0.1.71)**: the numbers,
+the pay, again, workshop (to the start page), home (`../index.html`, the
+level switcher); the workshop is on the start page only, and 気 starts at 0
+in the hiragana game.
 
 **Every upgrade wears a mark (v0.1.67).** The maintainer: "since I don't know
 any kanji it's hard for me to decide what to upgrade." The kanji is flavour;
@@ -633,8 +636,10 @@ character throws its own wisp at any monster carrying it, one charge per
 cast. The tracer is pointed at the nearest *dark* character, so the hand goes
 where the flame is out — which is the spaced-repetition design doing its job
 without a schedule. A dash on the seam between field and sketchbook shows the
-loaded character and its charge. Keyed by character, kept in localStorage,
-and it survives the ward falling. Tuning lives in `field.hitodama*` and
+loaded character and its charge. Keyed by character. **It survived the ward
+falling from v0.1.21 to v0.1.70; as of v0.1.71 the lights are the run's**
+and a new run begins dark — the maintainer: "my energy gauge should not
+persist between games." In the Tower nothing carries but the workshop. Tuning lives in `field.hitodama*` and
 `field.castMs`; see `scripts/PACK.md`.
 
 **The start page (v0.1.24)** opens the game on its two real axes: how much

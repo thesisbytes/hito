@@ -279,6 +279,7 @@ read as an alias.
 | `tamaWaves` | 3 | one tama per this many farang faced |
 | `inkwellStep` | 6 | ink in hand at the start of a run, per inkwell |
 | `lanternCost`, `lanternRamp` | see above | level one of each lantern, and how each level grows |
+| `energyStart` | 6 | 気 in the bag when a run begins. The hiragana game sets 0 (v0.1.71): the lights are the run's now, so there is nothing to throw it with yet. |
 | `tamaCost` | intent 24, quick 16, breath 20, shove 12, mend 20, wall 20, tend 18, dilig 16, harvest 14, rise 28 | 魂 for level one of each upgrade's *lasting* level, bought between runs (v0.1.70); each level grows by `lanternRamp`. A lasting level and the run's 墨 levels add, up to the upgrade's ceiling. |
 
 A difficulty can carry a `tama` multiplier (guided 0, medium 2). Each trace's

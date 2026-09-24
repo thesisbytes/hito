@@ -2042,3 +2042,22 @@ Running log. Append at the bottom, don't rewrite history.
   tabs and what they sell, a lasting intent carrying into a run and taking
   its hit, the run buying only up to the ceiling above it. `F.inkHtml` for
   the boosts' header.
+
+## 2026-09-24 — The lights are the run's, and the ending is its own page (hiragana v0.1.71, katakana-game v0.1.34)
+
+- The maintainer: "My energy gauge should not persist between games. Also,
+  the game over page should be separated. So again button is cool, but
+  have a go back home button too. I think the layout is just too cluttered."
+- **What persisted.** Through the real ending path in the stub — the ward
+  falls, the page opens, again — 気 came back at `energyStart` (6), but the
+  lights did: a character lit in one run was lit in the next, by design
+  since v0.1.21 ("it survives the ward falling"). On the seam the lights
+  are the 人魂 pips beside the loaded character, and with the 気 bar
+  starting a quarter full the whole gauge looked carried over. Reversed:
+  `restart()` quenches the lights, and the hiragana game starts the bag at
+  0. In the Tower nothing carries but the workshop; what lasts is bought.
+  This also takes a hidden multiplier out of the calibrated judge's hands.
+- **The ending.** Its own page now: the run's numbers, the pay, again, a
+  workshop button (to the start page, where the tabs are), a home link
+  (`../index.html`, the level switcher), the run's handwriting under. The
+  start page keeps the workshop and gains the same home link.
