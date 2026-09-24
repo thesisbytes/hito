@@ -1583,3 +1583,27 @@ Running log. Append at the bottom, don't rewrite history.
 - Mana proper — the gauge every stroke fills, and the release — is still
   the note of 2026-09-24. The bar has its place kept: 墨 sits where mana
   will, and the release is what 技 should become.
+
+## 2026-09-24 — Bars, and 気 (hiragana v0.1.56, katakana-game v0.1.19, vocab v0.1.34)
+
+- **The maintainer:** "Let's not do hearts. I like bars. For both the life
+  and energy for casting. The stroke does not depend on which enemy is
+  present. All strokes go into one bag of energy." And: the hiragana and
+  the romaji stay as they are — the voice-over comes later.
+- **気.** One bag per run (`energyMax` 24, `energyStart` 6). Every stroke
+  the hand completes fills it by `energyPerStroke` (1): the field wraps the
+  engine's `shine()`, which is the stroke-complete and reaches the layer as
+  a global; a conjure credits any strokes the shine did not, so a trace is
+  worth its strokes however the stub scored it. Every wisp a lit character
+  throws spends `castCost` (2): a lit character with an empty bag waits.
+  Lights still say which characters can answer for themselves; 気 is what
+  they answer with. Nothing fills it but the hand — the rule of the lore,
+  now a number.
+- **Bars.** 命 for the ward and 気 for the bag, on the seam, with the count
+  in small figures; hearts are gone. 墨, 魂, the wave and the two tabs stay.
+- The lights' tests are about targeting, not fuel, so their `fresh()`
+  fills the bag; the bag has its own test: a run starts with 6, three
+  strokes conjured add 3, it overflows at 24, a cast spends 2, an empty bag
+  casts nothing, two 気 cast once.
+- Not yet: a lantern for a bigger bag, and the release — a full bag thrown
+  at once, the moment to look up. That is the next of the gauge notes.

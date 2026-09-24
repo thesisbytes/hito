@@ -70,7 +70,7 @@ const ok = (c, m) => { if (!c) { console.log(`  FAIL: ${m}`); fail++; } };
 // Quench the ghost lights too: a lit character answers its own monsters, and
 // a charge left over from an earlier block would kill something a later block
 // is counting on to still be there.
-const fresh = () => { timers = []; F.restart(); F.quench(); T += 100; };
+const fresh = () => { timers = []; F.restart(); F.quench(); F.fill(99); T += 100; };   // a full bag of 気: these checks are about the lights, not the fuel
 
 const advance = (ms, stepMs = 16) => {
   for (let e = T + ms; T < e; ){
@@ -789,7 +789,9 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   // the whole loop: a 3-hit farang is finished by the lights one trace lit
   fresh(); F.quench();
   const boss = F.monsters[0];
-  boss.hp = 3; boss.d = 0.95; boss.speed = 0;
+  // parked near the ward and still, so it stays the nearest target while the
+  // wait spawns others (one carrying the same character, nearer, took the light)
+  boss.hp = 3; boss.d = 0.3; boss.speed = 0;
   globalThis.conjure();                       // hit one, and the character is lit
   advance(cfg.castMs * 4 + 2000);
   ok(!F.monsters.includes(boss), `a clean trace and its two lights did not finish a 3-hit farang (hp ${boss.hp})`);
@@ -801,11 +803,26 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   ok(/墨 0/.test(F.upgHtml) && /data-upg="quick"/.test(F.upgHtml), 'the workshop strip is missing or stale after a restart');
   // the dashboard on the seam: hearts, ink, 魂, the wave, and tabs that do not pause the run
   advance(20);
-  ok(/♥/.test(F.dashHtml) && /墨 0/.test(F.dashHtml) && /data-tab="skills"/.test(F.dashHtml), `the dashboard is missing something: ${F.dashHtml.slice(0, 160)}`);
-  ok((F.dashHtml.match(/♥/g) || []).length === F.wardMax, `the dashboard shows ${(F.dashHtml.match(/♥/g) || []).length} hearts for a ward of ${F.wardMax}`);
+  ok(/class="bar life"/.test(F.dashHtml) && /class="bar energy"/.test(F.dashHtml) && /墨 0/.test(F.dashHtml) && /data-tab="skills"/.test(F.dashHtml), `the dashboard is missing something: ${F.dashHtml.slice(0, 200)}`);
+  ok(new RegExp(`<small>${F.wardMax}/${F.wardMax}</small>`).test(F.dashHtml), `the life bar does not read ${F.wardMax} of ${F.wardMax}`);
   ok(F.openTab('skills') === 'skills' && F.tab === 'skills' && !F.paused, 'opening a tab paused the run, or did not open');
   ok(/aria-pressed="true"/.test(F.dashHtml), 'the open tab is not shown as open');
   ok(F.openTab(null) === null && F.tab === null, 'the tab did not close');
+
+  // 気: one bag, filled by every stroke whatever is on the field, spent by every cast
+  const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ x: x0 + (x1-x0)*i/(n-1), y: y0 + (y1-y0)*i/(n-1), p:.5, t: t0 + i*8 }));
+  F.restart(); F.quench();
+  ok(F.energy === cfg.energyStart, `a run starts with ${F.energy} 気, expected ${cfg.energyStart}`);
+  P.strokes.length = 0; P.strokes.push(line(120, 120, 280, 130, 60), line(200, 100, 210, 300, 80, 900), line(100, 200, 300, 210, 60, 1800));
+  const e0 = F.energy; globalThis.conjure(); advance(cfg.advanceMs + 60);
+  ok(F.energy === e0 + 3 * cfg.energyPerStroke, `three strokes conjured filled 気 by ${F.energy - e0}, expected ${3 * cfg.energyPerStroke}`);
+  ok(F.fill(999) === cfg.energyMax, `気 overflowed its bag (${F.energy} of ${cfg.energyMax})`);
+  // a lit character with an empty bag throws nothing; with 気 to throw, it throws and pays
+  F.restart(); F.quench(); F.fill(-999);
+  { const m = F.monsters[0]; F.kindle(P.LETTERS[m.i][0], 3); }
+  ok(F.energy === 0 && F.autocast(T + 99999) === null, 'a lit character cast with an empty bag');
+  F.fill(cfg.castCost);
+  ok(F.autocast(T + 199999) !== null && F.energy === 0, `a lit character with 気 to throw did not cast, or the cast did not spend ${cfg.castCost} (left ${F.energy})`);
 }
 
 // ---- the run ends, says what it was, and is written down

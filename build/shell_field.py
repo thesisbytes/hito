@@ -75,7 +75,13 @@ STYLE = """
   .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:9px;
              padding:5px 9px; border-radius:10px; background:rgba(22,20,17,.88); border:1px solid #3d3324;
              font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
-  .dash-bar .hp{ color:#e9c46a; font-size:13px; letter-spacing:1px; } .dash-bar .hp i{ font-style:normal; color:rgba(232,224,204,.28); }
+  .dash-bar .bar{ position:relative; flex:1 1 60px; min-width:54px; max-width:150px; height:18px; border-radius:6px; overflow:hidden;
+                  background:rgba(232,224,204,.08); border:1px solid #3d3324; }
+  .dash-bar .bar i{ position:absolute; left:0; top:0; bottom:0; background:#e9c46a; opacity:.75; transition:width .25s; }
+  .dash-bar .bar.energy i{ background:#7fd1c4; }
+  .dash-bar .bar b{ position:absolute; left:6px; top:1px; font-size:12px; color:#1a1712; }
+  .dash-bar .bar small{ position:absolute; right:5px; top:2px; font-size:10px; color:#e8e0cc; }
+  @media (prefers-reduced-motion:reduce){ .dash-bar .bar i{ transition:none; } }
   .dash-bar .n{ font-weight:700; color:#e9c46a; white-space:nowrap; } .dash-bar .n small{ font-weight:400; color:rgba(232,224,204,.55); }
   .dash-bar .tabs{ margin-left:auto; display:flex; gap:4px; }
   .dash-bar .tabs button{ font:700 13px ui-sans-serif,system-ui; padding:3px 10px; border-radius:8px; background:transparent;
@@ -278,6 +284,15 @@ LAYER = STYLE + r"""
   // how far, how many, how cleanly. Never a score.
   let run = null;
   const newRun = () => ({ at: Date.now(), began: performance.now(), traced: 0, clean: 0, earned: 0, cast: 0, ended: null, pay: 0, q: 0, qn: 0 });
+  // ---- 気, the energy for casting
+  // One bag. Every stroke the hand completes fills it, whatever is on the
+  // field ("the stroke does not depend on which enemy is present. All
+  // strokes go into one bag of energy"), and every wisp a lit character
+  // throws spends from it. Lights say which characters can answer for
+  // themselves; 気 is what they answer with. Nothing fills it but the hand.
+  let energy = 0, credited = 0;
+  const energyMax = () => CFG.energyMax;
+  function fill(n){ energy = Math.max(0, Math.min(energyMax(), energy + (+n || 0))); return energy; }   // negative drains; a breach may, one day
   function earn(n){ if (n > 0){ sumi += n; if (run) run.earned += n; renderUpg(); } return sumi; }
   function buy(id){
     if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
@@ -431,6 +446,8 @@ LAYER = STYLE + r"""
       if (!best || m.d < best.d) best = m;
     }
     if (!best) return null;
+    if (energy < CFG.castCost) return null;   // lit, but nothing to throw it with
+    energy -= CFG.castCost;
     const ch = key(best);
     HITODAMA[ch] = charge(ch) - 1; saveH();
     // A word is answered one slot at a time, in order: this light writes the
@@ -564,7 +581,7 @@ LAYER = STYLE + r"""
   const _load = window.load;
   let loading = false;
   window.load = function(i){
-    zapped = 0;
+    zapped = 0; credited = 0;
     if (loading) return _load.apply(this, arguments);
     const t = targetIdx();
     return _load.call(this, t === null ? i : t);
@@ -676,9 +693,15 @@ LAYER = STYLE + r"""
     return best;
   }
 
+  // every completed stroke fills 気 as it lands (shine() is the engine's own
+  // stroke-complete, and reaches here as a global); a conjure credits any the
+  // shine did not, so a trace is worth its strokes however it was scored
+  const _shine = window.shine;
+  if (typeof _shine === 'function') window.shine = function(){ fill(CFG.energyPerStroke); credited++; return _shine.apply(this, arguments); };
   const _conjure = window.conjure;
   window.conjure = function(){
     const drew = LETTERS[idx][0];
+    fill(Math.max(0, Math.max(1, strokes.length) - credited) * CFG.energyPerStroke); credited = 0;
     // A word is only ever advanced by its own next kana, so there is no
     // falling back to the locked monster: a stray character hits nothing.
     const t = bearer(drew) || (!WORDS && monsters.includes(locked) ? locked : null);
@@ -1058,7 +1081,7 @@ LAYER = STYLE + r"""
     upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null;
     zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
                   // and a run that restarts on the same character does not load one
-    sumi = own('inkwell') * CFG.inkwellStep;
+    sumi = own('inkwell') * CFG.inkwellStep; energy = CFG.energyStart; credited = 0;
     ward = wardMax(); over = false; wave = 0; killed = 0; locked = null;
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
     // The last banish of a stage leaves the engine celebrating: the whole path
@@ -1131,11 +1154,14 @@ LAYER = STYLE + r"""
   panel.appendChild(panelSkills); panel.appendChild(panelLanterns);
   wrap.appendChild(panel); wrap.appendChild(bar);
   let tab = null, dashMarkup = '';
-  const hearts = () => { const max = wardMax(), n = Math.max(0, Math.min(max, ward)); return '♥'.repeat(n) + (max > n ? '<i>' + '♥'.repeat(max - n) + '</i>' : ''); };
+  // Bars, not hearts (the maintainer: "let's not do hearts. I like bars. For
+  // both the life and energy for casting").
+  const bar_ = (cls, kana, v, max, title) => `<span class="bar ${cls}" title="${title}"><i style="width:${max > 0 ? Math.round(100*Math.max(0, Math.min(max, v))/max) : 0}%"></i><b>${kana}</b><small>${v}/${max}</small></span>`;
   const canBuyAny = () => Object.entries(UPG).some(([id, u]) => upg[id] < u.max && sumi >= costOf(id));
   function renderDash(){
     const p = purse();
-    const m = `<span class="hp" title="the ward">${hearts()}</span>`
+    const m = bar_('life', '命', ward, wardMax(), 'the ward: ' + ward + ' of ' + wardMax())
+      + bar_('energy', '気', energy, energyMax(), '気 — every stroke fills it, every wisp spends it: ' + energy + ' of ' + energyMax())
       + `<span class="n" title="ink — earned by tracing, spent on this run's skills">墨 ${sumi}</span>`
       + (p ? `<span class="n" title="魂 — earned by runs, spent on what lasts">魂 ${p.balance}</span>` : '')
       + `<span class="n"><small>wave</small> ${wave}</span>`
@@ -1326,6 +1352,7 @@ LAYER = STYLE + r"""
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN,
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; },
+    get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
     charge, kindle, quench, autocast, tidy, casting,
@@ -1445,6 +1472,8 @@ def config(pack, deck=None):
         f"cleanBonus:{int(f.get('cleanBonus', 1))},"
         f"hitodamaCap:{int(f.get('hitodamaCap', 6))},"
         f"castMs:{int(f.get('castMs', 900))},"
+        f"energyMax:{int(f.get('energyMax', 24))},energyStart:{int(f.get('energyStart', 6))},"
+        f"energyPerStroke:{int(f.get('energyPerStroke', 1))},castCost:{int(f.get('castCost', 2))},"
         f"holdMs:{int(f.get('holdMs', 1500))},"
         f"tidyStrays:{'true' if f.get('tidyStrays', True) else 'false'}"
         "};</script>"

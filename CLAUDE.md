@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.55.html`
+### Hiragana — `dist/hiragana-v0.1.56.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -332,7 +332,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.18.html`
+### Katakana — `dist/katakana-game-v0.1.19.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -353,7 +353,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.33.html`
+### Vocab — `dist/vocab-v0.1.34.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -614,8 +614,13 @@ and while it lives every character is traced with less help. Tama still buys
 the lanterns; the gate is no longer for sale. Guided pays nothing and sets no
 record. See `scripts/PACK.md`, "The tower".
 
-**The dashboard (v0.1.55).** Hearts, 墨, 魂 and the wave on the seam between
-field and sketchbook, where the eyes already are, with two tabs: 技, this
+**The dashboard (v0.1.55), and 気 (v0.1.56).** Two bars on the seam between
+field and sketchbook, where the eyes already are — 命, the ward, and 気, the
+energy for casting: one bag every stroke fills whatever is on the field, and
+every wisp a lit character throws spends from ("the stroke does not depend on
+which enemy is present. All strokes go into one bag of energy"). Lights say
+which characters can answer for themselves; 気 is what they answer with;
+nothing fills it but the hand. Beside them 墨, 魂 and the wave, with two tabs: 技, this
 run's skills bought with ink (the strip that used to sit at the top of the
 field), and 灯, the lanterns bought with 魂. A tab does not pause the run.
 The maintainer: "the crazy part of the game is knowing when you can relax the

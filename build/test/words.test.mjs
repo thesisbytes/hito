@@ -57,7 +57,7 @@ new Function(blocks.map(b => b + bridgeFor(b)).join('\n;\n') + probe)();
 const F = globalThis.__field, P = globalThis.__probe;
 let fail = 0;
 const ok = (c, m) => { if (!c) { console.log(`  FAIL: ${m}`); fail++; } };
-const fresh = () => { timers = []; F.restart(); F.quench(); T += 100; };
+const fresh = () => { timers = []; F.restart(); F.quench(); F.fill(99); T += 100; };   // a full bag of 気: these checks are about the lights, not the fuel
 const advance = (ms, stepMs = 16) => {
   for (let e = T + ms; T < e; ){
     T = Math.min(T + stepMs, e);
