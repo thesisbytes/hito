@@ -279,6 +279,7 @@ read as an alias.
 | `tamaWaves` | 3 | one tama per this many farang faced |
 | `inkwellStep` | 6 | ink in hand at the start of a run, per inkwell |
 | `lanternCost`, `lanternRamp` | see above | level one of each lantern, and how each level grows |
+| `tamaCost` | intent 24, quick 16, breath 20, shove 12, mend 20, wall 20, tend 18, dilig 16, harvest 14, rise 28 | 魂 for level one of each upgrade's *lasting* level, bought between runs (v0.1.70); each level grows by `lanternRamp`. A lasting level and the run's 墨 levels add, up to the upgrade's ceiling. |
 
 A difficulty can carry a `tama` multiplier (guided 0, medium 2). Each trace's
 share is scaled by how recognisable it was, from half (nobody could read it)
@@ -401,8 +402,8 @@ calls and the provider's redirect are both refused. See `server/README.md`.
 
 ```json
 "hand": { "maxPoints": 64, "keep": 60, "minStep": 4,
-          "pen":    { "size": [0.52, 0.52], "stage": "34dvh", "ease": 1,   "trail": 1,   "halo": 0,  "endFloor": 0.02 },
-          "finger": { "size": [0.62, 0.62], "stage": "46dvh", "ease": 1.3, "trail": 2.2, "halo": 36, "endFloor": 0.045, "flick": 0.12 } }
+          "pen":    { "size": [0.52, 0.52], "stage": "38dvh", "ease": 1,   "trail": 1,   "halo": 0,  "endFloor": 0.02 },
+          "finger": { "size": [0.62, 0.62], "stage": "50dvh", "ease": 1.3, "trail": 2.2, "halo": 36, "endFloor": 0.045, "flick": 0.12 } }
 ```
 
 `build/hand_layer.py`, appended to every build. It owns three things: the

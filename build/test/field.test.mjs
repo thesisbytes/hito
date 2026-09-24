@@ -801,8 +801,8 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(/data-upg="wall"/.test(F.guardHtml) && /data-upg="tend"/.test(F.guardHtml) && /data-upg="mend"/.test(F.guardHtml) && !/data-upg="mend"/.test(F.upgHtml),
      'the 耐 strip is missing something, or mend is still on 技');
   advance(20);
-  ok(/data-tab="guard"/.test(F.dashHtml), 'the dashboard has no 耐 tab');
-  ok(/data-tab="skills"[^>]*>\s*<svg/.test(F.dashHtml) && /data-tab="guard"[^>]*>\s*<svg/.test(F.dashHtml) && /data-tab="drive"[^>]*>\s*<svg/.test(F.dashHtml), 'a shop tab has no mark on it');
+  ok(/data-tab="boosts"/.test(F.dashHtml) && !/data-tab="guard"|data-tab="lanterns"/.test(F.dashHtml), 'the seam should carry one shop, boosts, and no lantern room');
+  ok(/data-tab="boosts"[^>]*>\s*<svg/.test(F.dashHtml), 'the boosts tab has no mark on it');
   ok(/data-tab="trace"[^>]*aria-label="the sketchbook"/.test(F.dashHtml), 'the sketchbook tab is unlabelled');
   // every upgrade wears a mark, and the lanterns too
   { const all = F.upgHtml + F.guardHtml + F.driveHtml;
@@ -810,7 +810,7 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
     F.openTab('lanterns');
     for (const id of Object.keys(F.LANTERN)) ok(new RegExp(`data-lantern="${id}"[^>]*>\\s*<b>\\s*<svg`).test(F.lanternHtml || ''), `lantern ${id} has no mark`);
     F.openTab(null); }
-  ok(F.openTab('guard') === 'guard' && F.tab === 'guard' && !F.paused, '耐 did not open, or paused the run');
+  ok(F.openTab('guard') === 'boosts' && F.tab === 'boosts' && !F.paused, 'the old 耐 tab did not open the boosts, or paused the run');
   F.openTab(null);
 
   // 志: currency gain. diligence on the trace, harvest on the banish, rise on the fall
@@ -825,7 +825,7 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
     ok(F.ink - ink0 === cfg.inkKill + 1, `a light's banish with harvest 1 paid ${F.ink - ink0}, expected ${cfg.inkKill + 1}`); }
   ok(/data-upg="rise"/.test(F.driveHtml) && !/data-upg="rise"/.test(F.upgHtml) && !/data-upg="rise"/.test(F.guardHtml), 'rise is not on 志 alone');
   advance(20);
-  ok(/data-tab="drive"/.test(F.dashHtml) && F.openTab('drive') === 'drive' && !F.paused, '志 is missing from the seam, or paused the run');
+  ok(F.openTab('drive') === 'boosts' && !F.paused, 'the old 志 tab did not open the boosts, or paused the run');
   F.openTab(null);
 
   // a tough farang survives the first hit, and the pips say how much is owed
@@ -866,13 +866,13 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   F.earn(50); F.buy('quick');
   fresh();
   ok(F.ink === 0 && F.upgrades.quick === 0 && F.upgrades.wall === 0 && F.wardMax === cfg.wardHp, 'ink or upgrades survived the ward falling');
-  ok(/墨 0/.test(F.upgHtml) && /data-upg="quick"/.test(F.upgHtml), 'the workshop strip is missing or stale after a restart');
+  ok(/墨 0/.test(F.inkHtml) && /data-upg="quick"/.test(F.upgHtml), 'the boosts shop is missing or stale after a restart');
   // the dashboard on the seam: hearts, ink, 魂, the wave, and tabs that do not pause the run
   advance(20);
-  ok(/class="bar life"/.test(F.dashHtml) && /class="bar energy"/.test(F.dashHtml) && /墨 0/.test(F.dashHtml) && /data-tab="skills"/.test(F.dashHtml), `the dashboard is missing something: ${F.dashHtml.slice(0, 200)}`);
+  ok(/class="bar life"/.test(F.dashHtml) && /class="bar energy"/.test(F.dashHtml) && /墨 0/.test(F.dashHtml) && /data-tab="boosts"/.test(F.dashHtml), `the dashboard is missing something: ${F.dashHtml.slice(0, 200)}`);
   ok(new RegExp(`<small>${F.wardMax}/${F.wardMax}</small>`).test(F.dashHtml), `the life bar does not read ${F.wardMax} of ${F.wardMax}`);
-  ok(F.openTab('skills') === 'skills' && F.tab === 'skills' && !F.paused, 'opening a tab paused the run, or did not open');
-  ok(/data-tab="skills" aria-pressed="true"/.test(F.dashHtml), 'the open tab is not shown as open');
+  ok(F.openTab('boosts') === 'boosts' && F.tab === 'boosts' && !F.paused, 'opening a tab paused the run, or did not open');
+  ok(/data-tab="boosts" aria-pressed="true"/.test(F.dashHtml), 'the open tab is not shown as open');
   // the sketchbook is a tab too: a shop stands where it stood, and there is nothing to trace on
   const stageEl = F.sketchbook;   // the stub hands a fresh element to every lookup, so ask the shell for its own
   ok(stageEl.hidden === true, 'the sketchbook is still there under an open shop');
@@ -880,14 +880,14 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(stageEl.hidden === false && /data-tab="trace" aria-pressed="true"/.test(F.dashHtml), 'closing the shop did not bring the sketchbook back');
   ok(F.openTab('trace') === null && F.tab === null, '筆 is not the way back to the sketchbook');
   // a tap is heard by the seam itself, on pointerdown, however often its buttons are rebuilt
-  ok(typeof F.tap === 'function' && F.tap('button[data-tab="guard"]') === true && F.tab === 'guard', 'a pointerdown on the 耐 tab did not open it');
+  ok(typeof F.tap === 'function' && F.tap('button[data-tab="boosts"]') === true && F.tab === 'boosts', 'a pointerdown on the boosts tab did not open it');
   F.earn(1); advance(20);   // a re-render between
-  ok(F.tap('button[data-tab="guard"]') === true && F.tab === null, 'a second tap on the open tab, after a re-render, did not close it');
+  ok(F.tap('button[data-tab="boosts"]') === true && F.tab === null, 'a second tap on the open tab, after a re-render, did not close it');
   // and it does not open under a pen that is down: lift, and find the gap
   F.touch();
-  ok(F.openTab('skills') === null && stageEl.hidden === false, 'a shop opened under a pen that was down');
+  ok(F.openTab('boosts') === null && stageEl.hidden === false, 'a shop opened under a pen that was down');
   advance(cfg.holdMs + 50);
-  ok(F.openTab('skills') === 'skills', 'a lifted pen could not open the shop');
+  ok(F.openTab('boosts') === 'boosts', 'a lifted pen could not open the shop');
   F.restart();
   ok(F.tab === null && stageEl.hidden === false, 'a new run began with the shop open');
 
@@ -1050,6 +1050,22 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   const hearts = F.wardMax, cap = F.capNow();
   const bag = F.energyMax;
   ok(F.buyLantern('heart') && F.buyLantern('lamp') && F.buyLantern('inkwell') && F.buyLantern('vessel'), 'a full purse could not buy the lanterns');
+  // what lasts is bought between runs, in tabs, with 魂: a level that lasts is a level in the run
+  F.openStart();
+  ok(/data-wtab="attack"/.test(F.startHtml) && /data-wtab="defend"/.test(F.startHtml) && /data-wtab="earn"/.test(F.startHtml) && /data-wtab="lanterns"/.test(F.startHtml) && /data-wtab="more"/.test(F.startHtml), 'the workshop between runs is missing a tab');
+  ok(/data-perm="intent"/.test(F.startHtml) && /data-perm="wall"/.test(F.startHtml) && /data-perm="rise"/.test(F.startHtml) && /data-lantern="heart"/.test(F.startHtml), 'the workshop does not sell what lasts');
+  ok(/KanjiVG/.test(F.startHtml) && /draw with/.test(F.startHtml), 'the "more" tab has lost the credits or the settings');
+  ok(F.showWtab('defend') === undefined && F.wtab === 'defend', 'a workshop tab did not switch');
+  { const own0 = F.own('intent'), bal0 = H.tama.balance, c = F.permCost('intent');
+    ok(F.buyPerm('intent') === true && F.own('intent') === own0 + 1 && H.tama.balance === bal0 - c, `a permanent intent could not be bought (own ${F.own('intent')}, balance ${H.tama.balance}, was ${bal0}, cost ${c})`);
+    ok(F.permCost('intent') > c, 'the next level of a permanent upgrade does not cost more');
+    fresh(); F.quench();
+    ok(F.lvl('intent') === own0 + 1 && F.upgrades.intent === 0, `a level that lasts did not carry into the run (lvl ${F.lvl('intent')}, run ${F.upgrades.intent})`);
+    const m = F.monsters[0]; m.hp = 5; F.hit(m, false, false);
+    ok(m.hp === 5 - (1 + F.lvl('intent')), `a hit with a lasting intent ${F.lvl('intent')} took ${5 - m.hp}`);
+    F.earn(100000); let n = 0; while (F.buy('intent') && n < 50) n++;
+    ok(F.lvl('intent') === F.UPG.intent.max && F.upgrades.intent === F.UPG.intent.max - F.own('intent'), `the run bought past the ceiling (lvl ${F.lvl('intent')}, run ${F.upgrades.intent}, own ${F.own('intent')})`);
+    ok(F.buyPerm('intent') === false || F.own('intent') <= F.UPG.intent.max, 'a permanent upgrade went past its ceiling'); }
   fresh(); F.begin();
   ok(F.energyMax === bag + cfg.vesselStep, `a vessel did not grow the bag (${F.energyMax}, was ${bag})`);
   ok(F.ward === hearts + 1 && F.wardMax === hearts + 1, `a heart did not carry into the next run (ward ${F.ward}, was ${hearts})`);

@@ -40,7 +40,8 @@ STYLE = """
      tracer. */
   body.field .tabs, body.field .count, body.field .meta, body.field .power,
   body.field .only-p, body.field .only-r, body.field #fontRow,
-  body.field .grid, body.field .hint { display:none !important; }
+  body.field .grid, body.field .hint,
+  body.field #badge, body.field .credit { display:none !important; }   /* the run is play room; the credits live in the workshop's "more" tab */
 
   body.field { height:100dvh; overflow:hidden; justify-content:flex-start; }
   body.field header { padding:6px 0 2px; }
@@ -95,6 +96,20 @@ STYLE = """
                           border:1px solid #3d3324; color:#e8e0cc; cursor:pointer; display:inline-flex; align-items:center; gap:4px; line-height:1; }
   .dash-bar .dash-tabs button svg{ width:13px; height:13px; flex:none; opacity:.85; }
   .dash-bar .dash-tabs button[data-tab="trace"]{ font-size:19px; padding:4px 16px; border-width:2px; }
+  .dash-bar .dash-tabs button small{ font-size:10px; font-weight:400; opacity:.7; }
+  .upg-h{ display:flex; align-items:center; gap:5px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(232,224,204,.55); margin:8px 0 4px; flex:1 0 100%; }
+  .upg-h svg{ width:13px; height:13px; }
+  #upg-ink{ display:block; margin:0 0 4px; } #upg-ink b{ font-size:15px; } #upg-ink small{ display:block; font-weight:400; color:rgba(232,224,204,.55); }
+  /* the workshop between runs: tabs across, one panel below */
+  .wtabs{ display:flex; gap:4px; margin:12px 0 8px; }
+  .wtabs button{ flex:1 1 0; min-width:0; padding:7px 4px; font:700 12px ui-sans-serif,system-ui; border-radius:9px; background:transparent; border:1px solid #3d3324; color:#e8e0cc; cursor:pointer;
+                 display:inline-flex; flex-direction:column; align-items:center; gap:3px; touch-action:manipulation; }
+  .wtabs button svg{ width:16px; height:16px; }
+  .wtabs button.can{ border-color:#7fd1c4; color:#bdf0e6; }
+  .wtabs button[aria-pressed="true"]{ background:rgba(127,209,196,.14); border-color:#7fd1c4; color:#bdf0e6; }
+  .wpanel[hidden]{ display:none; }
+  .wpanel .start-row button b i.k{ font-style:normal; font-size:10px; opacity:.6; margin-right:4px; }
+  .wpanel .start-row button b small.of{ display:inline; font-size:11px; font-weight:400; opacity:.55; margin-left:3px; }
   @media (max-width:560px){ .dash-bar .dash-tabs{ flex:1 0 100%; margin-left:0; justify-content:space-between; } }
   .dash-bar .dash-tabs button.can{ border-color:#7fd1c4; color:#bdf0e6; }
   .dash-bar .dash-tabs button[aria-pressed="true"]{ background:rgba(127,209,196,.14); border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 10px rgba(127,209,196,.25); }
@@ -301,7 +316,17 @@ LAYER = STYLE + r"""
   // `ink` shadowed it, and guided threw on every repaint in v0.1.39.
   let sumi = 0, upg = freshUpg();
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
-  const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
+  // An upgrade's level is what lasts plus what this run bought. What lasts
+  // is bought with 魂 between runs (the maintainer: "the game should rely
+  // on after game currency to level up the upgrades like in the tower");
+  // the run's 墨 buys the rungs above it, up to the same ceiling.
+  const lvl = id => own(id) + (upg[id] || 0);
+  const permCost = id => Math.round((CFG.tamaCost[id] || 20) * Math.pow(CFG.lanternRamp, own(id)));
+  function buyPerm(id){
+    const p = purse(); if (!p || !UPG[id]) return false;
+    return p.buy(id, permCost(id), UPG[id].max);
+  }
+  const castMs = () => CFG.castMs * Math.pow(0.82, lvl('quick'));
   // ---- stages, and the workshop between rounds ------------------------------
   // The maintainer: "make it impossible to advance without unlocking stuff. so
   // there needs to be a currency to use after each round". Stages did that
@@ -348,7 +373,7 @@ LAYER = STYLE + r"""
     return p.buy(id, lanternCost(id), LANTERN[id].max);
   }
   const capNow = () => CFG.hitodamaCap + own('lamp');
-  const wardMax = () => CFG.wardHp + own('heart') + upg.mend;
+  const wardMax = () => CFG.wardHp + own('heart') + lvl('mend');
   // What this run was, kept as it goes so the end can say it. Observations:
   // how far, how many, how cleanly. Never a score.
   let run = null;
@@ -364,7 +389,7 @@ LAYER = STYLE + r"""
   function fill(n){ energy = Math.max(0, Math.min(energyMax(), energy + (+n || 0))); return energy; }   // negative drains; a breach may, one day
   function earn(n){ if (n > 0){ sumi += n; if (run) run.earned += n; renderUpg(); } return sumi; }
   function buy(id){
-    if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
+    if (!UPG[id] || over || lvl(id) >= UPG[id].max) return false;
     const c = costOf(id);
     if (sumi < c) return false;
     sumi -= c; upg[id]++;
@@ -387,7 +412,7 @@ LAYER = STYLE + r"""
   // Words bite like anything else: a word that reaches the ward is a word
   // not answered.
   const biteFor = (w, boss) => Math.max(1, (CFG.biteEvery ? Math.min(CFG.biteMax, 1 + Math.floor(w / CFG.biteEvery)) : 1)
-                                          + (boss && ST ? ST.bossBite : 0) - upg.wall);
+                                          + (boss && ST ? ST.bossBite : 0) - lvl('wall'));
   let spawnAt = 0, tPrev = 0;
   let frames = { n:0, slow:0, jank:0 };
   // The field holds still while the start page is up. Nothing moves, nothing
@@ -632,7 +657,7 @@ LAYER = STYLE + r"""
     // 癒 tend: for every `tendEvery` waves held, a life back per level, up to
     // the ward's size. Held, not survived: it is paid when the wave comes,
     // so a ward at one life that lasts the stretch is mended at its end.
-    if (upg.tend && CFG.tendEvery && wave % CFG.tendEvery === 0) ward = Math.min(wardMax(), ward + upg.tend);
+    if (lvl('tend') && CFG.tendEvery && wave % CFG.tendEvery === 0) ward = Math.min(wardMax(), ward + lvl('tend'));
     applyShadow();   // a boss arriving dims the shape for everyone, retarget or not
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
     // is what it should be showing.
@@ -845,7 +870,7 @@ LAYER = STYLE + r"""
   // stroke-complete, and reaches here as a global); a conjure credits any the
   // shine did not, so a trace is worth its strokes however it was scored
   const _shine = window.shine;
-  const perStroke = () => CFG.energyPerStroke + upg.breath;
+  const perStroke = () => CFG.energyPerStroke + lvl('breath');
   // A stroke's 気 goes in through topUp, so a bag filled to the brim is
   // released whichever way the stroke was credited — as it shone, or at the
   // conjure for the strokes shine never saw.
@@ -887,7 +912,7 @@ LAYER = STYLE + r"""
     // times pays a little less, so the run pushes toward the ones that are new.
     const wasClean = !zapped;
     if (run){ run.traced++; if (wasClean) run.clean++; }
-    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)) + upg.dilig);
+    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)) + lvl('dilig'));
     const r = _conjure.apply(this, arguments);
     // What this trace is worth when the run ends. The hand has just judged how
     // recognisable it was (the note is taken on the way into the engine): a
@@ -918,7 +943,7 @@ LAYER = STYLE + r"""
   let readings = [];
   function strike(m, partial, auto){
     const p0 = px(m);
-    if (upg.shove) m.d = Math.min(1, m.d + upg.shove * CFG.shoveStep);
+    if (lvl('shove')) m.d = Math.min(1, m.d + lvl('shove') * CFG.shoveStep);
     if (partial){
       // a kana landed: the farang staggers back a step and waits for the next.
       // Only for the hand. A lit arsenal that also shoved would hold a word
@@ -928,7 +953,7 @@ LAYER = STYLE + r"""
         motes.push({x:p0.x, y:p0.y, vx:(Math.random()-.5)*2, vy:(Math.random()-.5)*2, life:.7});
       return;
     }
-    m.hp -= 1 + upg.intent;   // intent: every light cuts deeper
+    m.hp -= 1 + lvl('intent');   // intent: every light cuts deeper
     // The sound, attached to the kill. Tracing a shape teaches the shape and
     // nothing else — the hand can learn every stroke of ぬ without the reading
     // ever arriving. Success is the moment attention is highest, so that is
@@ -962,7 +987,7 @@ LAYER = STYLE + r"""
       if (m === locked) locked = null;
       if (m.boss) applyShadow();
       killed++;
-      if (auto) earn(CFG.inkKill + upg.harvest);
+      if (auto) earn(CFG.inkKill + lvl('harvest'));
       // An observation, not a claim: what was answered and how long it took.
       // Deliberately not a score — the client does not get to assert totals.
       try { window.__sync && window.__sync.record('banish', {
@@ -1294,7 +1319,7 @@ LAYER = STYLE + r"""
     const p = purse();
     const pay = !p ? 0 : Math.round((run.pay + Math.floor(wave/CFG.tamaWaves))
                                      * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1)
-                                     * (1 + upg.rise * CFG.riseStep));   // 起: get up with more
+                                     * (1 + lvl('rise') * CFG.riseStep));   // 起: get up with more
     if (p) p.earn(pay);
     // guided is practice: the hand keeps the run, but not as a furthest wave
     const rec = { at: run.at, realm: REALM, practice: difficulty === 'guided' || undefined, tama: pay,
@@ -1323,13 +1348,15 @@ LAYER = STYLE + r"""
   const stripDrive = document.createElement('div');
   stripDrive.className = 'upg'; stripDrive.id = 'upg-drive';
   let upgMarkup = '', guardMarkup = '', driveMarkup = '';
-  const stripHtml = tabName => `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${sumi}</div>`
+  const SECTION = { skills: ['sword', 'attack'], guard: ['shield', 'defend'], drive: ['coin', 'earn'] };
+  const stripHtml = tabName => `<p class="upg-h">${ICON[SECTION[tabName][0]]}${SECTION[tabName][1]}</p>`
       + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
-          const maxed = upg[id] >= u.max, c = costOf(id);
+          const maxed = lvl(id) >= u.max, c = costOf(id);
           return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
-            + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i></b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
+            + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i></b>${u.name}${lvl(id) ? ' ' + lvl(id) : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
         }).join('');
   function renderUpg(){
+    panelInk.innerHTML = `<b>墨 ${sumi}</b><small>this run's ink · boosts end with the run · what lasts is bought with 魂 between runs</small>`;
     strip.innerHTML = upgMarkup = stripHtml('skills');
     stripGuard.innerHTML = guardMarkup = stripHtml('guard');
     stripDrive.innerHTML = driveMarkup = stripHtml('drive');
@@ -1344,11 +1371,14 @@ LAYER = STYLE + r"""
   // real browser. The stub DOM cannot see a stylesheet; a screenshot can.
   const bar = document.createElement('div'); bar.className = 'dash-bar'; bar.id = 'dashbar';
   const panel = document.createElement('div'); panel.className = 'panel'; panel.id = 'panel'; panel.hidden = true;
-  const panelSkills = document.createElement('div'); panelSkills.innerHTML = '<p class="panel-h">技 · this run · intent, bought with 墨</p>'; panelSkills.appendChild(strip);
-  const panelGuard = document.createElement('div'); panelGuard.innerHTML = '<p class="panel-h">耐 · this run · persistence, bought with 墨</p>'; panelGuard.appendChild(stripGuard);
-  const panelDrive = document.createElement('div'); panelDrive.innerHTML = '<p class="panel-h">志 · this run · motivation, bought with 墨</p>'; panelDrive.appendChild(stripDrive);
-  const panelLanterns = document.createElement('div');
-  panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelDrive); panel.appendChild(panelLanterns);
+  // One shop in the run, not three tabs and a lantern room: 墨 boosts, in
+  // three short sections. What lasts is bought between runs (the maintainer:
+  // "not so cluttered ... should have after round tabs for upgrades").
+  const panelInk = document.createElement('div'); panelInk.className = 'upg-ink'; panelInk.id = 'upg-ink';
+  const panelSkills = document.createElement('div'); panelSkills.appendChild(strip);
+  const panelGuard = document.createElement('div'); panelGuard.appendChild(stripGuard);
+  const panelDrive = document.createElement('div'); panelDrive.appendChild(stripDrive);
+  panel.appendChild(panelInk); panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelDrive);
   stageEl.parentNode.insertBefore(panel, stageEl.nextSibling); wrap.appendChild(bar);
   let tab = null, dashMarkup = '';
   // Bars, not hearts (the maintainer: "let's not do hearts. I like bars. For
@@ -1362,19 +1392,15 @@ LAYER = STYLE + r"""
     flame:  '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8c2 3 3.6 4.4 3.6 7.4a3.6 3.6 0 0 1-7.2 0C4.4 6.2 6 4.8 8 1.8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
   };
   const bar_ = (cls, kana, v, max, title) => `<span class="bar ${cls}" title="${title}"><i style="width:${max > 0 ? Math.round(100*Math.max(0, Math.min(max, v))/max) : 0}%"></i><b>${kana}</b><small>${v}/${max}</small></span>`;
-  const canBuyAny = tabName => Object.entries(UPG).some(([id, u]) => u.tab === tabName && upg[id] < u.max && sumi >= costOf(id));
+  const canBuyAny = () => Object.entries(UPG).some(([id, u]) => lvl(id) < u.max && sumi >= costOf(id));
   function renderDash(){
     const p = purse();
     const m = bar_('life', '命', ward, wardMax(), 'the ward: ' + ward + ' of ' + wardMax())
       + bar_('energy', '気', energy, energyMax(), '気 — every stroke fills it, every wisp spends it: ' + energy + ' of ' + energyMax())
-      + `<span class="n" title="ink — earned by tracing, spent on this run's skills">墨 ${sumi}</span>`
-      + (p ? `<span class="n" title="魂 — earned by runs, spent on what lasts">魂 ${p.balance}</span>` : '')
+      + `<span class="n" title="ink — earned by tracing, spent on this run's boosts">墨 ${sumi}</span>`
       + `<span class="n" title="the wave"><small>波</small> ${wave}</span>`
-      + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook: write" aria-label="the sketchbook">筆</button>`
-      + `<button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="技 intent: how you attack" aria-label="intent: attack upgrades">${ICON.sword}技</button>`
-      + `<button data-tab="guard" aria-pressed="${tab === 'guard'}" class="${canBuyAny('guard') ? 'can' : ''}" title="耐 persistence: how you defend" aria-label="persistence: defence upgrades">${ICON.shield}耐</button>`
-      + `<button data-tab="drive" aria-pressed="${tab === 'drive'}" class="${canBuyAny('drive') ? 'can' : ''}" title="志 motivation: how you earn" aria-label="motivation: currency upgrades">${ICON.coin}志</button>`
-      + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="灯 what lasts, bought with 魂" aria-label="lanterns: what lasts">${ICON.flame}灯</button>` : '') + `</span>`;
+      + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook: write" aria-label="the sketchbook">筆<small>write</small></button>`
+      + `<button data-tab="boosts" aria-pressed="${tab === 'boosts'}" class="${canBuyAny() ? 'can' : ''}" title="墨 boosts: this run's upgrades" aria-label="boosts: this run's upgrades">${ICON.sword}墨<small>boosts</small></button></span>`;
     if (m === dashMarkup) return;
     dashMarkup = m; bar.innerHTML = m;
     // (the tab handlers live on `bar` itself; see tapOn)
@@ -1405,20 +1431,19 @@ LAYER = STYLE + r"""
   }
   tapOn(bar, 'button[data-tab]', b => openTab(tab === b.dataset.tab || b.dataset.tab === 'trace' ? null : b.dataset.tab));
   tapOn(panel, 'button[data-upg]', b => buy(b.dataset.upg));
-  tapOn(panel, 'button[data-lantern]', b => { if (buyLantern(b.dataset.lantern)) renderLanterns(); });
-  function renderLanterns(){ panelLanterns.innerHTML = `<p class="panel-h">灯 · what lasts · bought with 魂</p>` + workshopHtml(); renderDash(); }
+
   // A tab does not pause the run. That is the point: the waves keep coming
   // while you shop, and knowing when you can afford to is the game. And the
   // sketchbook is a tab too: while a shop is open there is nothing to trace
   // on, so a lit character's own lights are all that holds the ward. A shop
   // does not open under a pen that is down; lift, and find the gap.
   function openTab(name){
+    if (name === 'skills' || name === 'guard' || name === 'drive' || name === 'lanterns') name = 'boosts';   // the old tabs, one shop now
     if (name && name !== 'trace' && tracing()) return tab;
     tab = name && name !== 'trace' ? name : null;
     if (tab && !stageEl.hidden){ const r = stageEl.getBoundingClientRect(); if (r.width > 0){ panel.style.width = r.width + 'px'; panel.style.height = r.height + 'px'; } }
     stageEl.hidden = !!tab;
-    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelGuard.hidden = tab !== 'guard'; panelDrive.hidden = tab !== 'drive'; panelLanterns.hidden = tab !== 'lanterns';
-    if (tab === 'lanterns') renderLanterns();
+    panel.hidden = !tab;
     renderDash();
     return tab;
   }
@@ -1429,91 +1454,108 @@ LAYER = STYLE + r"""
   start.className = 'start'; start.id = 'start';
   let view = 'start', markup = '';
   const esc = t => String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-  function renderCredits(){
-    const lines = (CFG.credits || []).map(l => `<p>${esc(l)}</p>`).join('');
-    start.innerHTML = markup = `<div class="start-card credits">
-      <div class="start-title">hito<span>人</span></div>
-      <div class="start-sub">who this leans on</div>
-      <p class="lead"><b>人</b>is two strokes, and neither can stand on its own. Take one away and the character falls.</p>
-      <p>That is the project. One person records the strokes, another draws the letterforms, testers find the bugs, someone builds it, and every learner leans on all of them.</p>
-      ${lines}
-      <p class="small">${esc(CFG.credit || '')}</p>
-      <p class="small">Single file, opens from a double-click, and needs no network to play. Your progress lives on this device.${window.__sync && window.__sync.enabled ? ' When there is a network, notes on how the tracing went are sent to the workshop under a made-up device name; ✋ hand, up top, turns that off.' : ''}</p>
-      <button class="start-go">back</button>
-    </div>`;
-    const go = start.querySelector('.start-go');
-    if (go) go.onclick = () => { view = 'start'; renderStart(); };
+  // ---- the workshop between runs
+  // The Tower's shape (the maintainer: "the game should rely on after game
+  // currency to level up the upgrades like in the tower ... should have
+  // after round tabs for upgrades"): what a run earns buys levels that last,
+  // in tabs — attack, defend, earn, lanterns — and "more" holds the settings,
+  // the hand, and who this leans on. Every panel is in the page and only the
+  // active one is shown, so switching tabs rebuilds nothing.
+  let wtab = 'attack';
+  try { wtab = localStorage.getItem('hito-wtab') || 'attack'; } catch(_){}
+  const WTABS = [['attack', 'sword', 'skills'], ['defend', 'shield', 'guard'], ['earn', 'coin', 'drive'], ['lanterns', 'flame', null], ['more', null, null]];
+  function permHtml(tabName){
+    const p = purse(); if (!p) return '<p class="over-line">sign in or play from a page to keep what lasts</p>';
+    return `<div class="start-row lantern">` + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
+      const lv = own(id), maxed = lv >= u.max, c = permCost(id);
+      return `<button data-perm="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
+        + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}<small class="of">/${u.max}</small></b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
+    }).join('') + `</div>`;
   }
-  function renderStart(){
-    if (view === 'credits') return renderCredits();
-    if (view === 'over') return renderOver();
-    // Other realms, as links to sibling files. They are other single-file
-    // builds beside this one — on Pages or in the same folder offline — so
-    // the page is only a hop away and nothing here depends on it loading.
-    const realms = () => !(CFG.realms || []).length ? '' :
-      `<div class="start-h">other realms</div><div class="start-row">` +
-      CFG.realms.map(r => `<a href="${esc(r.file)}"><b>${r.kana ? `<i>${esc(r.kana)}</i>` : ''}${esc(r.label)}</b><small>${esc(r.blurb || '')}</small></a>`).join('') +
-      `</div>`;
-    // What draws belongs to the hand layer; the page only shows its switch,
-    // because on a phone it is the difference between a game and a picture.
+  function lanternsHtml(){
+    const p = purse(); if (!p) return '<p class="over-line">sign in or play from a page to keep what lasts</p>';
+    return `<div class="start-row lantern">` + Object.entries(LANTERN).map(([id, u]) => {
+      const lv = own(id), maxed = lv >= u.max, c = lanternCost(id);
+      return `<button data-lantern="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
+        + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}<small class="of">/${u.max}</small></b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
+    }).join('') + `</div>`;
+  }
+  function moreHtml(thumbs){
     const hand = window.__hand;
     const INPUTS = { pen: { kana:'✎', blurb:'fingers and palms are ignored, so the hand can rest on the glass.' },
                      finger: { kana:'☝', blurb:'anything that touches draws. one finger at a time.' } };
     const row = (k, table, cur) => Object.entries(table).map(([n, d]) =>
       `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
       + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
+    const lines = (CFG.credits || []).map(l => `<p>${esc(l)}</p>`).join('');
+    return `<div class="start-h">how much help</div><div class="start-row">${row('diff', DIFF, difficulty)}</div>
+      <div class="start-h">what the sign says</div><div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
+      ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
+      ${hand ? `<div class="start-links"><button class="start-hand">how the hand is doing</button></div>` : ''}
+      ${thumbs ? `<div class="start-h">as you wrote them</div>${thumbs}` : ''}
+      <div class="credits"><div class="start-h">who this leans on</div>
+      <p class="lead"><b>人</b>is two strokes, and neither can stand on its own. Take one away and the character falls.</p>
+      <p>That is the project. One person records the strokes, another draws the letterforms, testers find the bugs, someone builds it, and every learner leans on all of them.</p>
+      ${lines}
+      <p class="small">${esc(CFG.credit || '')}</p>
+      <p class="small">Single file, opens from a double-click, and needs no network to play. Your progress lives on this device.${window.__sync && window.__sync.enabled ? ' When there is a network, notes on how the tracing went are sent to the workshop under a made-up device name; ✋ hand, up top, turns that off.' : ''}</p></div>`;
+  }
+  function workshopHtml(only, thumbs){
+    const p = purse();
+    const panels = { attack: permHtml('skills'), defend: permHtml('guard'), earn: permHtml('drive'), lanterns: lanternsHtml(), more: moreHtml(thumbs) };
+    if (only) return panels[only] || '';
+    const canBuy = t => !!p && (t === 'lanterns'
+      ? Object.entries(LANTERN).some(([id, u]) => own(id) < u.max && p.balance >= lanternCost(id))
+      : Object.entries(UPG).some(([id, u]) => u.tab === (WTABS.find(w => w[0] === t) || [])[2] && own(id) < u.max && p.balance >= permCost(id)));
+    const tabs = `<div class="wtabs">` + WTABS.map(([t, icon]) =>
+      `<button data-wtab="${t}" aria-pressed="${wtab === t}" class="${canBuy(t) ? 'can' : ''}" aria-label="${t}">${icon ? ICON[icon] : ''}${t}</button>`).join('') + `</div>`;
+    const body = WTABS.map(([t]) => `<div class="wpanel" data-wpanel="${t}"${wtab === t ? '' : ' hidden'}>${panels[t]}</div>`).join('');
+    return `<div class="start-h">the workshop${p ? ' · 魂 ' + p.balance : ''} <small>what lasts, bought with 魂</small></div>${tabs}${body}`;
+  }
+  function showWtab(t){
+    wtab = t; try { localStorage.setItem('hito-wtab', t); } catch(_){}
+    if (!start.querySelectorAll) return;
+    for (const b of start.querySelectorAll('button[data-wtab]')) b.setAttribute('aria-pressed', String(b.dataset.wtab === t));
+    for (const el of start.querySelectorAll('[data-wpanel]')) el.hidden = el.dataset.wpanel !== t;
+  }
+  function renderCredits(){ wtab = 'more'; return renderStart(true); }
+  function renderStart(asStart){
+    if (view === 'credits' && !asStart) return renderCredits();
+    if (view === 'over') return renderOver();
+    const hand = window.__hand;
     start.innerHTML = markup = `<div class="start-card">
       <div class="start-title">hito<span>人</span></div>
       <div class="start-sub">${esc(REALM)} · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
-      <div class="start-h">how much help</div>
-      <div class="start-row">${row('diff', DIFF, difficulty)}</div>
-      <div class="start-h">what the sign says</div>
-      <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
       ${ST ? `<div class="start-h">the tower · furthest wave ${bestWave()} · ${roster().length} characters on the field${nextRowAt() < Infinity ? ' · next row of the chart at wave ' + nextRowAt() : ' · every row of the chart'}${difficulty === 'guided' ? ' · <b class="needs">practice: nothing counts</b>' : ''}</div>` : ''}
-      ${workshopHtml()}
-      ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
-      ${realms()}
       <button class="start-go">${over ? 'begin again' : 'begin'}</button>
-      <div class="start-links">${hand ? '<button class="start-hand">how the hand is doing</button>' : ''}<button class="start-credits">who this leans on</button></div>
+      ${workshopHtml()}
       <div class="start-foot">${WORDS ? 'draw below · the farang come from above · write what they are saying, one kana at a time' : 'draw below · the farang come from above · the one you are answering is yours'}</div>
     </div>`;
-    const cr = start.querySelector('.start-credits');
-    if (cr) cr.onclick = () => { view = 'credits'; renderStart(); };
+    wirePage(renderStart);
+  }
+  function wirePage(again){
     const hb = start.querySelector('.start-hand');
-    if (hb) hb.onclick = () => hand.show();
-    wireWorkshop(renderStart);
+    if (hb) hb.onclick = () => window.__hand.show();
     for (const b of start.querySelectorAll('button[data-k]')){
       b.onclick = () => {
         if (b.dataset.k === 'diff') setDifficulty(b.dataset.v);
-        else if (b.dataset.k === 'input') hand.setInput(b.dataset.v);
-        else if (b.dataset.k === 'stage'){ if (setStage(b.dataset.v) && !over){ monsters = []; wave = 0; killed = 0; locked = null; spawn(); retarget(true); } }
+        else if (b.dataset.k === 'input') window.__hand.setInput(b.dataset.v);
         else setSign(b.dataset.v);
-        renderStart();
+        again();
       };
     }
     const go = start.querySelector('.start-go');
     if (go) go.onclick = begin;
+    const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
   }
+  // purchases and tab switches are heard by the page itself: a purchase
+  // re-renders the page, and a handler on the button would go with it
+  tapOn(start, 'button[data-wtab]', b => showWtab(b.dataset.wtab));
+  tapOn(start, 'button[data-perm]', b => { if (buyPerm(b.dataset.perm)) renderStart(); });
+  tapOn(start, 'button[data-lantern]', b => { if (buyLantern(b.dataset.lantern)) renderStart(); });
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
   function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
-  // The lantern workshop. Shown where a round ends and where one begins.
-  function workshopHtml(){
-    const p = purse(); if (!p) return '';
-    const items = Object.entries(LANTERN).map(([id, u]) => {
-      const lv = own(id), maxed = lv >= u.max, c = lanternCost(id);
-      return `<button data-lantern="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
-        + `<b>${MARK[id] || ''}<i>${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}</b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
-    }).join('');
-    const gate = '';   // the gate was bought with 魂 until v0.1.54; rows open by distance now
-    return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
-  }
-  function wireWorkshop(again, root){
-    for (const b of (root || start).querySelectorAll('button[data-lantern]')) b.onclick = () => {
-      const id = b.dataset.lantern;
-      if (buyLantern(id)) again();
-    };
-  }
   function renderOver(){
     const e = ended; if (!e){ view = 'start'; return renderStart(); }
     const r = e.rec, H = window.__hand;
@@ -1534,21 +1576,16 @@ LAYER = STYLE + r"""
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
       ${r.practice ? `<p class="over-line">guided is practice: nothing here counts toward the tower or 魂.</p>` : ''}
       ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}clean, readable traces pay the most${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
-      ${workshopHtml()}
-      ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
       <button class="start-go">again</button>
-      <div class="start-links"><button class="start-page">difficulty and the sign</button>${H ? '<button class="start-hand">how the hand is doing</button>' : ''}</div>
+      ${workshopHtml(null, hands)}
       <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
     </div>`;
-    const go = start.querySelector('.start-go');
-    if (go) go.onclick = () => begin();
-    wireWorkshop(renderOver);
-    const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
-    const hb = start.querySelector('.start-hand'); if (hb) hb.onclick = () => H.show();
+    wirePage(renderOver);
   }
   function openOver(){ openTab(null); paused = true; view = 'over'; renderStart(); start.hidden = false; showRedo(false); }
   function openStart(){ paused = true; view = over && ended ? 'over' : 'start'; renderStart(); start.hidden = false; showRedo(false); }
   function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; showRedo(false); }
+  function openWorkshop(t){ if (t) wtab = t; return renderStart(); }
   function begin(){
     start.hidden = true;
     if (over) restart(); else paused = false;
@@ -1592,7 +1629,7 @@ LAYER = STYLE + r"""
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
-    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
+    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     // a synthetic tap: a pointerdown on the first element the selector finds, through the container's own listener
@@ -1607,7 +1644,7 @@ LAYER = STYLE + r"""
       const ev = { target: fake, preventDefault(){} };
       for (const h of (TAPS.get(bar) || [])) h(ev); for (const h of (TAPS.get(panel) || [])) h(ev);
       return true;
-    }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return panelLanterns.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return workshopHtml('lanterns'); }, get inkHtml(){ return panelInk.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -1715,6 +1752,7 @@ def config(pack, deck=None):
         f"inkwellStep:{int(f.get('inkwellStep', 6))},"
         f"lanternRamp:{float(f.get('lanternRamp', 1.6))},"
         f"lanternCost:{js({**{'heart': 20, 'lamp': 30, 'inkwell': 15, 'vessel': 25}, **(f.get('lanternCost') or {})})},"
+        f"tamaCost:{js({**{'intent': 24, 'quick': 16, 'breath': 20, 'shove': 12, 'mend': 20, 'wall': 20, 'tend': 18, 'dilig': 16, 'harvest': 14, 'rise': 28}, **(f.get('tamaCost') or {})})},"
         f"hpEvery:{int(f.get('hpEvery', 10))},"
         f"biteRate:{float(f.get('biteRate', 0.5))},"
         f"noRepeat:{int(f.get('noRepeat', 4))},"

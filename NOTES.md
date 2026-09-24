@@ -2014,3 +2014,31 @@ Running log. Append at the bottom, don't rewrite history.
 - Not tried on the phone. If the voiced fizzle rate does not come down in
   the next pull, the next suspects are the heading gate on a 20px stroke
   and the second tick starting inside the first's end tolerance.
+
+## 2026-09-24 — The workshop is between runs (hiragana v0.1.70, katakana-game v0.1.33, vocab v0.1.41)
+
+- The maintainer: "The game should rely on after game currency to level up
+  the upgrades like in the tower. And maybe not so cluttered like it is
+  now. The navigation is sort of messy dev mode. Should have after round
+  tabs for upgrades, we can add a tab for credits, and so in the game, the
+  teacher font title and kanjiVG can be removed to give us more play room."
+- **Levels that last.** Every upgrade (intent … rise) has a lasting level
+  bought with 魂 (`tamaCost`, growing by `lanternRamp`) through the purse
+  the lanterns already used (`LEDGER.tama.own[id]`, merged by max, travels
+  with a signed-in save). The run's 墨 buys the rungs above it: `lvl(id) =
+  own(id) + upg[id]`, capped at the ceiling, so a maxed lasting level leaves
+  the run nothing to buy, which is the Tower's shape exactly.
+- **The pages.** Start and ward-fell pages: title, the tower line or the
+  run's numbers, the begin/again button, then the workshop — tabs attack,
+  defend, earn, lanterns, more — with every panel in the page and only one
+  shown, so a tab switch rebuilds nothing. "more" holds how much help, the
+  sign, draw with, the hand, the run's handwriting, and who this leans on
+  (KanjiVG's credit lives there now). The last tab is remembered.
+- **The run.** Two tabs on the seam, 筆 write and 墨 boosts; the boosts are
+  one panel with three sections and the ink at the top; 魂 is off the seam.
+  The sketchbook's "teacher guide · device font" badge and the credit
+  footer are hidden in the field, and the sketchbook grows to 38/50dvh.
+- Tests: the boosts tab (the old names alias to it), the workshop's five
+  tabs and what they sell, a lasting intent carrying into a run and taking
+  its hit, the run buying only up to the ceiling above it. `F.inkHtml` for
+  the boosts' header.

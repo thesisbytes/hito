@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.69.html`
+### Hiragana — `dist/hiragana-v0.1.70.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -350,7 +350,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.32.html`
+### Katakana — `dist/katakana-game-v0.1.33.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -371,7 +371,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.40.html`
+### Vocab — `dist/vocab-v0.1.41.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -603,6 +603,21 @@ queue — the one exception to "don't base what I trace on what enemies
 populate", because a breach is not a lesson. The maintainer: "the way our
 base attacks things is sort of boring. And it targets weirdly allowing the
 closer farang to attack it."
+
+**The workshop is between runs, and it is the Tower's (v0.1.70).** The
+maintainer: "the game should rely on after game currency to level up the
+upgrades like in the tower. And maybe not so cluttered ... should have
+after round tabs for upgrades, we can add a tab for credits, and so in the
+game, the teacher font title and kanjiVG can be removed to give us more play
+room." Every upgrade has a level that lasts, bought with 魂 on the start and
+the ward-fell pages, in tabs — attack, defend, earn, lanterns, more (the
+settings, the hand, who this leans on) — and the run's 墨 buys the rungs
+above it, up to the same ceiling (`lvl(id) = own(id) + upg[id]`). The seam
+carries two tabs, 筆 write and 墨 boosts, and the boosts are one panel in
+three sections. The sketchbook's badge and the credit footer are hidden in
+the run; the sketchbook is 38dvh by pen and 50dvh by finger. Purchases and
+tab switches on the pages go through `tapOn(start, …)`, since a purchase
+re-renders the page.
 
 **Every upgrade wears a mark (v0.1.67).** The maintainer: "since I don't know
 any kanji it's hard for me to decide what to upgrade." The kanji is flavour;

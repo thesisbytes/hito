@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · katakana · v0.1.32</title>
+<title>hito 人 · katakana · v0.1.33</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -164,7 +164,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.32';
+const APP_VERSION='0.1.33';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"A"],["い","あ行","i","","a-row",2,1,"I"],["う","あ行","u","","a-row",3,1,"U"],["え","あ行","e","","a-row",4,1,"E"],["お","あ行","o","","a-row",5,1,"O"],["か","か行","ka","","ka-row",1,2,"KA"],["き","か行","ki","","ka-row",2,2,"KI"],["く","か行","ku","","ka-row",3,2,"KU"],["け","か行","ke","","ka-row",4,2,"KE"],["こ","か行","ko","","ka-row",5,2,"KO"],["さ","さ行","sa","","sa-row",1,3,"SA"],["し","さ行","shi","","sa-row",2,3,"SHI"],["す","さ行","su","","sa-row",3,3,"SU"],["せ","さ行","se","","sa-row",4,3,"SE"],["そ","さ行","so","","sa-row",5,3,"SO"],["た","た行","ta","","ta-row",1,4,"TA"],["ち","た行","chi","","ta-row",2,4,"CHI"],["つ","た行","tsu","","ta-row",3,4,"TSU"],["て","た行","te","","ta-row",4,4,"TE"],["と","た行","to","","ta-row",5,4,"TO"],["な","な行","na","","na-row",1,5,"NA"],["に","な行","ni","","na-row",2,5,"NI"],["ぬ","な行","nu","","na-row",3,5,"NU"],["ね","な行","ne","","na-row",4,5,"NE"],["の","な行","no","","na-row",5,5,"NO"],["は","は行","ha","","ha-row",1,6,"HA"],["ひ","は行","hi","","ha-row",2,6,"HI"],["ふ","は行","fu","","ha-row",3,6,"FU"],["へ","は行","he","","ha-row",4,6,"HE"],["ほ","は行","ho","","ha-row",5,6,"HO"],["ま","ま行","ma","","ma-row",1,7,"MA"],["み","ま行","mi","","ma-row",2,7,"MI"],["む","ま行","mu","","ma-row",3,7,"MU"],["め","ま行","me","","ma-row",4,7,"ME"],["も","ま行","mo","","ma-row",5,7,"MO"],["や","や行","ya","","ya-row",1,8,"YA"],["ゆ","や行","yu","","ya-row",3,8,"YU"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RA"],["り","ら行","ri","","ra-row",2,9,"RI"],["る","ら行","ru","","ra-row",3,9,"RU"],["れ","ら行","re","","ra-row",4,9,"RE"],["ろ","ら行","ro","","ra-row",5,9,"RO"],["わ","わ行","wa","","wa-row",1,10,"WA"],["を","わ行","wo","","wa-row",5,10,"WO"],["ん","","n","","",1,37,"N"],["が","が行","ga","","ga-row",1,12,"GA"],["ぎ","が行","gi","","ga-row",2,12,"GI"],["ぐ","が行","gu","","ga-row",3,12,"GU"],["げ","が行","ge","","ga-row",4,12,"GE"],["ご","が行","go","","ga-row",5,12,"GO"],["ざ","ざ行","za","","za-row",1,13,"ZA"],["じ","ざ行","ji","","za-row",2,13,"JI"],["ず","ざ行","zu","","za-row",3,13,"ZU"],["ぜ","ざ行","ze","","za-row",4,13,"ZE"],["ぞ","ざ行","zo","","za-row",5,13,"ZO"],["だ","だ行","da","","da-row",1,14,"DA"],["ぢ","だ行","ji","","da-row",2,14,"JI"],["づ","だ行","zu","","da-row",3,14,"ZU"],["で","だ行","de","","da-row",4,14,"DE"],["ど","だ行","do","","da-row",5,14,"DO"],["ば","ば行","ba","","ba-row",1,15,"BA"],["び","ば行","bi","","ba-row",2,15,"BI"],["ぶ","ば行","bu","","ba-row",3,15,"BU"],["べ","ば行","be","","ba-row",4,15,"BE"],["ぼ","ば行","bo","","ba-row",5,15,"BO"],["ぱ","ぱ行","pa","","pa-row",1,16,"PA"],["ぴ","ぱ行","pi","","pa-row",2,16,"PI"],["ぷ","ぱ行","pu","","pa-row",3,16,"PU"],["ぺ","ぱ行","pe","","pa-row",4,16,"PE"],["ぽ","ぱ行","po","","pa-row",5,16,"PO"],["ぁ","ぁ行","xa","","small-row",1,17,"XA"],["ぃ","ぁ行","xi","","small-row",2,17,"XI"],["ぅ","ぁ行","xu","","small-row",3,17,"XU"],["ぇ","ぁ行","xe","","small-row",4,17,"XE"],["ぉ","ぁ行","xo","","small-row",5,17,"XO"],["ゃ","ぁ行","xya","","small-row",1,17,"XYA"],["ゅ","ぁ行","xyu","","small-row",3,17,"XYU"],["ょ","ぁ行","xyo","","small-row",5,17,"XYO"],["っ","ぁ行","xtsu","","small-row",3,17,"XTSU"],["ゎ","ぁ行","xwa","","small-row",1,17,"XWA"],["ア","ア行","a","","Ka-row",1,18,"A"],["イ","ア行","i","","Ka-row",2,18,"I"],["ウ","ア行","u","","Ka-row",3,18,"U"],["エ","ア行","e","","Ka-row",4,18,"E"],["オ","ア行","o","","Ka-row",5,18,"O"],["カ","カ行","ka","","Kka-row",1,19,"KA"],["キ","カ行","ki","","Kka-row",2,19,"KI"],["ク","カ行","ku","","Kka-row",3,19,"KU"],["ケ","カ行","ke","","Kka-row",4,19,"KE"],["コ","カ行","ko","","Kka-row",5,19,"KO"],["サ","サ行","sa","","Ksa-row",1,20,"SA"],["シ","サ行","shi","","Ksa-row",2,20,"SHI"],["ス","サ行","su","","Ksa-row",3,20,"SU"],["セ","サ行","se","","Ksa-row",4,20,"SE"],["ソ","サ行","so","","Ksa-row",5,20,"SO"],["タ","タ行","ta","","Kta-row",1,21,"TA"],["チ","タ行","chi","","Kta-row",2,21,"CHI"],["ツ","タ行","tsu","","Kta-row",3,21,"TSU"],["テ","タ行","te","","Kta-row",4,21,"TE"],["ト","タ行","to","","Kta-row",5,21,"TO"],["ナ","ナ行","na","","Kna-row",1,22,"NA"],["ニ","ナ行","ni","","Kna-row",2,22,"NI"],["ヌ","ナ行","nu","","Kna-row",3,22,"NU"],["ネ","ナ行","ne","","Kna-row",4,22,"NE"],["ノ","ナ行","no","","Kna-row",5,22,"NO"],["ハ","ハ行","ha","","Kha-row",1,23,"HA"],["ヒ","ハ行","hi","","Kha-row",2,23,"HI"],["フ","ハ行","fu","","Kha-row",3,23,"FU"],["ヘ","ハ行","he","","Kha-row",4,23,"HE"],["ホ","ハ行","ho","","Kha-row",5,23,"HO"],["マ","マ行","ma","","Kma-row",1,24,"MA"],["ミ","マ行","mi","","Kma-row",2,24,"MI"],["ム","マ行","mu","","Kma-row",3,24,"MU"],["メ","マ行","me","","Kma-row",4,24,"ME"],["モ","マ行","mo","","Kma-row",5,24,"MO"],["ヤ","ヤ行","ya","","Kya-row",1,25,"YA"],["ユ","ヤ行","yu","","Kya-row",3,25,"YU"],["ヨ","ヤ行","yo","","Kya-row",5,25,"YO"],["ラ","ラ行","ra","","Kra-row",1,26,"RA"],["リ","ラ行","ri","","Kra-row",2,26,"RI"],["ル","ラ行","ru","","Kra-row",3,26,"RU"],["レ","ラ行","re","","Kra-row",4,26,"RE"],["ロ","ラ行","ro","","Kra-row",5,26,"RO"],["ワ","ワ行","wa","","Kwa-row",1,27,"WA"],["ヲ","ワ行","wo","","Kwa-row",5,27,"WO"],["ン","","n","","",1,37,"N"],["ガ","ガ行","ga","","Kga-row",1,29,"GA"],["ギ","ガ行","gi","","Kga-row",2,29,"GI"],["グ","ガ行","gu","","Kga-row",3,29,"GU"],["ゲ","ガ行","ge","","Kga-row",4,29,"GE"],["ゴ","ガ行","go","","Kga-row",5,29,"GO"],["ザ","ザ行","za","","Kza-row",1,30,"ZA"],["ジ","ザ行","ji","","Kza-row",2,30,"JI"],["ズ","ザ行","zu","","Kza-row",3,30,"ZU"],["ゼ","ザ行","ze","","Kza-row",4,30,"ZE"],["ゾ","ザ行","zo","","Kza-row",5,30,"ZO"],["ダ","ダ行","da","","Kda-row",1,31,"DA"],["ヂ","ダ行","ji","","Kda-row",2,31,"JI"],["ヅ","ダ行","zu","","Kda-row",3,31,"ZU"],["デ","ダ行","de","","Kda-row",4,31,"DE"],["ド","ダ行","do","","Kda-row",5,31,"DO"],["バ","バ行","ba","","Kba-row",1,32,"BA"],["ビ","バ行","bi","","Kba-row",2,32,"BI"],["ブ","バ行","bu","","Kba-row",3,32,"BU"],["ベ","バ行","be","","Kba-row",4,32,"BE"],["ボ","バ行","bo","","Kba-row",5,32,"BO"],["パ","パ行","pa","","Kpa-row",1,33,"PA"],["ピ","パ行","pi","","Kpa-row",2,33,"PI"],["プ","パ行","pu","","Kpa-row",3,33,"PU"],["ペ","パ行","pe","","Kpa-row",4,33,"PE"],["ポ","パ行","po","","Kpa-row",5,33,"PO"],["ァ","ァ行","xa","","Ksmall-row",1,34,"XA"],["ィ","ァ行","xi","","Ksmall-row",2,34,"XI"],["ゥ","ァ行","xu","","Ksmall-row",3,34,"XU"],["ェ","ァ行","xe","","Ksmall-row",4,34,"XE"],["ォ","ァ行","xo","","Ksmall-row",5,34,"XO"],["ャ","ァ行","xya","","Ksmall-row",1,34,"XYA"],["ュ","ァ行","xyu","","Ksmall-row",3,34,"XYU"],["ョ","ァ行","xyo","","Ksmall-row",5,34,"XYO"],["ッ","ァ行","xtsu","","Ksmall-row",3,34,"XTSU"],["ヮ","ァ行","xwa","","Ksmall-row",1,34,"XWA"],["ヴ","ヴ行","vu","","Kvu-row",3,35,"VU"],["ー","ー行","-","","long-row",1,36,"-"]];
 
 // ---------- state
@@ -868,7 +868,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.32');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.33');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1174,8 +1174,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
      screen because a pen needs no more; a fingertip hides what it is tracing,
      so it takes some of the field's height back. The field's canvas and the
      stage are both watched for size, so this is just a class. */
-  body.field.hand-pen .stage, body.vocab.hand-pen .stage{ width:min(96vw,34dvh); height:min(96vw,34dvh); }
-  body.field.hand-finger .stage, body.vocab.hand-finger .stage{ width:min(96vw,46dvh); height:min(96vw,46dvh); }
+  body.field.hand-pen .stage, body.vocab.hand-pen .stage{ width:min(96vw,38dvh); height:min(96vw,38dvh); }
+  body.field.hand-finger .stage, body.vocab.hand-finger .stage{ width:min(96vw,50dvh); height:min(96vw,50dvh); }
   .hand-btn.nudge{ border-color:#5fe3a1; color:#c3f7dc; box-shadow:0 0 14px rgba(95,227,161,.45); }
   .hand{ position:fixed; inset:0; z-index:10000; display:flex; align-items:center;
     justify-content:center; background:rgba(6,9,13,.93); font:13px ui-sans-serif,system-ui; color:#dce8f2; }
@@ -1781,14 +1781,15 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:{"deck":"katakana","words":[{"ja":"アメリカ","romaji":"amerika","en":"U.S.A."},{"ja":"カナダ","romaji":"kanada","en":"Canada"},{"ja":"イギリス","romaji":"igirisu","en":"Britain"},{"ja":"テレビ","romaji":"terebi","en":"TV"},{"ja":"カメラ","romaji":"kamera","en":"camera"},{"ja":"テニス","romaji":"tenisu","en":"tennis"},{"ja":"パン","romaji":"pan","en":"bread"},{"ja":"ピザ","romaji":"piza","en":"pizza"},{"ja":"ホテル","romaji":"hoteru","en":"hotel"},{"ja":"バス","romaji":"basu","en":"bus"},{"ja":"ペン","romaji":"pen","en":"pen"},{"ja":"クラス","romaji":"kurasu","en":"class"},{"ja":"テスト","romaji":"tesuto","en":"test"},{"ja":"ドア","romaji":"doa","en":"door"},{"ja":"トイレ","romaji":"toire","en":"toilet"},{"ja":"カラオケ","romaji":"karaoke","en":"karaoke"},{"ja":"バナナ","romaji":"banana","en":"banana"},{"ja":"トマト","romaji":"tomato","en":"tomato"},{"ja":"ミルク","romaji":"miruku","en":"milk"},{"ja":"ワイン","romaji":"wain","en":"wine"},{"ja":"サラダ","romaji":"sarada","en":"salad"},{"ja":"ピアノ","romaji":"piano","en":"piano"},{"ja":"ハワイ","romaji":"hawai","en":"Hawaii"},{"ja":"パリ","romaji":"pari","en":"Paris"},{"ja":"タオル","romaji":"taoru","en":"towel"},{"ja":"ドラマ","romaji":"dorama","en":"drama"},{"ja":"アニメ","romaji":"anime","en":"anime"},{"ja":"プレゼント","romaji":"purezento","en":"present"},{"ja":"ダンス","romaji":"dansu","en":"dance"},{"ja":"ビデオ","romaji":"bideo","en":"video"},{"ja":"ラジオ","romaji":"rajio","en":"radio"},{"ja":"ズボン","romaji":"zubon","en":"trousers"},{"ja":"ネクタイ","romaji":"nekutai","en":"necktie"},{"ja":"ガソリン","romaji":"gasorin","en":"gasoline"},{"ja":"エアコン","romaji":"eakon","en":"air conditioner"},{"ja":"アルバイト","romaji":"arubaito","en":"part-time job"},{"ja":"レストラン","romaji":"resutoran","en":"restaurant"},{"ja":"クリスマス","romaji":"kurisumasu","en":"Christmas"},{"ja":"サングラス","romaji":"sangurasu","en":"sunglasses"},{"ja":"スマホ","romaji":"sumaho","en":"smartphone"},{"ja":"ロンドン","romaji":"rondon","en":"London"},{"ja":"メロン","romaji":"meron","en":"melon"},{"ja":"オレンジ","romaji":"orenji","en":"orange"},{"ja":"コーヒー","romaji":"koohii","en":"coffee"},{"ja":"デート","romaji":"deeto","en":"date (romantic)"},{"ja":"ハンバーガー","romaji":"hanbaagaa","en":"hamburger"},{"ja":"ビール","romaji":"biiru","en":"beer"},{"ja":"スーパー","romaji":"suupaa","en":"supermarket"},{"ja":"デパート","romaji":"depaato","en":"department store"},{"ja":"タクシー","romaji":"takushii","en":"taxi"},{"ja":"ノート","romaji":"nooto","en":"notebook"},{"ja":"ボールペン","romaji":"boorupen","en":"ballpoint pen"},{"ja":"セーター","romaji":"seetaa","en":"sweater"},{"ja":"ゲーム","romaji":"geemu","en":"game"},{"ja":"ページ","romaji":"peeji","en":"page"},{"ja":"プール","romaji":"puuru","en":"swimming pool"},{"ja":"メール","romaji":"meeru","en":"e-mail"},{"ja":"アパート","romaji":"apaato","en":"apartment"},{"ja":"ケーキ","romaji":"keeki","en":"cake"},{"ja":"ラーメン","romaji":"raamen","en":"ramen"},{"ja":"コート","romaji":"kooto","en":"coat"},{"ja":"スキー","romaji":"sukii","en":"skiing"},{"ja":"ギター","romaji":"gitaa","en":"guitar"},{"ja":"スープ","romaji":"suupu","en":"soup"},{"ja":"ステーキ","romaji":"suteeki","en":"steak"},{"ja":"レポート","romaji":"repooto","en":"report"},{"ja":"エレベーター","romaji":"erebeetaa","en":"elevator"},{"ja":"ジーンズ","romaji":"jiinzu","en":"jeans"},{"ja":"スカート","romaji":"sukaato","en":"skirt"},{"ja":"アイスクリーム","romaji":"aisukuriimu","en":"ice cream"},{"ja":"ホームステイ","romaji":"hoomusutei","en":"homestay"},{"ja":"ルームメイト","romaji":"ruumumeito","en":"roommate"},{"ja":"カード","romaji":"kaado","en":"card"},{"ja":"オーストラリア","romaji":"oosutoraria","en":"Australia"},{"ja":"スポーツ","romaji":"supootsu","en":"sports"},{"ja":"サッカー","romaji":"sakkaa","en":"soccer"},{"ja":"ジュース","romaji":"juusu","en":"juice"},{"ja":"コンピューター","romaji":"konpyuutaa","en":"computer"},{"ja":"シャツ","romaji":"shatsu","en":"shirt"},{"ja":"パーティー","romaji":"paatii","en":"party"},{"ja":"カフェ","romaji":"kafe","en":"cafe"},{"ja":"サンドイッチ","romaji":"sandoitchi","en":"sandwich"},{"ja":"チョコレート","romaji":"chokoreeto","en":"chocolate"},{"ja":"キャンプ","romaji":"kyanpu","en":"camping"},{"ja":"シャワー","romaji":"shawaa","en":"shower"},{"ja":"インターネット","romaji":"intaanetto","en":"internet"},{"ja":"チケット","romaji":"chiketto","en":"ticket"},{"ja":"メニュー","romaji":"menyuu","en":"menu"},{"ja":"ニューヨーク","romaji":"nyuuyooku","en":"New York"},{"ja":"ソファ","romaji":"sofa","en":"sofa"},{"ja":"ジョギング","romaji":"jogingu","en":"jogging"},{"ja":"ファックス","romaji":"fakkusu","en":"fax"},{"ja":"キャンパス","romaji":"kyanpasu","en":"campus"},{"ja":"マッチ","romaji":"matchi","en":"match"},{"ja":"クッキー","romaji":"kukkii","en":"cookie"},{"ja":"ホッチキス","romaji":"hotchikisu","en":"stapler"},{"ja":"ティーシャツ","romaji":"tiishatsu","en":"T-shirt"},{"ja":"ミュージカル","romaji":"myuujikaru","en":"musical"},{"ja":"チャンス","romaji":"chansu","en":"chance"},{"ja":"ラッシュ","romaji":"rasshu","en":"rush hour"},{"ja":"ニュース","romaji":"nyuusu","en":"news"}]},knockback:0.07,sign:"romaji",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",credits:["Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.", "Stroke order recorded and checked by the project's teachers.", "Built by the maintainer, one version at a time."],realms:[],speed:0.03,wardHp:5,tower:{"rows":2,"rowWaves":10,"bossEvery":10,"bossHp":2,"bossBite":1,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15,"vessel":25},hpEvery:10,biteRate:0.5,noRepeat:4,hpMax:5,biteEvery:20,biteMax:4,tendEvery:10,riseStep:0.2,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"intent":12,"quick":8,"breath":9,"shove":6,"mend":10,"wall":10,"tend":9,"dilig":8,"harvest":7,"rise":14},spawnMs:9000,spawnRamp:200,spawnMin:3600,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,rescue:0.3,energyMax:24,energyStart:6,energyPerStroke:1,castCost:2,vesselStep:6,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:{"deck":"katakana","words":[{"ja":"アメリカ","romaji":"amerika","en":"U.S.A."},{"ja":"カナダ","romaji":"kanada","en":"Canada"},{"ja":"イギリス","romaji":"igirisu","en":"Britain"},{"ja":"テレビ","romaji":"terebi","en":"TV"},{"ja":"カメラ","romaji":"kamera","en":"camera"},{"ja":"テニス","romaji":"tenisu","en":"tennis"},{"ja":"パン","romaji":"pan","en":"bread"},{"ja":"ピザ","romaji":"piza","en":"pizza"},{"ja":"ホテル","romaji":"hoteru","en":"hotel"},{"ja":"バス","romaji":"basu","en":"bus"},{"ja":"ペン","romaji":"pen","en":"pen"},{"ja":"クラス","romaji":"kurasu","en":"class"},{"ja":"テスト","romaji":"tesuto","en":"test"},{"ja":"ドア","romaji":"doa","en":"door"},{"ja":"トイレ","romaji":"toire","en":"toilet"},{"ja":"カラオケ","romaji":"karaoke","en":"karaoke"},{"ja":"バナナ","romaji":"banana","en":"banana"},{"ja":"トマト","romaji":"tomato","en":"tomato"},{"ja":"ミルク","romaji":"miruku","en":"milk"},{"ja":"ワイン","romaji":"wain","en":"wine"},{"ja":"サラダ","romaji":"sarada","en":"salad"},{"ja":"ピアノ","romaji":"piano","en":"piano"},{"ja":"ハワイ","romaji":"hawai","en":"Hawaii"},{"ja":"パリ","romaji":"pari","en":"Paris"},{"ja":"タオル","romaji":"taoru","en":"towel"},{"ja":"ドラマ","romaji":"dorama","en":"drama"},{"ja":"アニメ","romaji":"anime","en":"anime"},{"ja":"プレゼント","romaji":"purezento","en":"present"},{"ja":"ダンス","romaji":"dansu","en":"dance"},{"ja":"ビデオ","romaji":"bideo","en":"video"},{"ja":"ラジオ","romaji":"rajio","en":"radio"},{"ja":"ズボン","romaji":"zubon","en":"trousers"},{"ja":"ネクタイ","romaji":"nekutai","en":"necktie"},{"ja":"ガソリン","romaji":"gasorin","en":"gasoline"},{"ja":"エアコン","romaji":"eakon","en":"air conditioner"},{"ja":"アルバイト","romaji":"arubaito","en":"part-time job"},{"ja":"レストラン","romaji":"resutoran","en":"restaurant"},{"ja":"クリスマス","romaji":"kurisumasu","en":"Christmas"},{"ja":"サングラス","romaji":"sangurasu","en":"sunglasses"},{"ja":"スマホ","romaji":"sumaho","en":"smartphone"},{"ja":"ロンドン","romaji":"rondon","en":"London"},{"ja":"メロン","romaji":"meron","en":"melon"},{"ja":"オレンジ","romaji":"orenji","en":"orange"},{"ja":"コーヒー","romaji":"koohii","en":"coffee"},{"ja":"デート","romaji":"deeto","en":"date (romantic)"},{"ja":"ハンバーガー","romaji":"hanbaagaa","en":"hamburger"},{"ja":"ビール","romaji":"biiru","en":"beer"},{"ja":"スーパー","romaji":"suupaa","en":"supermarket"},{"ja":"デパート","romaji":"depaato","en":"department store"},{"ja":"タクシー","romaji":"takushii","en":"taxi"},{"ja":"ノート","romaji":"nooto","en":"notebook"},{"ja":"ボールペン","romaji":"boorupen","en":"ballpoint pen"},{"ja":"セーター","romaji":"seetaa","en":"sweater"},{"ja":"ゲーム","romaji":"geemu","en":"game"},{"ja":"ページ","romaji":"peeji","en":"page"},{"ja":"プール","romaji":"puuru","en":"swimming pool"},{"ja":"メール","romaji":"meeru","en":"e-mail"},{"ja":"アパート","romaji":"apaato","en":"apartment"},{"ja":"ケーキ","romaji":"keeki","en":"cake"},{"ja":"ラーメン","romaji":"raamen","en":"ramen"},{"ja":"コート","romaji":"kooto","en":"coat"},{"ja":"スキー","romaji":"sukii","en":"skiing"},{"ja":"ギター","romaji":"gitaa","en":"guitar"},{"ja":"スープ","romaji":"suupu","en":"soup"},{"ja":"ステーキ","romaji":"suteeki","en":"steak"},{"ja":"レポート","romaji":"repooto","en":"report"},{"ja":"エレベーター","romaji":"erebeetaa","en":"elevator"},{"ja":"ジーンズ","romaji":"jiinzu","en":"jeans"},{"ja":"スカート","romaji":"sukaato","en":"skirt"},{"ja":"アイスクリーム","romaji":"aisukuriimu","en":"ice cream"},{"ja":"ホームステイ","romaji":"hoomusutei","en":"homestay"},{"ja":"ルームメイト","romaji":"ruumumeito","en":"roommate"},{"ja":"カード","romaji":"kaado","en":"card"},{"ja":"オーストラリア","romaji":"oosutoraria","en":"Australia"},{"ja":"スポーツ","romaji":"supootsu","en":"sports"},{"ja":"サッカー","romaji":"sakkaa","en":"soccer"},{"ja":"ジュース","romaji":"juusu","en":"juice"},{"ja":"コンピューター","romaji":"konpyuutaa","en":"computer"},{"ja":"シャツ","romaji":"shatsu","en":"shirt"},{"ja":"パーティー","romaji":"paatii","en":"party"},{"ja":"カフェ","romaji":"kafe","en":"cafe"},{"ja":"サンドイッチ","romaji":"sandoitchi","en":"sandwich"},{"ja":"チョコレート","romaji":"chokoreeto","en":"chocolate"},{"ja":"キャンプ","romaji":"kyanpu","en":"camping"},{"ja":"シャワー","romaji":"shawaa","en":"shower"},{"ja":"インターネット","romaji":"intaanetto","en":"internet"},{"ja":"チケット","romaji":"chiketto","en":"ticket"},{"ja":"メニュー","romaji":"menyuu","en":"menu"},{"ja":"ニューヨーク","romaji":"nyuuyooku","en":"New York"},{"ja":"ソファ","romaji":"sofa","en":"sofa"},{"ja":"ジョギング","romaji":"jogingu","en":"jogging"},{"ja":"ファックス","romaji":"fakkusu","en":"fax"},{"ja":"キャンパス","romaji":"kyanpasu","en":"campus"},{"ja":"マッチ","romaji":"matchi","en":"match"},{"ja":"クッキー","romaji":"kukkii","en":"cookie"},{"ja":"ホッチキス","romaji":"hotchikisu","en":"stapler"},{"ja":"ティーシャツ","romaji":"tiishatsu","en":"T-shirt"},{"ja":"ミュージカル","romaji":"myuujikaru","en":"musical"},{"ja":"チャンス","romaji":"chansu","en":"chance"},{"ja":"ラッシュ","romaji":"rasshu","en":"rush hour"},{"ja":"ニュース","romaji":"nyuusu","en":"news"}]},knockback:0.07,sign:"romaji",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",credits:["Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.", "Stroke order recorded and checked by the project's teachers.", "Built by the maintainer, one version at a time."],realms:[],speed:0.03,wardHp:5,tower:{"rows":2,"rowWaves":10,"bossEvery":10,"bossHp":2,"bossBite":1,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15,"vessel":25},tamaCost:{"intent":24,"quick":16,"breath":20,"shove":12,"mend":20,"wall":20,"tend":18,"dilig":16,"harvest":14,"rise":28},hpEvery:10,biteRate:0.5,noRepeat:4,hpMax:5,biteEvery:20,biteMax:4,tendEvery:10,riseStep:0.2,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"intent":12,"quick":8,"breath":9,"shove":6,"mend":10,"wall":10,"tend":9,"dilig":8,"harvest":7,"rise":14},spawnMs:9000,spawnRamp:200,spawnMin:3600,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,rescue:0.3,energyMax:24,energyStart:6,energyPerStroke:1,castCost:2,vesselStep:6,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
      tracer. */
   body.field .tabs, body.field .count, body.field .meta, body.field .power,
   body.field .only-p, body.field .only-r, body.field #fontRow,
-  body.field .grid, body.field .hint { display:none !important; }
+  body.field .grid, body.field .hint,
+  body.field #badge, body.field .credit { display:none !important; }   /* the run is play room; the credits live in the workshop's "more" tab */
 
   body.field { height:100dvh; overflow:hidden; justify-content:flex-start; }
   body.field header { padding:6px 0 2px; }
@@ -1843,6 +1844,20 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
                           border:1px solid #1e2f3e; color:#dce8f2; cursor:pointer; display:inline-flex; align-items:center; gap:4px; line-height:1; }
   .dash-bar .dash-tabs button svg{ width:13px; height:13px; flex:none; opacity:.85; }
   .dash-bar .dash-tabs button[data-tab="trace"]{ font-size:19px; padding:4px 16px; border-width:2px; }
+  .dash-bar .dash-tabs button small{ font-size:10px; font-weight:400; opacity:.7; }
+  .upg-h{ display:flex; align-items:center; gap:5px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(220,232,242,.55); margin:8px 0 4px; flex:1 0 100%; }
+  .upg-h svg{ width:13px; height:13px; }
+  #upg-ink{ display:block; margin:0 0 4px; } #upg-ink b{ font-size:15px; } #upg-ink small{ display:block; font-weight:400; color:rgba(220,232,242,.55); }
+  /* the workshop between runs: tabs across, one panel below */
+  .wtabs{ display:flex; gap:4px; margin:12px 0 8px; }
+  .wtabs button{ flex:1 1 0; min-width:0; padding:7px 4px; font:700 12px ui-sans-serif,system-ui; border-radius:9px; background:transparent; border:1px solid #1e2f3e; color:#dce8f2; cursor:pointer;
+                 display:inline-flex; flex-direction:column; align-items:center; gap:3px; touch-action:manipulation; }
+  .wtabs button svg{ width:16px; height:16px; }
+  .wtabs button.can{ border-color:#5fe3a1; color:#c3f7dc; }
+  .wtabs button[aria-pressed="true"]{ background:rgba(95,227,161,.14); border-color:#5fe3a1; color:#c3f7dc; }
+  .wpanel[hidden]{ display:none; }
+  .wpanel .start-row button b i.k{ font-style:normal; font-size:10px; opacity:.6; margin-right:4px; }
+  .wpanel .start-row button b small.of{ display:inline; font-size:11px; font-weight:400; opacity:.55; margin-left:3px; }
   @media (max-width:560px){ .dash-bar .dash-tabs{ flex:1 0 100%; margin-left:0; justify-content:space-between; } }
   .dash-bar .dash-tabs button.can{ border-color:#5fe3a1; color:#c3f7dc; }
   .dash-bar .dash-tabs button[aria-pressed="true"]{ background:rgba(95,227,161,.14); border-color:#5fe3a1; color:#c3f7dc; box-shadow:0 0 10px rgba(95,227,161,.25); }
@@ -2047,7 +2062,17 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // `ink` shadowed it, and guided threw on every repaint in v0.1.39.
   let sumi = 0, upg = freshUpg();
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
-  const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
+  // An upgrade's level is what lasts plus what this run bought. What lasts
+  // is bought with 魂 between runs (the maintainer: "the game should rely
+  // on after game currency to level up the upgrades like in the tower");
+  // the run's 墨 buys the rungs above it, up to the same ceiling.
+  const lvl = id => own(id) + (upg[id] || 0);
+  const permCost = id => Math.round((CFG.tamaCost[id] || 20) * Math.pow(CFG.lanternRamp, own(id)));
+  function buyPerm(id){
+    const p = purse(); if (!p || !UPG[id]) return false;
+    return p.buy(id, permCost(id), UPG[id].max);
+  }
+  const castMs = () => CFG.castMs * Math.pow(0.82, lvl('quick'));
   // ---- stages, and the workshop between rounds ------------------------------
   // The maintainer: "make it impossible to advance without unlocking stuff. so
   // there needs to be a currency to use after each round". Stages did that
@@ -2094,7 +2119,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     return p.buy(id, lanternCost(id), LANTERN[id].max);
   }
   const capNow = () => CFG.hitodamaCap + own('lamp');
-  const wardMax = () => CFG.wardHp + own('heart') + upg.mend;
+  const wardMax = () => CFG.wardHp + own('heart') + lvl('mend');
   // What this run was, kept as it goes so the end can say it. Observations:
   // how far, how many, how cleanly. Never a score.
   let run = null;
@@ -2110,7 +2135,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   function fill(n){ energy = Math.max(0, Math.min(energyMax(), energy + (+n || 0))); return energy; }   // negative drains; a breach may, one day
   function earn(n){ if (n > 0){ sumi += n; if (run) run.earned += n; renderUpg(); } return sumi; }
   function buy(id){
-    if (!UPG[id] || over || upg[id] >= UPG[id].max) return false;
+    if (!UPG[id] || over || lvl(id) >= UPG[id].max) return false;
     const c = costOf(id);
     if (sumi < c) return false;
     sumi -= c; upg[id]++;
@@ -2133,7 +2158,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // Words bite like anything else: a word that reaches the ward is a word
   // not answered.
   const biteFor = (w, boss) => Math.max(1, (CFG.biteEvery ? Math.min(CFG.biteMax, 1 + Math.floor(w / CFG.biteEvery)) : 1)
-                                          + (boss && ST ? ST.bossBite : 0) - upg.wall);
+                                          + (boss && ST ? ST.bossBite : 0) - lvl('wall'));
   let spawnAt = 0, tPrev = 0;
   let frames = { n:0, slow:0, jank:0 };
   // The field holds still while the start page is up. Nothing moves, nothing
@@ -2378,7 +2403,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // 癒 tend: for every `tendEvery` waves held, a life back per level, up to
     // the ward's size. Held, not survived: it is paid when the wave comes,
     // so a ward at one life that lasts the stretch is mended at its end.
-    if (upg.tend && CFG.tendEvery && wave % CFG.tendEvery === 0) ward = Math.min(wardMax(), ward + upg.tend);
+    if (lvl('tend') && CFG.tendEvery && wave % CFG.tendEvery === 0) ward = Math.min(wardMax(), ward + lvl('tend'));
     applyShadow();   // a boss arriving dims the shape for everyone, retarget or not
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
     // is what it should be showing.
@@ -2591,7 +2616,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // stroke-complete, and reaches here as a global); a conjure credits any the
   // shine did not, so a trace is worth its strokes however it was scored
   const _shine = window.shine;
-  const perStroke = () => CFG.energyPerStroke + upg.breath;
+  const perStroke = () => CFG.energyPerStroke + lvl('breath');
   // A stroke's 気 goes in through topUp, so a bag filled to the brim is
   // released whichever way the stroke was credited — as it shone, or at the
   // conjure for the strokes shine never saw.
@@ -2633,7 +2658,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // times pays a little less, so the run pushes toward the ones that are new.
     const wasClean = !zapped;
     if (run){ run.traced++; if (wasClean) run.clean++; }
-    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)) + upg.dilig);
+    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)) + lvl('dilig'));
     const r = _conjure.apply(this, arguments);
     // What this trace is worth when the run ends. The hand has just judged how
     // recognisable it was (the note is taken on the way into the engine): a
@@ -2664,7 +2689,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   let readings = [];
   function strike(m, partial, auto){
     const p0 = px(m);
-    if (upg.shove) m.d = Math.min(1, m.d + upg.shove * CFG.shoveStep);
+    if (lvl('shove')) m.d = Math.min(1, m.d + lvl('shove') * CFG.shoveStep);
     if (partial){
       // a kana landed: the farang staggers back a step and waits for the next.
       // Only for the hand. A lit arsenal that also shoved would hold a word
@@ -2674,7 +2699,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         motes.push({x:p0.x, y:p0.y, vx:(Math.random()-.5)*2, vy:(Math.random()-.5)*2, life:.7});
       return;
     }
-    m.hp -= 1 + upg.intent;   // intent: every light cuts deeper
+    m.hp -= 1 + lvl('intent');   // intent: every light cuts deeper
     // The sound, attached to the kill. Tracing a shape teaches the shape and
     // nothing else — the hand can learn every stroke of ぬ without the reading
     // ever arriving. Success is the moment attention is highest, so that is
@@ -2708,7 +2733,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       if (m === locked) locked = null;
       if (m.boss) applyShadow();
       killed++;
-      if (auto) earn(CFG.inkKill + upg.harvest);
+      if (auto) earn(CFG.inkKill + lvl('harvest'));
       // An observation, not a claim: what was answered and how long it took.
       // Deliberately not a score — the client does not get to assert totals.
       try { window.__sync && window.__sync.record('banish', {
@@ -3040,7 +3065,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const p = purse();
     const pay = !p ? 0 : Math.round((run.pay + Math.floor(wave/CFG.tamaWaves))
                                      * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1)
-                                     * (1 + upg.rise * CFG.riseStep));   // 起: get up with more
+                                     * (1 + lvl('rise') * CFG.riseStep));   // 起: get up with more
     if (p) p.earn(pay);
     // guided is practice: the hand keeps the run, but not as a furthest wave
     const rec = { at: run.at, realm: REALM, practice: difficulty === 'guided' || undefined, tama: pay,
@@ -3069,13 +3094,15 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   const stripDrive = document.createElement('div');
   stripDrive.className = 'upg'; stripDrive.id = 'upg-drive';
   let upgMarkup = '', guardMarkup = '', driveMarkup = '';
-  const stripHtml = tabName => `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${sumi}</div>`
+  const SECTION = { skills: ['sword', 'attack'], guard: ['shield', 'defend'], drive: ['coin', 'earn'] };
+  const stripHtml = tabName => `<p class="upg-h">${ICON[SECTION[tabName][0]]}${SECTION[tabName][1]}</p>`
       + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
-          const maxed = upg[id] >= u.max, c = costOf(id);
+          const maxed = lvl(id) >= u.max, c = costOf(id);
           return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
-            + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i></b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
+            + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i></b>${u.name}${lvl(id) ? ' ' + lvl(id) : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
         }).join('');
   function renderUpg(){
+    panelInk.innerHTML = `<b>墨 ${sumi}</b><small>this run's ink · boosts end with the run · what lasts is bought with 魂 between runs</small>`;
     strip.innerHTML = upgMarkup = stripHtml('skills');
     stripGuard.innerHTML = guardMarkup = stripHtml('guard');
     stripDrive.innerHTML = driveMarkup = stripHtml('drive');
@@ -3090,11 +3117,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // real browser. The stub DOM cannot see a stylesheet; a screenshot can.
   const bar = document.createElement('div'); bar.className = 'dash-bar'; bar.id = 'dashbar';
   const panel = document.createElement('div'); panel.className = 'panel'; panel.id = 'panel'; panel.hidden = true;
-  const panelSkills = document.createElement('div'); panelSkills.innerHTML = '<p class="panel-h">技 · this run · intent, bought with 墨</p>'; panelSkills.appendChild(strip);
-  const panelGuard = document.createElement('div'); panelGuard.innerHTML = '<p class="panel-h">耐 · this run · persistence, bought with 墨</p>'; panelGuard.appendChild(stripGuard);
-  const panelDrive = document.createElement('div'); panelDrive.innerHTML = '<p class="panel-h">志 · this run · motivation, bought with 墨</p>'; panelDrive.appendChild(stripDrive);
-  const panelLanterns = document.createElement('div');
-  panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelDrive); panel.appendChild(panelLanterns);
+  // One shop in the run, not three tabs and a lantern room: 墨 boosts, in
+  // three short sections. What lasts is bought between runs (the maintainer:
+  // "not so cluttered ... should have after round tabs for upgrades").
+  const panelInk = document.createElement('div'); panelInk.className = 'upg-ink'; panelInk.id = 'upg-ink';
+  const panelSkills = document.createElement('div'); panelSkills.appendChild(strip);
+  const panelGuard = document.createElement('div'); panelGuard.appendChild(stripGuard);
+  const panelDrive = document.createElement('div'); panelDrive.appendChild(stripDrive);
+  panel.appendChild(panelInk); panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelDrive);
   stageEl.parentNode.insertBefore(panel, stageEl.nextSibling); wrap.appendChild(bar);
   let tab = null, dashMarkup = '';
   // Bars, not hearts (the maintainer: "let's not do hearts. I like bars. For
@@ -3108,19 +3138,15 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     flame:  '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8c2 3 3.6 4.4 3.6 7.4a3.6 3.6 0 0 1-7.2 0C4.4 6.2 6 4.8 8 1.8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
   };
   const bar_ = (cls, kana, v, max, title) => `<span class="bar ${cls}" title="${title}"><i style="width:${max > 0 ? Math.round(100*Math.max(0, Math.min(max, v))/max) : 0}%"></i><b>${kana}</b><small>${v}/${max}</small></span>`;
-  const canBuyAny = tabName => Object.entries(UPG).some(([id, u]) => u.tab === tabName && upg[id] < u.max && sumi >= costOf(id));
+  const canBuyAny = () => Object.entries(UPG).some(([id, u]) => lvl(id) < u.max && sumi >= costOf(id));
   function renderDash(){
     const p = purse();
     const m = bar_('life', '命', ward, wardMax(), 'the ward: ' + ward + ' of ' + wardMax())
       + bar_('energy', '気', energy, energyMax(), '気 — every stroke fills it, every wisp spends it: ' + energy + ' of ' + energyMax())
-      + `<span class="n" title="ink — earned by tracing, spent on this run's skills">墨 ${sumi}</span>`
-      + (p ? `<span class="n" title="魂 — earned by runs, spent on what lasts">魂 ${p.balance}</span>` : '')
+      + `<span class="n" title="ink — earned by tracing, spent on this run's boosts">墨 ${sumi}</span>`
       + `<span class="n" title="the wave"><small>波</small> ${wave}</span>`
-      + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook: write" aria-label="the sketchbook">筆</button>`
-      + `<button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="技 intent: how you attack" aria-label="intent: attack upgrades">${ICON.sword}技</button>`
-      + `<button data-tab="guard" aria-pressed="${tab === 'guard'}" class="${canBuyAny('guard') ? 'can' : ''}" title="耐 persistence: how you defend" aria-label="persistence: defence upgrades">${ICON.shield}耐</button>`
-      + `<button data-tab="drive" aria-pressed="${tab === 'drive'}" class="${canBuyAny('drive') ? 'can' : ''}" title="志 motivation: how you earn" aria-label="motivation: currency upgrades">${ICON.coin}志</button>`
-      + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="灯 what lasts, bought with 魂" aria-label="lanterns: what lasts">${ICON.flame}灯</button>` : '') + `</span>`;
+      + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook: write" aria-label="the sketchbook">筆<small>write</small></button>`
+      + `<button data-tab="boosts" aria-pressed="${tab === 'boosts'}" class="${canBuyAny() ? 'can' : ''}" title="墨 boosts: this run's upgrades" aria-label="boosts: this run's upgrades">${ICON.sword}墨<small>boosts</small></button></span>`;
     if (m === dashMarkup) return;
     dashMarkup = m; bar.innerHTML = m;
     // (the tab handlers live on `bar` itself; see tapOn)
@@ -3151,20 +3177,19 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
   tapOn(bar, 'button[data-tab]', b => openTab(tab === b.dataset.tab || b.dataset.tab === 'trace' ? null : b.dataset.tab));
   tapOn(panel, 'button[data-upg]', b => buy(b.dataset.upg));
-  tapOn(panel, 'button[data-lantern]', b => { if (buyLantern(b.dataset.lantern)) renderLanterns(); });
-  function renderLanterns(){ panelLanterns.innerHTML = `<p class="panel-h">灯 · what lasts · bought with 魂</p>` + workshopHtml(); renderDash(); }
+
   // A tab does not pause the run. That is the point: the waves keep coming
   // while you shop, and knowing when you can afford to is the game. And the
   // sketchbook is a tab too: while a shop is open there is nothing to trace
   // on, so a lit character's own lights are all that holds the ward. A shop
   // does not open under a pen that is down; lift, and find the gap.
   function openTab(name){
+    if (name === 'skills' || name === 'guard' || name === 'drive' || name === 'lanterns') name = 'boosts';   // the old tabs, one shop now
     if (name && name !== 'trace' && tracing()) return tab;
     tab = name && name !== 'trace' ? name : null;
     if (tab && !stageEl.hidden){ const r = stageEl.getBoundingClientRect(); if (r.width > 0){ panel.style.width = r.width + 'px'; panel.style.height = r.height + 'px'; } }
     stageEl.hidden = !!tab;
-    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelGuard.hidden = tab !== 'guard'; panelDrive.hidden = tab !== 'drive'; panelLanterns.hidden = tab !== 'lanterns';
-    if (tab === 'lanterns') renderLanterns();
+    panel.hidden = !tab;
     renderDash();
     return tab;
   }
@@ -3175,91 +3200,108 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   start.className = 'start'; start.id = 'start';
   let view = 'start', markup = '';
   const esc = t => String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-  function renderCredits(){
-    const lines = (CFG.credits || []).map(l => `<p>${esc(l)}</p>`).join('');
-    start.innerHTML = markup = `<div class="start-card credits">
-      <div class="start-title">hito<span>人</span></div>
-      <div class="start-sub">who this leans on</div>
-      <p class="lead"><b>人</b>is two strokes, and neither can stand on its own. Take one away and the character falls.</p>
-      <p>That is the project. One person records the strokes, another draws the letterforms, testers find the bugs, someone builds it, and every learner leans on all of them.</p>
-      ${lines}
-      <p class="small">${esc(CFG.credit || '')}</p>
-      <p class="small">Single file, opens from a double-click, and needs no network to play. Your progress lives on this device.${window.__sync && window.__sync.enabled ? ' When there is a network, notes on how the tracing went are sent to the workshop under a made-up device name; ✋ hand, up top, turns that off.' : ''}</p>
-      <button class="start-go">back</button>
-    </div>`;
-    const go = start.querySelector('.start-go');
-    if (go) go.onclick = () => { view = 'start'; renderStart(); };
+  // ---- the workshop between runs
+  // The Tower's shape (the maintainer: "the game should rely on after game
+  // currency to level up the upgrades like in the tower ... should have
+  // after round tabs for upgrades"): what a run earns buys levels that last,
+  // in tabs — attack, defend, earn, lanterns — and "more" holds the settings,
+  // the hand, and who this leans on. Every panel is in the page and only the
+  // active one is shown, so switching tabs rebuilds nothing.
+  let wtab = 'attack';
+  try { wtab = localStorage.getItem('hito-wtab') || 'attack'; } catch(_){}
+  const WTABS = [['attack', 'sword', 'skills'], ['defend', 'shield', 'guard'], ['earn', 'coin', 'drive'], ['lanterns', 'flame', null], ['more', null, null]];
+  function permHtml(tabName){
+    const p = purse(); if (!p) return '<p class="over-line">sign in or play from a page to keep what lasts</p>';
+    return `<div class="start-row lantern">` + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
+      const lv = own(id), maxed = lv >= u.max, c = permCost(id);
+      return `<button data-perm="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
+        + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}<small class="of">/${u.max}</small></b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
+    }).join('') + `</div>`;
   }
-  function renderStart(){
-    if (view === 'credits') return renderCredits();
-    if (view === 'over') return renderOver();
-    // Other realms, as links to sibling files. They are other single-file
-    // builds beside this one — on Pages or in the same folder offline — so
-    // the page is only a hop away and nothing here depends on it loading.
-    const realms = () => !(CFG.realms || []).length ? '' :
-      `<div class="start-h">other realms</div><div class="start-row">` +
-      CFG.realms.map(r => `<a href="${esc(r.file)}"><b>${r.kana ? `<i>${esc(r.kana)}</i>` : ''}${esc(r.label)}</b><small>${esc(r.blurb || '')}</small></a>`).join('') +
-      `</div>`;
-    // What draws belongs to the hand layer; the page only shows its switch,
-    // because on a phone it is the difference between a game and a picture.
+  function lanternsHtml(){
+    const p = purse(); if (!p) return '<p class="over-line">sign in or play from a page to keep what lasts</p>';
+    return `<div class="start-row lantern">` + Object.entries(LANTERN).map(([id, u]) => {
+      const lv = own(id), maxed = lv >= u.max, c = lanternCost(id);
+      return `<button data-lantern="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
+        + `<b>${MARK[id] || ''}<i class="k">${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}<small class="of">/${u.max}</small></b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
+    }).join('') + `</div>`;
+  }
+  function moreHtml(thumbs){
     const hand = window.__hand;
     const INPUTS = { pen: { kana:'✎', blurb:'fingers and palms are ignored, so the hand can rest on the glass.' },
                      finger: { kana:'☝', blurb:'anything that touches draws. one finger at a time.' } };
     const row = (k, table, cur) => Object.entries(table).map(([n, d]) =>
       `<button data-k="${k}" data-v="${n}" aria-pressed="${n === cur}"${d.locked ? ' disabled' : ''}>`
       + `<b>${d.kana ? `<i>${d.kana}</i>` : ''}${n}</b><small>${d.blurb}</small></button>`).join('');
+    const lines = (CFG.credits || []).map(l => `<p>${esc(l)}</p>`).join('');
+    return `<div class="start-h">how much help</div><div class="start-row">${row('diff', DIFF, difficulty)}</div>
+      <div class="start-h">what the sign says</div><div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
+      ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
+      ${hand ? `<div class="start-links"><button class="start-hand">how the hand is doing</button></div>` : ''}
+      ${thumbs ? `<div class="start-h">as you wrote them</div>${thumbs}` : ''}
+      <div class="credits"><div class="start-h">who this leans on</div>
+      <p class="lead"><b>人</b>is two strokes, and neither can stand on its own. Take one away and the character falls.</p>
+      <p>That is the project. One person records the strokes, another draws the letterforms, testers find the bugs, someone builds it, and every learner leans on all of them.</p>
+      ${lines}
+      <p class="small">${esc(CFG.credit || '')}</p>
+      <p class="small">Single file, opens from a double-click, and needs no network to play. Your progress lives on this device.${window.__sync && window.__sync.enabled ? ' When there is a network, notes on how the tracing went are sent to the workshop under a made-up device name; ✋ hand, up top, turns that off.' : ''}</p></div>`;
+  }
+  function workshopHtml(only, thumbs){
+    const p = purse();
+    const panels = { attack: permHtml('skills'), defend: permHtml('guard'), earn: permHtml('drive'), lanterns: lanternsHtml(), more: moreHtml(thumbs) };
+    if (only) return panels[only] || '';
+    const canBuy = t => !!p && (t === 'lanterns'
+      ? Object.entries(LANTERN).some(([id, u]) => own(id) < u.max && p.balance >= lanternCost(id))
+      : Object.entries(UPG).some(([id, u]) => u.tab === (WTABS.find(w => w[0] === t) || [])[2] && own(id) < u.max && p.balance >= permCost(id)));
+    const tabs = `<div class="wtabs">` + WTABS.map(([t, icon]) =>
+      `<button data-wtab="${t}" aria-pressed="${wtab === t}" class="${canBuy(t) ? 'can' : ''}" aria-label="${t}">${icon ? ICON[icon] : ''}${t}</button>`).join('') + `</div>`;
+    const body = WTABS.map(([t]) => `<div class="wpanel" data-wpanel="${t}"${wtab === t ? '' : ' hidden'}>${panels[t]}</div>`).join('');
+    return `<div class="start-h">the workshop${p ? ' · 魂 ' + p.balance : ''} <small>what lasts, bought with 魂</small></div>${tabs}${body}`;
+  }
+  function showWtab(t){
+    wtab = t; try { localStorage.setItem('hito-wtab', t); } catch(_){}
+    if (!start.querySelectorAll) return;
+    for (const b of start.querySelectorAll('button[data-wtab]')) b.setAttribute('aria-pressed', String(b.dataset.wtab === t));
+    for (const el of start.querySelectorAll('[data-wpanel]')) el.hidden = el.dataset.wpanel !== t;
+  }
+  function renderCredits(){ wtab = 'more'; return renderStart(true); }
+  function renderStart(asStart){
+    if (view === 'credits' && !asStart) return renderCredits();
+    if (view === 'over') return renderOver();
+    const hand = window.__hand;
     start.innerHTML = markup = `<div class="start-card">
       <div class="start-title">hito<span>人</span></div>
       <div class="start-sub">${esc(REALM)} · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
-      <div class="start-h">how much help</div>
-      <div class="start-row">${row('diff', DIFF, difficulty)}</div>
-      <div class="start-h">what the sign says</div>
-      <div class="start-row">${row('sign', SIGNS, CFG.sign)}</div>
       ${ST ? `<div class="start-h">the tower · furthest wave ${bestWave()} · ${roster().length} characters on the field${nextRowAt() < Infinity ? ' · next row of the chart at wave ' + nextRowAt() : ' · every row of the chart'}${difficulty === 'guided' ? ' · <b class="needs">practice: nothing counts</b>' : ''}</div>` : ''}
-      ${workshopHtml()}
-      ${hand ? `<div class="start-h">draw with</div><div class="start-row">${row('input', INPUTS, hand.input)}</div>` : ''}
-      ${realms()}
       <button class="start-go">${over ? 'begin again' : 'begin'}</button>
-      <div class="start-links">${hand ? '<button class="start-hand">how the hand is doing</button>' : ''}<button class="start-credits">who this leans on</button></div>
+      ${workshopHtml()}
       <div class="start-foot">${WORDS ? 'draw below · the farang come from above · write what they are saying, one kana at a time' : 'draw below · the farang come from above · the one you are answering is yours'}</div>
     </div>`;
-    const cr = start.querySelector('.start-credits');
-    if (cr) cr.onclick = () => { view = 'credits'; renderStart(); };
+    wirePage(renderStart);
+  }
+  function wirePage(again){
     const hb = start.querySelector('.start-hand');
-    if (hb) hb.onclick = () => hand.show();
-    wireWorkshop(renderStart);
+    if (hb) hb.onclick = () => window.__hand.show();
     for (const b of start.querySelectorAll('button[data-k]')){
       b.onclick = () => {
         if (b.dataset.k === 'diff') setDifficulty(b.dataset.v);
-        else if (b.dataset.k === 'input') hand.setInput(b.dataset.v);
-        else if (b.dataset.k === 'stage'){ if (setStage(b.dataset.v) && !over){ monsters = []; wave = 0; killed = 0; locked = null; spawn(); retarget(true); } }
+        else if (b.dataset.k === 'input') window.__hand.setInput(b.dataset.v);
         else setSign(b.dataset.v);
-        renderStart();
+        again();
       };
     }
     const go = start.querySelector('.start-go');
     if (go) go.onclick = begin;
+    const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
   }
+  // purchases and tab switches are heard by the page itself: a purchase
+  // re-renders the page, and a handler on the button would go with it
+  tapOn(start, 'button[data-wtab]', b => showWtab(b.dataset.wtab));
+  tapOn(start, 'button[data-perm]', b => { if (buyPerm(b.dataset.perm)) renderStart(); });
+  tapOn(start, 'button[data-lantern]', b => { if (buyLantern(b.dataset.lantern)) renderStart(); });
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
   function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
-  // The lantern workshop. Shown where a round ends and where one begins.
-  function workshopHtml(){
-    const p = purse(); if (!p) return '';
-    const items = Object.entries(LANTERN).map(([id, u]) => {
-      const lv = own(id), maxed = lv >= u.max, c = lanternCost(id);
-      return `<button data-lantern="${id}"${maxed || p.balance < c ? ' disabled' : ''} class="${!maxed && p.balance >= c ? 'can' : ''}">`
-        + `<b>${MARK[id] || ''}<i>${u.kana}</i>${u.name}${lv ? ' ' + lv : ''}</b><small>${maxed ? 'as far as it goes' : '魂 ' + c + ' · ' + u.blurb}</small></button>`;
-    }).join('');
-    const gate = '';   // the gate was bought with 魂 until v0.1.54; rows open by distance now
-    return `<div class="start-h">the lantern workshop · 魂 ${p.balance}</div><div class="start-row lantern">${items}${gate}</div>`;
-  }
-  function wireWorkshop(again, root){
-    for (const b of (root || start).querySelectorAll('button[data-lantern]')) b.onclick = () => {
-      const id = b.dataset.lantern;
-      if (buyLantern(id)) again();
-    };
-  }
   function renderOver(){
     const e = ended; if (!e){ view = 'start'; return renderStart(); }
     const r = e.rec, H = window.__hand;
@@ -3280,21 +3322,16 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
       ${r.practice ? `<p class="over-line">guided is practice: nothing here counts toward the tower or 魂.</p>` : ''}
       ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}clean, readable traces pay the most${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
-      ${workshopHtml()}
-      ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
       <button class="start-go">again</button>
-      <div class="start-links"><button class="start-page">difficulty and the sign</button>${H ? '<button class="start-hand">how the hand is doing</button>' : ''}</div>
+      ${workshopHtml(null, hands)}
       <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
     </div>`;
-    const go = start.querySelector('.start-go');
-    if (go) go.onclick = () => begin();
-    wireWorkshop(renderOver);
-    const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
-    const hb = start.querySelector('.start-hand'); if (hb) hb.onclick = () => H.show();
+    wirePage(renderOver);
   }
   function openOver(){ openTab(null); paused = true; view = 'over'; renderStart(); start.hidden = false; showRedo(false); }
   function openStart(){ paused = true; view = over && ended ? 'over' : 'start'; renderStart(); start.hidden = false; showRedo(false); }
   function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; showRedo(false); }
+  function openWorkshop(t){ if (t) wtab = t; return renderStart(); }
   function begin(){
     start.hidden = true;
     if (over) restart(); else paused = false;
@@ -3338,7 +3375,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
-    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
+    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     // a synthetic tap: a pointerdown on the first element the selector finds, through the container's own listener
@@ -3353,7 +3390,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const ev = { target: fake, preventDefault(){} };
       for (const h of (TAPS.get(bar) || [])) h(ev); for (const h of (TAPS.get(panel) || [])) h(ev);
       return true;
-    }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return panelLanterns.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return workshopHtml('lanterns'); }, get inkHtml(){ return panelInk.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -3415,6 +3452,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.32</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.33</div>
 </body>
 </html>

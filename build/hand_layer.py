@@ -646,8 +646,8 @@ LAYER = r"""
 """
 
 
-PEN = {"size": None, "stage": "34dvh", "ease": 1.0, "trail": 1.0, "halo": 0, "endFloor": 0.02, "flick": 0}
-FINGER = {"size": [0.62, 0.62], "stage": "46dvh", "ease": 1.3, "trail": 2.2, "halo": 36, "endFloor": 0.045, "flick": 0.12}
+PEN = {"size": None, "stage": "38dvh", "ease": 1.0, "trail": 1.0, "halo": 0, "endFloor": 0.02, "flick": 0}
+FINGER = {"size": [0.62, 0.62], "stage": "50dvh", "ease": 1.3, "trail": 2.2, "halo": 36, "endFloor": 0.045, "flick": 0.12}
 
 
 def profiles(pack):
