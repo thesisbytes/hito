@@ -1,0 +1,6 @@
+# The build venv (.venv): what build/stitch.py, make_fonts.py and make_index.py need.
+#   python -m venv .venv && .venv/bin/pip install -r requirements.txt
+# The agents have their own venv and their own pyproject (agents/).
+fonttools==4.63.0
+brotli==1.2.0
+zopfli==0.4.3
