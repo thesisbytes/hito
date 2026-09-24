@@ -1699,3 +1699,21 @@ Running log. Append at the bottom, don't rewrite history.
   character. Costs: intent 12, breath 9, vessel 25 — arithmetic, not play.
 - The tests: intent's hit takes two, breath's two strokes fill four, a
   vessel grows the bag by six, the ceiling and the maxed button as before.
+
+## 2026-09-24 — Direction, not decided: persistence and motivation
+
+- The maintainer, after the intent tabs: "Persistence may be another tab..
+  where we develop defensive upgrades. And motivation.. where it sort of
+  resembles, fall seven get up eight."
+- **耐 persistence** (墨, this run, defensive): 守 mend moves here, leaving 技
+  purely about cutting; 壁 wall (a breach costs less, or the farang slow in
+  the last stretch); 癒 tend (a life back every so many waves held); 鎮 calm
+  (a breach does not drain 気, once that drain exists).
+- **志 motivation** (魂, lasting): 七転び八起き as the between-runs economy —
+  what a fall leaves for the next climb. 起 rise (the next run starts with
+  the 気 the ward fell with, capped); 継 carry (one lit character keeps its
+  lights through a fall); 八 the eighth (falls counted, and the run after a
+  fall pays a little more 魂). The lanterns fold into 志: they are lasting
+  too.
+- Four tabs then: 技, 耐, 志, and the lanterns inside 志. Two currencies,
+  two halves of the screen. Not built.

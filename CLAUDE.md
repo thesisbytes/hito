@@ -746,6 +746,12 @@ sentences. How that plays, as far as it has been thought through:
   and releases every lit character at once, the beat in which the hand may
   look up; and the sketchbook queuing by the ledger's struggle list rather
   than by the nearest farang. See NOTES.md.
+- *Persistence and motivation* (sketched 2026-09-24, not decided): 耐, a
+  defensive tab bought with 墨 in the run (mend, a wall, a life back every
+  so many waves); 志, the lasting tab bought with 魂 — 七転び八起き as the
+  between-runs economy: the next run keeps the 気 the ward fell with, one
+  lit character keeps its lights through a fall, and the run after a fall
+  pays a little more. See NOTES.md.
 - *Row resonance*, as the set bonus: all five of a row lit and that row's
   wisps fly harder. It rewards breadth and teaches the rows, which is the
   DECIDED affinity rule paying out. It must not light a sibling that was not
