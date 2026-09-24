@@ -980,6 +980,7 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   const bal0 = H.tama.balance;
   for (let g = 0; !F.over && g < 400; g++){ for (const m of F.monsters) m.d = 0.061; advance(40); }
   ok(F.over && F.ended.pay > 0 && H.tama.balance === bal0 + F.ended.pay, `a lost run paid ${F.ended && F.ended.pay} and the purse moved by ${H.tama.balance - bal0}`);
+  ok(F.ended.rec.frames && F.ended.rec.frames.n > 0 && F.ended.rec.frames.slow <= F.ended.rec.frames.n, `the run did not count its frames: ${JSON.stringify(F.ended.rec.frames)}`);
   ok(H.ledger.best[realm] && H.ledger.best[realm].wave === F.ended.rec.wave, 'the furthest wave was not kept');
   advance(900);
   ok(/the ward fell/.test(F.startHtml) && /\+ 魂/.test(F.startHtml) && !/gate to stage/.test(F.startHtml), 'the ending does not say the ward fell and what was paid, or still sells a gate');

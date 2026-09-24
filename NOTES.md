@@ -1827,3 +1827,42 @@ Running log. Append at the bottom, don't rewrite history.
   100 wants lanterns and a lit chart — which is what the lanterns are for.
   A guess with a reason behind it, to be corrected by the next runs.
 - Katakana's pace was already gentler (words); left.
+
+## 2026-09-24 — 仏 and 鬼: an agent to buff, an agent to nerf (hiragana v0.1.64, katakana-game v0.1.27)
+
+- The maintainer, after v0.1.63: an iPhone was "almost like butter compared
+  to my pixel 9", and "wouldn't it be cool to have an agent to buff and one
+  agent to nerf?"
+- **The phone.** Two phones, one build, opposite reports: the raster path,
+  not the game. There is no Pixel here, so the build now counts its frames
+  — every run's record carries `frames` (n, over 25 ms, over 50 ms) and
+  `plat` (the platform string, which is a device class and not a person) —
+  and `state_of_play` sums them. The next Pixel run will say what it saw.
+- **The pair.** `agents/hito_agents/balance.py`: 仏 hotoke, the learner's
+  advocate, and 鬼 oni, the farang's, two Strands agents with the same four
+  tools (the state of play, the current config, the pace model, propose)
+  and opposite standing orders. `pace.py` is the judge: need against
+  supply wave by wave (hits the farang need a second vs. the hand's trace
+  rate plus the lights its 気 can pay for), the wall, and the predicted end
+  — farang by farang, what the hand cannot answer in the gap reaches the
+  ward and bites. Calibration: the config before v0.1.63 ends near 25 here
+  against measured 27 (median) and 43 (furthest). Defaults are read out of
+  `shell_field.py` with a regex so the model cannot drift from the game.
+  The judge keeps only a value that holds a bare hand's predicted end
+  inside 55..120 (100 is the next level; lanterns should be what gets past
+  it), closest to the middle. Proposals outside the bounds are refused
+  before anyone argues.
+- **First live run** (Bedrock, Sonnet 4.6, one call each): 仏 proposed
+  hpEvery 45, spawnMs 5800, spawnRamp 30 (predicted end 69). 鬼 proposed
+  hpEvery 60, biteEvery 40, castCost 3 — and called the first two "the wall
+  moved out", which is a loosening dressed as a nerf; the LLM argued its
+  brief and lost the thread of its own side. The judge took hpEvery 60 (end
+  59), spawnMs 5800 (63), spawnRamp 30 (72), biteEvery 40 (78) and kept
+  castCost. Applied by hand with `--apply`: the hiragana game's pace is now
+  that verdict, predicted end 78 for the measured hand against 45 for
+  v0.1.63's guess. For the report: the arithmetic is the value, the
+  advocates choose knobs and narrate, and a nerf agent that argues a buff
+  is exactly why the judge is not a model.
+- The pack's `hand` block came back from `--apply` re-indented (json.dumps);
+  cosmetic. The judge's tests are pinned to a fixed base config, because
+  the agents edit the pack the tests would otherwise read.

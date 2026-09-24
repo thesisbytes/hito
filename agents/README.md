@@ -45,6 +45,8 @@ reserves the whole window against a small balance otherwise).
 agents/.venv/bin/python agents/pull.py                      # hito.events -> agents/data/events.jsonl
 agents/.venv/bin/python -m hito_agents.analyst "which characters fizzle most?"
 agents/.venv/bin/python -m hito_agents.system1              # Laya labels every trace -> agents/out/labels.jsonl
+agents/.venv/bin/python -m hito_agents.balance              # 仏 and 鬼 argue the tower's pace; the judge writes agents/out/balance-<date>.json
+agents/.venv/bin/python -m hito_agents.balance --apply agents/out/balance-<date>.json   # a human applies the verdict to the pack
 agents/.venv/bin/python -m unittest discover -s agents/test # offline; no key, no model needed
 ```
 
@@ -70,6 +72,8 @@ agents/
     system1.py            geometry per trace, Laya's typed questions, the labels, and the check against the flags
     factcheck.py          the fact fence: what the analyst measured vs. made up; figures checked against the tools; memory refuses causes
     analyst.py            the first agent: reads the pull and answers questions
+    pace.py               the tower's pace as arithmetic: need vs supply by wave, the wall, the predicted end; defaults read from the shell
+    balance.py            仏 hotoke (buff) and 鬼 oni (nerf) argue over the pace; the judge is pace.py, and the verdict is a file
   test/test_agents.py     the wiring, offline: a scripted model plays the LLM's part
   data/                   the pull (ignored by git)
   out/                    reports and the ledger (ignored by git)
@@ -93,3 +97,9 @@ agents/
   "(unverified)", and a memory write that explains rather than measures is
   refused. `HITO_FACTCHECK=off|mark|strict`.
 - **Nothing lives only in the terminal.** The ledger is a file.
+- **The judge is arithmetic.** The balance advocates choose which knobs and
+  argue why; `pace.py` refuses anything outside its bounds and keeps only
+  what holds the predicted end (a bare hand, no lanterns) inside the band.
+  An advocate can be as persuasive as it likes. On its first run 鬼 the
+  nerf argued for a loosening and called it a wall moved out; the judge
+  took the number, not the story.

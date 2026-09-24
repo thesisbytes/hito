@@ -1,6 +1,6 @@
 {
   "script": "hiragana",
-  "version": "0.1.63",
+  "version": "0.1.64",
   "title": "hito 人 · hiragana · v0.1.29",
   "brand": "hito 人",
   "fontDir": "fonts",
@@ -43,7 +43,14 @@
     0.32,
     0.62
   ],
-  "hand": { "pen": { "size": [0.52, 0.52] } },
+  "hand": {
+    "pen": {
+      "size": [
+        0.52,
+        0.52
+      ]
+    }
+  },
   "mode": "medium",
   "grid": "cross",
   "shell": "field",
@@ -51,11 +58,11 @@
     "sign": "kana",
     "speed": 0.055,
     "wardHp": 5,
-    "spawnMs": 5200,
-    "spawnRamp": 45,
+    "spawnMs": 5800,
+    "spawnRamp": 30,
     "spawnMin": 3400,
-    "hpEvery": 30,
-    "biteEvery": 30,
+    "hpEvery": 60,
+    "biteEvery": 40,
     "advanceMs": 460,
     "reading": "both",
     "fizzleRestarts": true,

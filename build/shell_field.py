@@ -356,6 +356,7 @@ LAYER = STYLE + r"""
   const biteFor = (w, boss) => Math.max(1, (CFG.biteEvery ? Math.min(CFG.biteMax, 1 + Math.floor(w / CFG.biteEvery)) : 1)
                                           + (boss && ST ? ST.bossBite : 0) - upg.wall);
   let spawnAt = 0, tPrev = 0;
+  let frames = { n:0, slow:0, jank:0 };
   // The field holds still while the start page is up. Nothing moves, nothing
   // spawns, no wisp flies; the clock resumes from where it stopped.
   let paused = true;
@@ -899,8 +900,14 @@ LAYER = STYLE + r"""
   // ---- the loop
   function step(now){
     if (!tPrev) tPrev = now;
-    const dt = Math.min(0.05, (now - tPrev)/1000); tPrev = now;
+    const raw = (now - tPrev)/1000, dt = Math.min(0.05, raw); tPrev = now;
     if (paused){ draw(); return; }
+    // How the phone kept up, counted rather than sampled: frames, the ones
+    // over 25 ms (a dropped frame at 60 Hz) and over 50 ms (a stutter a
+    // hand feels). Written into the run's record, so the table can say
+    // what each device saw — an iPhone was "like butter" and a Pixel 9
+    // "a touch laggy" on the same build, and nothing here could tell them apart.
+    if (raw > 0 && raw < 2){ frames.n++; if (raw > 0.025) frames.slow++; if (raw > 0.05) frames.jank++; }
     if (!over){
       // Nothing to answer is not a rest, it is a dead screen. Refill at once.
       if (!monsters.length) spawnAt = Math.min(spawnAt, now);
@@ -1169,7 +1176,7 @@ LAYER = STYLE + r"""
                   // and a run that restarts on the same character does not load one
     sumi = own('inkwell') * CFG.inkwellStep; energy = CFG.energyStart; credited = 0;
     ward = wardMax(); over = false; wave = 0; killed = 0; locked = null; asked = null; queue = []; recent = [];
-    spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
+    spawnAt = 0; tPrev = 0; castAt = 0; paused = false; frames = { n:0, slow:0, jank:0 }; spawn(); retarget();
     // The last banish of a stage leaves the engine celebrating: the whole path
     // lit, `done` set. If the first target of the new run is the character
     // already loaded, retarget() has nothing to change and that lit path is
@@ -1206,7 +1213,8 @@ LAYER = STYLE + r"""
     const rec = { at: run.at, realm: REALM, practice: difficulty === 'guided' || undefined, tama: pay,
                   quality: run.qn ? Math.round(100*run.q/run.qn)/100 : undefined, wave, banished: killed, traced: run.traced, clean: run.clean,
                   sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
-                  difficulty, sign: CFG.sign, upgrades: {...upg} };
+                  difficulty, sign: CFG.sign, upgrades: {...upg},
+                  frames: {...frames}, plat: (navigator.platform || '').slice(0, 24) || undefined };
     let best = null;
     try { if (H && H.run) best = H.run(rec); } catch(_){}
     try { window.__sync && window.__sync.record('run', rec); } catch(_){}
@@ -1459,7 +1467,7 @@ LAYER = STYLE + r"""
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
-    get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
+    get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,

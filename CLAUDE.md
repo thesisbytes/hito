@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.63.html`
+### Hiragana — `dist/hiragana-v0.1.64.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -339,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.26.html`
+### Katakana — `dist/katakana-game-v0.1.27.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -903,6 +903,16 @@ per-character ledger. Save data must have export/import from day one.
   field shell hides the engine's `.tabs` with `!important`, and a dashboard
   that named its own strip `tabs` shipped three releases with invisible
   buttons (v0.1.55-v0.1.60). No test sees a stylesheet; a screenshot does.
+- **The pace is argued, then judged (v0.1.64).** The maintainer: "wouldn't
+  it be cool to have an agent to buff and one agent to nerf?" `agents/`
+  has 仏 hotoke and 鬼 oni, two Strands agents reading the same pull of the
+  runs and proposing changes to the hiragana game's pace keys; the judge is
+  `agents/hito_agents/pace.py`, arithmetic that predicts where a bare hand's
+  run ends and keeps that inside a band. The verdict is a file under
+  `agents/out`; a human applies it to `scripts/hiragana/game.json` with
+  `--apply`, then builds and tests as ever. Agents never touch a build. Every
+  run now records its frame counts (`frames`, `plat`) so the table can tell
+  an iPhone from a Pixel.
 - **Look at a running build before shipping UI.** Headless Chrome is on this
   machine (`google-chrome --headless=new --screenshot`). Switch sharing off
   first (`hito-share` = `0`) or the run lands in the production table.

@@ -519,3 +519,143 @@ class FactCheck(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ---- the balance: two advocates and a judge that is arithmetic
+from hito_agents import balance, pace
+
+
+def run_row(wave, traced=20, ms=80000, diff="medium", frames=None, upgrades=None):
+    body = {"realm": "hiragana", "difficulty": diff, "wave": wave, "traced": traced, "clean": int(traced * 0.7),
+            "ms": ms, "banished": wave - 5, "cast": 10, "v": "0.1.64", "upgrades": upgrades or {}}
+    if frames:
+        body["frames"] = frames
+    return {"device": "dtest", "kind": "run", "at": "2026-09-24T10:00:00.000+00:00", "body": body, "$id": f"r{wave}"}
+
+
+HAND = {"s_per_trace": 3.8, "strokes_per_trace": 2.5}
+OLD = {"spawnMin": 1800, "spawnRamp": 140, "hpEvery": 10, "biteEvery": 20}
+# v0.1.63's hand-tuned ramp, fixed here so the tests do not move when the
+# pack does (the balance agents edit the pack; the judge's tests must not
+# read their own verdict back)
+BASE = {"spawnMs": 5200, "spawnMin": 3400, "spawnRamp": 45, "hpEvery": 30, "biteEvery": 30}
+
+
+def base_cfg():
+    cfg, refused = pace.with_changes(pace.current(), BASE)
+    assert not refused
+    return cfg
+
+
+class Pace(unittest.TestCase):
+    def test_the_defaults_are_read_from_the_shell_itself(self):
+        d = pace.shell_defaults()
+        self.assertEqual(d["spawnMs"], 5200)
+        self.assertEqual(d["wardHp"], 5)
+        self.assertEqual(d["tower"]["rows"], 2)
+        self.assertIn("bossHp", d["tower"])
+
+    def test_changes_are_bounded_and_named(self):
+        cfg = pace.current()
+        out, refused = pace.with_changes(cfg, {"spawnMin": 3000, "spawnMin2": 1, "hpEvery": 1000, "tower.bossHp": 1, "tower.rows": 9})
+        self.assertEqual(out["spawnMin"], 3000)
+        self.assertEqual(out["tower"]["bossHp"], 1)
+        self.assertEqual(set(refused), {"spawnMin2", "hpEvery", "tower.rows"})
+        self.assertEqual(cfg["tower"]["bossHp"], 2, "with_changes wrote into the config it was given")
+
+    def test_the_old_ramp_ends_where_the_runs_did_and_the_new_one_later(self):
+        cur = base_cfg()
+        old, _ = pace.with_changes(cur, OLD)
+        e_old, e_new = pace.end_of(old, HAND), pace.end_of(cur, HAND)
+        self.assertTrue(18 <= e_old <= 40, f"the old ramp is predicted to end at {e_old}; the runs ended 27-43")
+        self.assertGreater(e_new, e_old)
+        self.assertLess(pace.wall_of(old, HAND), pace.wall_of(cur, HAND))
+        slower, _ = pace.with_changes(cur, {"spawnMin": 5000})
+        self.assertGreaterEqual(pace.end_of(slower, HAND), e_new)
+
+    def test_a_faster_hand_goes_further(self):
+        cur = base_cfg()
+        self.assertGreater(pace.end_of(cur, {"s_per_trace": 2.0, "strokes_per_trace": 2.5}), pace.end_of(cur, HAND))
+
+
+class Balance(unittest.TestCase):
+    def setUp(self):
+        balance.use(parsed_runs())
+        self.tmp = tempfile.TemporaryDirectory()
+        self.out = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_the_state_of_play_measures_the_hand_and_the_phone(self):
+        s = balance.state_of_play()
+        self.assertEqual(s["runs"], 4)
+        self.assertEqual(s["hand"]["runs"], 3, "a practice run was counted")
+        self.assertAlmostEqual(s["hand"]["s_per_trace"], 4.0)
+        self.assertEqual(s["hand"]["wave_max"], 43)
+        self.assertEqual(s["upgrades_bought"], {"quick": 1})
+        self.assertEqual(s["frames"]["runs"], 1)
+        self.assertAlmostEqual(s["frames"]["jank"], 0.05)
+
+    def test_the_judge_keeps_what_no_side_can_hold_in_band(self):
+        cur = base_cfg()
+        props = {"hotoke": {"changes": {"spawnMin": 6000}}, "oni": {"changes": {"spawnMin": 1200}}}
+        # a hand so slow that nothing holds, and one so quick that nothing bites: the judge changes nothing
+        for hand in ({"s_per_trace": 30.0}, {"s_per_trace": 0.3}):
+            v = balance.judge(cur, hand, props)
+            self.assertEqual(v["changes"], {}, v)
+            self.assertIn("kept", v["why"]["spawnMin"])
+
+    def test_the_judge_takes_the_value_that_lands_in_band(self):
+        cur = base_cfg()
+        e0 = pace.end_of(cur, HAND)
+        v = balance.judge(cur, HAND, {"hotoke": {"changes": {"spawnMin": 6000}}, "oni": {"changes": {"spawnMin": 1200}}})
+        self.assertEqual(v["changes"], {"spawnMin": 6000}, v)
+        self.assertTrue(balance.BAND[0] <= v["end_after"] <= balance.BAND[1], v)
+        self.assertEqual(v["end_before"], e0)
+        self.assertIn("hotoke", v["why"]["spawnMin"])
+
+    def test_two_advocates_argue_and_the_verdict_is_a_file(self):
+        model = Scripted([
+            {"tool": ("state_of_play", {})},
+            {"tool": ("pace_model", {"changes": {"spawnMin": 3800}})},
+            {"tool": ("propose", {"changes": {"spawnMin": 3800, "nonsense": 1}, "because": "runs end at 27, the hand takes 4.0 s a trace"})},
+            {"text": "仏: slower spawns, so the later rows are seen."},
+            {"tool": ("state_of_play", {})},
+            {"tool": ("propose", {"changes": {"hpEvery": 25}, "because": "nobody has bought a heart; the tower should bite"})},
+            {"text": "鬼: sooner health, so the lanterns matter."},
+        ])
+        ledger, fence = Ledger(self.out / "ledger.jsonl"), Fence(self.out)
+        rec = balance.argue(model=model, out_dir=self.out, hooks=[ledger, fence], quiet=True)
+        self.assertEqual(rec["hotoke"]["changes"], {"spawnMin": 3800})
+        self.assertEqual(list(rec["hotoke"]["refused"]), ["nonsense"])
+        self.assertEqual(rec["oni"]["changes"], {"hpEvery": 25})
+        self.assertIn("仏", rec["hotoke"]["said"])
+        v = rec["verdict"]
+        self.assertTrue(set(v["changes"]) <= {"spawnMin", "hpEvery"})
+        self.assertTrue(v["end_after"] is None or balance.BAND[0] <= v["end_after"] <= balance.BAND[1] or v["changes"] == {})
+        p = Path(rec["file"])
+        self.assertTrue(p.exists() and p.parent == self.out)
+        self.assertEqual(json.loads(p.read_text())["verdict"]["changes"], v["changes"])
+        whats = [e["what"] for e in ledger.entries if e["what"] == "tool"]
+        self.assertEqual(len(whats), 5)
+
+    def test_apply_is_a_human_command_that_edits_the_pack(self):
+        game = self.out / "game.json"
+        game.write_text(json.dumps({"version": "0.0.0", "field": {"spawnMin": 3400, "tower": {"rows": 2}}}), encoding="utf-8")
+        verdict = self.out / "v.json"
+        verdict.write_text(json.dumps({"verdict": {"changes": {"spawnMin": 3800, "tower.bossHp": 1}}}), encoding="utf-8")
+        balance.apply(verdict, game=game)
+        pack = json.loads(game.read_text())
+        self.assertEqual(pack["field"]["spawnMin"], 3800)
+        self.assertEqual(pack["field"]["tower"], {"rows": 2, "bossHp": 1})
+        self.assertEqual(pack["version"], "0.0.0")
+
+
+def parsed_runs():
+    return [
+        run_row(27, traced=20, ms=80000),
+        run_row(43, traced=25, ms=100000, frames={"n": 1000, "slow": 200, "jank": 50}, upgrades={"quick": 2, "mend": 0}),
+        run_row(30, traced=20, ms=80000),
+        run_row(19, traced=22, ms=65000, diff="guided"),
+    ] + [dict(r, body=r["body"]) for r in []]
