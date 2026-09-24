@@ -72,10 +72,13 @@ STYLE = """
   /* The dashboard: hearts and ink on the seam, where the eyes already are, and
      tabs to duck into while the waves keep coming. The run does not pause for
      a tab; knowing when you can afford to look is the game. */
-  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:9px;
-             padding:5px 9px; border-radius:10px; background:rgba(22,20,17,.88); border:1px solid #3d3324;
+  /* Four tabs and two bars have to share 374px on a phone: the spacing is
+     tight on purpose, and the tabs may not grow (the engine's own button
+     rule would have them at 88px each). */
+  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:6px;
+             padding:5px 7px; border-radius:10px; background:rgba(22,20,17,.88); border:1px solid #3d3324;
              font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
-  .dash-bar .bar{ position:relative; flex:1 1 60px; min-width:54px; max-width:150px; height:18px; border-radius:6px; overflow:hidden;
+  .dash-bar .bar{ position:relative; flex:1 1 60px; min-width:46px; max-width:150px; height:18px; border-radius:6px; overflow:hidden;
                   background:rgba(232,224,204,.08); border:1px solid #3d3324; }
   .dash-bar .bar i{ position:absolute; left:0; top:0; bottom:0; background:#e9c46a; opacity:.75; transition:width .25s; }
   .dash-bar .bar.energy i{ background:#7fd1c4; }
@@ -83,8 +86,8 @@ STYLE = """
   .dash-bar .bar small{ position:absolute; right:5px; top:2px; font-size:10px; color:#e8e0cc; }
   @media (prefers-reduced-motion:reduce){ .dash-bar .bar i{ transition:none; } }
   .dash-bar .n{ font-weight:700; color:#e9c46a; white-space:nowrap; } .dash-bar .n small{ font-weight:400; color:rgba(232,224,204,.55); }
-  .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:4px; }
-  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:3px 10px; border-radius:8px; background:transparent;
+  .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:3px; }
+  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:3px 7px; border-radius:8px; background:transparent;
                           border:1px solid #3d3324; color:#e8e0cc; cursor:pointer; }
   .dash-bar .dash-tabs button.can{ border-color:#7fd1c4; color:#bdf0e6; }
   .dash-bar .dash-tabs button[aria-pressed="true"]{ background:rgba(127,209,196,.14); border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 10px rgba(127,209,196,.25); }
@@ -231,6 +234,11 @@ LAYER = STYLE + r"""
   // (`hpFor`) and in attack (`biteFor`, a breach costing more of the ward),
   // and this tab is what stands against the second. Persistence: a wall, a
   // life mended, a life back for every stretch of waves held.
+  // 志: motivation, which the maintainer pinned to currency: "Motivation tab
+  // should be upgrades for currency gain". Every trace pays more ink, every
+  // banish pays more ink, and the fall pays more 魂 — 七転び八起き, what you
+  // get up with. Three tabs, then, the way a tower is run: 技 cuts, 耐
+  // lasts, 志 earns. None of them writes a character.
   const UPG = {
     intent:{ tab:'skills', kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:3 },
     quick: { tab:'skills', kana:'早', name:'quick',  blurb:'the lights are thrown sooner',                    max:5 },
@@ -239,8 +247,11 @@ LAYER = STYLE + r"""
     mend:  { tab:'guard',  kana:'守', name:'mend',   blurb:'the ward gains a life',                           max:5 },
     wall:  { tab:'guard',  kana:'壁', name:'wall',   blurb:'a breach costs the ward one less',                max:3 },
     tend:  { tab:'guard',  kana:'癒', name:'tend',   blurb:'a life back for every stretch of waves held',     max:3 },
+    dilig: { tab:'drive',  kana:'勤', name:'diligence', blurb:'every trace pays one more 墨',                 max:5 },
+    harvest:{tab:'drive',  kana:'収', name:'harvest',blurb:'every farang your lights finish pays one more 墨', max:5 },
+    rise:  { tab:'drive',  kana:'起', name:'rise',   blurb:'the fall pays more 魂: get up with more',         max:3 },
   };
-  const TABS = { skills:'技', guard:'耐' };
+  const TABS = { skills:'技', guard:'耐', drive:'志' };
   const freshUpg = () => Object.fromEntries(Object.keys(UPG).map(id => [id, 0]));
   // `sumi`, not `ink`: `ink` is the engine's drawing context, and this layer
   // uses it (guided mode wipes the pen's mark with it). Calling the currency
@@ -785,7 +796,7 @@ LAYER = STYLE + r"""
     // times pays a little less, so the run pushes toward the ones that are new.
     const wasClean = !zapped;
     if (run){ run.traced++; if (wasClean) run.clean++; }
-    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
+    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)) + upg.dilig);
     const r = _conjure.apply(this, arguments);
     // What this trace is worth when the run ends. The hand has just judged how
     // recognisable it was (the note is taken on the way into the engine): a
@@ -860,7 +871,7 @@ LAYER = STYLE + r"""
       if (m === locked) locked = null;
       if (m.boss) applyShadow();
       killed++;
-      if (auto) earn(CFG.inkKill);
+      if (auto) earn(CFG.inkKill + upg.harvest);
       // An observation, not a claim: what was answered and how long it took.
       // Deliberately not a score — the client does not get to assert totals.
       try { window.__sync && window.__sync.record('banish', {
@@ -1166,7 +1177,8 @@ LAYER = STYLE + r"""
     // it pays less instead. Holding a stage to the end is worth half again.
     const p = purse();
     const pay = !p ? 0 : Math.round((run.pay + Math.floor(wave/CFG.tamaWaves))
-                                     * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1));
+                                     * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1)
+                                     * (1 + upg.rise * CFG.riseStep));   // 起: get up with more
     if (p) p.earn(pay);
     // guided is practice: the hand keeps the run, but not as a furthest wave
     const rec = { at: run.at, realm: REALM, practice: difficulty === 'guided' || undefined, tama: pay,
@@ -1190,7 +1202,9 @@ LAYER = STYLE + r"""
   strip.className = 'upg'; strip.id = 'upg';
   const stripGuard = document.createElement('div');
   stripGuard.className = 'upg'; stripGuard.id = 'upg-guard';
-  let upgMarkup = '', guardMarkup = '';
+  const stripDrive = document.createElement('div');
+  stripDrive.className = 'upg'; stripDrive.id = 'upg-drive';
+  let upgMarkup = '', guardMarkup = '', driveMarkup = '';
   const stripHtml = tabName => `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${sumi}</div>`
       + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
           const maxed = upg[id] >= u.max, c = costOf(id);
@@ -1200,7 +1214,8 @@ LAYER = STYLE + r"""
   function renderUpg(){
     strip.innerHTML = upgMarkup = stripHtml('skills');
     stripGuard.innerHTML = guardMarkup = stripHtml('guard');
-    for (const el of [strip, stripGuard]) if (el.querySelectorAll) for (const b of el.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
+    stripDrive.innerHTML = driveMarkup = stripHtml('drive');
+    for (const el of [strip, stripGuard, stripDrive]) if (el.querySelectorAll) for (const b of el.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
     if (typeof renderDash === 'function') renderDash();
   }
   // ---- the dashboard, and the tabs behind it
@@ -1212,8 +1227,9 @@ LAYER = STYLE + r"""
   const panel = document.createElement('div'); panel.className = 'panel'; panel.id = 'panel'; panel.hidden = true;
   const panelSkills = document.createElement('div'); panelSkills.innerHTML = '<p class="panel-h">技 · this run · intent, bought with 墨</p>'; panelSkills.appendChild(strip);
   const panelGuard = document.createElement('div'); panelGuard.innerHTML = '<p class="panel-h">耐 · this run · persistence, bought with 墨</p>'; panelGuard.appendChild(stripGuard);
+  const panelDrive = document.createElement('div'); panelDrive.innerHTML = '<p class="panel-h">志 · this run · motivation, bought with 墨</p>'; panelDrive.appendChild(stripDrive);
   const panelLanterns = document.createElement('div');
-  panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelLanterns);
+  panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelDrive); panel.appendChild(panelLanterns);
   wrap.appendChild(panel); wrap.appendChild(bar);
   let tab = null, dashMarkup = '';
   // Bars, not hearts (the maintainer: "let's not do hearts. I like bars. For
@@ -1229,6 +1245,7 @@ LAYER = STYLE + r"""
       + `<span class="n"><small>wave</small> ${wave}</span>`
       + `<span class="dash-tabs"><button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="this run's intent">技</button>`
       + `<button data-tab="guard" aria-pressed="${tab === 'guard'}" class="${canBuyAny('guard') ? 'can' : ''}" title="this run's persistence">耐</button>`
+      + `<button data-tab="drive" aria-pressed="${tab === 'drive'}" class="${canBuyAny('drive') ? 'can' : ''}" title="this run's motivation">志</button>`
       + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="what lasts">灯</button>` : '') + `</span>`;
     if (m === dashMarkup) return;
     dashMarkup = m; bar.innerHTML = m;
@@ -1239,7 +1256,7 @@ LAYER = STYLE + r"""
   // while you shop, and knowing when you can afford to is the game.
   function openTab(name){
     tab = name || null;
-    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelGuard.hidden = tab !== 'guard'; panelLanterns.hidden = tab !== 'lanterns';
+    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelGuard.hidden = tab !== 'guard'; panelDrive.hidden = tab !== 'drive'; panelLanterns.hidden = tab !== 'lanterns';
     if (tab === 'lanterns') renderLanterns();
     renderDash();
     return tab;
@@ -1414,7 +1431,7 @@ LAYER = STYLE + r"""
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
-    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -1529,13 +1546,14 @@ def config(pack, deck=None):
         f"biteEvery:{int(f.get('biteEvery', 20))},"
         f"biteMax:{int(f.get('biteMax', 4))},"
         f"tendEvery:{int(f.get('tendEvery', 10))},"
+        f"riseStep:{float(f.get('riseStep', 0.2))},"
         f"inkTrace:{int(f.get('inkTrace', 2))},"
         f"inkClean:{int(f.get('inkClean', 2))},"
         f"inkKill:{int(f.get('inkKill', 1))},"
         f"inkMastered:{int(f.get('inkMastered', 6))},"
         f"shoveStep:{float(f.get('shoveStep', 0.025))},"
         f"upgradeRamp:{float(f.get('upgradeRamp', 1.6))},"
-        f"upgradeCost:{js({**{'intent': 12, 'quick': 8, 'breath': 9, 'shove': 6, 'mend': 10, 'wall': 10, 'tend': 9}, **(f.get('upgradeCost') or {})})},"
+        f"upgradeCost:{js({**{'intent': 12, 'quick': 8, 'breath': 9, 'shove': 6, 'mend': 10, 'wall': 10, 'tend': 9, 'dilig': 8, 'harvest': 7, 'rise': 14}, **(f.get('upgradeCost') or {})})},"
         f"spawnMs:{int(f.get('spawnMs', 5200))},"
         f"spawnRamp:{int(f.get('spawnRamp', 140))},"
         f"spawnMin:{int(f.get('spawnMin', 1800))},"

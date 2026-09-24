@@ -107,7 +107,7 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 | `credits` | `[]` | Lines for the credits page behind the start page's "who this leans on" button, one paragraph each. The pack's `credit` (the licence line) is appended after them, so the KanjiVG attribution is on that page as well as in the footer. Name people here, by role or by name, as they prefer. |
 | `field.holdMs` | `1500` | How long after the pen last touched the pad the tracer still counts as busy. A retarget queued in that window waits, so a wisp or a breach elsewhere cannot swap the glyph under a hand that has lifted to think, or that has started a stroke which has not yet found the path. |
 | *(guided)* | | The field's guided difficulty sets `allRows`: its farang carry every row of the chart, not only the rows the stage has reached. Guided holds no stage past the second, so under the gate its rows never grew. |
-| *(the dashboard)* | | Two bars on the seam — 命 life (the ward) and 気 energy — with 墨, 魂 and the wave, and tabs 技 (this run's intent, bought with ink), 耐 (this run's persistence, bought with ink) and 灯 (the lanterns, bought with 魂). A tab does not pause the run. |
+| *(the dashboard)* | | Two bars on the seam — 命 life (the ward) and 気 energy — with 墨, 魂 and the wave, and tabs 技 (this run's intent), 耐 (persistence) and 志 (motivation: currency gain), all bought with ink, and 灯 (the lanterns, bought with 魂). A tab does not pause the run. |
 | `field.energyMax`, `energyStart` | 24, 6 | the bag of 気 a run can hold, and what it holds at the start |
 | `field.energyPerStroke` | 1 | every stroke the hand completes fills 気 by this much, whatever is on the field, landed or not (a conjure credits any strokes the shine did not) |
 | `field.castCost` | 2 | what a lit character's wisp spends. Lights say which characters can answer for themselves; 気 is what they answer with, and nothing fills it but the hand. |
@@ -207,8 +207,9 @@ above it.
 ```json
 "field": { "hpEvery": 10, "hpMax": 5, "inkTrace": 2, "inkClean": 2, "inkKill": 1,
            "inkMastered": 6, "shoveStep": 0.025, "upgradeRamp": 1.6,
-           "biteEvery": 20, "biteMax": 4, "tendEvery": 10,
-           "upgradeCost": { "intent": 12, "quick": 8, "breath": 9, "shove": 6, "mend": 10, "wall": 10, "tend": 9 } }
+           "biteEvery": 20, "biteMax": 4, "tendEvery": 10, "riseStep": 0.2,
+           "upgradeCost": { "intent": 12, "quick": 8, "breath": 9, "shove": 6, "mend": 10, "wall": 10, "tend": 9,
+                            "dilig": 8, "harvest": 7, "rise": 14 } }
 ```
 
 | key | default | what it does |
@@ -218,6 +219,7 @@ above it.
 | `biteEvery` | 20 | a breach costs the ward one more life every this many waves (the farang's attack, climbing as their health does). `0` switches it off. Words bite too: a word at the ward is a word not answered. |
 | `biteMax` | 4 | and no more than this, before a boss's extra and a wall's discount |
 | `tendEvery` | 10 | 癒 tend gives a life back per level every this many waves held |
+| `riseStep` | 0.2 | 起 rise: the fall pays this much more 魂 per level |
 | `inkTrace` | 2 | ink for landing a trace, whether or not anything was standing there |
 | `inkClean` | 2 | more, if it was clean |
 | `inkMastered` | 6 | a character conjured this many times pays one less |
@@ -226,8 +228,8 @@ above it.
 | `upgradeCost` | see above | what level one costs |
 | `upgradeRamp` | 1.6 | each level costs this many times the last |
 
-Two tabs of upgrades bought with ink during a run and gone when the ward
-falls. **技**, themed on intent — "we forge and sharpen our intent to cut
+Three tabs of upgrades bought with ink during a run and gone when the ward
+falls — 技 cuts, 耐 lasts, 志 earns. **技**, themed on intent — "we forge and sharpen our intent to cut
 through farangs' mindset of sticking to their old ways": **意 intent** (every
 light cuts one hit deeper per level, 3), **早 quick** (wisps fly 18% sooner
 per level, 5), **息 breath** (every stroke fills 気 by one more per level, 3),
@@ -235,7 +237,12 @@ per level, 5), **息 breath** (every stroke fills 気 by one more per level, 3),
 went in v0.1.60: intent does its job better. **耐**, persistence, against the
 farang's climbing attack (v0.1.61): **守 mend** (a life now, and a bigger
 ward, 5), **壁 wall** (a breach costs one less, never below one, 3), **癒
-tend** (a life back per level every `tendEvery` waves held, 3). The lanterns that last, bought with 魂: 心 heart,
+tend** (a life back per level every `tendEvery` waves held, 3). **志**,
+motivation, which is currency gain (v0.1.62, the maintainer: "Motivation tab
+should be upgrades for currency gain"): **勤 diligence** (every trace pays one
+more 墨, 5), **収 harvest** (every farang the lights finish pays one more 墨,
+5), **起 rise** (the fall pays `riseStep` more 魂 per level, 3 — 七転び八起き,
+what you get up with). The lanterns that last, bought with 魂: 心 heart,
 灯 lamp, 硯 inkwell, and **器 vessel** (the bag of 気 holds `vesselStep` (6)
 more per level, 3).
 

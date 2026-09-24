@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.61</title>
+<title>hito 人 · hiragana · v0.1.62</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -164,7 +164,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.61';
+const APP_VERSION='0.1.62';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -853,7 +853,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.61');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.62');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1764,7 +1764,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[],speed:0.055,wardHp:5,tower:{"rows":2,"rowWaves":10,"bossEvery":10,"bossHp":2,"bossBite":1,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15,"vessel":25},hpEvery:10,biteRate:0.5,noRepeat:4,hpMax:5,biteEvery:20,biteMax:4,tendEvery:10,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"intent":12,"quick":8,"breath":9,"shove":6,"mend":10,"wall":10,"tend":9},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,energyMax:24,energyStart:6,energyPerStroke:1,castCost:2,vesselStep:6,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[],speed:0.055,wardHp:5,tower:{"rows":2,"rowWaves":10,"bossEvery":10,"bossHp":2,"bossBite":1,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15,"vessel":25},hpEvery:10,biteRate:0.5,noRepeat:4,hpMax:5,biteEvery:20,biteMax:4,tendEvery:10,riseStep:0.2,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"intent":12,"quick":8,"breath":9,"shove":6,"mend":10,"wall":10,"tend":9,"dilig":8,"harvest":7,"rise":14},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,energyMax:24,energyStart:6,energyPerStroke:1,castCost:2,vesselStep:6,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -1803,10 +1803,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   /* The dashboard: hearts and ink on the seam, where the eyes already are, and
      tabs to duck into while the waves keep coming. The run does not pause for
      a tab; knowing when you can afford to look is the game. */
-  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:9px;
-             padding:5px 9px; border-radius:10px; background:rgba(13,19,26,.88); border:1px solid #1e2f3e;
+  /* Four tabs and two bars have to share 374px on a phone: the spacing is
+     tight on purpose, and the tabs may not grow (the engine's own button
+     rule would have them at 88px each). */
+  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:6px;
+             padding:5px 7px; border-radius:10px; background:rgba(13,19,26,.88); border:1px solid #1e2f3e;
              font:12px ui-sans-serif,system-ui; color:#dce8f2; }
-  .dash-bar .bar{ position:relative; flex:1 1 60px; min-width:54px; max-width:150px; height:18px; border-radius:6px; overflow:hidden;
+  .dash-bar .bar{ position:relative; flex:1 1 60px; min-width:46px; max-width:150px; height:18px; border-radius:6px; overflow:hidden;
                   background:rgba(220,232,242,.08); border:1px solid #1e2f3e; }
   .dash-bar .bar i{ position:absolute; left:0; top:0; bottom:0; background:#6cb8ff; opacity:.75; transition:width .25s; }
   .dash-bar .bar.energy i{ background:#5fe3a1; }
@@ -1814,8 +1817,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .dash-bar .bar small{ position:absolute; right:5px; top:2px; font-size:10px; color:#dce8f2; }
   @media (prefers-reduced-motion:reduce){ .dash-bar .bar i{ transition:none; } }
   .dash-bar .n{ font-weight:700; color:#6cb8ff; white-space:nowrap; } .dash-bar .n small{ font-weight:400; color:rgba(220,232,242,.55); }
-  .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:4px; }
-  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:3px 10px; border-radius:8px; background:transparent;
+  .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:3px; }
+  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:3px 7px; border-radius:8px; background:transparent;
                           border:1px solid #1e2f3e; color:#dce8f2; cursor:pointer; }
   .dash-bar .dash-tabs button.can{ border-color:#5fe3a1; color:#c3f7dc; }
   .dash-bar .dash-tabs button[aria-pressed="true"]{ background:rgba(95,227,161,.14); border-color:#5fe3a1; color:#c3f7dc; box-shadow:0 0 10px rgba(95,227,161,.25); }
@@ -1960,6 +1963,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // (`hpFor`) and in attack (`biteFor`, a breach costing more of the ward),
   // and this tab is what stands against the second. Persistence: a wall, a
   // life mended, a life back for every stretch of waves held.
+  // 志: motivation, which the maintainer pinned to currency: "Motivation tab
+  // should be upgrades for currency gain". Every trace pays more ink, every
+  // banish pays more ink, and the fall pays more 魂 — 七転び八起き, what you
+  // get up with. Three tabs, then, the way a tower is run: 技 cuts, 耐
+  // lasts, 志 earns. None of them writes a character.
   const UPG = {
     intent:{ tab:'skills', kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:3 },
     quick: { tab:'skills', kana:'早', name:'quick',  blurb:'the lights are thrown sooner',                    max:5 },
@@ -1968,8 +1976,11 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     mend:  { tab:'guard',  kana:'守', name:'mend',   blurb:'the ward gains a life',                           max:5 },
     wall:  { tab:'guard',  kana:'壁', name:'wall',   blurb:'a breach costs the ward one less',                max:3 },
     tend:  { tab:'guard',  kana:'癒', name:'tend',   blurb:'a life back for every stretch of waves held',     max:3 },
+    dilig: { tab:'drive',  kana:'勤', name:'diligence', blurb:'every trace pays one more 墨',                 max:5 },
+    harvest:{tab:'drive',  kana:'収', name:'harvest',blurb:'every farang your lights finish pays one more 墨', max:5 },
+    rise:  { tab:'drive',  kana:'起', name:'rise',   blurb:'the fall pays more 魂: get up with more',         max:3 },
   };
-  const TABS = { skills:'技', guard:'耐' };
+  const TABS = { skills:'技', guard:'耐', drive:'志' };
   const freshUpg = () => Object.fromEntries(Object.keys(UPG).map(id => [id, 0]));
   // `sumi`, not `ink`: `ink` is the engine's drawing context, and this layer
   // uses it (guided mode wipes the pen's mark with it). Calling the currency
@@ -2514,7 +2525,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // times pays a little less, so the run pushes toward the ones that are new.
     const wasClean = !zapped;
     if (run){ run.traced++; if (wasClean) run.clean++; }
-    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)));
+    if (casting()) earn(Math.max(1, CFG.inkTrace + (zapped ? 0 : CFG.inkClean) - ((MASTERY[drew] || 0) >= CFG.inkMastered ? 1 : 0)) + upg.dilig);
     const r = _conjure.apply(this, arguments);
     // What this trace is worth when the run ends. The hand has just judged how
     // recognisable it was (the note is taken on the way into the engine): a
@@ -2589,7 +2600,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       if (m === locked) locked = null;
       if (m.boss) applyShadow();
       killed++;
-      if (auto) earn(CFG.inkKill);
+      if (auto) earn(CFG.inkKill + upg.harvest);
       // An observation, not a claim: what was answered and how long it took.
       // Deliberately not a score — the client does not get to assert totals.
       try { window.__sync && window.__sync.record('banish', {
@@ -2895,7 +2906,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // it pays less instead. Holding a stage to the end is worth half again.
     const p = purse();
     const pay = !p ? 0 : Math.round((run.pay + Math.floor(wave/CFG.tamaWaves))
-                                     * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1));
+                                     * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1)
+                                     * (1 + upg.rise * CFG.riseStep));   // 起: get up with more
     if (p) p.earn(pay);
     // guided is practice: the hand keeps the run, but not as a furthest wave
     const rec = { at: run.at, realm: REALM, practice: difficulty === 'guided' || undefined, tama: pay,
@@ -2919,7 +2931,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   strip.className = 'upg'; strip.id = 'upg';
   const stripGuard = document.createElement('div');
   stripGuard.className = 'upg'; stripGuard.id = 'upg-guard';
-  let upgMarkup = '', guardMarkup = '';
+  const stripDrive = document.createElement('div');
+  stripDrive.className = 'upg'; stripDrive.id = 'upg-drive';
+  let upgMarkup = '', guardMarkup = '', driveMarkup = '';
   const stripHtml = tabName => `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${sumi}</div>`
       + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
           const maxed = upg[id] >= u.max, c = costOf(id);
@@ -2929,7 +2943,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   function renderUpg(){
     strip.innerHTML = upgMarkup = stripHtml('skills');
     stripGuard.innerHTML = guardMarkup = stripHtml('guard');
-    for (const el of [strip, stripGuard]) if (el.querySelectorAll) for (const b of el.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
+    stripDrive.innerHTML = driveMarkup = stripHtml('drive');
+    for (const el of [strip, stripGuard, stripDrive]) if (el.querySelectorAll) for (const b of el.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
     if (typeof renderDash === 'function') renderDash();
   }
   // ---- the dashboard, and the tabs behind it
@@ -2941,8 +2956,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   const panel = document.createElement('div'); panel.className = 'panel'; panel.id = 'panel'; panel.hidden = true;
   const panelSkills = document.createElement('div'); panelSkills.innerHTML = '<p class="panel-h">技 · this run · intent, bought with 墨</p>'; panelSkills.appendChild(strip);
   const panelGuard = document.createElement('div'); panelGuard.innerHTML = '<p class="panel-h">耐 · this run · persistence, bought with 墨</p>'; panelGuard.appendChild(stripGuard);
+  const panelDrive = document.createElement('div'); panelDrive.innerHTML = '<p class="panel-h">志 · this run · motivation, bought with 墨</p>'; panelDrive.appendChild(stripDrive);
   const panelLanterns = document.createElement('div');
-  panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelLanterns);
+  panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelDrive); panel.appendChild(panelLanterns);
   wrap.appendChild(panel); wrap.appendChild(bar);
   let tab = null, dashMarkup = '';
   // Bars, not hearts (the maintainer: "let's not do hearts. I like bars. For
@@ -2958,6 +2974,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       + `<span class="n"><small>wave</small> ${wave}</span>`
       + `<span class="dash-tabs"><button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="this run's intent">技</button>`
       + `<button data-tab="guard" aria-pressed="${tab === 'guard'}" class="${canBuyAny('guard') ? 'can' : ''}" title="this run's persistence">耐</button>`
+      + `<button data-tab="drive" aria-pressed="${tab === 'drive'}" class="${canBuyAny('drive') ? 'can' : ''}" title="this run's motivation">志</button>`
       + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="what lasts">灯</button>` : '') + `</span>`;
     if (m === dashMarkup) return;
     dashMarkup = m; bar.innerHTML = m;
@@ -2968,7 +2985,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // while you shop, and knowing when you can afford to is the game.
   function openTab(name){
     tab = name || null;
-    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelGuard.hidden = tab !== 'guard'; panelLanterns.hidden = tab !== 'lanterns';
+    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelGuard.hidden = tab !== 'guard'; panelDrive.hidden = tab !== 'drive'; panelLanterns.hidden = tab !== 'lanterns';
     if (tab === 'lanterns') renderLanterns();
     renderDash();
     return tab;
@@ -3143,7 +3160,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
-    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
@@ -3205,6 +3222,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.61</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.62</div>
 </body>
 </html>

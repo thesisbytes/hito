@@ -1755,3 +1755,22 @@ Running log. Append at the bottom, don't rewrite history.
   what `biteFor` says; tend at a tend wave; the 耐 strip and tab. The 気
   fill test now reads before the wait, like breath's: a light may spend some
   on a farang carrying the character.
+
+## 2026-09-24 — Motivation is currency gain: 志 (hiragana v0.1.62, katakana-game v0.1.25)
+
+- The maintainer: "Motivation tab should be upgrades for currency gain." So
+  志 is the third in-run tab bought with 墨, and the three are the way a
+  tower is run — 技 cuts, 耐 lasts, 志 earns. 勤 diligence (every trace pays
+  one more 墨, 5), 収 harvest (every farang the lights finish pays one more
+  墨, 5), 起 rise (the fall pays `riseStep` (0.2) more 魂 per level, 3 —
+  七転び八起き kept as the one that pays out when you get up). None writes a
+  character; rise is worthless in guided because guided pays no 魂, which
+  is right.
+- The earlier 志 sketch (the next run keeping its 気, a run after a fall
+  paying more) is retired by this: the maintainer's word for motivation
+  was currency, and rise is the piece of it that survived.
+- Four tabs and two bars on a 374px seam: spacing tightened (gap 6, tab
+  padding 7px, bar min-width 46). Checked at 390 and 360px; 灯 was off the
+  right edge before the tightening. The stubbed DOM would have passed it.
+- Test: diligence on a clean trace, harvest on a light's banish, rise on a
+  fallen run's 魂 against the same run without it, and the tab on the seam.

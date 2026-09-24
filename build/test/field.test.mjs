@@ -803,6 +803,21 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(F.openTab('guard') === 'guard' && F.tab === 'guard' && !F.paused, '耐 did not open, or paused the run');
   F.openTab(null);
 
+  // 志: currency gain. diligence on the trace, harvest on the banish, rise on the fall
+  fresh(); F.quench(); F.earn(100000);
+  ok(F.UPG.dilig.tab === 'drive' && F.UPG.harvest.tab === 'drive' && F.UPG.rise.tab === 'drive', 'diligence, harvest and rise belong to 志');
+  ok(F.buy('dilig') && F.buy('harvest') && F.buy('rise'), 'a full purse could not buy 志');
+  { const ink0 = F.ink; P.strokes.length = 0; P.strokes.push(line(120, 120, 280, 130, 60));
+    globalThis.conjure(); const paidTrace = F.ink - ink0;
+    advance(cfg.advanceMs + 60);
+    ok(paidTrace === cfg.inkTrace + cfg.inkClean + 1, `a clean trace with diligence 1 paid ${paidTrace}, expected ${cfg.inkTrace + cfg.inkClean + 1}`); }
+  { const m = F.monsters[0]; m.hp = 1; const ink0 = F.ink; F.hit(m, false, true);
+    ok(F.ink - ink0 === cfg.inkKill + 1, `a light's banish with harvest 1 paid ${F.ink - ink0}, expected ${cfg.inkKill + 1}`); }
+  ok(/data-upg="rise"/.test(F.driveHtml) && !/data-upg="rise"/.test(F.upgHtml) && !/data-upg="rise"/.test(F.guardHtml), 'rise is not on 志 alone');
+  advance(20);
+  ok(/data-tab="drive"/.test(F.dashHtml) && F.openTab('drive') === 'drive' && !F.paused, '志 is missing from the seam, or paused the run');
+  F.openTab(null);
+
   // a tough farang survives the first hit, and the pips say how much is owed
   fresh(); F.quench();
   const tough = F.monsters[0];
@@ -1004,6 +1019,19 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   // a conjure with no ink (nothing to judge) pays par, not zero and not a bonus
   fresh(); F.begin(); P.strokes.length = 0; globalThis.conjure();
   ok(Math.abs(F.run.pay - cfg.tamaClean) < 1e-9, `a trace with nothing to judge paid ${F.run.pay}, par is ${cfg.tamaClean}`);
+
+  // 起 rise: the fall pays more 魂, by riseStep per level
+  { const fall = () => { for (let g = 0; !F.over && g < 400; g++){ for (const m of F.monsters) m.d = 0.061; advance(40); } return F.ended.pay; };
+    // the glyph and its recognisability are random, so each run is judged
+    // against its own base: what it traced plus its waves, times medium's rate
+    const base = () => F.run.pay + Math.floor(F.ended.rec.wave / cfg.tamaWaves);
+    fresh(); F.begin(); F.setDifficulty('medium'); P.strokes.length = 0; globalThis.conjure(); advance(cfg.advanceMs + 60);
+    const plain = fall(), rate = Math.round(plain / base());
+    ok(plain > 0 && rate >= 1, `test setup: a plain medium run paid ${plain} on a base of ${base()}`);
+    fresh(); F.begin(); F.setDifficulty('medium'); P.strokes.length = 0; globalThis.conjure(); advance(cfg.advanceMs + 60);
+    F.earn(100000); F.buy('rise');
+    const risen = fall(), want = Math.round(base() * rate * (1 + cfg.riseStep));
+    ok(risen === want, `rise 1 paid ${risen} on a base of ${base()} at ×${rate}, expected ${want}`); }
 
   // guided is a sandbox: it pays nothing, and its waves are no record
   H.reset();
