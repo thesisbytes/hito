@@ -215,9 +215,9 @@ above it.
 | key | default | what it does |
 |---|---|---|
 | `hpEvery` | 10 | single characters take one more hit every this many waves. `0` switches it off. Words ignore it: a word is already as tough as it is long. The hiragana game's pace keys (`spawnMs`, `spawnMin`, `spawnRamp`, `hpEvery`, `biteEvery`) are set by the balance agents' verdict as of v0.1.64 — see `agents/README.md`; by finger a trace is ~3.8 s, and the defaults walled every run near wave 30. |
-| `hpMax` | 5 | and no more than this |
+| `hpMax` | 5 | and no more than this. The hiragana game sets 99 (v0.1.68): with a cap the upgrades outgrow the swarm and a run never ends — the maintainer reached wave 230. |
 | `biteEvery` | 20 | a breach costs the ward one more life every this many waves (the farang's attack, climbing as their health does). `0` switches it off. Words bite too: a word at the ward is a word not answered. |
-| `biteMax` | 4 | and no more than this, before a boss's extra and a wall's discount |
+| `biteMax` | 4 | and no more than this, before a boss's extra and a wall's discount. The hiragana game sets 6. |
 | `tendEvery` | 10 | 癒 tend gives a life back per level every this many waves held |
 | `riseStep` | 0.2 | 起 rise: the fall pays this much more 魂 per level |
 | `inkTrace` | 2 | ink for landing a trace, whether or not anything was standing there |
@@ -226,7 +226,7 @@ above it.
 | `inkKill` | 1 | ink when a wisp finishes a farang. Small on purpose: the idle half earns its keep without outearning the pen. |
 | `shoveStep` | 0.025 | how far one level of shove pushes a farang back per hit (the field is 1 across) |
 | `upgradeCost` | see above | what level one costs |
-| `upgradeRamp` | 1.6 | each level costs this many times the last. The hiragana game sets 1.85 (v0.1.65), and the ceilings went up with it (intent 5, quick 8, breath 5, shove 8, mend 8, wall 5, tend 5, diligence 8, harvest 8, rise 5): "we end up maxing out the upgrades so early". |
+| `upgradeRamp` | 1.6 | each level costs this many times the last. The hiragana game sets 1.85 (v0.1.65), and the ceilings went up with it (intent 3, quick 8, breath 3, shove 8, mend 8, wall 5, tend 5, diligence 8, harvest 8, rise 5 — intent and breath back to 3 in v0.1.68: they multiply each other, and 6 hits a cast on 6 気 a stroke was wave 230): "we end up maxing out the upgrades so early". |
 
 Three tabs of upgrades bought with ink during a run and gone when the ward
 falls — 技 cuts, 耐 lasts, 志 earns. **技**, themed on intent — "we forge and sharpen our intent to cut

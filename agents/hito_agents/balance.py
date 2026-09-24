@@ -50,6 +50,7 @@ BAND = (55, 120)
 
 _rows = None
 _proposals = {}
+_version = {}     # the build being judged, for hand_of
 
 
 def rows():
@@ -76,7 +77,7 @@ def state_of_play() -> dict:
     clean rate, which upgrades were bought, and how the phones kept up
     (frames over 25 and 50 ms) where a run recorded it. Start here."""
     rs = runs()
-    hand = pace.hand_of(rs)
+    hand = pace.hand_of(rs, _version.get("v"))
     bought = {}
     for r in rs:
         for k, v in (r.get("upgrades") or {}).items():
@@ -106,8 +107,14 @@ def pace_model(changes: dict = None) -> dict:
     wall is: the first wave the farang need more hits a second than the hand
     and its lights supply) for the current config with these changes applied. Keys as current_config lists them ('tower.bossHp' for
     the tower's). Refused keys come back with a reason and are ignored."""
-    cfg, refused = pace.with_changes(pace.current(), changes or {})
-    m = pace.model(cfg, pace.hand_of(runs()))
+    hand = pace.hand_of(runs(), _version.get("v"))
+    cur = pace.current()
+    cfg, refused = pace.with_changes(cur, changes or {})
+    m = pace.model(cfg, hand)
+    k = pace.calibration(cur, hand)
+    m["calibration"] = round(k, 2)
+    m["predicted_end"] = pace.predicted(cfg, hand, k)
+    m["note"] = "predicted_end is the model's end scaled by what the measured runs did against the model; it is the number the judge holds in band"
     m["table"] = [row for row in m["table"] if row["wave"] in (0, 10, 30, 60, 100, 140, 200)]
     if refused:
         m["refused"] = refused
@@ -121,10 +128,12 @@ def proposer(side):
         one plain sentence of why, quoting the numbers you saw. Out-of-bounds
         or unknown keys are refused and the rest kept. Call it once; a second
         call replaces the first."""
-        cfg, refused = pace.with_changes(pace.current(), changes or {})
+        hand = pace.hand_of(runs(), _version.get("v"))
+        cur = pace.current()
+        cfg, refused = pace.with_changes(cur, changes or {})
         kept = {k: v for k, v in (changes or {}).items() if k not in refused}
         _proposals[side] = {"changes": kept, "because": because, "refused": refused,
-                            "wall": pace.wall_of(cfg, pace.hand_of(runs())), "end": pace.end_of(cfg, pace.hand_of(runs()))}
+                            "wall": pace.wall_of(cfg, hand), "predicted_end": pace.predicted(cfg, hand, pace.calibration(cur, hand))}
         return _proposals[side]
     return propose
 
@@ -164,56 +173,61 @@ def judge(current_cfg, hand, proposals, band=BAND):
     """Arithmetic decides. Start from the current config; for each key either
     side proposed, try the sides' values (the smaller move first) and keep the
     one that leaves the predicted end inside the band, closest to its middle.
-    A key nobody's value can keep in band stays as it is."""
+    A key nobody's value can keep in band stays as it is. The prediction is
+    the model scaled by what the measured runs did against it, so a hand
+    that took the model's 78 to 230 is judged at 230."""
+    k = pace.calibration(current_cfg, hand)
+    end = lambda c: pace.predicted(c, hand, k)
     cfg = current_cfg
-    before = pace.end_of(cfg, hand)
+    before = end(cfg)
     mid = sum(band) / 2
     keys = []
     for side in ("hotoke", "oni"):
-        for k in (proposals.get(side) or {}).get("changes", {}):
-            if k not in keys:
-                keys.append(k)
+        for key in (proposals.get(side) or {}).get("changes", {}):
+            if key not in keys:
+                keys.append(key)
     chosen, why = {}, {}
-    def cur(k):
-        return cfg["tower"].get(k[6:]) if k.startswith("tower.") else cfg.get(k)
+    def cur(key):
+        return cfg["tower"].get(key[6:]) if key.startswith("tower.") else cfg.get(key)
     def dist(w):
         return abs((w if w is not None else 999) - mid)
-    for k in keys:
+    for key in keys:   # `key`, not `k`: `k` is the calibration, and a loop that reused it multiplied the model by a name
         options = []
         for side in ("hotoke", "oni"):
             ch = (proposals.get(side) or {}).get("changes", {})
-            if k in ch:
-                options.append((abs(ch[k] - (cur(k) or 0)), side, ch[k]))
+            if key in ch:
+                options.append((abs(ch[key] - (cur(key) or 0)), side, ch[key]))
         options.sort()
-        base = dist(pace.end_of(cfg, hand))
+        base = dist(end(cfg))
         best = None
         for move, side, v in options:
-            trial, refused = pace.with_changes(cfg, {k: v})
+            trial, refused = pace.with_changes(cfg, {key: v})
             if refused:
                 continue
-            w = pace.end_of(trial, hand)
+            w = end(trial)
             if w is not None and band[0] <= w <= band[1] and (best is None or dist(w) < best[0]):
                 best = (dist(w), side, v, w, trial)
         if best and best[0] <= base + 1e-9:
             _, side, v, w, trial = best
             cfg = trial
-            chosen[k] = v
-            why[k] = f"{side}'s {v}: predicted end {w}"
+            chosen[key] = v
+            why[key] = f"{side}'s {v}: predicted end {w}"
         else:
-            why[k] = "kept: no proposed value holds the predicted end in band, or none improves on it"
-    after = pace.end_of(cfg, hand)
-    return {"changes": chosen, "why": why, "end_before": before, "end_after": after, "band": list(band)}
+            why[key] = "kept: no proposed value holds the predicted end in band, or none improves on it"
+    after = end(cfg)
+    return {"changes": chosen, "why": why, "end_before": before, "end_after": after, "band": list(band), "calibration": round(k, 2)}
 
 
-def argue(model=None, out_dir=OUT, hooks=None, quiet=False):
+def argue(model=None, out_dir=OUT, hooks=None, quiet=False, version=None):
     """Both sides speak, the judge decides, the verdict is a file."""
     global _proposals
     _proposals = {}
+    _version["v"] = version
     said = {}
     for side in ("hotoke", "oni"):
         agent = build(side, model=model, hooks=hooks, callback_handler=None if quiet else None)
         said[side] = str(agent("Read the state of play and make your proposal."))
-    hand = pace.hand_of(runs())
+    hand = pace.hand_of(runs(), version)
     verdict = judge(pace.current(), hand, _proposals)
     record = {"date": date.today().isoformat(), "hand": hand, "current": {k: v for k, v in pace.current().items() if k in pace.TUNABLE or k == "tower"},
               "hotoke": {**_proposals.get("hotoke", {}), "said": said["hotoke"]},
@@ -274,7 +288,7 @@ def auto(rows_=None, version=None, threshold=THRESHOLD, balance_dir=BALANCE, arg
         return {"status": "done", "version": version, "runs": len(played), "file": str(verdict_file)}
     if len(played) < threshold:
         return {"status": "thin", "version": version, "runs": len(played), "threshold": threshold}
-    rec = (argue_fn or argue)(out_dir=OUT)
+    rec = (argue_fn or argue)(out_dir=OUT, version=version)
     rec["judged_version"] = version
     rec["runs_on_version"] = len(played)
     Path(balance_dir).mkdir(parents=True, exist_ok=True)

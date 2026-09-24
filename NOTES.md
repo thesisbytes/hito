@@ -1947,3 +1947,40 @@ Running log. Append at the bottom, don't rewrite history.
   sketchbook's box now, so it shows everywhere.
 - Rule for the file: new UI that names a thing in kanji names it in a mark
   too. The tabs got theirs the release before.
+
+## 2026-09-24 — Lost taps, and wave 230 (hiragana v0.1.68, katakana-game v0.1.31)
+
+- The maintainer: "I noticed I had to tap a couple times before my tab
+  would change. And right now it's hella OP lol. I got to like round 230."
+- **The taps.** `renderDash()` replaces the seam's innerHTML whenever its
+  markup changes — 気, 墨, the wave, the `can` outline — which during play
+  is most frames, and `renderUpg()` does the same to the strips on every
+  earn. A handler set on a button was set on an element that was often gone
+  between finger-down and the click, and the click went nowhere. `tapOn()`
+  puts one listener on the container (the seam, the panel) and acts on
+  pointerdown, before any re-render can get between; Enter and Space still
+  work. `touch-action: manipulation` on the buttons too, against the
+  double-tap delay. The stub cannot dispatch an event, so `F.tap(sel)` hands
+  a stand-in element with the selector's data attribute to the same
+  handlers; the test taps 耐 open, re-renders, and taps it shut.
+- **230.** Two causes, both mine. The v0.1.65 ceilings let intent reach 5
+  and breath 5: six hits a cast on six 気 a stroke, thirty-six times a bare
+  hand, and `hpMax` 5 meant the swarm stopped growing at wave 240 while the
+  hand did not. Intent and breath are back to 3 (they multiply each other;
+  the other caps stay), and the hiragana game sets `hpMax` 99 and `biteMax`
+  6, so the swarm always wins in the end, which is what a tower is.
+- **The judge was blind to it.** `pace.py` prices a bare hand — no
+  upgrades, no release, no lanterns — and said 78 for the config that went
+  to 230. It would have judged v0.1.67 "in band" and changed nothing.
+  `calibration()` is the measured median wave over the model's end for the
+  same config (5.0 here against the test's base), `predicted()` is the
+  model scaled by it, and the judge holds *that* in band; `hand_of` uses
+  the judged version's own runs once it has five. A hand that went to 230
+  is judged at 230. The calibration table for the record: at k=5, hpEvery
+  5→100, 6→115, 8→135, 10→150, 30→230. hpEvery is a blunt lever at that
+  scale, which is the arithmetic saying the caps were the real fault.
+- A loop variable `k` shadowed the calibration `k` in the judge and
+  multiplied the model by a key name; the test caught it as a type error.
+- For the report: this is the model being wrong in the useful direction —
+  it could not see the upgrades, the runs could, and the fix is to let the
+  measurement correct the model rather than to model everything.

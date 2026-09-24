@@ -1,6 +1,6 @@
 {
   "script": "hiragana",
-  "version": "0.1.67",
+  "version": "0.1.68",
   "title": "hito 人 · hiragana · v0.1.29",
   "brand": "hito 人",
   "fontDir": "fonts",
@@ -63,6 +63,8 @@
     "spawnRamp": 30,
     "spawnMin": 3400,
     "hpEvery": 60,
+    "hpMax": 99,
+    "biteMax": 6,
     "biteEvery": 40,
     "advanceMs": 460,
     "reading": "both",

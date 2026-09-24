@@ -25,7 +25,7 @@ TUNABLE = {
     "spawnMin":    (1200, 6000),
     "spawnRamp":   (0, 300),
     "hpEvery":     (5, 100),
-    "hpMax":       (1, 8),
+    "hpMax":       (1, 200),
     "biteEvery":   (5, 100),
     "biteMax":     (1, 6),
     "castCost":    (1, 4),
@@ -92,11 +92,17 @@ def with_changes(cfg, changes):
     return out, refused
 
 
-def hand_of(runs):
+def hand_of(runs, version=None, min_runs=5):
     """The measured hand: seconds per trace, strokes per trace (from the
     energy a run could earn — not recorded, so 2.5 is assumed), and how far
-    runs go. Medium only, practice left out."""
+    runs go. Medium only, practice left out. With a version and enough runs
+    on it, the waves are that version's: a pace is judged by the runs that
+    were played at it."""
     real = [r for r in runs if r.get("difficulty") == "medium" and not r.get("practice") and r.get("traced")]
+    if version:
+        mine = [r for r in real if r.get("v") == version]
+        if len(mine) >= min_runs:
+            real = mine
     if not real:
         return {"runs": 0, "s_per_trace": 3.6, "strokes_per_trace": 2.5, "wave_p50": None, "wave_max": None, "assumed": True}
     tpt = median((r.get("ms") or 0) / 1000 / r["traced"] for r in real)
@@ -107,6 +113,7 @@ def hand_of(runs):
         "strokes_per_trace": 2.5,
         "wave_p50": waves[len(waves) // 2],
         "wave_max": waves[-1],
+        "version": version if version and real and real[0].get("v") == version else None,
         "s_p50": round(median((r.get("ms") or 0) / 1000 for r in real)),
         "clean_rate": round(sum(r.get("clean") or 0 for r in real) / max(1, sum(r["traced"] for r in real)), 2),
         "assumed": False,
@@ -161,6 +168,25 @@ def model(cfg, hand, waves=range(0, 201, 10)):
 
 def end_of(cfg, hand):
     return model(cfg, hand)["end"]
+
+
+def calibration(cfg, hand):
+    """What the model does not know — upgrades, the release, the lanterns a
+    hand has bought — as one factor: the measured median wave over the
+    model's bare-hand end for the same config. 1 with nothing measured.
+    (The model said 78 for a config the maintainer took to wave 230.)"""
+    p50 = hand.get("wave_p50")
+    e = end_of(cfg, hand)
+    if not p50 or not e:
+        return 1.0
+    return max(0.2, min(10.0, p50 / e))
+
+
+def predicted(cfg, hand, k=1.0):
+    """The end, scaled by the calibration: where a run like the measured
+    ones is predicted to end under this config."""
+    e = end_of(cfg, hand)
+    return None if e is None else round(e * k)
 
 
 def wall_of(cfg, hand):

@@ -91,7 +91,7 @@ STYLE = """
      a coin to earn, a flame for what lasts. On a phone the tabs take a row
      of their own under the bars rather than fighting them for the width. */
   .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:4px; align-items:center; }
-  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:4px 8px; border-radius:8px; background:transparent;
+  .dash-bar .dash-tabs button{ touch-action:manipulation; flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:4px 8px; border-radius:8px; background:transparent;
                           border:1px solid #3d3324; color:#e8e0cc; cursor:pointer; display:inline-flex; align-items:center; gap:4px; line-height:1; }
   .dash-bar .dash-tabs button svg{ width:13px; height:13px; flex:none; opacity:.85; }
   .dash-bar .dash-tabs button[data-tab="trace"]{ font-size:19px; padding:4px 16px; border-width:2px; }
@@ -112,7 +112,7 @@ STYLE = """
   .upg-ink{ display:flex; align-items:center; gap:5px; padding:0 9px; border-radius:9px;
         background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e9c46a; font-weight:700; }
   .upg-ink i{ font-style:normal; color:rgba(232,224,204,.55); font-weight:400; }
-  .upg button{ flex:1 1 44%; min-width:0; text-align:left; padding:6px 8px; border-radius:9px; cursor:pointer;
+  .upg button{ touch-action:manipulation; flex:1 1 44%; min-width:0; text-align:left; padding:6px 8px; border-radius:9px; cursor:pointer;
         background:rgba(22,20,17,.82); border:1px solid #3d3324; color:#e8e0cc; font:inherit; line-height:1.25; }
   .upg button b{ color:#e9c46a; margin-right:5px; display:inline-flex; align-items:center; gap:3px; vertical-align:-3px; }
   .upg button b svg{ width:17px; height:17px; }
@@ -283,9 +283,9 @@ LAYER = STYLE + r"""
     // Ceilings raised in v0.1.65 (the maintainer: "we end up maxing out the
     // upgrades so early"), with the pack's ramp steepened: a run should end
     // with things still worth buying, or the tabs stop being a decision.
-    intent:{ tab:'skills', kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:5 },
+    intent:{ tab:'skills', kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:3 },   // 3, not 5: intent and breath multiply each other, and 6 hits a cast made wave 230 (v0.1.68)
     quick: { tab:'skills', kana:'早', name:'quick',  blurb:'the lights are thrown sooner',                    max:8 },
-    breath:{ tab:'skills', kana:'息', name:'breath', blurb:'every stroke fills 気 by one more',                max:5 },
+    breath:{ tab:'skills', kana:'息', name:'breath', blurb:'every stroke fills 気 by one more',                max:3 },
     shove: { tab:'skills', kana:'押', name:'shove',  blurb:'every hit pushes them back',                      max:8 },
     mend:  { tab:'guard',  kana:'守', name:'mend',   blurb:'the ward gains a life',                           max:8 },
     wall:  { tab:'guard',  kana:'壁', name:'wall',   blurb:'a breach costs the ward one less',                max:5 },
@@ -1333,7 +1333,8 @@ LAYER = STYLE + r"""
     strip.innerHTML = upgMarkup = stripHtml('skills');
     stripGuard.innerHTML = guardMarkup = stripHtml('guard');
     stripDrive.innerHTML = driveMarkup = stripHtml('drive');
-    for (const el of [strip, stripGuard, stripDrive]) if (el.querySelectorAll) for (const b of el.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
+    // no per-button handlers: the strips are re-rendered on every earn, and a
+    // handler on a button that has just been replaced is a tap that does nothing
     if (typeof renderDash === 'function') renderDash();
   }
   // ---- the dashboard, and the tabs behind it
@@ -1376,9 +1377,36 @@ LAYER = STYLE + r"""
       + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="灯 what lasts, bought with 魂" aria-label="lanterns: what lasts">${ICON.flame}灯</button>` : '') + `</span>`;
     if (m === dashMarkup) return;
     dashMarkup = m; bar.innerHTML = m;
-    if (bar.querySelectorAll) for (const b of bar.querySelectorAll('button[data-tab]')) b.onclick = () => openTab(tab === b.dataset.tab || b.dataset.tab === 'trace' ? null : b.dataset.tab);
+    // (the tab handlers live on `bar` itself; see tapOn)
   }
-  function renderLanterns(){ panelLanterns.innerHTML = `<p class="panel-h">灯 · what lasts · bought with 魂</p>` + workshopHtml(); wireWorkshop(renderLanterns, panelLanterns); renderDash(); }
+  // A tap lands on the element that is there when the finger comes down.
+  // The seam and the strips are rebuilt with innerHTML whenever a number on
+  // them changes — during play, most frames — so a handler on a button was
+  // a handler on an element that was often gone by the time the click came
+  // (the maintainer: "I had to tap a couple times before my tab would
+  // change"). The handlers sit on the containers, which are never replaced,
+  // and act on pointerdown, before any re-render can get between.
+  const TAPS = new Map();   // root -> its pointerdown handlers, for the stub's synthetic tap
+  function tapOn(root, sel, fn){
+    if (!root.addEventListener) return;
+    const down = e => {
+      const b = e.target && e.target.closest ? e.target.closest(sel) : null;
+      if (!b || b.disabled || !root.contains(b)) return;
+      e.preventDefault(); fn(b);
+    };
+    root.addEventListener('pointerdown', down);
+    if (!TAPS.has(root)) TAPS.set(root, []); TAPS.get(root).push(down);   // for the stub, which has no event dispatch
+    root.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const b = e.target && e.target.closest ? e.target.closest(sel) : null;
+      if (!b || b.disabled) return;
+      e.preventDefault(); fn(b);
+    });
+  }
+  tapOn(bar, 'button[data-tab]', b => openTab(tab === b.dataset.tab || b.dataset.tab === 'trace' ? null : b.dataset.tab));
+  tapOn(panel, 'button[data-upg]', b => buy(b.dataset.upg));
+  tapOn(panel, 'button[data-lantern]', b => { if (buyLantern(b.dataset.lantern)) renderLanterns(); });
+  function renderLanterns(){ panelLanterns.innerHTML = `<p class="panel-h">灯 · what lasts · bought with 魂</p>` + workshopHtml(); renderDash(); }
   // A tab does not pause the run. That is the point: the waves keep coming
   // while you shop, and knowing when you can afford to is the game. And the
   // sketchbook is a tab too: while a shop is open there is nothing to trace
@@ -1566,7 +1594,20 @@ LAYER = STYLE + r"""
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
-    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return panelLanterns.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    get upgHtml(){ return upgMarkup; },
+    // a synthetic tap: a pointerdown on the first element the selector finds, through the container's own listener
+    // The stub has no HTML parser and no event dispatch, so the tap is a
+    // stand-in element with the selector's data attribute, handed to the
+    // containers' own pointerdown handlers: what the browser would do, minus
+    // the browser.
+    tap(sel){
+      const m = /\[data-([a-z]+)="([^"]*)"\]/.exec(sel); if (!m) return false;
+      const fake = { dataset: { [m[1]]: m[2] }, disabled: false,
+        closest(q){ const w = /\[data-([a-z]+)(?:="([^"]*)")?\]/.exec(q); return w && this.dataset[w[1]] !== undefined && (w[2] === undefined || this.dataset[w[1]] === w[2]) ? this : null; } };
+      const ev = { target: fake, preventDefault(){} };
+      for (const h of (TAPS.get(bar) || [])) h(ev); for (const h of (TAPS.get(panel) || [])) h(ev);
+      return true;
+    }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get lanternHtml(){ return panelLanterns.innerHTML; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,

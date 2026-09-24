@@ -879,6 +879,10 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(F.openTab(null) === null && F.tab === null, 'the tab did not close');
   ok(stageEl.hidden === false && /data-tab="trace" aria-pressed="true"/.test(F.dashHtml), 'closing the shop did not bring the sketchbook back');
   ok(F.openTab('trace') === null && F.tab === null, '筆 is not the way back to the sketchbook');
+  // a tap is heard by the seam itself, on pointerdown, however often its buttons are rebuilt
+  ok(typeof F.tap === 'function' && F.tap('button[data-tab="guard"]') === true && F.tab === 'guard', 'a pointerdown on the 耐 tab did not open it');
+  F.earn(1); advance(20);   // a re-render between
+  ok(F.tap('button[data-tab="guard"]') === true && F.tab === null, 'a second tap on the open tab, after a re-render, did not close it');
   // and it does not open under a pen that is down: lift, and find the gap
   F.touch();
   ok(F.openTab('skills') === null && stageEl.hidden === false, 'a shop opened under a pen that was down');

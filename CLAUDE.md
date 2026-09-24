@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.67.html`
+### Hiragana — `dist/hiragana-v0.1.68.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -339,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.30.html`
+### Katakana — `dist/katakana-game-v0.1.31.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -917,6 +917,13 @@ per-character ledger. Save data must have export/import from day one.
 - **Builds are made here and committed here.** A build that exists only as a
   download is not a build yet — `dist/` is the only place one counts. This
   has already cost the project a tracer and two recording sessions.
+- **Handlers go on containers, not on buttons that get rebuilt.** The seam
+  and the strips are rebuilt with innerHTML whenever a number changes, which
+  during play is most frames, and a handler on a button was a handler on an
+  element that was gone by the time the click came ("I had to tap a couple
+  times before my tab would change", v0.1.68). `tapOn()` listens on the
+  container, on pointerdown. The stub cannot dispatch events, so `F.tap()`
+  is a stand-in element handed to the same handlers.
 - **A layer must not reuse an engine name.** Inside a layer's function,
   `let ink` does not replace the engine's `ink`, it hides it from that layer,
   silently, and the stubbed DOM cannot tell. `shadow.test.mjs` reads the
@@ -929,7 +936,10 @@ per-character ledger. Save data must have export/import from day one.
   has 仏 hotoke and 鬼 oni, two Strands agents reading the same pull of the
   runs and proposing changes to the hiragana game's pace keys; the judge is
   `agents/hito_agents/pace.py`, arithmetic that predicts where a bare hand's
-  run ends and keeps that inside a band. The verdict is a file under
+  run ends, **scaled by what the measured runs did against it** (v0.1.68: the
+  model said 78 for a config the maintainer took to wave 230, because it
+  knows nothing of upgrades or the release; the calibration is that ratio,
+  and a hand that went to 230 is judged at 230), and keeps that inside a band. The verdict is a file under
   `agents/out`; a human applies it to `scripts/hiragana/game.json` with
   `--apply`, then builds and tests as ever. Agents never touch a build. Every
   run now records its frame counts (`frames`, `plat`) and its build (`v`) so

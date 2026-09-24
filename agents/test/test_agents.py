@@ -573,6 +573,18 @@ class Pace(unittest.TestCase):
         slower, _ = pace.with_changes(cur, {"spawnMin": 5000})
         self.assertGreaterEqual(pace.end_of(slower, HAND), e_new)
 
+    def test_the_model_is_scaled_by_what_was_measured(self):
+        cur = base_cfg()
+        bare = pace.end_of(cur, HAND)
+        far = {**HAND, "wave_p50": bare * 3}
+        self.assertAlmostEqual(pace.calibration(cur, far), 3.0)
+        self.assertEqual(pace.predicted(cur, far, 3.0), bare * 3)
+        self.assertEqual(pace.calibration(cur, HAND), 1.0, "nothing measured, nothing scaled")
+        # a version's own runs are what count once there are enough of them
+        rs = [dict(run_row(20)["body"], v="0.1.1")] * 6 + [dict(run_row(200)["body"], v="0.1.2")] * 6
+        self.assertEqual(pace.hand_of(rs, "0.1.2")["wave_p50"], 200)
+        self.assertEqual(pace.hand_of(rs, "0.1.9")["version"], None)
+
     def test_a_faster_hand_goes_further(self):
         cur = base_cfg()
         self.assertGreater(pace.end_of(cur, {"s_per_trace": 2.0, "strokes_per_trace": 2.5}), pace.end_of(cur, HAND))
@@ -605,6 +617,16 @@ class Balance(unittest.TestCase):
             v = balance.judge(cur, hand, props)
             self.assertEqual(v["changes"], {}, v)
             self.assertIn("kept", v["why"]["spawnMin"])
+
+    def test_a_hand_that_went_to_230_is_judged_at_230(self):
+        cur = base_cfg()
+        hand = {**HAND, "wave_p50": 230}
+        props = {"hotoke": {"changes": {"hpEvery": 60}}, "oni": {"changes": {"hpEvery": 6}}}
+        v = balance.judge(cur, hand, props)
+        self.assertEqual(v["end_before"], 230)
+        self.assertGreater(v["calibration"], 2)
+        self.assertEqual(v["changes"].get("hpEvery"), 6, v)
+        self.assertTrue(balance.BAND[0] <= v["end_after"] <= balance.BAND[1], v)
 
     def test_the_judge_takes_the_value_that_lands_in_band(self):
         cur = base_cfg()
@@ -666,8 +688,9 @@ class Loop(unittest.TestCase):
         self.tmp.cleanup()
 
     def fake_argue(self, changes):
-        def argue_fn(out_dir=None):
+        def argue_fn(out_dir=None, version=None):
             self.calls += 1
+            self.version = version
             return {"verdict": {"changes": changes, "end_before": 45, "end_after": 78}, "file": None}
         return argue_fn
 
@@ -687,6 +710,7 @@ class Loop(unittest.TestCase):
     def test_enough_runs_judge_apply_bump_and_never_twice(self):
         r = self.go(self.played(3), {"spawnMin": 3800})
         self.assertEqual(r["status"], "changed", r)
+        self.assertEqual(self.version, "0.1.65", "the advocates were not told which build they judge")
         self.assertEqual((r["version"], r["new"]), ("0.1.65", "0.1.66"))
         self.assertEqual(json.loads(self.game.read_text())["field"]["spawnMin"], 3800)
         self.assertEqual(json.loads(self.game.read_text())["version"], "0.1.66")
