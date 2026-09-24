@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.56.html`
+### Hiragana — `dist/hiragana-v0.1.57.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -281,8 +281,15 @@ leaderboard and must not become one.**
 
 `index.html` is the title screen and is generated (`build/make_index.py`),
 because it signs people in and must run the same code the realms do. 人 is
-drawn in its two strokes, Begin goes to the realm you were last in, and the
-tally under it is read off the ledger the realms keep.
+drawn in its two strokes, Begin goes into the game, and the tally under it is
+read off the ledger the realms keep. **As of v0.1.57 it is a level switcher
+and nothing else**: ひらがな, then カタカナ, each opening when the tower
+before it has been climbed 100 waves deep (`LEVEL_WAVES`), read off the
+ledger's furthest wave. The maintainer: "no more toggles to hiragana,
+flashcards, or katakana. We just get right into the game." The in-game start
+pages no longer link to other realms either. The workshop and the flashcards
+still exist as files; the workshop is a footer link, the flashcards are not
+on the page.
 
 ### The hand — every build, as of hiragana v0.1.38
 
@@ -332,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.19.html`
+### Katakana — `dist/katakana-game-v0.1.20.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -353,7 +360,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.34.html`
+### Vocab — `dist/vocab-v0.1.35.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke

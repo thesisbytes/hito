@@ -1,6 +1,6 @@
 {
   "script": "vocab",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "title": "hito 人 · katakana · v0.1.0",
   "brand": "hito 人",
   "fontDir": "fonts",
@@ -61,20 +61,6 @@
     "batch": 40,
     "cap": 500
   },
-  "realms": [
-    {
-      "label": "hiragana",
-      "kana": "仮",
-      "file": "hiragana-game.html",
-      "blurb": "the game with single characters. the farang carry the ones you are forgetting."
-    },
-    {
-      "label": "vocab",
-      "kana": "語",
-      "file": "vocab.html",
-      "blurb": "Genki I vocabulary as flashcards. read the meaning, write the word."
-    }
-  ],
   "credits": [
     "Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.",
     "Stroke order recorded and checked by the project's teachers.",

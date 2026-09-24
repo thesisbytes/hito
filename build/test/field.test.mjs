@@ -168,7 +168,7 @@ if (stageCss){
   ok(/leans on/.test(F.startHtml), 'the credits page has lost the point of the name');
   F.openStart();
   ok(F.view === 'start', 'back from credits did not return to the start page');
-  ok(/href="vocab\.html"/.test(F.startHtml), 'the start page has no way into the vocab realm');
+  ok(!/href="vocab\.html"/.test(F.startHtml) && !/href="katakana-game\.html"/.test(F.startHtml), 'the start page still links to another realm: the front page is the level switcher');
   F.begin();
   ok(F.redoShown, 'the redo button did not come back for the run');
 }

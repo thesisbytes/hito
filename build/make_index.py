@@ -5,7 +5,8 @@
 
 It was a list of links. It is now the first screen of a game: the character
 the project is named for, drawn the way the game will ask you to draw, one
-thing to press, and who is playing.
+thing to press, the levels in order with the locked ones saying what opens
+them, and who is playing.
 
 Generated rather than hand-kept for one reason: it signs people in, and the
 code that does that (`account_layer.CORE`) must be the same code the realms
@@ -26,13 +27,18 @@ import theme
 
 ROOT = Path(__file__).resolve().parent.parent
 
-REALMS = [
-    {"id": "hiragana", "kana": "仮", "name": "hiragana", "file": "dist/hiragana-game.html",
+# The levels. One game, in order; each opens when the tower before it has
+# been climbed LEVEL_WAVES waves deep (the maintainer, 2026-09-24: "no more
+# toggles to hiragana, flashcards, or katakana. We just get right into the
+# game. So basically a level switcher. Every 100 rounds you unlock a new
+# level"). `realm` is the key the hand's ledger keeps the furthest wave under.
+# The flashcards are practice, not a level, and are not on this page.
+LEVEL_WAVES = 100
+LEVELS = [
+    {"id": "hiragana", "kana": "ひ", "name": "ひらがな", "file": "dist/hiragana-game.html", "realm": "hiragana",
      "blurb": "the farang carry the characters you are forgetting"},
-    {"id": "katakana", "kana": "片", "name": "katakana", "file": "dist/katakana-game.html",
-     "blurb": "loanwords, one kana at a time"},
-    {"id": "vocab", "kana": "語", "name": "vocab", "file": "dist/vocab.html",
-     "blurb": "Genki I as flashcards you write"},
+    {"id": "katakana", "kana": "カ", "name": "カタカナ", "file": "dist/katakana-game.html", "realm": "katakana",
+     "blurb": "loanwords, one kana at a time — the farang say coffee in their accent"},
 ]
 
 PAGE = r"""<!doctype html>
@@ -89,7 +95,10 @@ PAGE = r"""<!doctype html>
   .begin small{ display:block; margin-top:7px; font:500 11px/1 inherit; letter-spacing:.08em; text-transform:none; opacity:.72; }
   @keyframes breathe{ 50%{ box-shadow:0 0 0 1px rgba(255,241,184,.6),0 10px 44px rgba(233,196,106,.42); } }
 
-  .realms{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+  .realms{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:12px; }
+  .realms button.locked{ opacity:.55; cursor:default; }
+  .realms button.locked i{ color:rgba(232,224,204,.4); }
+  .realms button small{ display:block; margin-top:4px; font-size:10.5px; letter-spacing:.02em; color:rgba(232,224,204,.55); }
   .realms button{ background:var(--lacquer-2); color:var(--ink); border:1px solid #3d3324; border-radius:12px;
           padding:10px 4px 9px; cursor:pointer; font:inherit; }
   .realms button i{ display:block; font-style:normal; font-size:24px; color:rgba(233,196,106,.75); line-height:1.15; }
@@ -131,8 +140,8 @@ PAGE = r"""<!doctype html>
   <p class="tag">learn to write by writing · draw below, the farang come from above</p>
 
   <div class="menu">
-    <a class="begin" id="begin" href="dist/hiragana-game.html">begin<small id="beginSub">hiragana</small></a>
-    <div class="realms" id="realms" role="group" aria-label="realm"></div>
+    <a class="begin" id="begin" href="dist/hiragana-game.html">begin<small id="beginSub">ひらがな</small></a>
+    <div class="realms" id="realms" role="group" aria-label="level"></div>
     <p class="blurb" id="blurb"></p>
     <div class="tally" id="tally"></div>
     <div class="who" id="who"></div>
@@ -141,7 +150,7 @@ PAGE = r"""<!doctype html>
 <footer>
   人 is two strokes, and neither stands on its own.<br>
   Stroke order from <a href="https://kanjivg.tagaini.net/">KanjiVG</a> (CC BY-SA 3.0). Klee One and Noto Sans JP under the SIL Open Font License.<br>
-  <a href="dist/hiragana.html">the workshop</a> · <a href="https://github.com/thesisbytes/hito">source</a> · every realm is one file that opens offline
+  <a href="dist/hiragana.html">the workshop</a> · <a href="https://github.com/thesisbytes/hito">source</a> · every level is one file that opens offline
 </footer>
 
 <script>window.__ACCOUNT_CFG=__ACCOUNT__;</script>
@@ -149,25 +158,38 @@ PAGE = r"""<!doctype html>
 <script>
 /* ---- the title screen ---------------------------------------------------- */
 (function(){
-  const REALMS = __REALMS__;
+  const LEVELS = __LEVELS__, LEVEL_WAVES = __LEVEL_WAVES__;
   const $ = id => document.getElementById(id);
   const get = k => { try { return localStorage.getItem(k); } catch(_){ return null; } };
   const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-  // Begin goes where you were last. A title screen that asks which game you
-  // meant, every time, is a menu.
-  let realm = REALMS.find(r => r.id === get('hito-realm')) || REALMS[0];
-  function pick(id){
-    realm = REALMS.find(r => r.id === id) || realm;
-    try { localStorage.setItem('hito-realm', realm.id); } catch(_){}
+  // The furthest wave per level, off the ledger the games keep on this device.
+  function furthest(realm){
+    try { const L = JSON.parse(get('hito-ledger') || 'null'); const b = L && L.best && L.best[realm]; return b ? (+b.wave || 0) : 0; } catch(_){ return 0; }
+  }
+  // A level opens when the one before it has been climbed LEVEL_WAVES deep.
+  const open = k => k === 0 || furthest(LEVELS[k - 1].realm) >= LEVEL_WAVES;
+  // Begin goes to the level you were last in, if it is still yours; else the
+  // furthest one open. A title screen that asks which game you meant, every
+  // time, is a menu.
+  let level = LEVELS.findIndex(l => l.id === get('hito-level'));
+  if (level < 0 || !open(level)){ level = 0; for (let k = 0; k < LEVELS.length; k++) if (open(k)) level = k; }
+  function pick(k){
+    if (!open(k)) return;
+    level = k;
+    try { localStorage.setItem('hito-level', LEVELS[k].id); } catch(_){}
     draw();
   }
   function draw(){
-    $('begin').href = realm.file; $('beginSub').textContent = realm.name;
-    $('blurb').textContent = realm.blurb;
-    $('realms').innerHTML = REALMS.map(r =>
-      `<button data-r="${r.id}" aria-pressed="${r === realm}"><i>${r.kana}</i><span>${r.name}</span></button>`).join('');
-    for (const b of $('realms').querySelectorAll('button')) b.onclick = () => pick(b.dataset.r);
+    const l = LEVELS[level];
+    $('begin').href = l.file; $('beginSub').textContent = l.name;
+    $('blurb').textContent = l.blurb;
+    $('realms').innerHTML = LEVELS.map((r, k) => {
+      const on = open(k), w = furthest(r.realm);
+      const sub = on ? (w ? 'furthest wave ' + w : 'level ' + (k + 1)) : 'opens at wave ' + LEVEL_WAVES + ' of ' + esc(LEVELS[k - 1].name);
+      return `<button data-k="${k}" class="${on ? '' : 'locked'}" aria-pressed="${k === level}"${on ? '' : ' aria-disabled="true"'}><i>${r.kana}</i><span>${esc(r.name)}</span><small>${sub}</small></button>`;
+    }).join('');
+    for (const b of $('realms').querySelectorAll('button')) b.onclick = () => pick(+b.dataset.k);
   }
 
   // What the hand has done, read straight off the ledger the realms keep.
@@ -215,12 +237,12 @@ def main():
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "index.html"
     pack = json.loads((ROOT / "scripts/hiragana/game.json").read_text(encoding="utf-8"))
     js = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    for r in REALMS:
+    for r in LEVELS:
         if not (ROOT / r["file"]).exists():
             sys.exit(f"title screen links to {r['file']}, which does not exist")
     page = (PAGE.replace("__ACCOUNT__", js(account_layer.values(pack)))
                 .replace("__CORE__", account_layer.CORE)
-                .replace("__REALMS__", js(REALMS)))
+                .replace("__LEVELS__", js(LEVELS)).replace("__LEVEL_WAVES__", str(LEVEL_WAVES)))
     page = theme.apply(page, pack.get("theme", "gold"))   # the realm you are about to step into
     out.write_text(page, encoding="utf-8")
     print(f"{out}  {len(page.encode('utf-8'))/1024:.0f} KB")

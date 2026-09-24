@@ -248,7 +248,7 @@ fresh();
   F.openStart();
   ok(/katakana/.test(F.startHtml), 'the start page does not name the realm');
   ok(/koohii|coffee/.test(F.startHtml), 'the sign blurbs still talk about single characters');
-  ok(/href="hiragana-game\.html"/.test(F.startHtml), 'no way back to the hiragana game');
+  ok(!/href="hiragana-game\.html"/.test(F.startHtml), 'the start page still links to another realm: the front page is the level switcher');
   F.begin();
 }
 

@@ -1,6 +1,6 @@
 {
   "script": "hiragana",
-  "version": "0.1.56",
+  "version": "0.1.57",
   "title": "hito 人 · hiragana · v0.1.29",
   "brand": "hito 人",
   "fontDir": "fonts",
@@ -75,20 +75,6 @@
     "batch": 40,
     "cap": 500
   },
-  "realms": [
-    {
-      "label": "vocab",
-      "kana": "語",
-      "file": "vocab.html",
-      "blurb": "Genki I Lesson 1 as flashcards. read the meaning, write the word."
-    },
-    {
-      "label": "katakana",
-      "kana": "片",
-      "file": "katakana-game.html",
-      "blurb": "the game with loanwords. the farang say coffee in their accent; write コーヒー."
-    }
-  ],
   "credits": [
     "Stroke order recorded and checked by the project's teachers.",
     "Letterforms drawn by hand by the project's artist.",

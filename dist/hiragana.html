@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana trace · v0.1.56</title>
+<title>hito 人 · hiragana trace · v0.1.57</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -164,7 +164,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.56';
+const APP_VERSION='0.1.57';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -852,7 +852,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.56');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.57');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1763,6 +1763,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.56</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.57</div>
 </body>
 </html>

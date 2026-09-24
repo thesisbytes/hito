@@ -52,7 +52,10 @@
   .begin small{ display:block; margin-top:7px; font:500 11px/1 inherit; letter-spacing:.08em; text-transform:none; opacity:.72; }
   @keyframes breathe{ 50%{ box-shadow:0 0 0 1px rgba(226,243,255,.6),0 10px 44px rgba(108,184,255,.42); } }
 
-  .realms{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+  .realms{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:12px; }
+  .realms button.locked{ opacity:.55; cursor:default; }
+  .realms button.locked i{ color:rgba(220,232,242,.4); }
+  .realms button small{ display:block; margin-top:4px; font-size:10.5px; letter-spacing:.02em; color:rgba(220,232,242,.55); }
   .realms button{ background:var(--lacquer-2); color:var(--ink); border:1px solid #1e2f3e; border-radius:12px;
           padding:10px 4px 9px; cursor:pointer; font:inherit; }
   .realms button i{ display:block; font-style:normal; font-size:24px; color:rgba(108,184,255,.75); line-height:1.15; }
@@ -94,8 +97,8 @@
   <p class="tag">learn to write by writing · draw below, the farang come from above</p>
 
   <div class="menu">
-    <a class="begin" id="begin" href="dist/hiragana-game.html">begin<small id="beginSub">hiragana</small></a>
-    <div class="realms" id="realms" role="group" aria-label="realm"></div>
+    <a class="begin" id="begin" href="dist/hiragana-game.html">begin<small id="beginSub">ひらがな</small></a>
+    <div class="realms" id="realms" role="group" aria-label="level"></div>
     <p class="blurb" id="blurb"></p>
     <div class="tally" id="tally"></div>
     <div class="who" id="who"></div>
@@ -104,7 +107,7 @@
 <footer>
   人 is two strokes, and neither stands on its own.<br>
   Stroke order from <a href="https://kanjivg.tagaini.net/">KanjiVG</a> (CC BY-SA 3.0). Klee One and Noto Sans JP under the SIL Open Font License.<br>
-  <a href="dist/hiragana.html">the workshop</a> · <a href="https://github.com/thesisbytes/hito">source</a> · every realm is one file that opens offline
+  <a href="dist/hiragana.html">the workshop</a> · <a href="https://github.com/thesisbytes/hito">source</a> · every level is one file that opens offline
 </footer>
 
 <script>window.__ACCOUNT_CFG={"endpoint":"https://sfo.cloud.appwrite.io/v1","project":"6ab079700020b092b857","db":"hito","table":"saves","saveMs":20000};</script>
@@ -260,25 +263,38 @@
 <script>
 /* ---- the title screen ---------------------------------------------------- */
 (function(){
-  const REALMS = [{"id":"hiragana","kana":"仮","name":"hiragana","file":"dist/hiragana-game.html","blurb":"the farang carry the characters you are forgetting"},{"id":"katakana","kana":"片","name":"katakana","file":"dist/katakana-game.html","blurb":"loanwords, one kana at a time"},{"id":"vocab","kana":"語","name":"vocab","file":"dist/vocab.html","blurb":"Genki I as flashcards you write"}];
+  const LEVELS = [{"id":"hiragana","kana":"ひ","name":"ひらがな","file":"dist/hiragana-game.html","realm":"hiragana","blurb":"the farang carry the characters you are forgetting"},{"id":"katakana","kana":"カ","name":"カタカナ","file":"dist/katakana-game.html","realm":"katakana","blurb":"loanwords, one kana at a time — the farang say coffee in their accent"}], LEVEL_WAVES = 100;
   const $ = id => document.getElementById(id);
   const get = k => { try { return localStorage.getItem(k); } catch(_){ return null; } };
   const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-  // Begin goes where you were last. A title screen that asks which game you
-  // meant, every time, is a menu.
-  let realm = REALMS.find(r => r.id === get('hito-realm')) || REALMS[0];
-  function pick(id){
-    realm = REALMS.find(r => r.id === id) || realm;
-    try { localStorage.setItem('hito-realm', realm.id); } catch(_){}
+  // The furthest wave per level, off the ledger the games keep on this device.
+  function furthest(realm){
+    try { const L = JSON.parse(get('hito-ledger') || 'null'); const b = L && L.best && L.best[realm]; return b ? (+b.wave || 0) : 0; } catch(_){ return 0; }
+  }
+  // A level opens when the one before it has been climbed LEVEL_WAVES deep.
+  const open = k => k === 0 || furthest(LEVELS[k - 1].realm) >= LEVEL_WAVES;
+  // Begin goes to the level you were last in, if it is still yours; else the
+  // furthest one open. A title screen that asks which game you meant, every
+  // time, is a menu.
+  let level = LEVELS.findIndex(l => l.id === get('hito-level'));
+  if (level < 0 || !open(level)){ level = 0; for (let k = 0; k < LEVELS.length; k++) if (open(k)) level = k; }
+  function pick(k){
+    if (!open(k)) return;
+    level = k;
+    try { localStorage.setItem('hito-level', LEVELS[k].id); } catch(_){}
     draw();
   }
   function draw(){
-    $('begin').href = realm.file; $('beginSub').textContent = realm.name;
-    $('blurb').textContent = realm.blurb;
-    $('realms').innerHTML = REALMS.map(r =>
-      `<button data-r="${r.id}" aria-pressed="${r === realm}"><i>${r.kana}</i><span>${r.name}</span></button>`).join('');
-    for (const b of $('realms').querySelectorAll('button')) b.onclick = () => pick(b.dataset.r);
+    const l = LEVELS[level];
+    $('begin').href = l.file; $('beginSub').textContent = l.name;
+    $('blurb').textContent = l.blurb;
+    $('realms').innerHTML = LEVELS.map((r, k) => {
+      const on = open(k), w = furthest(r.realm);
+      const sub = on ? (w ? 'furthest wave ' + w : 'level ' + (k + 1)) : 'opens at wave ' + LEVEL_WAVES + ' of ' + esc(LEVELS[k - 1].name);
+      return `<button data-k="${k}" class="${on ? '' : 'locked'}" aria-pressed="${k === level}"${on ? '' : ' aria-disabled="true"'}><i>${r.kana}</i><span>${esc(r.name)}</span><small>${sub}</small></button>`;
+    }).join('');
+    for (const b of $('realms').querySelectorAll('button')) b.onclick = () => pick(+b.dataset.k);
   }
 
   // What the hand has done, read straight off the ledger the realms keep.

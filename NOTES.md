@@ -1607,3 +1607,24 @@ Running log. Append at the bottom, don't rewrite history.
   casts nothing, two 気 cast once.
 - Not yet: a lantern for a bigger bag, and the release — a full bag thrown
   at once, the moment to look up. That is the next of the gauge notes.
+
+## 2026-09-24 — The front page is a level switcher (hiragana v0.1.57, katakana-game v0.1.20, vocab v0.1.35)
+
+- **The maintainer:** "Let's makeover the front page. No more toggles to
+  hiragana, flashcards, or katakana. We just get right into the game. So
+  basically a level switcher. We can go like every 100 rounds you unlock a
+  new level."
+- **Built.** `index.html` shows 人, Begin, and the levels in order: ひらがな,
+  then カタカナ, which opens when ひらがな's furthest wave — the hand's
+  ledger has kept it for good since v0.1.43 — reaches `LEVEL_WAVES` (100).
+  A locked level says what opens it; an open one says its furthest wave.
+  Begin goes to the level you were last in if it is still open, else the
+  furthest open one. The next level (kanji, one day) is a line in `LEVELS`
+  with the realm it keeps its wave under.
+- The three game packs lost their `realms` rows, so the in-game start pages
+  no longer offer the other realms: the front page is where a level is
+  chosen. The flashcards (`vocab.html`) are practice, not a level, and are
+  off the front page; the workshop stays as a footer link. Both still build
+  and both still open from a double-click.
+- 100 waves is the maintainer's number and a first one: the furthest wave
+  in the table today is 33.
