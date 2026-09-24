@@ -83,11 +83,11 @@ STYLE = """
   .dash-bar .bar small{ position:absolute; right:5px; top:2px; font-size:10px; color:#e8e0cc; }
   @media (prefers-reduced-motion:reduce){ .dash-bar .bar i{ transition:none; } }
   .dash-bar .n{ font-weight:700; color:#e9c46a; white-space:nowrap; } .dash-bar .n small{ font-weight:400; color:rgba(232,224,204,.55); }
-  .dash-bar .tabs{ margin-left:auto; display:flex; gap:4px; }
-  .dash-bar .tabs button{ font:700 13px ui-sans-serif,system-ui; padding:3px 10px; border-radius:8px; background:transparent;
+  .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:4px; }
+  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:3px 10px; border-radius:8px; background:transparent;
                           border:1px solid #3d3324; color:#e8e0cc; cursor:pointer; }
-  .dash-bar .tabs button.can{ border-color:#7fd1c4; color:#bdf0e6; }
-  .dash-bar .tabs button[aria-pressed="true"]{ background:rgba(127,209,196,.14); border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 10px rgba(127,209,196,.25); }
+  .dash-bar .dash-tabs button.can{ border-color:#7fd1c4; color:#bdf0e6; }
+  .dash-bar .dash-tabs button[aria-pressed="true"]{ background:rgba(127,209,196,.14); border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 10px rgba(127,209,196,.25); }
   .panel{ position:absolute; left:8px; right:8px; top:8px; bottom:46px; z-index:2; overflow:auto; border-radius:12px; padding:10px;
           background:rgba(22,20,17,.93); border:1px solid #3d3324; font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
   .panel .panel-h{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:rgba(232,224,204,.55); margin:0 0 8px; }
@@ -226,17 +226,26 @@ LAYER = STYLE + r"""
   // is intent — the maintainer: "we forge and sharpen our intent to cut
   // through farangs' mindset of sticking to their old ways". Every one
   // multiplies what the hand's strokes are worth; none writes a character.
+  // 耐: the same ink, spent on lasting the waves out rather than cutting
+  // through them. The farang grow stronger as the waves climb, in health
+  // (`hpFor`) and in attack (`biteFor`, a breach costing more of the ward),
+  // and this tab is what stands against the second. Persistence: a wall, a
+  // life mended, a life back for every stretch of waves held.
   const UPG = {
-    intent:{ kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:3 },
-    quick: { kana:'早', name:'quick',  blurb:'the lights are thrown sooner',                    max:5 },
-    breath:{ kana:'息', name:'breath', blurb:'every stroke fills 気 by one more',                max:3 },
-    shove: { kana:'押', name:'shove',  blurb:'every hit pushes them back',                      max:5 },
-    mend:  { kana:'守', name:'mend',   blurb:'the ward gains a life',                           max:5 },
+    intent:{ tab:'skills', kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:3 },
+    quick: { tab:'skills', kana:'早', name:'quick',  blurb:'the lights are thrown sooner',                    max:5 },
+    breath:{ tab:'skills', kana:'息', name:'breath', blurb:'every stroke fills 気 by one more',                max:3 },
+    shove: { tab:'skills', kana:'押', name:'shove',  blurb:'every hit pushes them back',                      max:5 },
+    mend:  { tab:'guard',  kana:'守', name:'mend',   blurb:'the ward gains a life',                           max:5 },
+    wall:  { tab:'guard',  kana:'壁', name:'wall',   blurb:'a breach costs the ward one less',                max:3 },
+    tend:  { tab:'guard',  kana:'癒', name:'tend',   blurb:'a life back for every stretch of waves held',     max:3 },
   };
+  const TABS = { skills:'技', guard:'耐' };
+  const freshUpg = () => Object.fromEntries(Object.keys(UPG).map(id => [id, 0]));
   // `sumi`, not `ink`: `ink` is the engine's drawing context, and this layer
   // uses it (guided mode wipes the pen's mark with it). Calling the currency
   // `ink` shadowed it, and guided threw on every repaint in v0.1.39.
-  let sumi = 0, upg = { intent:0, quick:0, breath:0, shove:0, mend:0 };
+  let sumi = 0, upg = freshUpg();
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
   const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
   // ---- stages, and the workshop between rounds ------------------------------
@@ -317,6 +326,14 @@ LAYER = STYLE + r"""
   // workshop has to have made a trace worth more. Words are already as tough
   // as they are long, so this is for single characters.
   const hpFor = w => WORDS || !CFG.hpEvery ? 1 : Math.min(CFG.hpMax, 1 + Math.floor(w / CFG.hpEvery));
+  // And they bite harder (the maintainer: "every increment in round they get
+  // stronger. Both in attack and health"). A breach costs the ward one life
+  // at the foot of the tower and one more every `biteEvery` waves; a boss
+  // bites `bossBite` more; a wall takes off one per level, never below one.
+  // Words bite like anything else: a word that reaches the ward is a word
+  // not answered.
+  const biteFor = (w, boss) => Math.max(1, (CFG.biteEvery ? Math.min(CFG.biteMax, 1 + Math.floor(w / CFG.biteEvery)) : 1)
+                                          + (boss && ST ? ST.bossBite : 0) - upg.wall);
   let spawnAt = 0, tPrev = 0;
   // The field holds still while the start page is up. Nothing moves, nothing
   // spawns, no wisp flies; the clock resumes from where it stopped.
@@ -529,6 +546,10 @@ LAYER = STYLE + r"""
       hp: hpFor(wave) + (boss ? ST.bossHp : 0), wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
+    // 癒 tend: for every `tendEvery` waves held, a life back per level, up to
+    // the ward's size. Held, not survived: it is paid when the wave comes,
+    // so a ward at one life that lasts the stretch is mended at its end.
+    if (upg.tend && CFG.tendEvery && wave % CFG.tendEvery === 0) ward = Math.min(wardMax(), ward + upg.tend);
     applyShadow();   // a boss arriving dims the shape for everyone, retarget or not
     // If the tracer is idle or pointed at a glyph nobody carries, the arrival
     // is what it should be showing.
@@ -871,9 +892,10 @@ LAYER = STYLE + r"""
         if (m.d <= 0.06){
           monsters = monsters.filter(x => x !== m);
           if (m === locked) locked = null;
-          ward--;
+          const bite = biteFor(wave, m.boss);
+          ward = Math.max(0, ward - bite);
           try { window.__sync && window.__sync.record('breach', {
-            glyph: LETTERS[m.i][0], word: m.w ? m.w.ja : undefined, wardLeft: ward, wave,
+            glyph: LETTERS[m.i][0], word: m.w ? m.w.ja : undefined, wardLeft: ward, wave, bite,
           }); } catch(_){}
           retarget();
           if (navigator.vibrate) navigator.vibrate(90);
@@ -1109,7 +1131,7 @@ LAYER = STYLE + r"""
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
-    upg = { intent:0, quick:0, breath:0, shove:0, mend:0 }; run = newRun(); ended = null;
+    upg = freshUpg(); run = newRun(); ended = null;
     zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
                   // and a run that restarts on the same character does not load one
     sumi = own('inkwell') * CFG.inkwellStep; energy = CFG.energyStart; credited = 0;
@@ -1166,29 +1188,38 @@ LAYER = STYLE + r"""
   // frame, and a button is a button to a screen reader and to a finger.
   const strip = document.createElement('div');
   strip.className = 'upg'; strip.id = 'upg';
-  let upgMarkup = '';
-  function renderUpg(){
-    strip.innerHTML = upgMarkup = `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${sumi}</div>`
-      + Object.entries(UPG).map(([id, u]) => {
+  const stripGuard = document.createElement('div');
+  stripGuard.className = 'upg'; stripGuard.id = 'upg-guard';
+  let upgMarkup = '', guardMarkup = '';
+  const stripHtml = tabName => `<div class="upg-ink" title="ink — earned by tracing, most of all by tracing cleanly">墨 ${sumi}</div>`
+      + Object.entries(UPG).filter(([, u]) => u.tab === tabName).map(([id, u]) => {
           const maxed = upg[id] >= u.max, c = costOf(id);
           return `<button data-upg="${id}" title="${u.blurb}" class="${!maxed && sumi >= c ? 'can' : ''}"${maxed ? ' disabled' : ''}>`
             + `<b>${u.kana}</b>${u.name}${upg[id] ? ' ' + upg[id] : ''}<small>${maxed ? 'max' : '墨 ' + c + '<i> · ' + u.blurb + '</i>'}</small></button>`;
         }).join('');
-    if (strip.querySelectorAll) for (const b of strip.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
+  function renderUpg(){
+    strip.innerHTML = upgMarkup = stripHtml('skills');
+    stripGuard.innerHTML = guardMarkup = stripHtml('guard');
+    for (const el of [strip, stripGuard]) if (el.querySelectorAll) for (const b of el.querySelectorAll('button[data-upg]')) b.onclick = () => buy(b.dataset.upg);
     if (typeof renderDash === 'function') renderDash();
   }
   // ---- the dashboard, and the tabs behind it
+  // `dash-tabs`, not `tabs`: the shell hides the workshop's `.tabs` with an
+  // !important rule up top, and a dashboard that borrowed the name shipped
+  // three releases (v0.1.55-v0.1.60) with its tab buttons invisible in every
+  // real browser. The stub DOM cannot see a stylesheet; a screenshot can.
   const bar = document.createElement('div'); bar.className = 'dash-bar'; bar.id = 'dashbar';
   const panel = document.createElement('div'); panel.className = 'panel'; panel.id = 'panel'; panel.hidden = true;
-  const panelSkills = document.createElement('div'); panelSkills.innerHTML = '<p class="panel-h">技 · this run · bought with 墨</p>'; panelSkills.appendChild(strip);
+  const panelSkills = document.createElement('div'); panelSkills.innerHTML = '<p class="panel-h">技 · this run · intent, bought with 墨</p>'; panelSkills.appendChild(strip);
+  const panelGuard = document.createElement('div'); panelGuard.innerHTML = '<p class="panel-h">耐 · this run · persistence, bought with 墨</p>'; panelGuard.appendChild(stripGuard);
   const panelLanterns = document.createElement('div');
-  panel.appendChild(panelSkills); panel.appendChild(panelLanterns);
+  panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelLanterns);
   wrap.appendChild(panel); wrap.appendChild(bar);
   let tab = null, dashMarkup = '';
   // Bars, not hearts (the maintainer: "let's not do hearts. I like bars. For
   // both the life and energy for casting").
   const bar_ = (cls, kana, v, max, title) => `<span class="bar ${cls}" title="${title}"><i style="width:${max > 0 ? Math.round(100*Math.max(0, Math.min(max, v))/max) : 0}%"></i><b>${kana}</b><small>${v}/${max}</small></span>`;
-  const canBuyAny = () => Object.entries(UPG).some(([id, u]) => upg[id] < u.max && sumi >= costOf(id));
+  const canBuyAny = tabName => Object.entries(UPG).some(([id, u]) => u.tab === tabName && upg[id] < u.max && sumi >= costOf(id));
   function renderDash(){
     const p = purse();
     const m = bar_('life', '命', ward, wardMax(), 'the ward: ' + ward + ' of ' + wardMax())
@@ -1196,7 +1227,8 @@ LAYER = STYLE + r"""
       + `<span class="n" title="ink — earned by tracing, spent on this run's skills">墨 ${sumi}</span>`
       + (p ? `<span class="n" title="魂 — earned by runs, spent on what lasts">魂 ${p.balance}</span>` : '')
       + `<span class="n"><small>wave</small> ${wave}</span>`
-      + `<span class="tabs"><button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny() ? 'can' : ''}" title="this run's skills">技</button>`
+      + `<span class="dash-tabs"><button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="this run's intent">技</button>`
+      + `<button data-tab="guard" aria-pressed="${tab === 'guard'}" class="${canBuyAny('guard') ? 'can' : ''}" title="this run's persistence">耐</button>`
       + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="what lasts">灯</button>` : '') + `</span>`;
     if (m === dashMarkup) return;
     dashMarkup = m; bar.innerHTML = m;
@@ -1207,7 +1239,7 @@ LAYER = STYLE + r"""
   // while you shop, and knowing when you can afford to is the game.
   function openTab(name){
     tab = name || null;
-    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelLanterns.hidden = tab !== 'lanterns';
+    panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelGuard.hidden = tab !== 'guard'; panelLanterns.hidden = tab !== 'lanterns';
     if (tab === 'lanterns') renderLanterns();
     renderDash();
     return tab;
@@ -1382,9 +1414,9 @@ LAYER = STYLE + r"""
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
-    get upgHtml(){ return upgMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; },
+    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
-    earn, buy, costOf, hpFor, castMs, hit: strike, UPG,
+    earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
     charge, kindle, quench, autocast, tidy, casting,
     touch(){ penAt = performance.now(); },
@@ -1483,7 +1515,7 @@ def config(pack, deck=None):
         f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"
         f"speed:{f.get('speed', 0.055)},"
         f"wardHp:{int(f.get('wardHp', 5))},"
-        f"tower:{js({**{'rows': 2, 'rowWaves': 10, 'bossEvery': 10, 'bossHp': 2, 'speedStep': 0.03}, **(f.get('tower', f.get('stages')) or {})}) if f.get('tower', f.get('stages', True)) else 'null'},"
+        f"tower:{js({**{'rows': 2, 'rowWaves': 10, 'bossEvery': 10, 'bossHp': 2, 'bossBite': 1, 'speedStep': 0.03}, **(f.get('tower', f.get('stages')) or {})}) if f.get('tower', f.get('stages', True)) else 'null'},"
         f"tamaClean:{int(f.get('tamaClean', 2))},"
         f"tamaTrace:{int(f.get('tamaTrace', 1))},"
         f"tamaWaves:{int(f.get('tamaWaves', 3))},"
@@ -1494,13 +1526,16 @@ def config(pack, deck=None):
         f"biteRate:{float(f.get('biteRate', 0.5))},"
         f"noRepeat:{int(f.get('noRepeat', 4))},"
         f"hpMax:{int(f.get('hpMax', 5))},"
+        f"biteEvery:{int(f.get('biteEvery', 20))},"
+        f"biteMax:{int(f.get('biteMax', 4))},"
+        f"tendEvery:{int(f.get('tendEvery', 10))},"
         f"inkTrace:{int(f.get('inkTrace', 2))},"
         f"inkClean:{int(f.get('inkClean', 2))},"
         f"inkKill:{int(f.get('inkKill', 1))},"
         f"inkMastered:{int(f.get('inkMastered', 6))},"
         f"shoveStep:{float(f.get('shoveStep', 0.025))},"
         f"upgradeRamp:{float(f.get('upgradeRamp', 1.6))},"
-        f"upgradeCost:{js({**{'intent': 12, 'quick': 8, 'breath': 9, 'shove': 6, 'mend': 10}, **(f.get('upgradeCost') or {})})},"
+        f"upgradeCost:{js({**{'intent': 12, 'quick': 8, 'breath': 9, 'shove': 6, 'mend': 10, 'wall': 10, 'tend': 9}, **(f.get('upgradeCost') or {})})},"
         f"spawnMs:{int(f.get('spawnMs', 5200))},"
         f"spawnRamp:{int(f.get('spawnRamp', 140))},"
         f"spawnMin:{int(f.get('spawnMin', 1800))},"

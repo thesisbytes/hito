@@ -770,6 +770,39 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   F.buy('mend');
   ok(F.wardMax === m0 + 1 && F.ward === w0 + 1, `mend took the ward from ${w0}/${m0} to ${F.ward}/${F.wardMax}`);
 
+  // 耐: the farang bite harder as the waves climb, and the tab stands against it
+  fresh();
+  ok(F.UPG.mend.tab === 'guard' && F.UPG.wall.tab === 'guard' && F.UPG.tend.tab === 'guard' && F.UPG.intent.tab === 'skills',
+     'mend, wall and tend belong to 耐; intent to 技');
+  ok(F.biteFor(0, false) === 1, `a breach at the foot of the tower costs ${F.biteFor(0, false)}, expected 1`);
+  ok(F.biteFor(cfg.biteEvery, false) === 2, `a breach at wave ${cfg.biteEvery} costs ${F.biteFor(cfg.biteEvery, false)}, expected 2`);
+  ok(F.biteFor(cfg.biteEvery * 100, false) === cfg.biteMax, `the bite went past its ceiling: ${F.biteFor(cfg.biteEvery * 100, false)}`);
+  { const bb = JSON.parse(html.match(/tower:(\{[^}]*\})/)[1]).bossBite;
+    ok(F.biteFor(0, true) === 1 + bb, `a boss bites ${F.biteFor(0, true)}, expected ${1 + bb}`); }
+  F.earn(100000); F.buy('wall');
+  ok(F.upgrades.wall === 1 && F.biteFor(cfg.biteEvery, false) === 1, `one wall left a wave-${cfg.biteEvery} bite at ${F.biteFor(cfg.biteEvery, false)}, expected 1`);
+  ok(F.biteFor(0, false) === 1, 'a wall took a bite below one');
+  // and a real breach takes what biteFor says
+  { const m = F.monsters[0]; const before = F.ward, bite = F.biteFor(F.wave, m.boss);
+    m.d = 0.07; m.speed = 0.055;
+    advance(300);
+    ok(!F.monsters.includes(m), 'test setup: the farang should have breached');
+    ok(F.ward === before - bite, `a breach took ${before - F.ward}, biteFor said ${bite}`); }
+  // tend: for every stretch of waves held, a life back, up to the ward's size
+  fresh(); F.earn(100000); F.buy('tend');
+  { const m = F.monsters[0]; m.d = 0.07; m.speed = 0.055; advance(300); }
+  ok(F.ward === F.wardMax - 1, `test setup: the ward should be one down (${F.ward}/${F.wardMax})`);
+  for (const m of F.monsters) m.speed = 0;
+  { let guard = 0; while (F.wave % cfg.tendEvery !== 0 && guard++ < 50){ F.spawn(); for (const m of F.monsters) m.speed = 0; }
+    ok(F.wave % cfg.tendEvery === 0, `test setup: could not reach a tend wave (wave ${F.wave})`);
+    ok(F.ward === F.wardMax, `tend did not give the life back at wave ${F.wave}: ${F.ward}/${F.wardMax}`); }
+  ok(/data-upg="wall"/.test(F.guardHtml) && /data-upg="tend"/.test(F.guardHtml) && /data-upg="mend"/.test(F.guardHtml) && !/data-upg="mend"/.test(F.upgHtml),
+     'the 耐 strip is missing something, or mend is still on 技');
+  advance(20);
+  ok(/data-tab="guard"/.test(F.dashHtml), 'the dashboard has no 耐 tab');
+  ok(F.openTab('guard') === 'guard' && F.tab === 'guard' && !F.paused, '耐 did not open, or paused the run');
+  F.openTab(null);
+
   // a tough farang survives the first hit, and the pips say how much is owed
   fresh(); F.quench();
   const tough = F.monsters[0];
@@ -807,7 +840,7 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   // and all of it belongs to the run
   F.earn(50); F.buy('quick');
   fresh();
-  ok(F.ink === 0 && F.upgrades.quick === 0 && F.wardMax === cfg.wardHp, 'ink or upgrades survived the ward falling');
+  ok(F.ink === 0 && F.upgrades.quick === 0 && F.upgrades.wall === 0 && F.wardMax === cfg.wardHp, 'ink or upgrades survived the ward falling');
   ok(/墨 0/.test(F.upgHtml) && /data-upg="quick"/.test(F.upgHtml), 'the workshop strip is missing or stale after a restart');
   // the dashboard on the seam: hearts, ink, 魂, the wave, and tabs that do not pause the run
   advance(20);
@@ -821,8 +854,9 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   F.restart(); F.quench();
   ok(F.energy === cfg.energyStart, `a run starts with ${F.energy} 気, expected ${cfg.energyStart}`);
   P.strokes.length = 0; P.strokes.push(line(120, 120, 280, 130, 60), line(200, 100, 210, 300, 80, 900), line(100, 200, 300, 210, 60, 1800));
-  const e0 = F.energy; globalThis.conjure(); advance(cfg.advanceMs + 60);
-  ok(F.energy === e0 + 3 * cfg.energyPerStroke, `three strokes conjured filled 気 by ${F.energy - e0}, expected ${3 * cfg.energyPerStroke}`);
+  const e0 = F.energy; globalThis.conjure(); const e1 = F.energy;   // read before the wait: a light may spend some on a farang carrying the character
+  advance(cfg.advanceMs + 60);
+  ok(e1 === e0 + 3 * cfg.energyPerStroke, `three strokes conjured filled 気 by ${e1 - e0}, expected ${3 * cfg.energyPerStroke}`);
   ok(F.fill(999) === cfg.energyMax, `気 overflowed its bag (${F.energy} of ${cfg.energyMax})`);
   // a lit character with an empty bag throws nothing; with 気 to throw, it throws and pays
   F.restart(); F.quench(); F.fill(-999);

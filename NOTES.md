@@ -1717,3 +1717,41 @@ Running log. Append at the bottom, don't rewrite history.
   too.
 - Four tabs then: 技, 耐, 志, and the lanterns inside 志. Two currencies,
   two halves of the screen. Not built.
+
+## 2026-09-24 — Persistence: the farang bite harder, and 耐 stands against it (hiragana v0.1.61, katakana-game v0.1.24)
+
+- The maintainer, on the persistence tab: "Every increment in round they get
+  stronger. Both in attack and health." Health already climbed (`hpEvery`).
+  Attack now does: a breach costs the ward `biteFor(wave)` — one life at the
+  foot, one more every `biteEvery` (20) waves up to `biteMax` (4), a boss
+  `tower.bossBite` (1) more. A breach event records its `bite`. Words bite
+  like anything else: a word at the ward is a word not answered.
+- **耐 persistence**, the second tab bought with 墨 during the run: 守 mend
+  moves here from 技 (which is now purely intent: 意 早 息 押); 壁 wall (a
+  breach costs one less, never below one, 3); 癒 tend (a life back per level
+  every `tendEvery` (10) waves held, paid when the wave comes, 3). Upgrades
+  carry a `tab`; `freshUpg()` builds the empty set from the table so a new
+  upgrade cannot be forgotten in a restart.
+- **A bug found by looking: the dashboard's tabs were never visible.** The
+  shell hides the workshop's furniture with `body.field .tabs { display:none
+  !important }`, and the dashboard's tab strip was `<span class="tabs">`. So
+  from v0.1.55 to v0.1.60 the 技 and 灯 buttons existed in the markup, passed
+  every test, and were invisible in every real browser. The stub DOM has no
+  stylesheet. Renamed `dash-tabs`; and the engine's generic `button{flex:1;
+  min-width:88px}` had to be overridden too, or three tabs ate the bars at
+  phone width. Checked with headless Chrome at 390px, sharing off. This is
+  the CSS cousin of the "a layer must not reuse an engine name" rule, and
+  the "look at a running build before shipping UI" rule earning its place:
+  a layer's class names are engine names too.
+- What this may explain: "the other upgrades I didn't even notice much" and
+  the request to "implement our upgrade tabs" after they had shipped.
+- 志 motivation is still direction. Rethought: lights already survive the
+  ward falling, so "one lit character keeps its lights through a fall" is
+  already true and is not an upgrade. What is left for 志: the next run
+  starting with the 気 the ward fell with, and a run after a fall paying
+  more 魂. Neither built.
+- Test: `field.test.mjs` reads a bite at the foot, at `biteEvery`, past the
+  ceiling, a boss's; a wall's discount and its floor; a real breach taking
+  what `biteFor` says; tend at a tend wave; the 耐 strip and tab. The 気
+  fill test now reads before the wait, like breath's: a light may spend some
+  on a farang carrying the character.

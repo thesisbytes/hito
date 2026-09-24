@@ -107,7 +107,7 @@ Unset leaves whatever `shadow` specifies and the guide always on.
 | `credits` | `[]` | Lines for the credits page behind the start page's "who this leans on" button, one paragraph each. The pack's `credit` (the licence line) is appended after them, so the KanjiVG attribution is on that page as well as in the footer. Name people here, by role or by name, as they prefer. |
 | `field.holdMs` | `1500` | How long after the pen last touched the pad the tracer still counts as busy. A retarget queued in that window waits, so a wisp or a breach elsewhere cannot swap the glyph under a hand that has lifted to think, or that has started a stroke which has not yet found the path. |
 | *(guided)* | | The field's guided difficulty sets `allRows`: its farang carry every row of the chart, not only the rows the stage has reached. Guided holds no stage past the second, so under the gate its rows never grew. |
-| *(the dashboard)* | | Two bars on the seam — 命 life (the ward) and 気 energy — with 墨, 魂 and the wave, and tabs 技 (this run's skills, bought with ink) and 灯 (the lanterns, bought with 魂). A tab does not pause the run. |
+| *(the dashboard)* | | Two bars on the seam — 命 life (the ward) and 気 energy — with 墨, 魂 and the wave, and tabs 技 (this run's intent, bought with ink), 耐 (this run's persistence, bought with ink) and 灯 (the lanterns, bought with 魂). A tab does not pause the run. |
 | `field.energyMax`, `energyStart` | 24, 6 | the bag of 気 a run can hold, and what it holds at the start |
 | `field.energyPerStroke` | 1 | every stroke the hand completes fills 気 by this much, whatever is on the field, landed or not (a conjure credits any strokes the shine did not) |
 | `field.castCost` | 2 | what a lit character's wisp spends. Lights say which characters can answer for themselves; 気 is what they answer with, and nothing fills it but the hand. |
@@ -207,13 +207,17 @@ above it.
 ```json
 "field": { "hpEvery": 10, "hpMax": 5, "inkTrace": 2, "inkClean": 2, "inkKill": 1,
            "inkMastered": 6, "shoveStep": 0.025, "upgradeRamp": 1.6,
-           "upgradeCost": { "intent": 12, "quick": 8, "breath": 9, "shove": 6, "mend": 10 } }
+           "biteEvery": 20, "biteMax": 4, "tendEvery": 10,
+           "upgradeCost": { "intent": 12, "quick": 8, "breath": 9, "shove": 6, "mend": 10, "wall": 10, "tend": 9 } }
 ```
 
 | key | default | what it does |
 |---|---|---|
 | `hpEvery` | 10 | single characters take one more hit every this many waves. `0` switches it off. Words ignore it: a word is already as tough as it is long. |
 | `hpMax` | 5 | and no more than this |
+| `biteEvery` | 20 | a breach costs the ward one more life every this many waves (the farang's attack, climbing as their health does). `0` switches it off. Words bite too: a word at the ward is a word not answered. |
+| `biteMax` | 4 | and no more than this, before a boss's extra and a wall's discount |
+| `tendEvery` | 10 | 癒 tend gives a life back per level every this many waves held |
 | `inkTrace` | 2 | ink for landing a trace, whether or not anything was standing there |
 | `inkClean` | 2 | more, if it was clean |
 | `inkMastered` | 6 | a character conjured this many times pays one less |
@@ -222,14 +226,16 @@ above it.
 | `upgradeCost` | see above | what level one costs |
 | `upgradeRamp` | 1.6 | each level costs this many times the last |
 
-Four upgrades, bought during a run from the strip at the top of the field, and
-gone when the ward falls, themed on intent — "we forge and sharpen our intent
-to cut through farangs' mindset of sticking to their old ways": **意 intent**
-(every light cuts one hit deeper per level, 3), **早 quick** (wisps fly 18%
-sooner per level, 5), **息 breath** (every stroke fills 気 by one more per
-level, 3), **押 shove** (every hit pushes them back, 5), **守 mend** (a life
-now, and a bigger ward, 5). Bright (a trace lights one more) went in v0.1.60:
-intent does its job better. The lanterns that last, bought with 魂: 心 heart,
+Two tabs of upgrades bought with ink during a run and gone when the ward
+falls. **技**, themed on intent — "we forge and sharpen our intent to cut
+through farangs' mindset of sticking to their old ways": **意 intent** (every
+light cuts one hit deeper per level, 3), **早 quick** (wisps fly 18% sooner
+per level, 5), **息 breath** (every stroke fills 気 by one more per level, 3),
+**押 shove** (every hit pushes them back, 5). Bright (a trace lights one more)
+went in v0.1.60: intent does its job better. **耐**, persistence, against the
+farang's climbing attack (v0.1.61): **守 mend** (a life now, and a bigger
+ward, 5), **壁 wall** (a breach costs one less, never below one, 3), **癒
+tend** (a life back per level every `tendEvery` waves held, 3). The lanterns that last, bought with 魂: 心 heart,
 灯 lamp, 硯 inkwell, and **器 vessel** (the bag of 気 holds `vesselStep` (6)
 more per level, 3).
 
@@ -241,7 +247,7 @@ needs the pen again or a brighter workshop. That is the whole curve.
 ### The tower, 魂 tama and the lantern workshop
 
 ```json
-"field": { "tower": { "rows": 2, "rowWaves": 10, "bossEvery": 10, "bossHp": 2, "speedStep": 0.03 },
+"field": { "tower": { "rows": 2, "rowWaves": 10, "bossEvery": 10, "bossHp": 2, "bossBite": 1, "speedStep": 0.03 },
            "tamaClean": 2, "tamaTrace": 1, "tamaWaves": 3, "inkwellStep": 6,
            "lanternCost": { "heart": 20, "lamp": 30, "inkwell": 15, "vessel": 25 }, "lanternRamp": 1.6 }
 ```
@@ -258,6 +264,7 @@ read as an alias.
 | `tower.rowWaves` | 10 | one more row of the chart opens every this many waves, counted from the furthest wave the realm has ever reached or the current run's, whichever is further. The curriculum gate, keyed to distance. |
 | `tower.bossEvery` | 10 | every this many waves the farang is a boss. While any boss lives, every character traced is shown with less help — the shape faint, the start dot kept — not only the boss's own. Words are not bossed. |
 | `tower.bossHp` | 2 | extra hits a boss takes |
+| `tower.bossBite` | 1 | extra life a boss takes from the ward when it breaches |
 | `tower.speedStep` | 0.03 | farang come this much faster per `bossEvery` waves |
 | `tamaClean`, `tamaTrace` | 2, 1 | tama for a clean trace, and for one that was zapped |
 | `tamaWaves` | 3 | one tama per this many farang faced |

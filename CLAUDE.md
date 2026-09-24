@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.60.html`
+### Hiragana — `dist/hiragana-v0.1.61.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -339,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.23.html`
+### Katakana — `dist/katakana-game-v0.1.24.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -640,11 +640,17 @@ every wisp a lit character throws spends from ("the stroke does not depend on
 which enemy is present. All strokes go into one bag of energy"). Lights say
 which characters can answer for themselves; 気 is what they answer with;
 nothing fills it but the hand. Beside them 墨, 魂 and the wave, with two tabs
-(the tabs' contents, as of v0.1.60: 技 is 意 intent, 早 quick, 息 breath, 押
-shove, 守 mend; 灯 is 心 heart, 灯 lamp, 硯 inkwell, 器 vessel — see
-`scripts/PACK.md`, "The tower"): 技, this
-run's skills bought with ink (the strip that used to sit at the top of the
-field), and 灯, the lanterns bought with 魂. A tab does not pause the run.
+(the tabs' contents, as of v0.1.61: 技 is 意 intent, 早 quick, 息 breath, 押
+shove; 耐 is 守 mend, 壁 wall, 癒 tend; 灯 is 心 heart, 灯 lamp, 硯 inkwell,
+器 vessel — see `scripts/PACK.md`, "The tower"): 技, this run's intent
+bought with ink (the strip that used to sit at the top of the field), 耐,
+this run's persistence bought with ink (v0.1.61: the farang's attack climbs
+with the wave as their health does — a breach costs more of the ward the
+higher the tower — and this tab is what stands against it), and 灯, the
+lanterns bought with 魂. A tab does not pause the run. **The tab buttons
+were invisible from v0.1.55 to v0.1.60**: the shell hides the workshop's
+`.tabs` with an `!important` rule and the dashboard had borrowed the class
+name; the stubbed DOM has no stylesheet, so only a screenshot could see it.
 The maintainer: "the crazy part of the game is knowing when you can relax the
 stroke practice and tab out into your upgrades."
 
@@ -746,12 +752,11 @@ sentences. How that plays, as far as it has been thought through:
   and releases every lit character at once, the beat in which the hand may
   look up; and the sketchbook queuing by the ledger's struggle list rather
   than by the nearest farang. See NOTES.md.
-- *Persistence and motivation* (sketched 2026-09-24, not decided): 耐, a
-  defensive tab bought with 墨 in the run (mend, a wall, a life back every
-  so many waves); 志, the lasting tab bought with 魂 — 七転び八起き as the
-  between-runs economy: the next run keeps the 気 the ward fell with, one
-  lit character keeps its lights through a fall, and the run after a fall
-  pays a little more. See NOTES.md.
+- *Motivation* (sketched 2026-09-24, not decided; 耐 persistence was built
+  in v0.1.61): 志, the lasting tab bought with 魂 — 七転び八起き as the
+  between-runs economy: the next run keeps the 気 the ward fell with, and the
+  run after a fall pays a little more. Lights already survive a fall, so
+  that part needs no upgrade. See NOTES.md.
 - *Row resonance*, as the set bonus: all five of a row lit and that row's
   wisps fly harder. It rewards breadth and teaches the rows, which is the
   DECIDED affinity rule paying out. It must not light a sibling that was not
@@ -890,7 +895,10 @@ per-character ledger. Save data must have export/import from day one.
 - **A layer must not reuse an engine name.** Inside a layer's function,
   `let ink` does not replace the engine's `ink`, it hides it from that layer,
   silently, and the stubbed DOM cannot tell. `shadow.test.mjs` reads the
-  source for it. It has been a shipped bug twice.
+  source for it. It has been a shipped bug twice. **Class names count**: the
+  field shell hides the engine's `.tabs` with `!important`, and a dashboard
+  that named its own strip `tabs` shipped three releases with invisible
+  buttons (v0.1.55-v0.1.60). No test sees a stylesheet; a screenshot does.
 - **Look at a running build before shipping UI.** Headless Chrome is on this
   machine (`google-chrome --headless=new --screenshot`). Switch sharing off
   first (`hito-share` = `0`) or the run lands in the production table.
