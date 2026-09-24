@@ -207,7 +207,7 @@ above it.
 ```json
 "field": { "hpEvery": 10, "hpMax": 5, "inkTrace": 2, "inkClean": 2, "inkKill": 1,
            "inkMastered": 6, "shoveStep": 0.025, "upgradeRamp": 1.6,
-           "upgradeCost": { "quick": 8, "bright": 14, "shove": 6, "mend": 10 } }
+           "upgradeCost": { "intent": 12, "quick": 8, "breath": 9, "shove": 6, "mend": 10 } }
 ```
 
 | key | default | what it does |
@@ -223,9 +223,15 @@ above it.
 | `upgradeRamp` | 1.6 | each level costs this many times the last |
 
 Four upgrades, bought during a run from the strip at the top of the field, and
-gone when the ward falls: **早 quick** (wisps fly 18% sooner per level, 5),
-**灯 bright** (a trace lights one more, 3), **押 shove** (every hit pushes them
-back, 5), **守 mend** (a heart now, and a bigger ward, 5).
+gone when the ward falls, themed on intent — "we forge and sharpen our intent
+to cut through farangs' mindset of sticking to their old ways": **意 intent**
+(every light cuts one hit deeper per level, 3), **早 quick** (wisps fly 18%
+sooner per level, 5), **息 breath** (every stroke fills 気 by one more per
+level, 3), **押 shove** (every hit pushes them back, 5), **守 mend** (a life
+now, and a bigger ward, 5). Bright (a trace lights one more) went in v0.1.60:
+intent does its job better. The lanterns that last, bought with 魂: 心 heart,
+灯 lamp, 硯 inkwell, and **器 vessel** (the bag of 気 holds `vesselStep` (6)
+more per level, 3).
 
 The rule they all obey: **an upgrade multiplies what a trace is worth and
 never lights a character the hand has not written.** A clean trace is three
@@ -237,7 +243,7 @@ needs the pen again or a brighter workshop. That is the whole curve.
 ```json
 "field": { "tower": { "rows": 2, "rowWaves": 10, "bossEvery": 10, "bossHp": 2, "speedStep": 0.03 },
            "tamaClean": 2, "tamaTrace": 1, "tamaWaves": 3, "inkwellStep": 6,
-           "lanternCost": { "heart": 20, "lamp": 30, "inkwell": 15 }, "lanternRamp": 1.6 }
+           "lanternCost": { "heart": 20, "lamp": 30, "inkwell": 15, "vessel": 25 }, "lanternRamp": 1.6 }
 ```
 
 The waves do not end; a run ends when the ward falls, and how far it got is

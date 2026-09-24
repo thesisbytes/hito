@@ -712,6 +712,7 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   F.setDifficulty('medium');
 }
 
+const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ x: x0 + (x1-x0)*i/(n-1), y: y0 + (y1-y0)*i/(n-1), p:.5, t: t0 + i*8 }));
 // ---- the run: ink, the workshop strip, and farang that take more than one hit
 //
 // The rule being defended is the one The Tower does not have: nothing here
@@ -746,19 +747,20 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
 
   // an upgrade stops at its ceiling
   F.earn(100000);
-  let n = 0; while (F.buy('bright') && n < 50) n++;
-  ok(F.upgrades.bright === F.UPG.bright.max, `bright went to ${F.upgrades.bright}, its ceiling is ${F.UPG.bright.max}`);
-  ok(/<small>max<\/small>/.test(F.upgHtml) && /data-upg="bright"[^>]*disabled/.test(F.upgHtml), 'a maxed upgrade still offers itself for sale');
+  let n = 0; while (F.buy('intent') && n < 50) n++;
+  ok(F.upgrades.intent === F.UPG.intent.max, `intent went to ${F.upgrades.intent}, its ceiling is ${F.UPG.intent.max}`);
+  ok(/<small>max<\/small>/.test(F.upgHtml) && /data-upg="intent"[^>]*disabled/.test(F.upgHtml), 'a maxed upgrade still offers itself for sale');
 
-  // bright makes a trace light more — it multiplies the hand, it does not replace it
-  fresh(); F.quench();
-  const ch0 = P.LETTERS[P.idx][0];
-  globalThis.conjure();
-  const plain = F.charge(ch0);
-  fresh(); F.quench(); F.earn(100000); F.buy('bright');
-  const ch1 = P.LETTERS[P.idx][0];
-  globalThis.conjure();
-  ok(F.charge(ch1) === Math.min(cfg.hitodamaCap, plain + 1), `bright lit ${F.charge(ch1)}, a plain trace lit ${plain}`);
+  // intent: every light cuts deeper — it multiplies the hand, it does not replace it
+  fresh(); F.quench(); F.earn(100000); F.buy('intent');
+  { const m = F.monsters[0]; m.hp = 5; F.hit(m, false, false); ok(m.hp === 3, `one hit with intent 1 took ${5 - m.hp}, expected 2`); }
+  // breath: every stroke fills 気 by one more
+  fresh(); F.quench(); F.earn(100000);
+  ok(F.buy('breath') === true && F.upgrades.breath === 1, `breath could not be bought (over ${F.over}, ink ${F.ink}, level ${F.upgrades.breath})`);
+  { F.fill(-999); P.strokes.length = 0; P.strokes.push(line(120, 120, 280, 130, 60), line(200, 100, 210, 300, 80, 900));
+    globalThis.conjure(); const filled = F.energy;   // read before the wait: a light may spend some on a farang carrying the character
+    advance(cfg.advanceMs + 60);
+    ok(filled === 2 * (cfg.energyPerStroke + 1), `two strokes with breath 1 filled 気 by ${filled}, expected ${2 * (cfg.energyPerStroke + 1)}`); }
   F.quench();
   ok(Object.keys(F.hitodama).length === 0, 'buying something lit a character nobody traced');
 
@@ -816,7 +818,6 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   ok(F.openTab(null) === null && F.tab === null, 'the tab did not close');
 
   // 気: one bag, filled by every stroke whatever is on the field, spent by every cast
-  const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ x: x0 + (x1-x0)*i/(n-1), y: y0 + (y1-y0)*i/(n-1), p:.5, t: t0 + i*8 }));
   F.restart(); F.quench();
   ok(F.energy === cfg.energyStart, `a run starts with ${F.energy} 気, expected ${cfg.energyStart}`);
   P.strokes.length = 0; P.strokes.push(line(120, 120, 280, 130, 60), line(200, 100, 210, 300, 80, 900), line(100, 200, 300, 210, 60, 1800));
@@ -930,8 +931,10 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
 
   // what lasts, lasts: into the next run and the one after
   const hearts = F.wardMax, cap = F.capNow();
-  ok(F.buyLantern('heart') && F.buyLantern('lamp') && F.buyLantern('inkwell'), 'a full purse could not buy the lanterns');
+  const bag = F.energyMax;
+  ok(F.buyLantern('heart') && F.buyLantern('lamp') && F.buyLantern('inkwell') && F.buyLantern('vessel'), 'a full purse could not buy the lanterns');
   fresh(); F.begin();
+  ok(F.energyMax === bag + cfg.vesselStep, `a vessel did not grow the bag (${F.energyMax}, was ${bag})`);
   ok(F.ward === hearts + 1 && F.wardMax === hearts + 1, `a heart did not carry into the next run (ward ${F.ward}, was ${hearts})`);
   ok(F.capNow() === cap + 1, 'a lamp did not raise how many lights a character holds');
   ok(F.ink === cfg.inkwellStep, `an inkwell started the run with ${F.ink} ink, expected ${cfg.inkwellStep}`);

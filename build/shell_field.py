@@ -222,16 +222,21 @@ LAYER = STYLE + r"""
   // from tracing, and mostly from tracing cleanly; a wisp's kill pays a
   // little, so the idle half earns its keep without outearning the pen.
   // All of it belongs to the run and goes when the ward falls.
+  // 技: this run's skills, bought with 墨, gone when the ward falls. The theme
+  // is intent — the maintainer: "we forge and sharpen our intent to cut
+  // through farangs' mindset of sticking to their old ways". Every one
+  // multiplies what the hand's strokes are worth; none writes a character.
   const UPG = {
-    quick: { kana:'早', name:'quick', blurb:'the lights are thrown faster',  max:5 },
-    bright:{ kana:'灯', name:'bright', blurb:'a trace lights one more',      max:3 },
-    shove: { kana:'押', name:'shove', blurb:'every hit pushes them back',     max:5 },
-    mend:  { kana:'守', name:'mend',  blurb:'the ward gains a heart',          max:5 },
+    intent:{ kana:'意', name:'intent', blurb:'every light cuts deeper: one more hit per cast', max:3 },
+    quick: { kana:'早', name:'quick',  blurb:'the lights are thrown sooner',                    max:5 },
+    breath:{ kana:'息', name:'breath', blurb:'every stroke fills 気 by one more',                max:3 },
+    shove: { kana:'押', name:'shove',  blurb:'every hit pushes them back',                      max:5 },
+    mend:  { kana:'守', name:'mend',   blurb:'the ward gains a life',                           max:5 },
   };
   // `sumi`, not `ink`: `ink` is the engine's drawing context, and this layer
   // uses it (guided mode wipes the pen's mark with it). Calling the currency
   // `ink` shadowed it, and guided threw on every repaint in v0.1.39.
-  let sumi = 0, upg = { quick:0, bright:0, shove:0, mend:0 };
+  let sumi = 0, upg = { intent:0, quick:0, breath:0, shove:0, mend:0 };
   const costOf = id => Math.round((CFG.upgradeCost[id] || 10) * Math.pow(CFG.upgradeRamp, upg[id]));
   const castMs = () => CFG.castMs * Math.pow(0.82, upg.quick);
   // ---- stages, and the workshop between rounds ------------------------------
@@ -250,6 +255,7 @@ LAYER = STYLE + r"""
     heart:   { kana:'心', name:'heart',   blurb:'the ward starts with one more',        max:5 },
     lamp:    { kana:'灯', name:'lamp',    blurb:'a character can hold one more light',  max:4 },
     inkwell: { kana:'硯', name:'inkwell', blurb:'every run starts with more ink in hand', max:5 },
+    vessel:  { kana:'器', name:'vessel',  blurb:'the bag of 気 holds more',                 max:3 },
   };
   const lanternCost = id => Math.round((CFG.lanternCost[id] || 20) * Math.pow(CFG.lanternRamp, own(id)));
   // The tower (the maintainer, 2026-09-24: "there is no completing a level.
@@ -291,7 +297,7 @@ LAYER = STYLE + r"""
   // throws spends from it. Lights say which characters can answer for
   // themselves; 気 is what they answer with. Nothing fills it but the hand.
   let energy = 0, credited = 0;
-  const energyMax = () => CFG.energyMax;
+  const energyMax = () => CFG.energyMax + own('vessel') * CFG.vesselStep;
   function fill(n){ energy = Math.max(0, Math.min(energyMax(), energy + (+n || 0))); return energy; }   // negative drains; a breach may, one day
   function earn(n){ if (n > 0){ sumi += n; if (run) run.earned += n; renderUpg(); } return sumi; }
   function buy(id){
@@ -720,11 +726,12 @@ LAYER = STYLE + r"""
   // stroke-complete, and reaches here as a global); a conjure credits any the
   // shine did not, so a trace is worth its strokes however it was scored
   const _shine = window.shine;
-  if (typeof _shine === 'function') window.shine = function(){ fill(CFG.energyPerStroke); credited++; return _shine.apply(this, arguments); };
+  const perStroke = () => CFG.energyPerStroke + upg.breath;
+  if (typeof _shine === 'function') window.shine = function(){ fill(perStroke()); credited++; return _shine.apply(this, arguments); };
   const _conjure = window.conjure;
   window.conjure = function(){
     const drew = LETTERS[idx][0];
-    fill(Math.max(0, Math.max(1, strokes.length) - credited) * CFG.energyPerStroke); credited = 0;
+    fill(Math.max(0, Math.max(1, strokes.length) - credited) * perStroke()); credited = 0;
     // A word is only ever advanced by its own next kana, so there is no
     // falling back to the locked monster: a stray character hits nothing.
     const t = bearer(drew);   // a character hits whichever farang carries it, or nothing
@@ -745,7 +752,7 @@ LAYER = STYLE + r"""
     // In a word too: every kana written lights that kana, and clean means
     // this kana. The light belongs to the character, whatever it was part of.
     if (casting()){
-      const gain = CFG.hitodamaGain + upg.bright + (zapped ? 0 : CFG.cleanBonus);
+      const gain = CFG.hitodamaGain + (zapped ? 0 : CFG.cleanBonus);
       kindle(drew, gain);
       const d = dash();
       for (let k=0;k<14;k++)
@@ -798,7 +805,7 @@ LAYER = STYLE + r"""
         motes.push({x:p0.x, y:p0.y, vx:(Math.random()-.5)*2, vy:(Math.random()-.5)*2, life:.7});
       return;
     }
-    m.hp--;
+    m.hp -= 1 + upg.intent;   // intent: every light cuts deeper
     // The sound, attached to the kill. Tracing a shape teaches the shape and
     // nothing else — the hand can learn every stroke of ぬ without the reading
     // ever arriving. Success is the moment attention is highest, so that is
@@ -1102,7 +1109,7 @@ LAYER = STYLE + r"""
 
   function restart(){
     monsters = []; shots = []; motes = []; readings = [];
-    upg = { quick:0, bright:0, shove:0, mend:0 }; run = newRun(); ended = null;
+    upg = { intent:0, quick:0, breath:0, shove:0, mend:0 }; run = newRun(); ended = null;
     zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
                   // and a run that restarts on the same character does not load one
     sumi = own('inkwell') * CFG.inkwellStep; energy = CFG.energyStart; credited = 0;
@@ -1482,7 +1489,7 @@ def config(pack, deck=None):
         f"tamaWaves:{int(f.get('tamaWaves', 3))},"
         f"inkwellStep:{int(f.get('inkwellStep', 6))},"
         f"lanternRamp:{float(f.get('lanternRamp', 1.6))},"
-        f"lanternCost:{js({**{'heart': 20, 'lamp': 30, 'inkwell': 15}, **(f.get('lanternCost') or {})})},"
+        f"lanternCost:{js({**{'heart': 20, 'lamp': 30, 'inkwell': 15, 'vessel': 25}, **(f.get('lanternCost') or {})})},"
         f"hpEvery:{int(f.get('hpEvery', 10))},"
         f"biteRate:{float(f.get('biteRate', 0.5))},"
         f"noRepeat:{int(f.get('noRepeat', 4))},"
@@ -1493,7 +1500,7 @@ def config(pack, deck=None):
         f"inkMastered:{int(f.get('inkMastered', 6))},"
         f"shoveStep:{float(f.get('shoveStep', 0.025))},"
         f"upgradeRamp:{float(f.get('upgradeRamp', 1.6))},"
-        f"upgradeCost:{js({**{'quick': 8, 'bright': 14, 'shove': 6, 'mend': 10}, **(f.get('upgradeCost') or {})})},"
+        f"upgradeCost:{js({**{'intent': 12, 'quick': 8, 'breath': 9, 'shove': 6, 'mend': 10}, **(f.get('upgradeCost') or {})})},"
         f"spawnMs:{int(f.get('spawnMs', 5200))},"
         f"spawnRamp:{int(f.get('spawnRamp', 140))},"
         f"spawnMin:{int(f.get('spawnMin', 1800))},"
@@ -1505,7 +1512,7 @@ def config(pack, deck=None):
         f"hitodamaCap:{int(f.get('hitodamaCap', 6))},"
         f"castMs:{int(f.get('castMs', 900))},"
         f"energyMax:{int(f.get('energyMax', 24))},energyStart:{int(f.get('energyStart', 6))},"
-        f"energyPerStroke:{int(f.get('energyPerStroke', 1))},castCost:{int(f.get('castCost', 2))},"
+        f"energyPerStroke:{int(f.get('energyPerStroke', 1))},castCost:{int(f.get('castCost', 2))},vesselStep:{int(f.get('vesselStep', 6))},"
         f"holdMs:{int(f.get('holdMs', 1500))},"
         f"tidyStrays:{'true' if f.get('tidyStrays', True) else 'false'}"
         "};</script>"

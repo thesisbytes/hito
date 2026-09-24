@@ -1680,3 +1680,22 @@ Running log. Append at the bottom, don't rewrite history.
 - On v0.1.59, played "as accurate as I can": the offset did not come back
   ("might've been operator error. At least my hiragana is looking better").
   Closed as not reproduced; the lag fix stands on its own.
+
+## 2026-09-24 — Intent: the upgrade tabs (hiragana v0.1.60, katakana-game v0.1.23, vocab v0.1.38)
+
+- **The maintainer:** "I'd like to implement our upgrade tabs. We should
+  decide on some simple things. Like raising cast power. 'Intention' maybe.
+  Following that idea that we forge and sharpen our intent to cut through
+  farangs' mindset of sticking to their old ways."
+- **技, this run, bought with 墨:** 意 intent (every light cuts one hit
+  deeper per level, max 3 — a boss at three hits falls to two casts at
+  intent 1), 早 quick (as before), 息 breath (every stroke fills 気 by one
+  more per level, max 3), 押 shove and 守 mend (as before). Bright is gone:
+  "a trace lights one more" was the weakest thing on the strip and intent
+  does its job with a point.
+- **灯, lasting, bought with 魂:** 器 vessel joins heart, lamp and inkwell —
+  the bag of 気 holds six more per level, max 3.
+- Every one of them still multiplies the hand's strokes; none writes a
+  character. Costs: intent 12, breath 9, vessel 25 — arithmetic, not play.
+- The tests: intent's hit takes two, breath's two strokes fill four, a
+  vessel grows the bag by six, the ceiling and the maxed button as before.
