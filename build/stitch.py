@@ -560,11 +560,17 @@ def main():
         # rect: the ink landed a few pixels from the finger for that stroke
         # (the maintainer: "when I fizzle out, sometimes my finger drawing
         # would be offset away from where my actual finger is drawing").
+        # Only while the shake runs: reading computed style on every pointer
+        # event forced a style recalc per sample and made a phone lag (v0.1.58).
         s.sub("position ignores the shake",
               r"function pos\(e\)\{const r=iC\.getBoundingClientRect\(\);return\{x:e\.clientX-r\.left,y:e\.clientY-r\.top,",
+              "let shaking=false; stage.addEventListener('animationend',()=>{ shaking=false; }); stage.addEventListener('animationcancel',()=>{ shaking=false; });\n"
               "function pos(e){const r=iC.getBoundingClientRect(); let sx=0,sy=0;\n"
-              "  try{ const m=getComputedStyle(stage).transform; if(m&&m!=='none'){ const v=m.match(/matrix\\(([^)]+)\\)/); if(v){ const a=v[1].split(',').map(Number); sx=a[4]||0; sy=a[5]||0; } } }catch(_){}\n"
+              "  if(shaking){ try{ const m=getComputedStyle(stage).transform; if(m&&m!=='none'){ const v=m.match(/matrix\\(([^)]+)\\)/); if(v){ const a=v[1].split(',').map(Number); sx=a[4]||0; sy=a[5]||0; } } }catch(_){} }\n"
               "  return{x:e.clientX-r.left+sx,y:e.clientY-r.top+sy,")
+        s.sub("the shake says it is running",
+              r"stage\.style\.animation='shake \.4s';",
+              "stage.style.animation='shake .4s'; shaking=true;")
         # Past the end without reaching it. The hand traced the stroke and
         # missed its end a little above or below, and used to poke the end to
         # be let on ("sometimes I'll mistrace some chars slightly, like just

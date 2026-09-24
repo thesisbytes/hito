@@ -1660,3 +1660,20 @@ Running log. Append at the bottom, don't rewrite history.
 - Nine field tests were written when the tracer followed the nearest farang
   and are rewritten for the queue; the run.sh homepage link check now
   strips a query.
+
+## 2026-09-24 — The lag (hiragana v0.1.59, katakana-game v0.1.22, vocab v0.1.37)
+
+- **The maintainer, on v0.1.58:** "Seems a bit laggy too. This round the
+  trace seems to think my finger is a couple cm away from my actual touch."
+- **The lag was v0.1.52's shake compensation:** `pos()` read the
+  sketchbook's computed transform on every pointer sample, which forces a
+  style recalculation per sample — a phone at 120 samples a second felt
+  it. It now reads it only while the shake is running (`shaking`, set by
+  `fizzle()`, cleared on `animationend`).
+- **The offset is not reproduced.** The sketchbook carries no transform at
+  rest, and a size observer already re-syncs the canvas when its box
+  changes, so a stretched canvas is not it either. An autostarted run now
+  re-sizes the field and the sketchbook right before it begins, in case
+  the layout had not settled at script time. Two questions went back to
+  the hand: is the offset there from the first stroke or only after a
+  fizzle or a zap, and is it the same direction every time.

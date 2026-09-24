@@ -1432,7 +1432,7 @@ LAYER = STYLE + r"""
   // starts at once. Without it, the start page as before (the ending's
   // "difficulty and the sign" still opens it).
   let go = null; try { go = new URLSearchParams(location.search).get('go'); } catch(_){}
-  if (go && DIFF[go] && !DIFF[go].locked){ setDifficulty(go); begin(); try { history.replaceState(null, '', location.pathname + location.hash); } catch(_){} }
+  if (go && DIFF[go] && !DIFF[go].locked){ setDifficulty(go); try { sizeField(); resize(); } catch(_){} begin(); try { history.replaceState(null, '', location.pathname + location.hash); } catch(_){} }
   else openStart();
   requestAnimationFrame(fieldLoop);
 })();
