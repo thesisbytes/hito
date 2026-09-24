@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.57.html`
+### Hiragana — `dist/hiragana-v0.1.58.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -339,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.20.html`
+### Katakana — `dist/katakana-game-v0.1.21.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -360,7 +360,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.35.html`
+### Vocab — `dist/vocab-v0.1.36.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -559,7 +559,19 @@ it does not carry its own copy of it.
 The seam is `load()`. The field wraps it so every load the *engine* initiates
 on its own — `conjure()`'s delayed advance, the clear button, a mode change —
 lands on whatever the field is asking for rather than the next character in
-the chart. If that slips, the player traces one character to kill a monster
+the chart.
+
+**As of v0.1.58 what the field asks for is its own order, not the farang's.**
+The maintainer: "I wrote tsu like four times in a row. Don't base what I trace
+on what enemies populate." A character realm asks from a queue over the open
+rows — the characters this hand keeps getting wrong first, then the ones it
+has not written for longest — and no character comes round again until
+`noRepeat` (4) others have. What is drawn hits whichever farang carries it, or
+is kept as a light. Arrivals and breaches no longer swap the character under
+the hand. A tap on a farang asks for its character. A word realm still walks
+the word its farang carries. The title page's Begin and Practice open the
+game with `?go=medium` or `?go=guided` and the run starts at once; a boss
+shows its faint shape and nothing else. If that slips, the player traces one character to kill a monster
 carrying another, so `field.test.mjs` tests the wrapper directly rather than
 the boot state, which passes either way.
 

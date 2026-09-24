@@ -185,7 +185,7 @@ F.setDifficulty('guided');
 globalThis.resize();   // the harness stubs DOMContentLoaded, so W and H are 0 until this runs
 // の: one long spiral, which bends away from its chord more than any
 // tolerance. Loaded through the lock, since every load lands on the target.
-F.target.i = P.LETTERS.findIndex(l => l[0] === 'の');
+F.ask(P.LETTERS.findIndex(l => l[0] === 'の'));
 F.retarget(true);
 {
   const R = P.R, den = P.denorm, fol = P.follow;
@@ -227,7 +227,7 @@ F.retarget(true);
     // not finished the stroke. Reported from play: "the circle is way ahead
     // of my stylus and completes the strokes before I can".
     // (a fresh の: the drag above conjured it, and follow() does not check done)
-    F.target.i = P.LETTERS.findIndex(l => l[0] === 'の');
+    F.ask(P.LETTERS.findIndex(l => l[0] === 'の'));
     F.retarget(true);
     ok(!P.done && P.LETTERS[P.idx][0] === 'の', 'could not reload の for the resting-light check');
     P.setSeg(si);
@@ -250,7 +250,7 @@ F.retarget(true);
 // covers it. So travel counts only once the pen has been near the stroke's
 // start — a stroke has a start the way it has an end.
 fresh(); F.setDifficulty('medium'); globalThis.resize();
-F.target.i = P.LETTERS.findIndex(l => l[0] === 'ふ');
+F.ask(P.LETTERS.findIndex(l => l[0] === 'ふ'));
 F.retarget(true);
 ok(P.LETTERS[P.idx][0] === 'ふ' && !P.done, 'could not load ふ');
 {
@@ -314,59 +314,66 @@ ok(/body\.field[^{]*\.only-p[^{]*\{ display:none/.test(html),
    'the practice row (Back/Clear/Next, Watch teacher) is showing in the game');
 ok(/body\.field[^{]*\.hint[^{]*\{ display:none/.test(html), 'the "Easy mode" hint is showing in the game');
 
-// ---- the field starts with something to fight, and the tracer is on it
+// ---- the tracer asks in its own order, not the farang's
+// "I wrote tsu like four times in a row. Don't base what I trace on what
+// enemies populate." The sketchbook asks from a queue over the open rows;
+// what is drawn hits whichever farang carries it, or is kept as a light.
 ok(F.monsters.length >= 1, 'no monster at boot — there is nothing to answer');
-ok(F.target, 'no target chosen');
-ok(P.idx === F.target.i,
-   `the tracer is on ${P.LETTERS[P.idx][0]} but the target carries ${P.LETTERS[F.target.i][0]}`);
-
-// ---- the redirect itself, not just the boot state
-// retarget() calls the unwrapped load directly, so idx matching the target at
-// boot proves nothing about the wrapper. What the wrapper is for is every load
-// the *engine* initiates on its own — conjure()'s delayed load(idx+1), the
-// clear button, a mode change. Those must land on what the field is asking
-// for, or the player traces one character to kill a monster carrying another.
-const away = (F.target.i + 7) % P.LETTERS.length;
-globalThis.load(away);
-ok(P.idx === F.target.i,
-   `load(${away}) landed on ${P.LETTERS[P.idx][0]}, not the target's `
-   + `${P.LETTERS[F.target.i][0]} — the field is not driving the tracer`);
-
-// ---- the target is locked, not recomputed
-// The bug this replaces: target() returned whichever monster was nearest the
-// ward at that instant, so one overtaking yours mid-glyph stole the shot. You
-// drew one character and something carrying another died for it.
+ok(F.roster().includes(P.idx), `the tracer is on ${P.LETTERS[P.idx][0]}, which is not on the field's rows`);
+{
+  // a load the engine starts on its own lands on what the field asks for
+  fresh();
+  const want = P.idx, away = (P.idx + 7) % P.LETTERS.length;
+  globalThis.load(away);
+  ok(P.idx === want, `load(${away}) landed on ${P.LETTERS[P.idx][0]}, not what the field asked for — the field is not driving the tracer`);
+}
+{
+  // no character comes round again until noRepeat others have
+  fresh(); const seen = [];
+  for (let k = 0; k <= cfg.noRepeat; k++){ seen.push(P.LETTERS[P.idx][0]); globalThis.conjure(); advance(cfg.advanceMs + 60); }
+  ok(new Set(seen).size === seen.length, `a character came round again within ${cfg.noRepeat + 1} traces: ${seen.join(' ')}`);
+}
+{
+  // arrivals do not swap the character under the hand
+  fresh(); const before = P.idx;
+  for (let k = 0; k < 5; k++) F.spawn();
+  advance(300);
+  ok(P.idx === before, 'a farang arriving changed what the tracer asked for');
+}
+{
+  // a finished character hits whichever farang carries it, nearest first
+  fresh(); F.spawn(); F.spawn();
+  const carrier = F.monsters[0]; F.ask(carrier.i); F.retarget(true);
+  ok(P.idx === carrier.i, 'ask() did not point the tracer at the character');
+  for (const m of F.monsters) if (m !== carrier) m.d = 0.2;
+  carrier.d = 0.9;
+  globalThis.conjure();
+  ok(F.shots.length === 1 && P.LETTERS[F.shots[0].to.i][0] === P.LETTERS[carrier.i][0], 'the shot went to a farang carrying another character');
+  // and one nothing carries hits nothing, and is kept as a light
+  fresh(); advance(cfg.advanceMs + 60);
+  const none = F.roster().find(i => !F.monsters.some(m => m.i === i));
+  if (none != null){
+    F.ask(none); F.retarget(true);
+    const n0 = F.shots.length; globalThis.conjure();
+    ok(F.shots.length === n0, 'a character no farang carries hit something');
+    ok(F.charge(P.LETTERS[none][0]) >= 1, 'a character no farang carries was not kept as a light');
+  }
+}
+// ---- tapping a farang asks for its character
 fresh();
 F.spawn(); F.spawn();
-const mine = F.target;
-ok(mine, 'no target to lock');
-// shove every other monster past it — under the old code this would retarget
-for (const m of F.monsters) if (m !== mine) m.d = 0.2;
-mine.d = 0.9;
-advance(300);
-ok(F.target === mine,
-   'the target changed while it was being answered — a closer monster stole it');
-ok(P.idx === mine.i, 'the tracer followed the thief instead of the locked target');
-globalThis.conjure();
-// By character, not identity: a finished glyph hits whichever monster carries
-// it, nearest first, and the spawn is random enough that one of the shoved
-// monsters carries the same character every twenty runs or so.
-ok(F.shots.length === 1 && P.LETTERS[F.shots[0].to.i][0] === P.LETTERS[mine.i][0],
-   'the shot went to a monster other than the one whose glyph was traced');
-
-// ---- tapping picks a different one
-fresh();
-F.spawn(); F.spawn();
-const other = F.monsters.find(m => m !== F.target);
-if (other){
-  const p = F.posOf(other);
-  ok(F.pick(p.x, p.y - 14), 'tapping a monster did not select it');
-  ok(F.target === other, 'tap did not move the lock');
-  ok(P.idx === other.i, 'tap did not point the tracer at the tapped monster');
+{
+  const other = F.monsters.find(m => m.i !== P.idx);
+  if (other){
+    const p = F.posOf(other);
+    ok(F.pick(p.x, p.y - 14), 'tapping a monster did not select it');
+    ok(P.idx === other.i, 'tap did not point the tracer at the tapped monster');
+  }
 }
 
 // ---- the next glyph arrives promptly, not after the celebration
 fresh();
+F.ask(F.monsters[0].i); F.retarget(true);   // ask for a character a farang carries, so the shot has somewhere to go
 const before2 = F.killed;
 globalThis.conjure();
 F.quench();   // the conjure kindled the glyph; a twin would draw a second kill
@@ -374,9 +381,7 @@ F.quench();   // the conjure kindled the glyph; a twin would draw a second kill
 advance(420);
 ok(F.killed === before2 + 1, 'the shot had not landed by 420ms');
 advance(cfg.advanceMs + 120);
-ok(F.target && P.idx === F.target.i,
-   `after ${cfg.advanceMs}ms the tracer is on ${P.LETTERS[P.idx][0]} `
-   + `but the target carries ${F.target ? P.LETTERS[F.target.i][0] : '-'}`);
+ok(F.roster().includes(P.idx) && !P.done, `after ${cfg.advanceMs}ms the tracer has not moved on (on ${P.LETTERS[P.idx][0]}, done ${P.done})`);
 ok(cfg.advanceMs < 1900,
    `advance delay is ${cfg.advanceMs}ms — the engine's 1.9s celebration is dead time under a clock`);
 
@@ -388,20 +393,20 @@ ok(cfg.advanceMs < 1900,
 fresh();
 {
   F.spawn();
-  const twin = F.monsters.find(m => m !== F.target);
+  const first = F.monsters[0], twin = F.monsters.find(m => m !== first);
   if (twin){
-    twin.i = F.target.i;
+    twin.i = first.i; F.ask(first.i); F.retarget(true);
     // restart() leaves spawnAt at 0, so the first frame adds a third monster;
     // let it arrive, then send it away so only the twin can be next.
     advance(50);
-    for (const m of [...F.monsters]) if (m !== F.target && m !== twin) F.monsters.splice(F.monsters.indexOf(m), 1);
+    for (const m of [...F.monsters]) if (m !== first && m !== twin) F.monsters.splice(F.monsters.indexOf(m), 1);
     globalThis.conjure();
     // The conjure kindles the character, and a wisp would take the twin, empty
     // the field, and let the refill clear `done` for the wrong reason.
     F.quench();
     advance(cfg.advanceMs + 120);
-    ok(!P.done, 'after a conjure the next target carried the same glyph and the tracer stayed in its celebration');
-    ok(F.target && P.idx === F.target.i, 'the tracer is not on the twin');
+    ok(!P.done, 'after a conjure the tracer stayed in its celebration');
+    ok(F.roster().includes(P.idx), 'the tracer is not on a character from the open rows');
   }
 }
 
@@ -416,6 +421,7 @@ ok(/prog=0; offCount=0; smudge=0; outCount=0; trailProg=-1;/.test(html),
 fresh();
 F.spawn(); F.spawn(); F.spawn();
 {
+  F.ask(F.monsters[1].i); F.retarget(true);   // ask for a character on the field
   const drew = P.LETTERS[P.idx][0];
   const carriers = F.monsters.filter(m => P.LETTERS[m.i][0] === drew);
   globalThis.conjure();
@@ -456,7 +462,7 @@ F.spawn();
   advance(400);
   ok(P.idx === held, 'the glyph changed within holdMs of the pen touching the pad');
   advance(cfg.holdMs + 400);
-  if (F.target) ok(P.idx === F.target.i, 'the deferred retarget never applied once the hand was gone');
+  ok(P.idx === held, 'a breach moved the tracer off what it was asking for: the queue, not the farang, decides');
 }
 
 // ---- a stroke that never found the path is erased on pen-up
@@ -514,14 +520,13 @@ fresh();
   ok(F.monsters.length >= 1,
      'an empty field did not refill within 2.5s — a dead screen, not a rest');
   ok(!P.done, 'still celebrating after 2.5s — the tracer is frozen');
-  ok(F.target && P.idx === F.target.i,
-     `tracer stuck on ${P.LETTERS[P.idx][0]} while the target carries `
-     + `${F.target ? P.LETTERS[F.target.i][0] : '-'}`);
+  ok(F.roster().includes(P.idx), `tracer stuck on ${P.LETTERS[P.idx][0]}, which is not on the field's rows`);
 }
 
 // ---- the reading is shown when a monster falls
 fresh();
 {
+  F.ask(F.monsters[0].i); F.retarget(true);   // a character a farang carries, so there is a kill
   const before = F.readings.length;
   globalThis.conjure();
   advance(500);
@@ -661,8 +666,9 @@ ok(F.monsters.length > n1 || F.ward < 5, `nothing spawned over 20s (still ${n1})
 
 // ---- a finished glyph reaches the monster and removes it
 fresh();
-const victim = F.target, before = F.killed;
-ok(victim, 'no target after restart');
+const victim = F.monsters[0], before = F.killed;
+ok(victim, 'no farang after restart');
+F.ask(victim.i); F.retarget(true);   // ask for what it carries
 globalThis.conjure();
 // The conjure also kindles the character, and every forty runs or so a second
 // monster carries it and a wisp would make this two banishments, not one.
@@ -673,9 +679,8 @@ advance(1200);
 ok(F.killed === before + 1, `killed went ${before} -> ${F.killed}, expected one banishment`);
 ok(!F.monsters.includes(victim), 'the monster survived a completed glyph');
 
-// ---- and the tracer moves to whatever is next
-if (F.target) ok(P.idx === F.target.i,
-  'after a kill the tracer is still on the dead monster\'s glyph');
+// ---- and the tracer moves to whatever is next in its own queue
+ok(F.roster().includes(P.idx) && P.idx !== victim.i, 'after a kill the tracer is still on the dead monster\'s glyph');
 
 // ---- a monster that arrives costs the ward
 fresh();
@@ -792,6 +797,7 @@ ok(!F.over && F.ward > 0 && F.monsters.length >= 1, 'restart did not begin a new
   // parked near the ward and still, so it stays the nearest target while the
   // wait spawns others (one carrying the same character, nearer, took the light)
   boss.hp = 3; boss.d = 0.3; boss.speed = 0;
+  F.ask(boss.i); F.retarget(true);            // ask for what it carries
   globalThis.conjure();                       // hit one, and the character is lit
   advance(cfg.castMs * 4 + 2000);
   ok(!F.monsters.includes(boss), `a clean trace and its two lights did not finish a 3-hit farang (hp ${boss.hp})`);

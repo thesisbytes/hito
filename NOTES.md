@@ -1628,3 +1628,35 @@ Running log. Append at the bottom, don't rewrite history.
   and both still open from a double-click.
 - 100 waves is the maintainer's number and a first one: the furthest wave
   in the table today is 33.
+
+## 2026-09-24 — What the tracer asks for is its own (hiragana v0.1.58, katakana-game v0.1.21, vocab v0.1.36)
+
+- **The maintainer, four things:** Chrome shrank the title page after sign-in
+  — "so let's have the game begin from the title page. The practice button
+  can exist on title." "Boss mode still has a guide circle." "Too much repeat
+  on the hiragana words. I wrote tsu like four times in a row. Don't base
+  what I trace on what enemies populate."
+- **The queue.** The sketchbook asked for whatever the nearest farang
+  carried, and with spawns biased toward shaky characters that meant the
+  same one four times running. Now a character realm asks from its own
+  queue over the open rows — shaky first, then least recently written by
+  the ledger's `last`, random within ties — and nothing comes round again
+  until `noRepeat` (4) others have. What is drawn hits whichever farang
+  carries it (`bearer()`), nearest first, or hits nothing and is kept as a
+  light; the fallback that sent a shot at the locked farang whatever was
+  drawn is gone. Arrivals and breaches no longer swap the character under
+  the hand, which closes a whole class of "the glyph changed under my pen"
+  bugs the tests used to guard one at a time. A tap on a farang asks for
+  its character (`ask()`), and the tests aim the tracer the same way. Word
+  realms are untouched: a word is walked in order.
+- **Begin from the title.** `?go=medium` and `?go=guided` start the run at
+  once; the title page's Begin and its new Practice button carry them, and
+  the URL is cleaned after. The game's own start page still exists behind
+  the ending's "difficulty and the sign". The sign-in shrink in Chrome was
+  the address bar returning after the redirect; the title page is the only
+  page that signs in now, and a game is a fresh navigation.
+- **The boss shows its faint shape and nothing else.** The start dot was
+  kept as a hint in v0.1.51; it read as a guide circle. Gone.
+- Nine field tests were written when the tracer followed the nearest farang
+  and are rewritten for the queue; the run.sh homepage link check now
+  strips a query.

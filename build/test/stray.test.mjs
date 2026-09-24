@@ -26,7 +26,7 @@ function rig(file, opts){
   // on a fonts promise nobody awaits, and retargeting to the glyph the engine
   // already names is a no-op on an engine that has loaded nothing)
   const want = P.LETTERS.findIndex(l => l[0] === 'あ');
-  if (g.__field) g.__field.target.i = want;
+  if (g.__field) g.__field.ask(want);
   g.load(want);
   if (P.SEGS.length < 2) throw new Error(`${file}: could not load a multi-stroke glyph (got ${P.LETTERS[P.idx][0]})`);
   const px = i => P.denorm(P.PATH[i]);
@@ -101,7 +101,7 @@ for (const file of process.argv.slice(2)){
   if (rig(file).g.__field) {
     const { P, g, along, px, fire, tick } = rig(file);
     g.__field.setDifficulty('guided'); g.resize();
-    g.__field.target.i = P.LETTERS.findIndex(l => l[0] === 'あ'); g.load(g.__field.target.i);
+    { const i = P.LETTERS.findIndex(l => l[0] === 'あ'); g.__field.ask(i); g.load(i); }
     ok(P.DRAG === true, 'guided did not switch the engine to dragging');
     const [a, b] = P.SEGS[0], sp = P.SEGLEN[0] / (b - a), R = P.R;
     const short = b - Math.round(0.6 * R / sp);          // the light 0.6R from the end: the finger covers it
@@ -111,7 +111,7 @@ for (const file of process.argv.slice(2)){
       ok(P.awaitLift === false, 'a finger 1.6 reaches short of the end closed the stroke');
       const { P: Q, g: h, along: go } = rig(file);
       h.__field.setDifficulty('guided'); h.resize();
-      h.__field.target.i = Q.LETTERS.findIndex(l => l[0] === 'あ'); h.load(h.__field.target.i);
+      { const i = Q.LETTERS.findIndex(l => l[0] === 'あ'); h.__field.ask(i); h.load(i); }
       go(a, short);
       ok(Q.awaitLift === true, `a finger covering the end (0.6R short) did not close the stroke (prog ${Q.prog} of ${b})`);
     }
@@ -124,7 +124,7 @@ for (const file of process.argv.slice(2)){
   if (rig(file).g.__field) {
     const { P, g, along } = rig(file);
     g.__field.setDifficulty('medium'); g.resize();
-    g.__field.target.i = P.LETTERS.findIndex(l => l[0] === 'あ'); g.load(g.__field.target.i);
+    { const i = P.LETTERS.findIndex(l => l[0] === 'あ'); g.__field.ask(i); g.load(i); }
     for (const [x, y] of P.SEGS) along(x, y);
     ok(P.done === true, 'tracing every stroke did not conjure あ');
     g.__field.restart();
@@ -140,7 +140,7 @@ for (const file of process.argv.slice(2)){
     const { P, g, fire, tick, px } = rig(file);
     const want = P.LETTERS.findIndex(l => l[0] === 'め');
     if (want >= 0){
-      if (g.__field) g.__field.target.i = want;
+      if (g.__field) g.__field.ask(want);
       g.load(want);
       // the loop: the first stroke that crosses itself, and where
       const cross = (a, b, c, d) => { const x = (o, p, q) => (p.x-o.x)*(q.y-o.y) - (p.y-o.y)*(q.x-o.x); return x(a,b,c)*x(a,b,d) < 0 && x(c,d,a)*x(c,d,b) < 0; };
@@ -187,8 +187,8 @@ for (const file of process.argv.slice(2)){
     const boss = F.monsters[F.monsters.length - 1];
     ok(boss.boss === true && F.monsters.slice(0, -1).every(m => !m.boss), 'the tenth farang is not the boss, or another is');
     ok(boss.hp >= 3, `the boss takes ${boss.hp} hits`);
-    F.monsters.splice(0, F.monsters.length - 1);   // leave only the boss, and aim at it
-    F.retarget(true);
+    F.monsters.splice(0, F.monsters.length - 1);   // leave only the boss, and ask for its character
+    F.ask(boss.i); F.retarget(true);
     ok(P.LETTERS[P.idx][0] === P.LETTERS[boss.i][0], 'the tracer is not on the boss');
     ok(P.SHADOW_MODE === 'faint', `the boss shows its full shape or none (${P.SHADOW_MODE})`);
     boss.hp = 1; F.hit(boss, false, false);

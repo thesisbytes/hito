@@ -554,7 +554,30 @@ LAYER = STYLE + r"""
     locked = nearest();
     return locked;
   }
-  function targetIdx(){ const t = target(); return t ? t.i : null; }
+  // ---- what the tracer asks for. Its own order, not the farang's.
+  // "Too much repeat on the hiragana words. I wrote tsu like four times in a
+  // row. Don't base what I trace on what enemies populate." A word realm still
+  // walks the word its farang carries; a character realm asks from a queue
+  // over the open rows — the characters this hand keeps getting wrong first,
+  // then the ones it has not written for longest — and no character comes
+  // round again until `noRepeat` others have. What is drawn still hits
+  // whichever farang carries it; what nothing carries is kept as a light.
+  // A tap on a farang (or a test's ask()) puts its character at the head.
+  let asked = null, queue = [], recent = [];
+  function nextAsk(){
+    if (asked !== null) return asked;
+    if (!queue.length){
+      const pool = roster().filter(i => !recent.includes(i));
+      const H = window.__hand;
+      const last = i => { try { const e = H && H.ledger && H.ledger.g && H.ledger.g[LETTERS[i][0]]; return (e && +e.last) || 0; } catch(_){ return 0; } };
+      queue = (pool.length ? pool : roster()).map(i => ({ i, k: [shaky(LETTERS[i][0]) ? 0 : 1, last(i), Math.random()] }))
+        .sort((a, b) => a.k[0] - b.k[0] || a.k[1] - b.k[1] || a.k[2] - b.k[2]).map(o => o.i);
+    }
+    return queue[0];
+  }
+  function askDone(i){ if (asked === i) asked = null; if (queue[0] === i) queue.shift(); recent = [i, ...recent.filter(x => x !== i)].slice(0, CFG.noRepeat); }
+  function ask(i){ asked = i; }
+  function targetIdx(){ if (!WORDS) return nextAsk(); const t = target(); return t ? t.i : null; }
 
   // Tapping a monster is how you choose what to answer. This is the
   // identification mechanic arriving early: with the guide up the tracer still
@@ -566,7 +589,7 @@ LAYER = STYLE + r"""
       if (d < bd){ bd = d; best = m; }
     }
     if (best && best !== locked){
-      locked = best;
+      locked = best; ask(best.i);
       pendingRetarget = false;
       loading = true; try { _load(best.i); } finally { loading = false; }
       return true;
@@ -704,7 +727,8 @@ LAYER = STYLE + r"""
     fill(Math.max(0, Math.max(1, strokes.length) - credited) * CFG.energyPerStroke); credited = 0;
     // A word is only ever advanced by its own next kana, so there is no
     // falling back to the locked monster: a stray character hits nothing.
-    const t = bearer(drew) || (!WORDS && monsters.includes(locked) ? locked : null);
+    const t = bearer(drew);   // a character hits whichever farang carries it, or nothing
+    if (!WORDS) askDone(idx);
     let whole = true;   // did this finish what the monster carries
     if (t && t.w){
       // one kana of the word is written; the farang now waits for the next
@@ -1082,7 +1106,7 @@ LAYER = STYLE + r"""
     zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
                   // and a run that restarts on the same character does not load one
     sumi = own('inkwell') * CFG.inkwellStep; energy = CFG.energyStart; credited = 0;
-    ward = wardMax(); over = false; wave = 0; killed = 0; locked = null;
+    ward = wardMax(); over = false; wave = 0; killed = 0; locked = null; asked = null; queue = []; recent = [];
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; spawn(); retarget();
     // The last banish of a stage leaves the engine celebrating: the whole path
     // lit, `done` set. If the first target of the new run is the character
@@ -1349,7 +1373,7 @@ LAYER = STYLE + r"""
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
-    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN,
+    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; },
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
@@ -1402,7 +1426,14 @@ LAYER = STYLE + r"""
   // what lasts is in force from the first run, not the second
   ward = wardMax(); sumi = own('inkwell') * CFG.inkwellStep;
   spawn(); retarget();
-  openStart();
+  // The title page is the game's start page now ("let's have the game begin
+  // from the title page. The practice button can exist on title"): its Begin
+  // and Practice open this file with ?go=medium or ?go=guided, and the run
+  // starts at once. Without it, the start page as before (the ending's
+  // "difficulty and the sign" still opens it).
+  let go = null; try { go = new URLSearchParams(location.search).get('go'); } catch(_){}
+  if (go && DIFF[go] && !DIFF[go].locked){ setDifficulty(go); begin(); try { history.replaceState(null, '', location.pathname + location.hash); } catch(_){} }
+  else openStart();
   requestAnimationFrame(fieldLoop);
 })();
 </script>
@@ -1454,6 +1485,7 @@ def config(pack, deck=None):
         f"lanternCost:{js({**{'heart': 20, 'lamp': 30, 'inkwell': 15}, **(f.get('lanternCost') or {})})},"
         f"hpEvery:{int(f.get('hpEvery', 10))},"
         f"biteRate:{float(f.get('biteRate', 0.5))},"
+        f"noRepeat:{int(f.get('noRepeat', 4))},"
         f"hpMax:{int(f.get('hpMax', 5))},"
         f"inkTrace:{int(f.get('inkTrace', 2))},"
         f"inkClean:{int(f.get('inkClean', 2))},"

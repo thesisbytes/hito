@@ -791,7 +791,7 @@ def main():
               "    if(COMET_ON){ const n=_a+Math.max(2,Math.floor(ph*(end-_a)));"
               " paintPath(fx,Math.max(_a,n-16),n,{alpha:.9,blur:18,scale:.8}); } // comet\n"
               "  }\n"
-              "  if(GUIDE_ON||SHADOW_MODE==='faint'){   // the start dot: guided, and a boss's one hint\n"
+              "  if(GUIDE_ON){   // the start dot is guided's (a boss had it in v0.1.51-57: 'still has a guide circle')\n"
               "    const s0=denorm(PATH[(awaitLift&&segIdx<SEGS.length-1)"
               "?SEGS[segIdx+1][0]:prog]), pulse=.5+.5*Math.sin(now/260);\n"
               "    fx.save(); fx.fillStyle=`rgba(255,241,184,${.5+.4*pulse})`;"

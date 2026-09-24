@@ -157,7 +157,7 @@ echo "── homepage (every local link on index.html resolves) ──"
 # The Pages root is index.html, and it links to the stable names above. A
 # link to a file that is not there is a 404 on the one page a visitor is
 # handed, so it is a failure here rather than a surprise on a phone.
-for href in $(grep -o 'href="[^"]*"' index.html | sed 's/href="//;s/"$//' | grep -v '^[a-z]*:'); do
+for href in $(grep -o 'href="[^"]*"' index.html | sed 's/href="//;s/"$//;s/?.*//' | grep -v '^[a-z]*:' | sort -u); do
   if [ -f "$href" ]; then
     echo "  $href"
   else

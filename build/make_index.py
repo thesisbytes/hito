@@ -93,6 +93,9 @@ PAGE = r"""<!doctype html>
           text-transform:uppercase; box-shadow:0 0 0 1px rgba(255,241,184,.4),0 10px 34px rgba(233,196,106,.22);
           animation:breathe 2.8s 3s ease-in-out infinite; }
   .begin small{ display:block; margin-top:7px; font:500 11px/1 inherit; letter-spacing:.08em; text-transform:none; opacity:.72; }
+  .practice{ display:block; margin-top:8px; padding:10px; border-radius:12px; text-decoration:none; text-align:center; font:600 13px ui-sans-serif,system-ui;
+             color:rgba(232,224,204,.8); background:var(--lacquer-2); border:1px solid #3d3324; }
+  .practice small{ display:block; margin-top:3px; font-size:10.5px; font-weight:400; color:rgba(232,224,204,.5); }
   @keyframes breathe{ 50%{ box-shadow:0 0 0 1px rgba(255,241,184,.6),0 10px 44px rgba(233,196,106,.42); } }
 
   .realms{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:12px; }
@@ -140,7 +143,8 @@ PAGE = r"""<!doctype html>
   <p class="tag">learn to write by writing · draw below, the farang come from above</p>
 
   <div class="menu">
-    <a class="begin" id="begin" href="dist/hiragana-game.html">begin<small id="beginSub">ひらがな</small></a>
+    <a class="begin" id="begin" href="dist/hiragana-game.html?go=medium">begin<small id="beginSub">ひらがな</small></a>
+    <a class="practice" id="practice" href="dist/hiragana-game.html?go=guided">practice<small>guided · every row · nothing counts</small></a>
     <div class="realms" id="realms" role="group" aria-label="level"></div>
     <p class="blurb" id="blurb"></p>
     <div class="tally" id="tally"></div>
@@ -182,7 +186,8 @@ PAGE = r"""<!doctype html>
   }
   function draw(){
     const l = LEVELS[level];
-    $('begin').href = l.file; $('beginSub').textContent = l.name;
+    $('begin').href = l.file + '?go=medium'; $('beginSub').textContent = l.name;
+    $('practice').href = l.file + '?go=guided';
     $('blurb').textContent = l.blurb;
     $('realms').innerHTML = LEVELS.map((r, k) => {
       const on = open(k), w = furthest(r.realm);
