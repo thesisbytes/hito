@@ -310,7 +310,10 @@ def main():
               # gate in follow().
               f"let HEADING_GATE={'true' if pack.get('headingGate', True) else 'false'},mvx=0,mvy=0,moving=false;"
               # how far beyond a stroke's end, in end tolerances, is "past it"
-              f"let PAST_END={pack.get('pastEnd', 1.5)};")
+              f"let PAST_END={pack.get('pastEnd', 1.5)};"
+              # A stroke shorter than this fraction of the canvas is a flick for
+              # this hand (0: no stroke is). The hand layer sets it per profile.
+              "let HAND_FLICK=0;")
 
         s.sub("build segments",
               r"if\(rec\)\{ rec\.forEach\(st=>\{ const R=resample\(st,"
@@ -382,7 +385,8 @@ def main():
               "  // stroke glyphs have no lift barrier, so without this they let\n"
               "  // a dense scribble through on coverage alone.\n"
               "  if(down){ lastN=null; mvx=0; mvy=0; moving=false; }\n"
-              "  if(!segStarted&&Math.hypot(n.x-PATH[seg[0]].x,n.y-PATH[seg[0]].y)<startTol(segIdx)) segStarted=true;\n"
+              "  // a flick's start is judged as loosely as its end (see _flickOk below)\n"
+              "  if(!segStarted&&Math.hypot(n.x-PATH[seg[0]].x,n.y-PATH[seg[0]].y)<startTol(segIdx)*(HAND_FLICK>0&&SEGLEN[segIdx]<HAND_FLICK?1.25:1)) segStarted=true;\n"
               "  if(!lastN){ lastN={x:n.x,y:n.y}; }\n"
               "  else { const step=Math.hypot(n.x-lastN.x,n.y-lastN.y);\n"
               "    // Sub-threshold movement is digitizer noise, not travel.\n"
@@ -494,9 +498,20 @@ def main():
               "    // along the stroke, the finger within R of it. Covering the end\n"
               "    // closes the stroke, which is what the hand thought it was doing.\n"
               "    const _end=Math.hypot(n.x-PATH[seg[1]].x,n.y-PATH[seg[1]].y);\n"
+              "    // A flick. 点々 are two strokes a sixth of the glyph long — 20-40px\n"
+              "    // on a phone, under a fingertip that covers 50 — and a finger\n"
+              "    // cannot see whether it drew 60% or 100% of one. Voiced kana\n"
+              "    // fizzled 33% by finger against 13% for the rest, with the ticks\n"
+              "    // drawn as short dashes a reader would pass. For a stroke shorter\n"
+              "    // than HAND_FLICK (the finger's profile; a pen has none) the test\n"
+              "    // is a flick's: began at its start, moved its way (a third of its\n"
+              "    // length, in its direction), and ended near its end.\n"
+              "    const _flick=HAND_FLICK>0&&SEGLEN[segIdx]<HAND_FLICK;\n"
+              "    const _flickOk=_flick&&segStarted&&segTravel>=0.3*SEGLEN[segIdx]\n"
+              "      &&((PATH[seg[1]].x-PATH[seg[0]].x)*mvx+(PATH[seg[1]].y-PATH[seg[0]].y)*mvy)>0&&_end<endTol(segIdx)*1.25;\n"
               "    if(DRAG_FOLLOW ? ((seg[1]-prog)*(SEGLEN[segIdx]/Math.max(1,seg[1]-seg[0]))<R && _end<R)\n"
-              "                   : (prog>=seg[1]-SEGSLACK[segIdx] && _end<endTol(segIdx))){"
-              " prog=seg[1];\n"
+              "                   : (_flickOk || (prog>=seg[1]-SEGSLACK[segIdx] && _end<endTol(segIdx)))){"
+              " prog=seg[1]; if(_flick) for(let i=seg[0];i<=seg[1];i++) hit[i]=1;\n"
               "      if(segIdx>=SEGS.length-1){\n"
               "        const cov=covered(), eff=PATHLEN?travel/PATHLEN:1;\n"
               "        if(cov>=COVER_MIN&&eff<=MAX_TRAVEL){"
@@ -606,7 +621,10 @@ def main():
               "  const d=down_; down_=null;\n"
               "  if(STRAY_MODE==='keep') return;   // the old rule: every stroke stays\n"
               "  if(awaitLift||segIdx!==d.seg||hiMark-d.prog>STRAY_SKID) return;   // it went somewhere\n"
-              "  if(STRAY_MODE==='restart'){ fizzleWhy='that stroke went nowhere ✦ the character starts again'; fizzle(); return; }\n"
+              "  // A flick that went nowhere is dropped, never a restart: the tick is\n"
+              "  // where the finger cannot see, and a clean た should not be wiped\n"
+              "  // for one short dash on its 点々.\n"
+              "  if(STRAY_MODE==='restart'&&!(HAND_FLICK>0&&SEGLEN[d.seg]<HAND_FLICK)){ fizzleWhy='that stroke went nowhere ✦ the character starts again'; fizzle(); return; }\n"
               "  strokes.pop(); redrawInk();\n"
               "  prog=d.prog; travel=d.travel; segTravel=d.segTravel; segStarted=d.started; smudge=d.smudge; offCount=0; lastN=null;\n"
               "  if(hit&&d.hit) hit.set(d.hit);\n"

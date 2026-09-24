@@ -83,6 +83,10 @@ echo "── stray (a stroke that went nowhere never happened) ──"
 node build/test/stray.test.mjs "dist/hiragana-v$ver.html" "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
 
 echo
+echo "── flick (a stroke shorter than a fingertip) ───────"
+node build/test/flick.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── field (the game loop runs and the seam holds) ───"
 node build/test/field.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
 

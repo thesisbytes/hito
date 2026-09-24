@@ -83,7 +83,7 @@ LAYER = r"""
    Pen or finger, what was drawn, and how it has been going. Writes down what
    the tracer decided; decides nothing itself.                              */
 (function(){
-  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0,endFloor:0.02}, finger:{size:[0.62,0.62],ease:1.3,trail:2.2,halo:36,endFloor:0.045}, qualitySpan:0.09};
+  const CFG = window.__HAND_CFG || {maxPoints:64, keep:60, minStep:4, pen:{size:null,ease:1,trail:1,halo:0,endFloor:0.02,flick:0}, finger:{size:[0.62,0.62],ease:1.3,trail:2.2,halo:36,endFloor:0.045,flick:0.12}, qualitySpan:0.09};
   const K_INPUT = 'hito-input', K_LEDGER = 'hito-ledger', K_HANDS = 'hito-hands';
   const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch(_){ return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(_){ return false; } };
@@ -137,6 +137,8 @@ LAYER = r"""
     // where a stroke's end (and start) is judged to be reached: a fingertip
     // cannot land inside a pen's floor
     try { if (typeof HAND_END !== 'undefined') HAND_END = p.endFloor; } catch(_){}
+    // a stroke shorter than this is a flick for this hand: 点々, ふ's ticks
+    try { if (typeof HAND_FLICK !== 'undefined') HAND_FLICK = p.flick || 0; } catch(_){}
     try { const c = document.body.classList; c[on ? 'add' : 'remove']('hand-finger'); c[on ? 'remove' : 'add']('hand-pen'); c[on ? 'add' : 'remove']('roomy'); } catch(_){}
     return on;
   }
@@ -644,8 +646,8 @@ LAYER = r"""
 """
 
 
-PEN = {"size": None, "stage": "34dvh", "ease": 1.0, "trail": 1.0, "halo": 0, "endFloor": 0.02}
-FINGER = {"size": [0.62, 0.62], "stage": "46dvh", "ease": 1.3, "trail": 2.2, "halo": 36, "endFloor": 0.045}
+PEN = {"size": None, "stage": "34dvh", "ease": 1.0, "trail": 1.0, "halo": 0, "endFloor": 0.02, "flick": 0}
+FINGER = {"size": [0.62, 0.62], "stage": "46dvh", "ease": 1.3, "trail": 2.2, "halo": 36, "endFloor": 0.045, "flick": 0.12}
 
 
 def profiles(pack):
@@ -666,7 +668,9 @@ def profiles(pack):
             raise SystemExit(f"hand.{name}.ease must be 1..2, not {p['ease']!r}: past 2 it is no longer tracing")
         if not (0.01 <= float(p["endFloor"]) <= 0.08):
             raise SystemExit(f"hand.{name}.endFloor must be 0.01..0.08 of the canvas, not {p['endFloor']!r}")
-        p.update(ease=float(p["ease"]), trail=float(p["trail"]), halo=int(p["halo"]), endFloor=float(p["endFloor"]))
+        if not (0 <= float(p.get("flick", 0)) <= 0.3):
+            raise SystemExit(f"hand.{name}.flick must be 0..0.3 of the canvas, not {p.get('flick')!r}")
+        p.update(ease=float(p["ease"]), trail=float(p["trail"]), halo=int(p["halo"]), endFloor=float(p["endFloor"]), flick=float(p.get("flick", 0)))
         out[name] = p
     return out
 
@@ -682,7 +686,7 @@ def config(pack):
     import json
     h = pack.get("hand") or {}
     pr = profiles(pack)
-    js = lambda p: json.dumps({k: p[k] for k in ("size", "ease", "trail", "halo", "endFloor")}, separators=(",", ":"))
+    js = lambda p: json.dumps({k: p[k] for k in ("size", "ease", "trail", "halo", "endFloor", "flick")}, separators=(",", ":"))
     return (
         "<script>window.__HAND_CFG={"
         f"maxPoints:{int(h.get('maxPoints', 64))},"

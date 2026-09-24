@@ -1984,3 +1984,33 @@ Running log. Append at the bottom, don't rewrite history.
 - For the report: this is the model being wrong in the useful direction —
   it could not see the upgrades, the runs could, and the fix is to let the
   measurement correct the model rather than to model everything.
+
+## 2026-09-24 — 点々: a stroke shorter than a fingertip is a flick (hiragana v0.1.69, katakana-game v0.1.32, vocab v0.1.40)
+
+- The maintainer: "The ten ten are pretty hard to get right."
+- **What the table said.** Voiced kana by finger on medium: 61 traces, 33%
+  fizzled, against 13% for plain kana by the same hand. The dakuten strokes
+  are 0.14-0.16 of their glyph's span (ふ's ticks are 0.36); at the
+  finger's size on a phone that is 20-40px under a fingertip covering 50.
+  The gallery of だ shows the fizzles with the body drawn well and the ticks
+  drawn as short dashes.
+- **What the engine said.** Synthetic finger ticks on だ, fed through the
+  seam: exact lands; 60% of the length RESTARTS the character; 14px off
+  RESTARTS; a dab RESTARTS; backwards RESTARTS; 150% lands. A tick that
+  fell short of the travel cap was "a stroke that went nowhere", and in
+  medium that rule wipes the character. So a clean た and one short dash
+  cost the whole thing, six strokes in.
+- **The rule.** `HAND_FLICK`, per hand profile (`flick`: finger 0.12 of the
+  canvas, pen 0). A stroke shorter than it is judged as a flick: `segStarted`
+  (within 1.25× the start tolerance), travel of at least a third of its
+  length, the smoothed motion agreeing with the stroke's own direction, and
+  the pen within 1.25× the end tolerance of the end. Its coverage is
+  granted whole. A flick that went nowhere is dropped in every stray mode;
+  the character does not restart for it. The pen is unchanged: it can see.
+- `flick.test.mjs` (in run.sh): by finger, 60% and 14px-off land, a dab and
+  a backwards tick are dropped without a restart, the real tick then lands;
+  by pen the 60% tick is still a stroke that went nowhere. The tail guard
+  is unaffected: the workshop build carries no flick.
+- Not tried on the phone. If the voiced fizzle rate does not come down in
+  the next pull, the next suspects are the heading gate on a 20px stroke
+  and the second tick starting inside the first's end tolerance.

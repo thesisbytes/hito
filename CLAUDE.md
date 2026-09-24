@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.68.html`
+### Hiragana — `dist/hiragana-v0.1.69.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -205,6 +205,17 @@ What the tracing enforces, all of it learned by finding it broken:
   ふ's hook the maintainer had to poke the end to be let on. A stroke
   shorter than a fingertip is a flick for a finger, and the tail guard's
   80% rule is not modelled for it.
+- **A stroke shorter than a fingertip is a flick (v0.1.69).** The
+  maintainer: "the ten ten are pretty hard to get right." 点々 are two
+  strokes a sixth of the glyph long, 20-40px on a phone under a fingertip
+  that covers 50, and voiced kana fizzled 33% by finger against 13% for
+  the rest — with the ticks drawn as short dashes a reader would pass, and
+  a tick that fell short restarting the whole character. For the finger's
+  profile (`hand.finger.flick`, 0.12 of the canvas; the pen has none) such
+  a stroke is judged as a flick: began near its start, moved a third of its
+  way in its direction, ended near its end. One that went nowhere is
+  dropped, never a restart. `flick.test.mjs` feeds だ's ticks short, off,
+  as a dab, backwards, and by pen.
 - **Past the end, the stroke starts over (v0.1.53).** Near the end and
   then beyond it along the stroke's direction without reaching it, and the
   stroke restarts rather than waiting to be poked. `pastEnd` in the pack.
@@ -339,7 +350,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.31.html`
+### Katakana — `dist/katakana-game-v0.1.32.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -360,7 +371,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.39.html`
+### Vocab — `dist/vocab-v0.1.40.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
