@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.65.html`
+### Hiragana — `dist/hiragana-v0.1.66.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -339,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.28.html`
+### Katakana — `dist/katakana-game-v0.1.29.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -580,6 +580,18 @@ resolution independent and rotating a tablet changes nothing. Encounter rate
 is biased toward glyphs whose mastery has gone quiet — a monster is a
 character you are forgetting, which is the spaced-repetition design already
 written into the lore.
+
+**The release, the door, and the rescue (v0.1.66).** A bag of 気 filled to
+the brim is thrown all at once — every lit character at its nearest bearer,
+nearest first, until the 気 runs out — and a tap on the ward throws whatever
+is there. It is the moment the hand may look up, and it is still nothing but
+characters the hand has written. The lights leave the farang the hand is
+tracing for to the hand, unless it is inside `rescue` of the ward; and a
+dark character at the door is what the tracer asks for next, ahead of its
+queue — the one exception to "don't base what I trace on what enemies
+populate", because a breach is not a lesson. The maintainer: "the way our
+base attacks things is sort of boring. And it targets weirdly allowing the
+closer farang to attack it."
 
 **Hitodama (v0.1.21)** is the first piece of the economy in play. Every
 finished glyph kindles a ghost light (人魂) on its character, and a lit

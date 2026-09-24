@@ -632,10 +632,12 @@ fresh();
   }
 }
 
-// the one under the pen is yours: no wisp at the locked target mid-trace
+// the one under the pen is yours: no wisp at the farang the hand is answering mid-trace
+// (the one carrying the character the tracer is on — since the queue, not the nearest)
 fresh();
 {
-  const mine = F.target;
+  const mine = F.monsters[0];
+  F.ask(mine.i); F.retarget(true);
   const ch = P.LETTERS[mine.i][0];
   F.kindle(ch, 3);
   P.setProg(4);
@@ -800,6 +802,8 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
      'the 耐 strip is missing something, or mend is still on 技');
   advance(20);
   ok(/data-tab="guard"/.test(F.dashHtml), 'the dashboard has no 耐 tab');
+  ok(/data-tab="skills"[^>]*>\s*<svg/.test(F.dashHtml) && /data-tab="guard"[^>]*>\s*<svg/.test(F.dashHtml) && /data-tab="drive"[^>]*>\s*<svg/.test(F.dashHtml), 'a shop tab has no mark on it');
+  ok(/data-tab="trace"[^>]*aria-label="the sketchbook"/.test(F.dashHtml), 'the sketchbook tab is unlabelled');
   ok(F.openTab('guard') === 'guard' && F.tab === 'guard' && !F.paused, '耐 did not open, or paused the run');
   F.openTab(null);
 
@@ -891,6 +895,47 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(F.energy === 0 && F.autocast(T + 99999) === null, 'a lit character cast with an empty bag');
   F.fill(cfg.castCost);
   ok(F.autocast(T + 199999) !== null && F.energy === 0, `a lit character with 気 to throw did not cast, or the cast did not spend ${cfg.castCost} (left ${F.energy})`);
+
+  // the release: a full bag is thrown all at once, nearest first, until the 気 runs out
+  F.restart(); F.quench(); F.fill(-999);
+  F.spawn(); F.spawn(); F.spawn();
+  { const ms = F.monsters.slice(0, 3); ms.forEach((m, k) => { m.d = 0.9 - k*0.2; m.speed = 0; F.kindle(P.LETTERS[m.i][0], 3); });
+    F.ask(ms[0].i); F.retarget(true);   // the hand is pointed at the farthest
+    F.fill(cfg.castCost * 2);
+    const n = F.release(T + 300000);
+    ok(n === 2 && F.shots.length === 2 && F.energy === 0, `a bag of two casts released ${n} lights (shots ${F.shots.length}, 気 left ${F.energy})`);
+    ok(F.shots.every(s => s.to !== ms[0]) && F.shots.some(s => s.to === ms[2]), 'the release did not go nearest first, or hit what the hand is tracing');
+    ok(F.flare > 0, 'the release left no mark on the ward'); }
+  // a stroke that fills the bag releases it
+  F.restart(); F.quench(); F.fill(-999);
+  { const m = F.monsters[0]; m.d = 0.2; m.speed = 0; F.kindle(P.LETTERS[m.i][0], 3);   // at the door: the hand's own target is answered there too
+    F.fill(cfg.energyMax - 1); const b0 = F.flare;
+    P.strokes.length = 0; P.strokes.push(line(120, 120, 280, 130, 60)); globalThis.conjure();
+    ok(F.flare > b0 || F.shots.length > 0, 'a stroke that filled the bag did not release it'); advance(cfg.advanceMs + 60); }
+  // rescue: the farang the hand is tracing for is left to the hand — until it is at the door
+  F.restart(); F.quench(); F.fill(999);
+  { const m = F.monsters[0]; m.speed = 0; F.kindle(P.LETTERS[m.i][0], 3); F.ask(m.i); F.retarget(true);
+    F.touch();   // the pen is down
+    m.d = 0.8;
+    ok(F.autocast(T + 400000) === null, 'a light took the far farang the hand was tracing for');
+    m.d = cfg.rescue - 0.05;
+    ok(F.autocast(T + 500000) === m, 'a light left the farang at the door to a pen that was still drawing');
+    advance(cfg.holdMs + 50); }
+  // the door: a dark character about to walk in is what the pen is asked for, queue or no queue
+  F.restart(); F.quench(); F.fill(-999);
+  F.spawn(); F.spawn();
+  { const [A, B] = F.monsters; A.d = 0.8; B.d = cfg.rescue - 0.05; A.speed = B.speed = 0;
+    if (P.LETTERS[A.i][0] !== P.LETTERS[B.i][0]){
+      F.ask(A.i); F.retarget(true);
+      ok(P.idx === A.i, 'test setup: the tracer should be on the far farang');
+      F.ask(null);                       // the hand has no standing request; the queue would decide
+      advance(40);
+      ok(P.idx === B.i, `a dark farang at the door did not pull the pen (on ${P.LETTERS[P.idx][0]}, the door carries ${P.LETTERS[B.i][0]})`);
+      F.kindle(P.LETTERS[B.i][0], 3);    // lit, the lights answer it and the queue is not overridden
+      F.ask(A.i); F.retarget(true); F.ask(null);
+      advance(40);
+      ok(P.idx === A.i, 'a lit farang at the door pulled the pen off the queue');
+    } }
 }
 
 // ---- the run ends, says what it was, and is written down

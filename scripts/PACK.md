@@ -272,6 +272,8 @@ read as an alias.
 | `tower.bossEvery` | 10 | every this many waves the farang is a boss. While any boss lives, every character traced is shown with less help — the shape faint, the start dot kept — not only the boss's own. Words are not bossed. |
 | `tower.bossHp` | 2 | extra hits a boss takes |
 | `tower.bossBite` | 1 | extra life a boss takes from the ward when it breaches |
+| *(the release)* | | a bag of 気 filled to the brim is thrown all at once, every lit character at its nearest bearer until the 気 runs out; a tap on the ward throws whatever is there (v0.1.66). |
+| `rescue` | 0.3 | how close to the ward (the field is 1 across, the ward at 0.06) a farang is "at the door". Inside it the lights answer even the farang the hand is tracing for, and a dark character there is what the tracer asks for next, ahead of its queue. |
 | `tower.speedStep` | 0.03 | farang come this much faster per `bossEvery` waves |
 | `tamaClean`, `tamaTrace` | 2, 1 | tama for a clean trace, and for one that was zapped |
 | `tamaWaves` | 3 | one tama per this many farang faced |

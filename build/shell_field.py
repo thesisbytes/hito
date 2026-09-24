@@ -75,7 +75,7 @@ STYLE = """
   /* Four tabs and two bars have to share 374px on a phone: the spacing is
      tight on purpose, and the tabs may not grow (the engine's own button
      rule would have them at 88px each). */
-  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:5px;
+  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; flex-wrap:wrap; align-items:center; gap:5px;
              padding:5px 6px; border-radius:10px; background:rgba(22,20,17,.88); border:1px solid #3d3324;
              font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
   .dash-bar .bar{ position:relative; flex:1 1 60px; min-width:40px; max-width:150px; height:18px; border-radius:6px; overflow:hidden;
@@ -86,9 +86,16 @@ STYLE = """
   .dash-bar .bar small{ position:absolute; right:5px; top:2px; font-size:10px; color:#e8e0cc; }
   @media (prefers-reduced-motion:reduce){ .dash-bar .bar i{ transition:none; } }
   .dash-bar .n{ font-weight:700; font-size:11px; color:#e9c46a; white-space:nowrap; } .dash-bar .n small{ font-weight:400; color:rgba(232,224,204,.55); }
-  .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:3px; }
-  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:3px 6px; border-radius:8px; background:transparent;
-                          border:1px solid #3d3324; color:#e8e0cc; cursor:pointer; }
+  /* The tabs (the maintainer: "not so obvious"): the sketchbook's is the
+     big one, and each shop wears a mark — a sword to cut, a shield to last,
+     a coin to earn, a flame for what lasts. On a phone the tabs take a row
+     of their own under the bars rather than fighting them for the width. */
+  .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:4px; align-items:center; }
+  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:4px 8px; border-radius:8px; background:transparent;
+                          border:1px solid #3d3324; color:#e8e0cc; cursor:pointer; display:inline-flex; align-items:center; gap:4px; line-height:1; }
+  .dash-bar .dash-tabs button svg{ width:13px; height:13px; flex:none; opacity:.85; }
+  .dash-bar .dash-tabs button[data-tab="trace"]{ font-size:19px; padding:4px 16px; border-width:2px; }
+  @media (max-width:560px){ .dash-bar .dash-tabs{ flex:1 0 100%; margin-left:0; justify-content:space-between; } }
   .dash-bar .dash-tabs button.can{ border-color:#7fd1c4; color:#bdf0e6; }
   .dash-bar .dash-tabs button[aria-pressed="true"]{ background:rgba(127,209,196,.14); border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 10px rgba(127,209,196,.25); }
   /* The shop stands where the sketchbook stood, and the sketchbook is gone
@@ -483,18 +490,46 @@ LAYER = STYLE + r"""
   let castAt = 0;
   function dash(){ return { x: cx(), y: FH - 48 }; }   // above the dashboard
   const casting = () => !DIFF[difficulty] || DIFF[difficulty].cast !== false;
+  // A farang the hand is tracing for is left to the hand — the trace lands
+  // on it, and a light spent there is a light wasted — unless it is about
+  // to walk in. Inside `rescue` of the ward the lights answer whatever they
+  // can, whoever is tracing what. (The maintainer: "it targets weirdly,
+  // allowing the closer farang to attack it.")
+  const leftToHand = m => tracing() && !done && m === bearer(LETTERS[idx][0]) && m.d > CFG.rescue;
   function autocast(now){
     if (!casting()) return null;
     if (now - castAt < castMs()) return null;
     let best = null;
     for (const m of monsters){
       if (charge(key(m)) < 1) continue;
-      if (m === locked && tracing()) continue;
+      if (leftToHand(m)) continue;
       if (shots.some(s => s.to === m)) continue;
       if (!best || m.d < best.d) best = m;
     }
     if (!best) return null;
     if (energy < CFG.castCost) return null;   // lit, but nothing to throw it with
+    return fire(best, now);
+  }
+  // The release: a full bag is thrown all at once, every lit character at
+  // its nearest bearer, nearest first, until the 気 runs out. It happens
+  // when a stroke fills the bag, and when the ward is tapped. This is the
+  // moment the hand may look up (the maintainer: "the way our base attacks
+  // things is sort of boring"), and it is still nothing but characters the
+  // hand has written.
+  let flareAt = 0;   // `flare`, not `burst`: the engine owns `burst`
+  function release(now){
+    if (!casting()) return 0;
+    now = now == null ? performance.now() : now;
+    let n = 0;
+    for (const m of monsters.slice().sort((a, b) => a.d - b.d)){
+      if (energy < CFG.castCost) break;
+      if (charge(key(m)) < 1 || leftToHand(m) || shots.some(s => s.to === m)) continue;
+      fire(m, now); n++;
+    }
+    if (n){ flareAt = performance.now(); if (navigator.vibrate) navigator.vibrate([30, 40, 30]); }
+    return n;
+  }
+  function fire(best, now){
     energy -= CFG.castCost;
     const ch = key(best);
     HITODAMA[ch] = charge(ch) - 1; saveH();
@@ -616,8 +651,23 @@ LAYER = STYLE + r"""
   // whichever farang carries it; what nothing carries is kept as a light.
   // A tap on a farang (or a test's ask()) puts its character at the head.
   let asked = null, queue = [], recent = [];
+  // The one exception to the queue: a farang at the door (inside `rescue`)
+  // whose character is dark. No light can answer it and the queue was going
+  // to ask for something else while it walked in — "it targets weirdly,
+  // allowing the closer farang to attack it". The pen goes to the hole
+  // that is about to become a breach; the queue resumes after.
+  function door(){
+    let best = null;
+    for (const m of monsters){
+      if (m.d >= CFG.rescue) continue;
+      if (casting() && charge(key(m)) >= 1) continue;
+      if (!best || m.d < best.d) best = m;
+    }
+    return best;
+  }
   function nextAsk(){
     if (asked !== null) return asked;
+    const d = door(); if (d) return d.i;
     if (!queue.length){
       const pool = roster().filter(i => !recent.includes(i));
       const H = window.__hand;
@@ -773,11 +823,15 @@ LAYER = STYLE + r"""
   // shine did not, so a trace is worth its strokes however it was scored
   const _shine = window.shine;
   const perStroke = () => CFG.energyPerStroke + upg.breath;
-  if (typeof _shine === 'function') window.shine = function(){ fill(perStroke()); credited++; return _shine.apply(this, arguments); };
+  // A stroke's 気 goes in through topUp, so a bag filled to the brim is
+  // released whichever way the stroke was credited — as it shone, or at the
+  // conjure for the strokes shine never saw.
+  const topUp = n => { fill(n); if (n > 0 && energy >= energyMax()) release(); };
+  if (typeof _shine === 'function') window.shine = function(){ topUp(perStroke()); credited++; return _shine.apply(this, arguments); };
   const _conjure = window.conjure;
   window.conjure = function(){
     const drew = LETTERS[idx][0];
-    fill(Math.max(0, Math.max(1, strokes.length) - credited) * perStroke()); credited = 0;
+    topUp(Math.max(0, Math.max(1, strokes.length) - credited) * perStroke()); credited = 0;
     // A word is only ever advanced by its own next kana, so there is no
     // falling back to the locked monster: a stray character hits nothing.
     const t = bearer(drew);   // a character hits whichever farang carries it, or nothing
@@ -946,6 +1000,7 @@ LAYER = STYLE + r"""
     if (!over && !tracing()){
       if (pendingRetarget) retarget();
       else if (!done && monsters.length && !bearer(LETTERS[idx][0])) retarget();
+      else if (!done && !WORDS && asked === null){ const d = door(); if (d && d.i !== idx) retarget(); }
     }
     for (const p of motes){ p.x += p.vx; p.y += p.vy; p.life -= dt*1.6; }
     motes = motes.filter(p => p.life > 0);
@@ -979,6 +1034,12 @@ LAYER = STYLE + r"""
     g.clearRect(0,0,FW,FH);
     const X = cx(), Y = cy();
 
+    // the release: a ring leaving the ward
+    const since = (performance.now() - flareAt)/520;
+    if (since < 1){
+      g.save(); g.globalAlpha = (1 - since) * 0.9; g.strokeStyle = 'rgba(127,209,196,.9)'; g.lineWidth = 2 + 4*(1 - since);
+      g.beginPath(); g.arc(cx(), cy(), 20 + since*Math.max(FW, FH)*0.55, 0, 6.284); g.stroke(); g.restore();
+    }
     // the ward being protected
     const pulse = 0.6 + 0.4*Math.sin(performance.now()/700);
     glowAt(g, X, Y, 13 + 22*pulse, 13 + 22*pulse, over ? 'rgba(120,60,50,.5)' : 'rgba(233,196,106,.5)', 1);
@@ -1268,6 +1329,14 @@ LAYER = STYLE + r"""
   let tab = null, dashMarkup = '';
   // Bars, not hearts (the maintainer: "let's not do hearts. I like bars. For
   // both the life and energy for casting").
+  // Marks for the tabs, inline and in the button's own colour so the theme
+  // table paints them: a sword, a shield, a five-yen coin, a flame.
+  const ICON = {
+    sword:  '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 3 6 10M3.5 9.5l3 3M2.5 13.5l2-2M12 2l2 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+    shield: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6 13.3 3.6V8c0 3.4-2.3 5.7-5.3 7C5 13.7 2.7 11.4 2.7 8V3.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+    coin:   '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.8" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>',
+    flame:  '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8c2 3 3.6 4.4 3.6 7.4a3.6 3.6 0 0 1-7.2 0C4.4 6.2 6 4.8 8 1.8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+  };
   const bar_ = (cls, kana, v, max, title) => `<span class="bar ${cls}" title="${title}"><i style="width:${max > 0 ? Math.round(100*Math.max(0, Math.min(max, v))/max) : 0}%"></i><b>${kana}</b><small>${v}/${max}</small></span>`;
   const canBuyAny = tabName => Object.entries(UPG).some(([id, u]) => u.tab === tabName && upg[id] < u.max && sumi >= costOf(id));
   function renderDash(){
@@ -1277,11 +1346,11 @@ LAYER = STYLE + r"""
       + `<span class="n" title="ink — earned by tracing, spent on this run's skills">墨 ${sumi}</span>`
       + (p ? `<span class="n" title="魂 — earned by runs, spent on what lasts">魂 ${p.balance}</span>` : '')
       + `<span class="n" title="the wave"><small>波</small> ${wave}</span>`
-      + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook">筆</button>`
-      + `<button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="this run's intent">技</button>`
-      + `<button data-tab="guard" aria-pressed="${tab === 'guard'}" class="${canBuyAny('guard') ? 'can' : ''}" title="this run's persistence">耐</button>`
-      + `<button data-tab="drive" aria-pressed="${tab === 'drive'}" class="${canBuyAny('drive') ? 'can' : ''}" title="this run's motivation">志</button>`
-      + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="what lasts">灯</button>` : '') + `</span>`;
+      + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook: write" aria-label="the sketchbook">筆</button>`
+      + `<button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="技 intent: how you attack" aria-label="intent: attack upgrades">${ICON.sword}技</button>`
+      + `<button data-tab="guard" aria-pressed="${tab === 'guard'}" class="${canBuyAny('guard') ? 'can' : ''}" title="耐 persistence: how you defend" aria-label="persistence: defence upgrades">${ICON.shield}耐</button>`
+      + `<button data-tab="drive" aria-pressed="${tab === 'drive'}" class="${canBuyAny('drive') ? 'can' : ''}" title="志 motivation: how you earn" aria-label="motivation: currency upgrades">${ICON.coin}志</button>`
+      + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="灯 what lasts, bought with 魂" aria-label="lanterns: what lasts">${ICON.flame}灯</button>` : '') + `</span>`;
     if (m === dashMarkup) return;
     dashMarkup = m; bar.innerHTML = m;
     if (bar.querySelectorAll) for (const b of bar.querySelectorAll('button[data-tab]')) b.onclick = () => openTab(tab === b.dataset.tab || b.dataset.tab === 'trace' ? null : b.dataset.tab);
@@ -1448,7 +1517,9 @@ LAYER = STYLE + r"""
   fc.addEventListener('pointerdown', e => {
     if (over){ openStart(); return; }
     const r = fc.getBoundingClientRect();
-    pick(e.clientX - r.left, e.clientY - r.top);
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    if (!paused && Math.hypot(x - cx(), y - cy()) < 34){ release(); return; }   // the ward itself: throw what you have
+    pick(x, y);
   });
 
   // A handle on the field, for the same reason the tracer has one: a game
@@ -1476,7 +1547,7 @@ LAYER = STYLE + r"""
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
-    charge, kindle, quench, autocast, tidy, casting,
+    charge, kindle, quench, autocast, release, tidy, casting, get flare(){ return flareAt; },
     touch(){ penAt = performance.now(); },
     bearer,
     spawn, restart, retarget, pick,
@@ -1605,6 +1676,7 @@ def config(pack, deck=None):
         f"cleanBonus:{int(f.get('cleanBonus', 1))},"
         f"hitodamaCap:{int(f.get('hitodamaCap', 6))},"
         f"castMs:{int(f.get('castMs', 900))},"
+        f"rescue:{float(f.get('rescue', 0.3))},"
         f"energyMax:{int(f.get('energyMax', 24))},energyStart:{int(f.get('energyStart', 6))},"
         f"energyPerStroke:{int(f.get('energyPerStroke', 1))},castCost:{int(f.get('castCost', 2))},vesselStep:{int(f.get('vesselStep', 6))},"
         f"holdMs:{int(f.get('holdMs', 1500))},"

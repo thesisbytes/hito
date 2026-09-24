@@ -1900,3 +1900,36 @@ Running log. Append at the bottom, don't rewrite history.
   something a learner can accumulate.
 - `build/release.sh` exists now because the loop needed the release to be
   one command; the hand gets it too.
+
+## 2026-09-24 — The tabs read, the bag releases, the door is answered (hiragana v0.1.66, katakana-game v0.1.29)
+
+- The maintainer: "The tabs are not so obvious... Make the scratchpad tab
+  more obvious by making it larger than its friends. Maybe add icons to each
+  upgrade tab... Also, the way our base attacks things is sort of boring. And
+  it targets weirdly allowing the closer farang to attack it."
+- **The tabs.** On a phone they take a row of their own under the bars
+  (`flex-wrap`, under 560px), so the bars get the width back too. 筆 is
+  19px with a 2px border; 技 耐 志 灯 wear a sword, a shield, a five-yen
+  coin and a flame — inline SVG in `currentColor`, so the theme table paints
+  them and the theme test has nothing new to object to. Every tab has an
+  aria-label saying what it upgrades.
+- **The release.** A bag filled to the brim is thrown at once: every lit
+  character at its nearest bearer, nearest first, until the 気 runs out;
+  a ring leaves the ward; the phone buzzes. A tap on the ward throws what is
+  there. Every stroke's 気 goes in through `topUp()`, whether it shone or
+  was credited at the conjure, because the first version checked only the
+  shine wrapper and the stub's conjure credits strokes the other way.
+  Still nothing but characters the hand has written.
+- **The targeting.** Since the queue (v0.1.58) the tracer is on its own
+  character, so `locked` was stale in the character game and the old "leave
+  the locked one to the hand" rule was mostly dead — and `F.target` in the
+  old test set it as a side effect, which is why the test passed. The rule
+  is now about the bearer of the character the tracer is on, and it has a
+  limit: inside `rescue` (0.3) of the ward the lights answer that one too.
+- **The door.** The real "weird" case was a farang at the door carrying a
+  dark character while the queue asked for something else. `door()` is the
+  one exception to the queue: a dark character inside `rescue` is what the
+  tracer asks for next, and the queue resumes after. A lit one at the door
+  is the lights' business and does not pull the pen.
+- `burst` is an engine name; the field's is `flareAt`. The shadow test
+  caught it before the build shipped, again.
