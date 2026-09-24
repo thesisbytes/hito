@@ -211,7 +211,10 @@ LAYER = STYLE + r"""
 
   const cx = () => fc.width / (2*DPRF());
   const cy = () => fc.height / (2*DPRF()) * 1.06;   // ward sits a touch low
-  function DPRF(){ return Math.min(devicePixelRatio||1, 3); }
+  // 2x, not 3x: the field is a phone's width and redrawn every frame, and a
+  // 3x phone paints 2.25x the pixels of a 2x one for glows nobody can tell
+  // apart. (The maintainer, v0.1.62: "still a touch laggy.")
+  function DPRF(){ return Math.min(devicePixelRatio||1, 2); }
   let FW = 0, FH = 0;
   function sizeField(){
     const r = wrap.getBoundingClientRect(), d = DPRF();
@@ -942,6 +945,25 @@ LAYER = STYLE + r"""
   }
   function fieldLoop(now){ step(now); requestAnimationFrame(fieldLoop); }
 
+  // Glow without shadowBlur. CLAUDE.md's rule is "no per-frame shadow blur",
+  // and the field broke it ten times a frame: a blurred shadow is rasterised
+  // afresh on every draw, on a canvas a phone wide, sixty times a second.
+  // A glow is a radial gradient painted once into a small sprite per colour
+  // and stretched to size; the solid shape is drawn over it as before.
+  const GLOWS = {};
+  function glowAt(g, x, y, rx, ry, color, alpha){
+    let sp = GLOWS[color];
+    if (!sp){
+      sp = document.createElement('canvas'); sp.width = sp.height = 64;
+      const c = sp.getContext('2d'), gr = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+      if (gr && gr.addColorStop){ gr.addColorStop(0, color); gr.addColorStop(0.3, color); gr.addColorStop(1, 'rgba(0,0,0,0)'); }
+      c.fillStyle = gr; c.fillRect(0, 0, 64, 64);
+      GLOWS[color] = sp;
+    }
+    if (alpha != null && alpha !== 1){ g.save(); g.globalAlpha = alpha; }
+    g.drawImage(sp, x - rx, y - ry, rx*2, ry*2);
+    if (alpha != null && alpha !== 1) g.restore();
+  }
   function draw(){
     const g = fc.getContext('2d');
     g.clearRect(0,0,FW,FH);
@@ -949,11 +971,9 @@ LAYER = STYLE + r"""
 
     // the ward being protected
     const pulse = 0.6 + 0.4*Math.sin(performance.now()/700);
-    g.save();
-    g.shadowColor = 'rgba(233,196,106,.8)'; g.shadowBlur = 26*pulse;
+    glowAt(g, X, Y, 13 + 22*pulse, 13 + 22*pulse, over ? 'rgba(120,60,50,.5)' : 'rgba(233,196,106,.5)', 1);
     g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(233,196,106,.92)';
     g.beginPath(); g.arc(X, Y, 13, 0, 6.284); g.fill();
-    g.restore();
     g.strokeStyle = over ? 'rgba(200,90,70,.35)' : 'rgba(233,196,106,.22)';
     g.lineWidth = 1;
     g.beginPath(); g.arc(X, Y, 26 + 5*pulse, 0, 6.284); g.stroke();
@@ -973,8 +993,7 @@ LAYER = STYLE + r"""
       const near = 1 - m.d;
       g.save();
       g.globalAlpha = 0.5 + 0.5*near;
-      g.shadowColor = isT ? 'rgba(127,209,196,.75)' : 'rgba(150,170,190,.4)';
-      g.shadowBlur = isT ? 20 : 10;
+      glowAt(g, p.x, p.y+bob, isT ? 17 + 16 : 17 + 8, isT ? 21 + 16 : 21 + 8, isT ? 'rgba(127,209,196,.45)' : 'rgba(150,170,190,.22)', 1);
       g.fillStyle = isT ? 'rgba(127,209,196,.30)' : 'rgba(170,185,200,.20)';
       g.beginPath(); g.ellipse(p.x, p.y+bob, 17, 21, 0, 0, 6.284); g.fill();
       g.restore();
@@ -1030,11 +1049,9 @@ LAYER = STYLE + r"""
       }
       // a lit character: its own wisp will answer this one
       if (casting() && charge(key(m)) >= 1){
-        g.save();
-        g.shadowColor = 'rgba(127,209,196,.9)'; g.shadowBlur = 10;
+        glowAt(g, p.x + w/2 + 2, by-14, 11, 11, 'rgba(127,209,196,.6)', 1);
         g.fillStyle = 'rgba(160,230,215,.95)';
         g.beginPath(); g.arc(p.x + w/2 + 2, by-14, 3.2, 0, 6.284); g.fill();
-        g.restore();
       }
     }
 
@@ -1056,18 +1073,17 @@ LAYER = STYLE + r"""
           g.beginPath(); g.arc(tx, ty, 9 - k*1.5, 0, 6.284); g.fill();
         }
         g.globalAlpha = 0.95;
-        g.shadowColor = 'rgba(127,209,196,.95)'; g.shadowBlur = 22;
-        g.fillStyle = 'rgba(190,240,228,.9)';
         g.font = '700 15px ui-sans-serif,system-ui,"Klee One",sans-serif';
         const rx = Math.max(11, g.measureText(s.ch).width/2 + 7);   // a word needs a longer light
+        glowAt(g, x, y, rx + 18, 13 + 18, 'rgba(127,209,196,.6)', 1);
+        g.fillStyle = 'rgba(190,240,228,.9)';
         g.beginPath(); g.ellipse(x, y, rx, 13, 0, 0, 6.284); g.fill();
-        g.shadowBlur = 0;
         g.fillStyle = 'rgba(20,40,40,.9)';
         g.textAlign = 'center'; g.textBaseline = 'middle';
         g.fillText(s.ch, x, y+1);
       } else {
         g.globalAlpha = 0.9;
-        g.shadowColor = 'rgba(233,196,106,.9)'; g.shadowBlur = 18;
+        glowAt(g, x, y, 26, 26, 'rgba(233,196,106,.55)', 1);
         g.fillStyle = '#ffe9a8';
         g.font = '700 26px ui-sans-serif,system-ui,"Klee One",sans-serif';
         g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -1080,7 +1096,7 @@ LAYER = STYLE + r"""
       const a = Math.min(1, r.life*1.6);
       g.save();
       g.globalAlpha = a;
-      g.shadowColor = 'rgba(233,196,106,.9)'; g.shadowBlur = 16;
+      glowAt(g, r.x, r.y, 30, 22, 'rgba(233,196,106,.45)', 1);
       g.fillStyle = '#ffe9a8';
       g.font = `700 ${Math.round(26 + 10*(1-r.life))}px ui-sans-serif,system-ui`;
       g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -1130,11 +1146,9 @@ LAYER = STYLE + r"""
       const flick = 0.75 + 0.25*Math.sin(performance.now()/160);
       for (let k=0;k<cap;k++){
         const px = x0 + 41 + lw + k*pipW + 4, lit = k < c;
-        g.save();
-        if (lit){ g.shadowColor = 'rgba(127,209,196,.95)'; g.shadowBlur = 9*flick; }
+        if (lit) glowAt(g, px, d.y, 3.4 + 8*flick, 4 + 8*flick, 'rgba(127,209,196,.6)', 1);
         g.fillStyle = lit ? 'rgba(170,236,220,.95)' : 'rgba(127,209,196,.14)';
         g.beginPath(); g.ellipse(px, d.y, 3.4, lit ? 4.6*flick+1 : 3.4, 0, 0, 6.284); g.fill();
-        g.restore();
       }
     }
 

@@ -1797,3 +1797,33 @@ Running log. Append at the bottom, don't rewrite history.
   to 40px and the spacing is at its tightest. Checked at 360 and 390px in
   headless Chrome; below 360 the last tab will clip, and the next thing to
   give would be the numbers' labels.
+
+## 2026-09-24 — The lag, and the wall at wave 30 (hiragana v0.1.63, katakana-game v0.1.26, vocab v0.1.39)
+
+- The maintainer: "Still a touch laggy. The game's current state I'll never
+  reach the next advancement."
+- **The lag.** The field broke CLAUDE.md's oldest performance rule — "no
+  per-frame shadow blur" — ten times a frame: the ward's pulse (26px), every
+  farang (10-20), every lit marker, every wisp (22), every thrown character
+  (18), every reading (16), every lit pip. A blurred shadow is rasterised
+  afresh on each draw, on a canvas a phone wide at 3x, sixty times a second.
+  `glowAt()` now paints a radial gradient once into a 64px sprite per colour
+  and stretches it; the solid shape goes over it as before. Both canvases
+  are capped at 2x (the sketchbook copies its whole ink twice on every pen
+  move; 3x is 2.25x the pixels for nothing a reader could see). Not measured
+  on the phone — there is no phone here — so this is the removal of the
+  known offender, not a proven fix. A `//` comment in the engine's one-line
+  `resize()` swallowed the rest of the line and set W and H to nothing; the
+  hand and stray tests caught it before the build shipped.
+- **The wall.** 61 runs in the events table. Medium by finger ends at wave
+  27-43, every run 80-105 s, ~3.6 s per trace, and until yesterday no run
+  had bought a single upgrade (the tabs were invisible). The spawn floor of
+  1.8 s was reached at wave 24 and with hp 3-4 by then, holding needed two
+  hits a second against a hand that supplies 0.28. Nobody could pass wave
+  ~35 whatever they learned, and the next level sits at 100. Anchored to
+  the measured hand: `spawnMin` 3400 (a farang per 3.4 s, about one trace),
+  `spawnRamp` 45 (the floor at wave 40), `hpEvery` 30, `biteEvery` 30. The
+  arithmetic says a hand alone holds to ~30, hand plus lights to ~60, and
+  100 wants lanterns and a lit chart — which is what the lanterns are for.
+  A guess with a reason behind it, to be corrected by the next runs.
+- Katakana's pace was already gentler (words); left.

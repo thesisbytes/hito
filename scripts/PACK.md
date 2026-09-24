@@ -214,7 +214,7 @@ above it.
 
 | key | default | what it does |
 |---|---|---|
-| `hpEvery` | 10 | single characters take one more hit every this many waves. `0` switches it off. Words ignore it: a word is already as tough as it is long. |
+| `hpEvery` | 10 | single characters take one more hit every this many waves. `0` switches it off. Words ignore it: a word is already as tough as it is long. The hiragana game sets 30 (v0.1.63): by finger a trace is ~3.6 s, and the default ramp walled every run near wave 30. |
 | `hpMax` | 5 | and no more than this |
 | `biteEvery` | 20 | a breach costs the ward one more life every this many waves (the farang's attack, climbing as their health does). `0` switches it off. Words bite too: a word at the ward is a word not answered. |
 | `biteMax` | 4 | and no more than this, before a boss's extra and a wall's discount |

@@ -238,7 +238,7 @@ function compare(u,t){ // both normalized strokes → {ok,reason}
 }
 
 // ---------- canvas sizing
-function resize(){ const r=stage.getBoundingClientRect(); DPR=Math.min(devicePixelRatio||1,3); W=Math.round(r.width); H=Math.round(r.height);
+function resize(){ const r=stage.getBoundingClientRect(); DPR=Math.min(devicePixelRatio||1,2); /* 2x: every pen move copies the whole ink twice, and 3x is 2.25x the pixels */ W=Math.round(r.width); H=Math.round(r.height);
   for(const c of [gC,iC,fC]){c.width=W*DPR;c.height=H*DPR;c.getContext('2d').setTransform(DPR,0,0,DPR,0,0);} trailProg=-1; drawGuide(); redrawInk(); }
 addEventListener('resize',resize);
 

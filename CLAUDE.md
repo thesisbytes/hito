@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.62.html`
+### Hiragana — `dist/hiragana-v0.1.63.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -339,7 +339,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.25.html`
+### Katakana — `dist/katakana-game-v0.1.26.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -360,7 +360,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.38.html`
+### Vocab — `dist/vocab-v0.1.39.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -872,7 +872,10 @@ per-character ledger. Save data must have export/import from day one.
   so the copy costs nothing.
 - **Nothing lives only in browser storage.** Fonts, stroke data, and defaults
   are embedded in the HTML. User progress has export/import.
-- **Performance:** no per-frame shadow blur. Cache trails offscreen.
+- **Performance:** no per-frame shadow blur. Cache trails offscreen. The
+  field broke this ten times a frame until v0.1.63 and was "a touch laggy"
+  on the phone for it; a glow is a cached gradient sprite (`glowAt()` in
+  the field shell), and both canvases are capped at 2x.
 - **Beginner pacing:** comet/guide speed stays slow. Tested with young
   learners; keep it.
 - **Aesthetic:** traditional/classic first, modern refinements later. Gold on

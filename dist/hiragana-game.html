@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · hiragana · v0.1.62</title>
+<title>hito 人 · hiragana · v0.1.63</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -164,7 +164,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.62';
+const APP_VERSION='0.1.63';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"AH"],["い","あ行","i","","a-row",2,1,"EYE"],["う","あ行","u","1st stroke is a short separate tick, print may attach","a-row",3,1,"YOO"],["え","あ行","e","","a-row",4,1,"EE"],["お","あ行","o","","a-row",5,1,"OH"],["か","か行","ka","","ka-row",1,2,"KAH"],["き","か行","ki","3rd/4th stroke separate in textbook form; print fonts often join them","ka-row",2,2,"KEY"],["く","か行","ku","","ka-row",3,2,"KOO"],["け","か行","ke","","ka-row",4,2,"KAY"],["こ","か行","ko","","ka-row",5,2,"KOH"],["さ","さ行","sa","2nd/3rd stroke separate in textbook form; print fonts join","sa-row",1,3,"SAH"],["し","さ行","shi","","sa-row",2,3,"SHE"],["す","さ行","su","","sa-row",3,3,"SUE"],["せ","さ行","se","","sa-row",4,3,"SAY"],["そ","さ行","so","","sa-row",5,3,"SEW"],["た","た行","ta","","ta-row",1,4,"TAH"],["ち","た行","chi","","ta-row",2,4,"CHEE"],["つ","た行","tsu","","ta-row",3,4,"SOO"],["て","た行","te","","ta-row",4,4,"TAY"],["と","た行","to","","ta-row",5,4,"TOE"],["な","な行","na","","na-row",1,5,"NAH"],["に","な行","ni","","na-row",2,5,"KNEE"],["ぬ","な行","nu","","na-row",3,5,"NEW"],["ね","な行","ne","","na-row",4,5,"NAY"],["の","な行","no","","na-row",5,5,"NOH"],["は","は行","ha","","ha-row",1,6,"HAH"],["ひ","は行","hi","","ha-row",2,6,"HEE"],["ふ","は行","fu","four separate strokes in textbook form; print merges into one loop","ha-row",3,6,"FOO"],["へ","は行","he","","ha-row",4,6,"HAY"],["ほ","は行","ho","","ha-row",5,6,"HOE"],["ま","ま行","ma","","ma-row",1,7,"MAH"],["み","ま行","mi","","ma-row",2,7,"ME"],["む","ま行","mu","","ma-row",3,7,"MOO"],["め","ま行","me","","ma-row",4,7,"MAY"],["も","ま行","mo","","ma-row",5,7,"MOE"],["や","や行","ya","2nd stroke is a short separate tick","ya-row",1,8,"YAH"],["ゆ","や行","yu","hook on 1st stroke is open in textbook form","ya-row",3,8,"YOO"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RRRAH"],["り","ら行","ri","two separate strokes in textbook form; print joins","ra-row",2,9,"RRREE"],["る","ら行","ru","","ra-row",3,9,"ROO"],["れ","ら行","re","","ra-row",4,9,"RAY"],["ろ","ら行","ro","","ra-row",5,9,"ROW"],["わ","わ行","wa","","wa-row",1,10,"WAH"],["を","わ行","wo","","wa-row",5,10,"W-OH"],["ん","","n","","",1,18,"EN"],["が","が行","ga","","ga-row",1,11,"GAH"],["ぎ","が行","gi","","ga-row",2,11,"GHEE"],["ぐ","が行","gu","","ga-row",3,11,"GOO"],["げ","が行","ge","","ga-row",4,11,"GEH"],["ご","が行","go","","ga-row",5,11,"GO"],["ざ","ざ行","za","","za-row",1,12,"ZAH"],["じ","ざ行","ji","","za-row",2,12,"JEE"],["ず","ざ行","zu","","za-row",3,12,"ZOO"],["ぜ","ざ行","ze","","za-row",4,12,"ZEH"],["ぞ","ざ行","zo","","za-row",5,12,"ZOH"],["だ","だ行","da","","da-row",1,13,"DAH"],["ぢ","だ行","ji","the ji of はなぢ; Genki writes it ji, same as じ","da-row",2,13,"DJEE"],["づ","だ行","zu","the zu of つづく; Genki writes it zu, same as ず","da-row",3,13,"DZOO"],["で","だ行","de","","da-row",4,13,"DEH"],["ど","だ行","do","","da-row",5,13,"DOH"],["ば","ば行","ba","","ba-row",1,14,"BAH"],["び","ば行","bi","","ba-row",2,14,"BEE"],["ぶ","ば行","bu","","ba-row",3,14,"BOO"],["べ","ば行","be","","ba-row",4,14,"BEH"],["ぼ","ば行","bo","","ba-row",5,14,"BOH"],["ぱ","ぱ行","pa","","pa-row",1,15,"PAH"],["ぴ","ぱ行","pi","","pa-row",2,15,"PEE"],["ぷ","ぱ行","pu","","pa-row",3,15,"POO"],["ぺ","ぱ行","pe","","pa-row",4,15,"PEH"],["ぽ","ぱ行","po","","pa-row",5,15,"POH"],["ゃ","ゃ行","small ya","small: きゃ is one syllable, きや is two","small-row",1,16,"LIL-YAH"],["ゅ","ゃ行","small yu","small: きゅ is one syllable","small-row",3,16,"LIL-YOO"],["ょ","ゃ行","small yo","small: きょ is one syllable","small-row",5,16,"LIL-YO"],["っ","っ行","small tsu","small: a held consonant. きって has a pause, きて does not","sokuon-row",3,17,"LIL-SOO"]];
 
 // ---------- state
@@ -262,7 +262,7 @@ function compare(u,t){ // both normalized strokes → {ok,reason}
 }
 
 // ---------- canvas sizing
-function resize(){ const r=stage.getBoundingClientRect(); DPR=Math.min(devicePixelRatio||1,3); W=Math.round(r.width); H=Math.round(r.height); if(!W||!H) return;
+function resize(){ const r=stage.getBoundingClientRect(); DPR=Math.min(devicePixelRatio||1,2); /* 2x: every pen move copies the whole ink twice, and 3x is 2.25x the pixels */ W=Math.round(r.width); H=Math.round(r.height); if(!W||!H) return;
   for(const c of [gC,iC,fC]){c.width=W*DPR;c.height=H*DPR;c.getContext('2d').setTransform(DPR,0,0,DPR,0,0);} trailProg=-1; drawGuide(); redrawInk(); }
 addEventListener('resize',resize);
 if(typeof ResizeObserver!=='undefined') new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); if(Math.round(r.width)!==W||Math.round(r.height)!==H) resize(); }).observe(stage);
@@ -853,7 +853,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.62');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.63');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1764,7 +1764,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[],speed:0.055,wardHp:5,tower:{"rows":2,"rowWaves":10,"bossEvery":10,"bossHp":2,"bossBite":1,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15,"vessel":25},hpEvery:10,biteRate:0.5,noRepeat:4,hpMax:5,biteEvery:20,biteMax:4,tendEvery:10,riseStep:0.2,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"intent":12,"quick":8,"breath":9,"shove":6,"mend":10,"wall":10,"tend":9,"dilig":8,"harvest":7,"rise":14},spawnMs:5200,spawnRamp:140,spawnMin:1800,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,energyMax:24,energyStart:6,energyPerStroke:1,castCost:2,vesselStep:6,holdMs:1500,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:null,knockback:0.07,sign:"kana",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License.",credits:["Stroke order recorded and checked by the project's teachers.", "Letterforms drawn by hand by the project's artist.", "Bugs found by the testers, several of them young, all of them right.", "Built by the maintainer, one version at a time."],realms:[],speed:0.055,wardHp:5,tower:{"rows":2,"rowWaves":10,"bossEvery":10,"bossHp":2,"bossBite":1,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15,"vessel":25},hpEvery:30,biteRate:0.5,noRepeat:4,hpMax:5,biteEvery:30,biteMax:4,tendEvery:10,riseStep:0.2,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"intent":12,"quick":8,"breath":9,"shove":6,"mend":10,"wall":10,"tend":9,"dilig":8,"harvest":7,"rise":14},spawnMs:5200,spawnRamp:45,spawnMin:3400,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,energyMax:24,energyStart:6,energyPerStroke:1,castCost:2,vesselStep:6,holdMs:1500,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -1940,7 +1940,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 
   const cx = () => fc.width / (2*DPRF());
   const cy = () => fc.height / (2*DPRF()) * 1.06;   // ward sits a touch low
-  function DPRF(){ return Math.min(devicePixelRatio||1, 3); }
+  // 2x, not 3x: the field is a phone's width and redrawn every frame, and a
+  // 3x phone paints 2.25x the pixels of a 2x one for glows nobody can tell
+  // apart. (The maintainer, v0.1.62: "still a touch laggy.")
+  function DPRF(){ return Math.min(devicePixelRatio||1, 2); }
   let FW = 0, FH = 0;
   function sizeField(){
     const r = wrap.getBoundingClientRect(), d = DPRF();
@@ -2671,6 +2674,25 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   }
   function fieldLoop(now){ step(now); requestAnimationFrame(fieldLoop); }
 
+  // Glow without shadowBlur. CLAUDE.md's rule is "no per-frame shadow blur",
+  // and the field broke it ten times a frame: a blurred shadow is rasterised
+  // afresh on every draw, on a canvas a phone wide, sixty times a second.
+  // A glow is a radial gradient painted once into a small sprite per colour
+  // and stretched to size; the solid shape is drawn over it as before.
+  const GLOWS = {};
+  function glowAt(g, x, y, rx, ry, color, alpha){
+    let sp = GLOWS[color];
+    if (!sp){
+      sp = document.createElement('canvas'); sp.width = sp.height = 64;
+      const c = sp.getContext('2d'), gr = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+      if (gr && gr.addColorStop){ gr.addColorStop(0, color); gr.addColorStop(0.3, color); gr.addColorStop(1, 'rgba(0,0,0,0)'); }
+      c.fillStyle = gr; c.fillRect(0, 0, 64, 64);
+      GLOWS[color] = sp;
+    }
+    if (alpha != null && alpha !== 1){ g.save(); g.globalAlpha = alpha; }
+    g.drawImage(sp, x - rx, y - ry, rx*2, ry*2);
+    if (alpha != null && alpha !== 1) g.restore();
+  }
   function draw(){
     const g = fc.getContext('2d');
     g.clearRect(0,0,FW,FH);
@@ -2678,11 +2700,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 
     // the ward being protected
     const pulse = 0.6 + 0.4*Math.sin(performance.now()/700);
-    g.save();
-    g.shadowColor = 'rgba(108,184,255,.8)'; g.shadowBlur = 26*pulse;
+    glowAt(g, X, Y, 13 + 22*pulse, 13 + 22*pulse, over ? 'rgba(120,60,50,.5)' : 'rgba(108,184,255,.5)', 1);
     g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(108,184,255,.92)';
     g.beginPath(); g.arc(X, Y, 13, 0, 6.284); g.fill();
-    g.restore();
     g.strokeStyle = over ? 'rgba(200,90,70,.35)' : 'rgba(108,184,255,.22)';
     g.lineWidth = 1;
     g.beginPath(); g.arc(X, Y, 26 + 5*pulse, 0, 6.284); g.stroke();
@@ -2702,8 +2722,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const near = 1 - m.d;
       g.save();
       g.globalAlpha = 0.5 + 0.5*near;
-      g.shadowColor = isT ? 'rgba(95,227,161,.75)' : 'rgba(150,170,190,.4)';
-      g.shadowBlur = isT ? 20 : 10;
+      glowAt(g, p.x, p.y+bob, isT ? 17 + 16 : 17 + 8, isT ? 21 + 16 : 21 + 8, isT ? 'rgba(95,227,161,.45)' : 'rgba(150,170,190,.22)', 1);
       g.fillStyle = isT ? 'rgba(95,227,161,.30)' : 'rgba(170,185,200,.20)';
       g.beginPath(); g.ellipse(p.x, p.y+bob, 17, 21, 0, 0, 6.284); g.fill();
       g.restore();
@@ -2759,11 +2778,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       }
       // a lit character: its own wisp will answer this one
       if (casting() && charge(key(m)) >= 1){
-        g.save();
-        g.shadowColor = 'rgba(95,227,161,.9)'; g.shadowBlur = 10;
+        glowAt(g, p.x + w/2 + 2, by-14, 11, 11, 'rgba(95,227,161,.6)', 1);
         g.fillStyle = 'rgba(150,240,195,.95)';
         g.beginPath(); g.arc(p.x + w/2 + 2, by-14, 3.2, 0, 6.284); g.fill();
-        g.restore();
       }
     }
 
@@ -2785,18 +2802,17 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
           g.beginPath(); g.arc(tx, ty, 9 - k*1.5, 0, 6.284); g.fill();
         }
         g.globalAlpha = 0.95;
-        g.shadowColor = 'rgba(95,227,161,.95)'; g.shadowBlur = 22;
-        g.fillStyle = 'rgba(190,240,228,.9)';
         g.font = '700 15px ui-sans-serif,system-ui,"Klee One",sans-serif';
         const rx = Math.max(11, g.measureText(s.ch).width/2 + 7);   // a word needs a longer light
+        glowAt(g, x, y, rx + 18, 13 + 18, 'rgba(95,227,161,.6)', 1);
+        g.fillStyle = 'rgba(190,240,228,.9)';
         g.beginPath(); g.ellipse(x, y, rx, 13, 0, 0, 6.284); g.fill();
-        g.shadowBlur = 0;
         g.fillStyle = 'rgba(20,40,40,.9)';
         g.textAlign = 'center'; g.textBaseline = 'middle';
         g.fillText(s.ch, x, y+1);
       } else {
         g.globalAlpha = 0.9;
-        g.shadowColor = 'rgba(108,184,255,.9)'; g.shadowBlur = 18;
+        glowAt(g, x, y, 26, 26, 'rgba(108,184,255,.55)', 1);
         g.fillStyle = '#bfe3ff';
         g.font = '700 26px ui-sans-serif,system-ui,"Klee One",sans-serif';
         g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -2809,7 +2825,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const a = Math.min(1, r.life*1.6);
       g.save();
       g.globalAlpha = a;
-      g.shadowColor = 'rgba(108,184,255,.9)'; g.shadowBlur = 16;
+      glowAt(g, r.x, r.y, 30, 22, 'rgba(108,184,255,.45)', 1);
       g.fillStyle = '#bfe3ff';
       g.font = `700 ${Math.round(26 + 10*(1-r.life))}px ui-sans-serif,system-ui`;
       g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -2859,11 +2875,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       const flick = 0.75 + 0.25*Math.sin(performance.now()/160);
       for (let k=0;k<cap;k++){
         const px = x0 + 41 + lw + k*pipW + 4, lit = k < c;
-        g.save();
-        if (lit){ g.shadowColor = 'rgba(95,227,161,.95)'; g.shadowBlur = 9*flick; }
+        if (lit) glowAt(g, px, d.y, 3.4 + 8*flick, 4 + 8*flick, 'rgba(95,227,161,.6)', 1);
         g.fillStyle = lit ? 'rgba(170,236,220,.95)' : 'rgba(95,227,161,.14)';
         g.beginPath(); g.ellipse(px, d.y, 3.4, lit ? 4.6*flick+1 : 3.4, 0, 0, 6.284); g.fill();
-        g.restore();
       }
     }
 
@@ -3237,6 +3251,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.62</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. · v0.1.63</div>
 </body>
 </html>
