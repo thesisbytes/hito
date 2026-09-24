@@ -30,7 +30,7 @@ const el = () => new Proxy({ style:{}, classList:{add(){},remove(){},contains:()
       if (k==='parentNode') return el();
       if (typeof k==='symbol') return undefined;
       return new Proxy(function(){ return el(); }, { get:()=>'' });
-    }, set(){ return true; } });
+    }, set(t,k,v){ t[k]=v; return true; } });   // writes persist, as in dom.mjs: a `hidden` the shell sets is a `hidden` a test can read
 globalThis.document = { getElementById:el, createElement:el, body:el(), addEventListener(){},
   documentElement:el(), fonts:{ready:Promise.resolve(), add(){}} };
 globalThis.window = globalThis;
@@ -862,8 +862,20 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   ok(/class="bar life"/.test(F.dashHtml) && /class="bar energy"/.test(F.dashHtml) && /墨 0/.test(F.dashHtml) && /data-tab="skills"/.test(F.dashHtml), `the dashboard is missing something: ${F.dashHtml.slice(0, 200)}`);
   ok(new RegExp(`<small>${F.wardMax}/${F.wardMax}</small>`).test(F.dashHtml), `the life bar does not read ${F.wardMax} of ${F.wardMax}`);
   ok(F.openTab('skills') === 'skills' && F.tab === 'skills' && !F.paused, 'opening a tab paused the run, or did not open');
-  ok(/aria-pressed="true"/.test(F.dashHtml), 'the open tab is not shown as open');
+  ok(/data-tab="skills" aria-pressed="true"/.test(F.dashHtml), 'the open tab is not shown as open');
+  // the sketchbook is a tab too: a shop stands where it stood, and there is nothing to trace on
+  const stageEl = F.sketchbook;   // the stub hands a fresh element to every lookup, so ask the shell for its own
+  ok(stageEl.hidden === true, 'the sketchbook is still there under an open shop');
   ok(F.openTab(null) === null && F.tab === null, 'the tab did not close');
+  ok(stageEl.hidden === false && /data-tab="trace" aria-pressed="true"/.test(F.dashHtml), 'closing the shop did not bring the sketchbook back');
+  ok(F.openTab('trace') === null && F.tab === null, '筆 is not the way back to the sketchbook');
+  // and it does not open under a pen that is down: lift, and find the gap
+  F.touch();
+  ok(F.openTab('skills') === null && stageEl.hidden === false, 'a shop opened under a pen that was down');
+  advance(cfg.holdMs + 50);
+  ok(F.openTab('skills') === 'skills', 'a lifted pen could not open the shop');
+  F.restart();
+  ok(F.tab === null && stageEl.hidden === false, 'a new run began with the shop open');
 
   // 気: one bag, filled by every stroke whatever is on the field, spent by every cast
   F.restart(); F.quench();

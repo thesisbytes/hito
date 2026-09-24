@@ -75,24 +75,31 @@ STYLE = """
   /* Four tabs and two bars have to share 374px on a phone: the spacing is
      tight on purpose, and the tabs may not grow (the engine's own button
      rule would have them at 88px each). */
-  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:6px;
-             padding:5px 7px; border-radius:10px; background:rgba(22,20,17,.88); border:1px solid #3d3324;
+  .dash-bar{ position:absolute; left:8px; right:8px; bottom:6px; z-index:3; display:flex; align-items:center; gap:5px;
+             padding:5px 6px; border-radius:10px; background:rgba(22,20,17,.88); border:1px solid #3d3324;
              font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
-  .dash-bar .bar{ position:relative; flex:1 1 60px; min-width:46px; max-width:150px; height:18px; border-radius:6px; overflow:hidden;
+  .dash-bar .bar{ position:relative; flex:1 1 60px; min-width:40px; max-width:150px; height:18px; border-radius:6px; overflow:hidden;
                   background:rgba(232,224,204,.08); border:1px solid #3d3324; }
   .dash-bar .bar i{ position:absolute; left:0; top:0; bottom:0; background:#e9c46a; opacity:.75; transition:width .25s; }
   .dash-bar .bar.energy i{ background:#7fd1c4; }
   .dash-bar .bar b{ position:absolute; left:6px; top:1px; font-size:12px; color:#1a1712; }
   .dash-bar .bar small{ position:absolute; right:5px; top:2px; font-size:10px; color:#e8e0cc; }
   @media (prefers-reduced-motion:reduce){ .dash-bar .bar i{ transition:none; } }
-  .dash-bar .n{ font-weight:700; color:#e9c46a; white-space:nowrap; } .dash-bar .n small{ font-weight:400; color:rgba(232,224,204,.55); }
+  .dash-bar .n{ font-weight:700; font-size:11px; color:#e9c46a; white-space:nowrap; } .dash-bar .n small{ font-weight:400; color:rgba(232,224,204,.55); }
   .dash-bar .dash-tabs{ margin-left:auto; display:flex; gap:3px; }
-  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:3px 7px; border-radius:8px; background:transparent;
+  .dash-bar .dash-tabs button{ flex:none; min-width:0; font:700 13px ui-sans-serif,system-ui; padding:3px 6px; border-radius:8px; background:transparent;
                           border:1px solid #3d3324; color:#e8e0cc; cursor:pointer; }
   .dash-bar .dash-tabs button.can{ border-color:#7fd1c4; color:#bdf0e6; }
   .dash-bar .dash-tabs button[aria-pressed="true"]{ background:rgba(127,209,196,.14); border-color:#7fd1c4; color:#bdf0e6; box-shadow:0 0 10px rgba(127,209,196,.25); }
-  .panel{ position:absolute; left:8px; right:8px; top:8px; bottom:46px; z-index:2; overflow:auto; border-radius:12px; padding:10px;
+  /* The shop stands where the sketchbook stood, and the sketchbook is gone
+     while it does: the tracing is a tab like the others (the maintainer:
+     "the player has to wait for opportunities to switch out to upgrade").
+     It takes the sketchbook's own box, measured as it is hidden, so the
+     page does not jump. */
+  .panel{ position:relative; flex:0 0 auto; box-sizing:border-box; width:min(96vw,34dvh); height:min(96vw,34dvh); margin:8px auto 10px;
+          z-index:2; overflow:auto; border-radius:12px; padding:10px;
           background:rgba(22,20,17,.93); border:1px solid #3d3324; font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
+  body.field .stage[hidden]{ display:none; }
   .panel .panel-h{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:rgba(232,224,204,.55); margin:0 0 8px; }
   .panel .start-h, .panel .start-row{ margin-top:0; }
   .upg-ink{ display:flex; align-items:center; gap:5px; padding:0 9px; border-radius:9px;
@@ -1141,6 +1148,7 @@ LAYER = STYLE + r"""
   }
 
   function restart(){
+    if (typeof openTab === 'function') openTab(null);
     monsters = []; shots = []; motes = []; readings = [];
     upg = freshUpg(); run = newRun(); ended = null;
     zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
@@ -1230,7 +1238,7 @@ LAYER = STYLE + r"""
   const panelDrive = document.createElement('div'); panelDrive.innerHTML = '<p class="panel-h">志 · this run · motivation, bought with 墨</p>'; panelDrive.appendChild(stripDrive);
   const panelLanterns = document.createElement('div');
   panel.appendChild(panelSkills); panel.appendChild(panelGuard); panel.appendChild(panelDrive); panel.appendChild(panelLanterns);
-  wrap.appendChild(panel); wrap.appendChild(bar);
+  stageEl.parentNode.insertBefore(panel, stageEl.nextSibling); wrap.appendChild(bar);
   let tab = null, dashMarkup = '';
   // Bars, not hearts (the maintainer: "let's not do hearts. I like bars. For
   // both the life and energy for casting").
@@ -1242,20 +1250,27 @@ LAYER = STYLE + r"""
       + bar_('energy', '気', energy, energyMax(), '気 — every stroke fills it, every wisp spends it: ' + energy + ' of ' + energyMax())
       + `<span class="n" title="ink — earned by tracing, spent on this run's skills">墨 ${sumi}</span>`
       + (p ? `<span class="n" title="魂 — earned by runs, spent on what lasts">魂 ${p.balance}</span>` : '')
-      + `<span class="n"><small>wave</small> ${wave}</span>`
-      + `<span class="dash-tabs"><button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="this run's intent">技</button>`
+      + `<span class="n" title="the wave"><small>波</small> ${wave}</span>`
+      + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook">筆</button>`
+      + `<button data-tab="skills" aria-pressed="${tab === 'skills'}" class="${canBuyAny('skills') ? 'can' : ''}" title="this run's intent">技</button>`
       + `<button data-tab="guard" aria-pressed="${tab === 'guard'}" class="${canBuyAny('guard') ? 'can' : ''}" title="this run's persistence">耐</button>`
       + `<button data-tab="drive" aria-pressed="${tab === 'drive'}" class="${canBuyAny('drive') ? 'can' : ''}" title="this run's motivation">志</button>`
       + (p ? `<button data-tab="lanterns" aria-pressed="${tab === 'lanterns'}" title="what lasts">灯</button>` : '') + `</span>`;
     if (m === dashMarkup) return;
     dashMarkup = m; bar.innerHTML = m;
-    if (bar.querySelectorAll) for (const b of bar.querySelectorAll('button[data-tab]')) b.onclick = () => openTab(tab === b.dataset.tab ? null : b.dataset.tab);
+    if (bar.querySelectorAll) for (const b of bar.querySelectorAll('button[data-tab]')) b.onclick = () => openTab(tab === b.dataset.tab || b.dataset.tab === 'trace' ? null : b.dataset.tab);
   }
   function renderLanterns(){ panelLanterns.innerHTML = `<p class="panel-h">灯 · what lasts · bought with 魂</p>` + workshopHtml(); wireWorkshop(renderLanterns, panelLanterns); renderDash(); }
   // A tab does not pause the run. That is the point: the waves keep coming
-  // while you shop, and knowing when you can afford to is the game.
+  // while you shop, and knowing when you can afford to is the game. And the
+  // sketchbook is a tab too: while a shop is open there is nothing to trace
+  // on, so a lit character's own lights are all that holds the ward. A shop
+  // does not open under a pen that is down; lift, and find the gap.
   function openTab(name){
-    tab = name || null;
+    if (name && name !== 'trace' && tracing()) return tab;
+    tab = name && name !== 'trace' ? name : null;
+    if (tab && !stageEl.hidden){ const r = stageEl.getBoundingClientRect(); if (r.width > 0){ panel.style.width = r.width + 'px'; panel.style.height = r.height + 'px'; } }
+    stageEl.hidden = !!tab;
     panel.hidden = !tab; panelSkills.hidden = tab !== 'skills'; panelGuard.hidden = tab !== 'guard'; panelDrive.hidden = tab !== 'drive'; panelLanterns.hidden = tab !== 'lanterns';
     if (tab === 'lanterns') renderLanterns();
     renderDash();
@@ -1385,7 +1400,7 @@ LAYER = STYLE + r"""
     const pg = start.querySelector('.start-page'); if (pg) pg.onclick = () => { view = 'start'; renderStart(); };
     const hb = start.querySelector('.start-hand'); if (hb) hb.onclick = () => H.show();
   }
-  function openOver(){ paused = true; view = 'over'; renderStart(); start.hidden = false; showRedo(false); }
+  function openOver(){ openTab(null); paused = true; view = 'over'; renderStart(); start.hidden = false; showRedo(false); }
   function openStart(){ paused = true; view = over && ended ? 'over' : 'start'; renderStart(); start.hidden = false; showRedo(false); }
   function openCredits(){ paused = true; view = 'credits'; renderStart(); start.hidden = false; showRedo(false); }
   function begin(){
@@ -1431,7 +1446,7 @@ LAYER = STYLE + r"""
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, get asked(){ return asked; }, get queue(){ return queue; },
     get run(){ return run; }, get ended(){ return ended; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
-    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
+    get upgHtml(){ return upgMarkup; }, get guardHtml(){ return guardMarkup; }, get driveHtml(){ return driveMarkup; }, get sketchbook(){ return stageEl; }, get dashHtml(){ return dashMarkup; }, openTab, get tab(){ return tab; }, TABS,
     get energy(){ return energy; }, get energyMax(){ return energyMax(); }, fill,
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,

@@ -650,8 +650,11 @@ breach costs more of the ward the higher the tower — and this tab is what
 stands against it), 志, this run's motivation, which is currency gain
 (v0.1.62, the maintainer's word: more 墨 per trace, more 墨 per banish, more
 魂 from the fall — 技 cuts, 耐 lasts, 志 earns), and 灯, the lanterns bought
-with 魂. A tab does not pause the run. **The tab buttons
-were invisible from v0.1.55 to v0.1.60**: the shell hides the workshop's
+with 魂. A tab does not pause the run. **The sketchbook is a tab too** (筆,
+v0.1.62): a shop stands where it stood, nothing can be traced while one is
+open, and it does not open under a pen that is down — the maintainer: "the
+player has to wait for opportunities to switch out to upgrade." **The tab
+buttons were invisible from v0.1.55 to v0.1.60**: the shell hides the workshop's
 `.tabs` with an `!important` rule and the dashboard had borrowed the class
 name; the stubbed DOM has no stylesheet, so only a screenshot could see it.
 The maintainer: "the crazy part of the game is knowing when you can relax the

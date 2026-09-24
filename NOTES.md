@@ -1774,3 +1774,26 @@ Running log. Append at the bottom, don't rewrite history.
   right edge before the tightening. The stubbed DOM would have passed it.
 - Test: diligence on a clean trace, harvest on a light's banish, rise on a
   fallen run's 魂 against the same run without it, and the tab on the seam.
+
+## 2026-09-24 — The sketchbook is a tab (hiragana v0.1.62, katakana-game v0.1.25, same release)
+
+- The maintainer: "I also meant the tracing is another tab. So the player
+  has to wait for opportunities to switch out to upgrade." So the seam's
+  tabs are 筆 技 耐 志 灯, and a shop stands where the sketchbook stood,
+  in its own box (measured as it is hidden, so the page does not jump).
+  While a shop is open there is nothing to trace on: the lit characters'
+  own lights are all that holds the ward, and the farang do not wait. That
+  is the cost of an upgrade, which is what the maintainer wanted the
+  decision to be — "knowing when you can relax the stroke practice and
+  tab out".
+- A shop does not open under a pen that is down (`tracing()`, including
+  the hold after a lift): lift, and find the gap. A run's start and end
+  close it.
+- The field test's own DOM stub discarded every property write (`set(){
+  return true; }`), unlike `dom.mjs`; it keeps them now, or a `hidden` the
+  shell sets could not be read back. `F.sketchbook` hands the shell's own
+  element to a test, because the stub gives a fresh one to every lookup.
+- Five tabs on a 344px seam: the wave's label is 波 now, the bars go down
+  to 40px and the spacing is at its tightest. Checked at 360 and 390px in
+  headless Chrome; below 360 the last tab will clip, and the next thing to
+  give would be the numbers' labels.
