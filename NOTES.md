@@ -2334,3 +2334,32 @@ Running log. Append at the bottom, don't rewrite history.
   word, and it is the maintainer's.
 - Concept canvas: the stage and the estate redrawn around people; the
   lineup screen removed.
+
+## 2026-09-26 — The heroes auto attack; the hand casts the specials (decided in direction)
+
+- The maintainer: "I think I was more leaning towards the heroes are auto
+  attacking. But ooh. Maybe in order for us to do like stuns, or block
+  break, you gotta stroke the characters."
+- **Basic attacks are the heroes'.** A hero hits by itself, as hard as the
+  practice that forged it, and chips a costume layer at a time. This is
+  the AFK auto-battle, and it is what makes a cleared stage replayable by
+  the household alone, which is what the estate's away rate is claiming.
+- **Specials are the hand's.** A fight charges a hero's special (the seam's
+  気, filled now by the fighting rather than the hand — a reversal of the
+  v0.1.56 rule "nothing fills it but the hand", for the reason that the
+  hand now *spends* it: the practice is the release, not the charge).
+  When it is ready the sketchbook lights with a character, and writing it
+  fires the move: a **stun** that holds the wave while the heroes catch
+  up, a **block break** for a farang who has put up a guard, a heavy slash
+  that strips a layer whole. The reader's special is cast by spotting the
+  sign, the grammarian's by ordering the words, same shape.
+- **A block is only ever broken by hand.** A farang's guard is a comic
+  prop — a phrasebook held up like a shield, a selfie stick, a menu — and
+  no auto attack gets through it. So a stage's difficulty is how many
+  blocks it puts up: none on a stage you have cleared, one on the general,
+  more as the tower climbs. That is "harder stages require their
+  interaction" as a mechanic rather than a dial, and "nothing draws for
+  you" still holds: nothing ever traces, and the hand is what the fight
+  turns on.
+- Concept canvas: the general now holds up a phrasebook, and the
+  sketchbook says the special is ready.
