@@ -2224,3 +2224,38 @@ Running log. Append at the bottom, don't rewrite history.
   (the 2026-09-24 sketch, "the farang learn what you learn", now with a
   picture): banishing them is what makes them stronger farang.
 - The stage artboard on the concept canvas is redrawn with the three tiers.
+
+## 2026-09-26 — Six a side; the heroes fight on their own until they cannot
+
+- The maintainer: "the stages are fought like 6v6 style. So when the player
+  goes for a fight, they can have the heros auto fight, but harder stages
+  would require their interaction."
+- **Six heroes, chosen.** A team is six from the roster, not a row of five;
+  a row is a set bonus (five of a row lean harder), not the team. This is
+  the strategic mashup, and it costs nothing in the data: a team is six
+  codepoints.
+- **The lineup is a reading test.** Their six signs are shown before the
+  fight the way the sign mode says (romaji, the accent, or kana), and the
+  player picks the six shapes to answer them. Bring き for KI. Pick ぬ for
+  NA and nobody answers that farang but the hand. This is the recognition
+  mode the AFK sketch asked for, built into the fight instead of beside it.
+- **Auto fight is the lit characters, and needs their charge to last.** A
+  hero throws its own wisp at the farang carrying its character — the
+  mechanic since v0.1.21 — so a stage below the player falls to the six
+  without a stroke. That requires a charge that survives the run, which
+  **reverses v0.1.71 ("the lights are the run's")**: what a hero arrives
+  with is its potency, the decaying candle from the original economy, and
+  writing is what refills it. The maintainer's complaint then was 気, the
+  bag, persisting; 気 stays the run's. The lights were quenched with it
+  because the run was the game. It is not any more.
+- **Harder stages need the hand, by construction, not by a switch.** Three
+  things the six can never do: answer a farang whose character none of
+  them carries; answer the general, whose sign is hidden until he arrives
+  and is always written by hand; and keep throwing once their charge is
+  spent, which the stage's HP outruns as it climbs. So a cleared stage
+  replays itself (the estate's idle rate is honest: that stage really can
+  be won by the team alone) and a new stage is the hand's. "Nothing draws
+  for you" holds: every wisp is from a character the hand wrote and
+  charged.
+- Concept canvas: the stage redrawn with six heroes, and a lineup screen
+  added between the estate and the stage.
