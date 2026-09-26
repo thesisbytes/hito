@@ -2270,3 +2270,67 @@ Running log. Append at the bottom, don't rewrite history.
   decided: which character is the first hero (あ is the chart's first; 人
   itself is the lore's), and whether an arc is a row's chapter or one
   character's.
+
+## 2026-09-26 — Hito are people (decided in direction; supersedes the kana roster above)
+
+- The maintainer: "im not buying the characters as mashups.. it seems a
+  stray from my dream idea. Hito are people. So our heroes and farang are
+  people. Our heroes are forged with stroke practice, reading practice,
+  speaking practice, grammar practice. The farang come in confident like
+  team rocket or the phantom trope, and the battle is fought through
+  something violent, yet artistic, and heavy on comedy. I haven't gotten
+  the idea yet for how they lose hit points. There could be a stroke dojo
+  outside the stages.. omg. Lmao. And in the stages, the hero vs farang
+  fight, and depending where the player is on their progress, tracing
+  characters, words, or pushing the right sequence for grammar, or
+  identifying the characters, or even speaking someday, become dynamics to
+  cast the special skill each hero is designed around."
+- **Heroes are people; characters are what they cast.** The kana roster,
+  the six-kana team and the lineup-as-reading-test (earlier today) are
+  withdrawn. What survives of them: the ledger keyed by codepoint is still
+  the truth, but a hero is a *person* whose strength is a view over it —
+  the calligrapher is forged by the stroke ledger, the reader by the
+  recognition record, the grammarian by the sequence record, the speaker
+  (someday) by speech. "Our characters are literally the characters"
+  survives as the spellbook, not the roster: the calligrapher casts か.
+- **Each hero's special is a practice.** Tracing a character or a word
+  casts the calligrapher's; identifying the sign casts the reader's;
+  pushing the right sequence casts the grammarian's; speaking, someday,
+  the speaker's. Which of these the stage asks for is where the player is
+  in their progress. This joins the two earlier notes: a hero's arc is a
+  *practice* arc — the villager who cannot read learns to write (chapter
+  one, alone), and finds the reader (chapter two: 人 is two strokes), and
+  so on. Rows of the chart are the curriculum inside each.
+- **The first hero is the villager who found the tablet** (DECIDED long
+  ago: the hero cannot read), and the villager is drawn as 人 — a head and
+  the two strokes. Every hero is a 人 figure with a tool. The heroes look
+  like the name of the game.
+- **The farang are Team Rocket.** They arrive confident, strike a pose,
+  announce themselves in the gaijin accent, and get sent packing. The
+  costume tiers stand (box, patched lantern, the general's kasa), and a
+  named farang comes back every few stages with a new scheme and better
+  gear, the way the trope wants.
+- **Proposed, for the hit points the maintainer has not found yet: the
+  costume is the hit points.** A hit strips a layer — the hat, the tape,
+  the lantern — and under the last one is a tourist in a loud shirt,
+  mortified, who blasts off. Violent, artistic and comic in one mechanic,
+  and it reuses the tier art: a general simply wears more. The hit itself
+  is **the player's own stroke, flung**: the trace the hand just made,
+  scaled up and drawn across the field as a brush slash on its way to the
+  farang. The handwriting ledger already holds it, `quality()` already
+  scores it, and the sketch "the stroke is the attack" becomes literal.
+  The reader's cast is a spotlight that catches the farang out; the
+  grammarian's is a sequence that trips them. Sketched, not decided.
+- **The stroke dojo is the workshop, given a door.** The single-canvas
+  tracer becomes a place at the estate where the calligrapher trains
+  between stages, and the same for a reading room and a grammar hall as
+  those heroes arrive. What is practised there is what the stage lets you
+  cast.
+- **Gacha, revisited:** now that a hero is a person, a draw *can* be a
+  hero, the AFK way, without touching "nothing draws for you": a drawn
+  hero arrives untrained, and is forged the same way as the first.
+- Speaking needs speech recognition, which is not offline on every device
+  and is not in the single-file constraint's gift; "someday" is the right
+  word, and it is the maintainer's.
+- Concept canvas: the stage and the estate redrawn around people; the
+  lineup screen removed.
