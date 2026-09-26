@@ -2259,3 +2259,14 @@ Running log. Append at the bottom, don't rewrite history.
   charged.
 - Concept canvas: the stage redrawn with six heroes, and a lineup screen
   added between the estate and the stage.
+- **Addendum, same day.** The maintainer: "the player is not always
+  required to have six on their team. We could build a story based on the
+  one hero arch that could unlock other hero archs." So six is the ceiling,
+  not the rule: a fight is N against N, and N is how many the story has
+  opened. Chapter one is one hero and one farang. A hero's arc is the
+  chapter that opens the next slot, and the natural beat for the second is
+  the name of the game — 人 is two strokes and neither stands alone, so the
+  game is not Hito until the first hero finds a second. Sketched, not
+  decided: which character is the first hero (あ is the chart's first; 人
+  itself is the lore's), and whether an arc is a row's chapter or one
+  character's.
