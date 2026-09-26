@@ -2202,3 +2202,25 @@ Running log. Append at the bottom, don't rewrite history.
   the rank: a spirit cannot write.
 - Content, not engine: art, abilities, a balance table the agents would
   need to know about. After the graphics and after the estate exists.
+
+## 2026-09-26 — The farang are not yokai; they are in costume
+
+- The maintainer, on the lantern ghosts: "I like the lantern ghosts, but we
+  can't stray too far its not recognizable as our farang who comedically
+  try and imitate the culture but fail because our heros are slaying their
+  weaknesses and making them stronger farang."
+- So a farang is a foreigner in a chōchin-obake costume, and the costume is
+  the joke: legs in socks and sandals under the lantern, hands holding it
+  up, an eye through a hole cut by hand, tape over the tears, a bucket hat
+  on top. The same joke as the gaijin voice ("koohii") and the hero who
+  cannot read: the farang is the player's mirror.
+- **The sign is always right.** The comedy lives in the costume and the
+  voice, never in the character, because the character is what the learner
+  is reading. A wrong kana on a farang would teach a wrong kana.
+- **The costume is the tier.** Tier 1, a cardboard box with a hole cut in
+  it. Tier 2, a paper lantern patched with tape. Tier 3, a general: the
+  real thing at last, a straw kasa, a name (将 マイケル), and still the
+  sandals. A farang sent home comes back better dressed and carrying more
+  (the 2026-09-24 sketch, "the farang learn what you learn", now with a
+  picture): banishing them is what makes them stronger farang.
+- The stage artboard on the concept canvas is redrawn with the three tiers.
