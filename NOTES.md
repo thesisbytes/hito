@@ -2145,3 +2145,36 @@ Running log. Append at the bottom, don't rewrite history.
   sketchbook: the sign says ka, tap the farang carrying か — a thing a finger
   can win). Tracer and tower unchanged.
 - None of it built. Recorded so the reasoning survives.
+
+## 2026-09-26 — Graphics first; heroes are a row; the stage sets the rate (decided in direction)
+
+- The maintainer: "for my motivation's sake, we should revamp the graphics
+  first. I like the idea of having heroes relying on each other to clear
+  each stage, and the latest stage the player cleared is the rate they
+  accrue currency to level their characters and stuff."
+- What the field draws today, looked at in headless Chrome at phone width:
+  the ward is a blue circle with pips, a farang is a pale ellipse with a
+  text bubble, a light is a teal ellipse with the character in it. Dots and
+  ovals. The revamp is real.
+- **Heroes are the characters, and a team is a row of the chart** — か き
+  く け こ stand together before the gate, and the lit ones lean on each
+  other (人). This is the DECIDED affinity rule (linguistic structure, not
+  invented elements) and row resonance drawn as a picture, and it changes
+  nothing underneath: a hero acts only when lit, and only the hand lights.
+- **The farang are chōchin-obake**, paper-lantern ghosts with the sign
+  painted on the paper, one eye, a tongue. A lantern carries a sign by
+  nature, so the bubble goes. Ours is cold (blue ink, teal light); theirs
+  is warm (paper and a candle inside) — the one place warm belongs besides
+  a warning, and it is a warning, in the sense that it is coming for you.
+  The ward is a torii, the household's gate, with 命 hung on it as lanterns.
+- **The stage cleared sets the rate.** Stages are finite again — a fixed
+  set of lanterns and a general at the end — because "the latest stage the
+  player cleared" needs a stage that can be cleared. The endless tower can
+  stay as a mode (see 2026-09-26 above: AFK has a King's Tower). What the
+  household earns while away is a function of the furthest stage cleared,
+  and is claimed through the gate.
+- A concept of three screens (the stage, the estate in place of the level
+  switcher, the gate) is on a design canvas for the maintainer to react
+  to before the field shell is touched. Kanji labels carry an English word
+  and a drawn mark, as the v0.1.67 rule says.
+- Nothing in a build yet.
