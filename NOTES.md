@@ -2178,3 +2178,27 @@ Running log. Append at the bottom, don't rewrite history.
   to before the field shell is touched. Kanji labels carry an English word
   and a drawn mark, as the v0.1.67 rule says.
 - Nothing in a build yet.
+
+## 2026-09-26 — Gacha (sketched, not decided)
+
+- The maintainer: "I love the play on terminology that our characters are
+  literally the characters.. but I think I'd like to add Gatcha draws in
+  the future for strategic Mashup of characters."
+- The rule at stake: nothing draws for you, and no character is learned by
+  standing near one that was. A draw that hands over ぬ is exactly that.
+- **Proposed: draws give spirits; characters are written.** The lore's cast
+  (kodama, kitsune, tanuki, kappa, tengu, Hanuman's monkeys, the phi) as
+  companions that ride a character and give it a role — wall, healer, a
+  chain to the next lantern, a burst by stroke count. A spirit rides only a
+  lit character; duplicates ascend the spirit. The strategic mashup is
+  which spirit on which character and how the rows combine. The pun holds:
+  the character is yours because you wrote it, the spirit because you were
+  lucky.
+- Rejected on the way: draws that open a character early (fights the stage
+  gate, reads as gambling for lessons); draws from the player's own lit set
+  (keeps every rule, is not a gacha).
+- Souls from the gate pay for draws, so the learning loop funds the
+  collection loop; no money, no pity timer, no paywall. Doors pushed stays
+  the rank: a spirit cannot write.
+- Content, not engine: art, abilities, a balance table the agents would
+  need to know about. After the graphics and after the estate exists.
