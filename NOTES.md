@@ -2086,3 +2086,62 @@ Running log. Append at the bottom, don't rewrite history.
   flight against the farang's hp; a light is withheld only from one that
   is already finished. Two effects: the flake is gone, and a light no
   longer goes the long way round while the hand's hit is still flying.
+
+## 2026-09-26 — The estate, the gate, and the doors (sketched, not decided)
+
+- The maintainer, over two days: "at first I thought it would be cool to go
+  towards a tower defense game, but I keep tracking back to that AFK arena
+  game ... we could have recognition games, and grammar games that follow
+  along the progression, while the player earns currency even when they are
+  actually not at the screen." Then: "definitely a single player game that
+  eventually multi players ... you can definitely have your skills autocast
+  and progress. But those who rank the highest reach the top of
+  leaderboards. And instead of logging back in and pressing collect for your
+  afk rewards, im genuinely inspired by hunter x hunter, when killua returns
+  home and has to push through doors."
+- **This is the economy section of CLAUDE.md, not a pivot from it.** Potency
+  that decays, idle income from characters still remembered, away gains
+  computed on return from a timestamp — all written before any game existed.
+  The tower grafted a run loop on top. AFK's shape is one roster fed by many
+  modes, and the ledger keyed by codepoint is that roster: tracing,
+  recognition and grammar would each write to the same per-character record.
+  The tower stays as one mode (AFK has a King's Tower).
+- **The rule that survives untouched:** nothing draws for you. In AFK,
+  waiting makes you stronger; here the wall has to be a reading wall. Away
+  income buys multipliers, workshop levels, modes, cosmetics. It never lights
+  a character and never gets past a door whose characters you cannot read.
+- **The gate.** The Zoldyck testing gate: seven doors, each twice as heavy,
+  and how many you can push is your measure; the side door is free and leads
+  to the dog. Mapped: while away, the estate gathers what the lit characters
+  earned (Hanuman's monkeys, the idle workforce the lore always had — a
+  formula over the ledger on return, not a simulation, since nothing happens
+  while the app is closed). It is behind the gate. Each door is a test drawn
+  from the ledger, heavier as it goes: characters known cold with the shape
+  shown, then the shaky ones, then the boss-faint shape, then words, then
+  recall with nothing shown — which gives hard mode a home the moment its
+  scorer exists. The take is split across the doors and weighted deep, so
+  "collect" becomes proving you still know it. The side door pays a pittance
+  and never locks anyone out of playing. No timer: the gate waits, but what
+  is behind it dims as the candles dim, so a week away costs and an hour
+  does not.
+- **Rank the test, not the purse.** Doors pushed is the leaderboard number:
+  a live measure every return, never an accumulated total, and each door is
+  an observation (character, mode, quality, handwriting, hand, timing, build)
+  of the kind the 2026-08-31 rule asked for. The server counts doors from
+  accepted events; the client sends attempts, never a count. Away 魂 can then
+  stay client-written like the rest of the save file, because it is not
+  ranked. Honest limit: a single-file client can be made cheat-evident, not
+  cheat-proof. Ranking is for the signed-in, every ranked event carries the
+  handwriting (the traces gallery already renders it), and an inhuman trace
+  is exactly what the analyst agents read the table for.
+- **Multiplayer, beneficial:** a shared boss where everyone's traces chip at
+  one HP and the rank is contribution; a weekly gate race; a friend's
+  handwriting as a reference. Never a friend's lit character answering a
+  farang — that is a character learned by standing near one that was.
+- **If built, the first honest step:** away earnings from the count of lit
+  and mastered characters, capped; the title screen becomes the estate —
+  the chart as the roster with tiers, the gate, the modes — in place of the
+  level switcher; recognition as the first new mode (the field without the
+  sketchbook: the sign says ka, tap the farang carrying か — a thing a finger
+  can win). Tracer and tower unchanged.
+- None of it built. Recorded so the reasoning survives.
