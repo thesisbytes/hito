@@ -2363,3 +2363,59 @@ Running log. Append at the bottom, don't rewrite history.
   turns on.
 - Concept canvas: the general now holds up a phrasebook, and the
   sketchbook says the special is ready.
+
+## 2026-09-26 — The stage (hiragana v0.1.73, katakana-game v0.1.36)
+
+- The maintainer: "Okay, let's build that stage." Built from the day's
+  design, in the field shell, as a layer over the same engine and the same
+  seam: nothing about what counts as a correct glyph moved.
+- **The gate at the foot of the field, the farang from above.** `cy()` is
+  `gateY` (0.84) of the field's height; the fan is polar still, bearings
+  over the upper half only, the emptiest of three draws so two do not
+  arrive on one spot. Nothing that reasons in `d` changed, so the tests
+  that push farang to the door by setting `d` still mean what they meant.
+- **Heroes are people, drawn as 人.** The calligrapher stands left of the
+  gate with a brush; the next hero's place is dashed (neither stroke stands
+  alone). The calligrapher throws a dart every `heroMs` at the nearest
+  farang that is not blocking, chipping `heroHit` of a layer, times
+  `1 + forged` where forged is the share of the chart this hand has learned
+  (`heroForge` characters for double). A dart never writes a kana, so a
+  word farang is the lights' and the hand's; guided has nobody at the gate.
+  The first dart flies on the first frame of a run: a hero does not wait to
+  be asked, and the test that assumed otherwise was the one at fault.
+- **The costume is the hit points.** `hp` is layers; `hp0` what it arrived
+  in — one is a cardboard box, more is the paper lantern, patched with tape,
+  bucket hat on the third layer, a general's kasa in its place. A dart
+  chips, a hand's hit or a light strips a whole layer, and under the last
+  is the tourist in the loud shirt holding the sign up on a card. The sign
+  is always right and always painted on; a word's stays on a card above
+  the costume with its slots. Their colours are warm on purpose and
+  `theme.test.mjs` is told so by name.
+- **The block.** A general holds up a phrasebook (`bossBlock`); from
+  `blockFrom` waves a `blockRate` share of the rank and file do too. No
+  dart and no light gets through it — they bounce — and only the hand
+  breaks it, its hit landing through. This is how a stage gets harder in a
+  way the heroes cannot answer alone.
+- **The stun.** A clean trace that lands holds every farang for `stunMs`.
+  The hand's special, and it is nothing but a clean stroke. The 気 gauge is
+  untouched: the earlier note's reversal (the fight filling it, the hand
+  spending it) is deferred, because the stun as a clean stroke needed no
+  gauge at all and reversed nothing.
+- **The hit is the hand's own stroke, flung.** `flung()` reads the engine's
+  `strokes` before its load() clears them, boxes them to unit size, and the
+  shot carries them; the field paints them as a brush slash on the way. In
+  guided there is no ink, and the character flies as text, as before.
+- **Found by the screenshot, fixed:** the seam was only re-rendered when
+  ink was earned or a tab changed, so the wave and the life bar sat stale
+  during play (the wave read 0 at 26 s). It is refreshed from the loop every
+  sixth frame now; renderDash() diffs its markup.
+- Tests: the stage block in `field.test.mjs` — the fan is above the gate,
+  the darts fly on their own and chip, a block stops darts and lights and
+  the hand breaks it, a clean shot holds the wave and a zapped one does not,
+  the shot carries the strokes in their own box, guided has no hero. The
+  spawn check counts the wave, not the crowd: the darts send first-timers
+  home about as fast as they arrive.
+- **Not built, from the same design:** finite stages and a cleared stage's
+  rate, the estate in place of the level switcher, the gate and its doors,
+  the reader, the general's motto. The tower loop is what runs under the
+  new stage; the stage is what it looks like.

@@ -16,6 +16,12 @@ const WARNINGS = new Set(['220,90,60', '#dc5a3c', '#ef8a7a', '#e8a0a0', '232,160
   '#c8842f', '200,132,47',                                                                  // ink that strayed; the fizzle's embers
   '120,60,50', '200,90,70',                                                                 // the ward, fallen
   '#2a1614', '#6b3129']);                                                                  // the debug build's "fails here" button
+// The farang are warm on purpose (NOTES.md, 2026-09-26: ours is cold, theirs
+// is warm): paper and its ribs, tape, skin, socks and sandals, the cardboard
+// box, the bucket hat and the general's kasa, the loud shirt and the
+// phrasebook, the tongue, the eye, the candle inside.
+for (const c of ['#e4d7bd', '#c6b58d', '#d9cfa8', '#e8a58f', '#f6f2e8', '#3a2a22', '#b58a5a', '#8e6a40', '#b8a77a', '#a5946a',
+                 '#c9b98a', '#c9524a', '#b9463f', '#fbf7ee', '#2a1e18', '244,194,107']) WARNINGS.add(c);
 
 let fail = 0, themed = 0;
 for (const file of process.argv.slice(2)){

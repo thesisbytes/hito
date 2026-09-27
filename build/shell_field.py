@@ -236,8 +236,12 @@ LAYER = STYLE + r"""
   const stageEl = document.getElementById('stage');
   stageEl.parentNode.insertBefore(wrap, stageEl);
 
+  // The stage (v0.1.73): the gate stands at the foot of the field and the
+  // farang come down from the top, so the geometry is a fan over the gate
+  // rather than a ring around a ward. Still polar — d runs 1 at the edge to
+  // 0 at the gate — so nothing that reasons in d changed.
   const cx = () => fc.width / (2*DPRF());
-  const cy = () => fc.height / (2*DPRF()) * 1.06;   // ward sits a touch low
+  const cy = () => fc.height / DPRF() * CFG.gateY;   // the gate, near the ground
   // 2x, not 3x: the field is a phone's width and redrawn every frame, and a
   // 3x phone paints 2.25x the pixels of a 2x one for glows nobody can tell
   // apart. (The maintainer, v0.1.62: "still a touch laggy.")
@@ -252,6 +256,7 @@ LAYER = STYLE + r"""
 
   // ---- state
   let monsters = [], shots = [], motes = [];
+  let darts = [], stunUntil = 0, heroFiredAt = 0;   // the heroes' own darts, the hold a clean stroke buys, the calligrapher's clock
   let ward = CFG.wardHp, over = false, wave = 0, killed = 0;
 
   // ---- ink, and what it buys during a run
@@ -611,6 +616,55 @@ LAYER = STYLE + r"""
     return best;
   }
 
+  // ---- the heroes' own attack (the stage, v0.1.73)
+  // A hero is a person, and the calligrapher fights on their own: a dart at
+  // the nearest farang every `heroMs`, chipping a costume layer a piece at a
+  // time, as hard as the practice that forged them — every character this
+  // hand has learned makes the dart heavier, up to double at `heroForge`
+  // characters. A dart is not a stroke: it never writes a kana (a word
+  // farang is left to the lights and the hand) and it bounces off a block.
+  // Guided has nobody at the gate: it is practice. (The maintainer: "the
+  // heroes are auto attacking ... in order to do like stuns, or block
+  // break, you gotta stroke the characters.")
+  let heroOn = true;
+  const forged = () => { try { return Math.min(1, LETTERS.filter(L => (MASTERY[L[0]] || 0) > 0).length / CFG.heroForge); } catch(_){ return 0; } };
+  const heroHit = () => CFG.heroHit * (1 + forged());
+  const dartsOwed = m => m.hp - darts.filter(s => s.to === m).length * heroHit();
+  function autohero(now){
+    if (!heroOn || !casting() || !CFG.heroMs) return null;
+    if (now - heroFiredAt < CFG.heroMs) return null;
+    let best = null;
+    for (const m of monsters){
+      if (m.w || m.block > 0 || dartsOwed(m) <= 1e-9) continue;
+      if (!best || m.d < best.d) best = m;
+    }
+    if (!best) return null;
+    darts.push({ from: heroAt(0), to: best, t: 0 });
+    heroFiredAt = now;
+    return best;
+  }
+  // A dart lands: a piece of a layer. The reading blooms only when it goes.
+  function chip(m, amount){
+    if (!monsters.includes(m)) return;
+    if (m.block > 0){ bounce(m); return; }
+    m.hp -= amount;
+    const p = px(m);
+    for (let k=0;k<5;k++) motes.push({x:p.x, y:p.y, vx:(Math.random()-.5)*1.6, vy:(Math.random()-.5)*1.6, life:.6, wisp:true});
+    if (m.hp <= 1e-9){ if (CFG.reading !== 'off') bloom(m); banish(m, true); }
+  }
+  // off the phrasebook
+  function bounce(m){
+    const p = px(m);
+    for (let k=0;k<6;k++) motes.push({x:p.x-22, y:p.y-6, vx:-Math.random()*2.2, vy:(Math.random()-.5)*2, life:.5, wisp:true});
+  }
+  // The stun: a clean trace holds the whole wave for `stunMs` while the
+  // heroes catch up. The hand's special, and it is nothing but a clean stroke.
+  function stun(now){
+    stunUntil = Math.max(stunUntil, (now == null ? performance.now() : now) + CFG.stunMs);
+    if (navigator.vibrate) navigator.vibrate([40, 30, 40, 30, 80]);
+    return stunUntil;
+  }
+
   // Three ways a monster can ask. kana tests recall of the shape; romaji tests
   // the reading, which is the direction that actually matters; gaijin asks in
   // the learner's own broken accent, which is the same joke as the hero who
@@ -655,10 +709,27 @@ LAYER = STYLE + r"""
     // trace disappears ... perhaps not completely blank, just less help.")
     // Words are not bossed: a word is long enough.
     const boss = !!(ST && !w && (wave + 1) % ST.bossEvery === 0);
+    // The costume is the hit points (the stage, v0.1.73): a hit strips a
+    // layer, and under the last one is a tourist in a loud shirt. `hp0` says
+    // what it arrived in — one layer is a cardboard box, more is the paper
+    // lantern — and `block` is a phrasebook held up like a shield, which no
+    // hero's dart and no light gets through: only the hand breaks a block.
+    // A general always blocks; past `blockFrom` waves some of the rank and
+    // file do too. Words are never blocked: a word is long enough.
+    const hp = hpFor(wave) + (boss ? ST.bossHp : 0);
+    const block = w ? 0 : boss ? CFG.bossBlock : (wave >= CFG.blockFrom && Math.random() < CFG.blockRate ? 1 : 0);
+    // A bearing over the upper half, the emptiest of three draws: two arriving
+    // on the same spot read as one farang with two signs.
+    let a = 0, room = -1;
+    for (let k = 0; k < 3; k++){
+      const c = Math.PI + 0.38 + Math.random()*(Math.PI - 0.76);
+      const r = monsters.reduce((best, m) => Math.min(best, Math.abs(m.a - c)), 9);
+      if (r > room){ room = r; a = c; }
+    }
     monsters.push({
-      i, w, ci: 0, zaps: 0, a: Math.random()*Math.PI*2, d: 1.05, boss,
+      i, w, ci: 0, zaps: 0, a, d: 1.05, boss,
       speed: CFG.speed * (0.8 + Math.random()*0.5) * (ST ? 1 + ST.speedStep*Math.floor(wave / ST.bossEvery) : 1),
-      hp: hpFor(wave) + (boss ? ST.bossHp : 0), wob: Math.random()*6.28, born: performance.now(),
+      hp, hp0: hp, block, wob: Math.random()*6.28, born: performance.now(),
     });
     wave++;
     // 癒 tend: for every `tendEvery` waves held, a life back per level, up to
@@ -883,6 +954,20 @@ LAYER = STYLE + r"""
   // conjure for the strokes shine never saw.
   const topUp = n => { fill(n); if (n > 0 && energy >= energyMax()) release(); };
   if (typeof _shine === 'function') window.shine = function(){ topUp(perStroke()); credited++; return _shine.apply(this, arguments); };
+  // The hit is the hand's own stroke, flung (the stage, v0.1.73): what was
+  // just drawn, in its own box, so it can be painted at any size on its way
+  // across the field. Guided leaves no ink, and then the character flies as
+  // text. Read before the engine's own load() clears the strokes.
+  function flung(){
+    try {
+      const ss = strokes.filter(s => s && s.length > 1);
+      if (!ss.length) return null;
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (const s of ss) for (const q of s){ if (q.x < x0) x0 = q.x; if (q.y < y0) y0 = q.y; if (q.x > x1) x1 = q.x; if (q.y > y1) y1 = q.y; }
+      const span = Math.max(x1 - x0, y1 - y0, 1), ox = (x0 + x1) / 2, oy = (y0 + y1) / 2;
+      return ss.map(s => s.filter((q, k) => k % 2 === 0 || k === s.length - 1).map(q => [(q.x - ox) / span, (q.y - oy) / span]));
+    } catch(_){ return null; }
+  }
   const _conjure = window.conjure;
   window.conjure = function(){
     const drew = LETTERS[idx][0];
@@ -899,7 +984,9 @@ LAYER = STYLE + r"""
       if (!whole) t.i = AT[t.w.chars[t.ci]];
     }
     if (t){
-      shots.push({from:{x:cx(), y:FH-6}, to:t, t:0, ch:drew, partial: !whole});
+      // the stroke itself flies, from the calligrapher's hand; a clean one
+      // stuns the wave when it lands
+      shots.push({from: heroAt(0), to:t, t:0, ch:drew, partial: !whole, path: flung(), clean: !zapped});
       if (navigator.vibrate) navigator.vibrate([12,30,40]);
     }
     // And the character is kindled whether or not anything carried it — a
@@ -960,54 +1047,72 @@ LAYER = STYLE + r"""
         motes.push({x:p0.x, y:p0.y, vx:(Math.random()-.5)*2, vy:(Math.random()-.5)*2, life:.7});
       return;
     }
+    // A block: a phrasebook held up like a shield. The hand breaks it and the
+    // hit lands through it; a light bounces off, the way a dart does.
+    if (m.block > 0){
+      if (auto){ bounce(m); return; }
+      m.block--; if (navigator.vibrate) navigator.vibrate([20, 30, 60]);
+    }
     m.hp -= 1 + lvl('intent');   // intent: every light cuts deeper
     // The sound, attached to the kill. Tracing a shape teaches the shape and
     // nothing else — the hand can learn every stroke of ぬ without the reading
     // ever arriving. Success is the moment attention is highest, so that is
     // where the reading goes.
-    // The correct reading, and underneath it the way you probably said it.
-    // The joke is the teaching: "SOO" next to "tsu" names the dropped t far
-    // better than the correct spelling does on its own, because the learner
-    // recognises the wrong one as theirs.
     // A tough one is hit several times. The reading blooms when the hand
     // lands it and when it finally goes — not once per wisp, or it is noise.
-    if (CFG.reading !== 'off' && (!auto || m.hp <= 0)){
-      const p = px(m);
-      let text, sub = null;
-      if (m.w){
-        // the word blooms with whichever half the sign kept back: after
-        // "koohii" the news is "coffee", after "coffee" it is "koohii"
-        const flip = CFG.sign === 'romaji';
-        text = CFG.reading === 'gaijin' || (CFG.reading === 'both' && flip) ? m.w.en : m.w.romaji;
-        if (CFG.reading === 'both') sub = flip ? m.w.romaji : m.w.en;
-      } else {
-        text = CFG.reading === 'gaijin' ? labelOf(m,'gaijin') : LETTERS[m.i][2];
-        sub  = CFG.reading === 'both'   ? labelOf(m,'gaijin') : null;
-      }
-      readings.push({ x:p.x, y:p.y, life:1, text, sub });
-    }
+    if (CFG.reading !== 'off' && (!auto || m.hp <= 1e-9)) bloom(m);
     for (let k=0;k<18;k++)
       motes.push({x:px(m).x, y:px(m).y, vx:(Math.random()-.5)*2.4,
                   vy:(Math.random()-.5)*2.4, life:1});
-    if (m.hp <= 0){
-      monsters = monsters.filter(x => x !== m);
-      if (m === locked) locked = null;
-      if (m.boss) applyShadow();
-      killed++;
-      if (auto) earn(CFG.inkKill + lvl('harvest'));
-      // An observation, not a claim: what was answered and how long it took.
-      // Deliberately not a score — the client does not get to assert totals.
-      try { window.__sync && window.__sync.record('banish', {
-        glyph: LETTERS[m.i][0], level: MASTERY[LETTERS[m.i][0]] || 0,
-        word: m.w ? m.w.ja : undefined,
-        ms: Math.round(performance.now() - m.born), sign: CFG.sign,
-      }); } catch(_){}
-      retarget();
+    if (m.hp <= 1e-9) banish(m, auto);
+  }
+  // The correct reading, and underneath it the way you probably said it.
+  // The joke is the teaching: "SOO" next to "tsu" names the dropped t far
+  // better than the correct spelling does on its own, because the learner
+  // recognises the wrong one as theirs.
+  function bloom(m){
+    const p = px(m);
+    let text, sub = null;
+    if (m.w){
+      // the word blooms with whichever half the sign kept back: after
+      // "koohii" the news is "coffee", after "coffee" it is "koohii"
+      const flip = CFG.sign === 'romaji';
+      text = CFG.reading === 'gaijin' || (CFG.reading === 'both' && flip) ? m.w.en : m.w.romaji;
+      if (CFG.reading === 'both') sub = flip ? m.w.romaji : m.w.en;
+    } else {
+      text = CFG.reading === 'gaijin' ? labelOf(m,'gaijin') : LETTERS[m.i][2];
+      sub  = CFG.reading === 'both'   ? labelOf(m,'gaijin') : null;
     }
+    readings.push({ x:p.x, y:p.y, life:1, text, sub });
+  }
+  // Sent packing. The last layer off, the tourist underneath goes home.
+  function banish(m, auto){
+    if (!monsters.includes(m)) return;
+    monsters = monsters.filter(x => x !== m);
+    if (m === locked) locked = null;
+    if (m.boss) applyShadow();
+    killed++;
+    if (auto) earn(CFG.inkKill + lvl('harvest'));
+    // An observation, not a claim: what was answered and how long it took.
+    // Deliberately not a score — the client does not get to assert totals.
+    try { window.__sync && window.__sync.record('banish', {
+      glyph: LETTERS[m.i][0], level: MASTERY[LETTERS[m.i][0]] || 0,
+      word: m.w ? m.w.ja : undefined,
+      ms: Math.round(performance.now() - m.born), sign: CFG.sign,
+    }); } catch(_){}
+    retarget();
   }
 
-  const px = m => ({ x: cx() + Math.cos(m.a)*m.d*FW*0.52,
-                     y: cy() + Math.sin(m.a)*m.d*FH*0.52 });
+  // The fan: angles run over the upper half only (spawn() draws them so), and
+  // the vertical reach is the gate's height off the top, so d = 1 is the
+  // top edge straight up and the sides at the shallow angles.
+  // A costume is ~90px tall with its hat on and ~60 wide with its hands out,
+  // so the fan stops short of the edges: a farang arriving is seen arriving.
+  const px = m => ({ x: cx() + Math.cos(m.a)*m.d*FW*0.42,
+                     y: cy() + Math.sin(m.a)*m.d*FH*(CFG.gateY - 0.17) });
+  // Where a hero stands: on the ground beside the gate, the calligrapher to
+  // its left, the next hero's place to its right (人 is two strokes).
+  const heroAt = k => ({ x: cx() + (k === 0 ? -1 : 1) * Math.min(FW*0.22, 92), y: cy() + 6 });
 
   // ---- the loop
   function step(now){
@@ -1027,8 +1132,9 @@ LAYER = STYLE + r"""
         spawn();
         spawnAt = now + Math.max(CFG.spawnMin, CFG.spawnMs - wave*CFG.spawnRamp);
       }
+      const held = now < stunUntil;   // a clean stroke's hold: nobody moves
       for (const m of monsters){
-        m.d -= m.speed*dt;
+        if (!held) m.d -= m.speed*dt;
         if (m.d <= 0.06){
           monsters = monsters.filter(x => x !== m);
           if (m === locked) locked = null;
@@ -1043,11 +1149,17 @@ LAYER = STYLE + r"""
         }
       }
       autocast(now);
+      autohero(now);
       for (const s of shots){
         s.t += dt*2.6;
-        if (s.t >= 1){ strike(s.to, s.partial, s.auto); }
+        if (s.t >= 1){ strike(s.to, s.partial, s.auto); if (s.clean && !s.auto) stun(now); }
       }
       shots = shots.filter(s => s.t < 1 && monsters.includes(s.to));
+      for (const s of darts){
+        s.t += dt*3.2;
+        if (s.t >= 1) chip(s.to, heroHit());
+      }
+      darts = darts.filter(s => s.t < 1 && monsters.includes(s.to));
     }
     // Deferred work, once the hand is free: a queued retarget, or a glyph that
     // no monster carries any more — which would otherwise strand the player
@@ -1063,13 +1175,95 @@ LAYER = STYLE + r"""
     readings = readings.filter(r => r.life > 0);
     draw();
   }
-  function fieldLoop(now){ step(now); requestAnimationFrame(fieldLoop); }
+  // The seam is refreshed from the loop, every few frames: it was only ever
+  // re-rendered when ink was earned or a tab changed, so the wave and the
+  // life bar sat stale between (found in a screenshot of v0.1.73, the wave
+  // reading 0 at 26 s). renderDash() diffs its markup, so this is cheap.
+  let dashTick = 0;
+  function fieldLoop(now){ step(now); if (++dashTick % 6 === 0) renderDash(); requestAnimationFrame(fieldLoop); }
 
   // Glow without shadowBlur. CLAUDE.md's rule is "no per-frame shadow blur",
   // and the field broke it ten times a frame: a blurred shadow is rasterised
   // afresh on every draw, on a canvas a phone wide, sixty times a second.
   // A glow is a radial gradient painted once into a small sprite per colour
   // and stretched to size; the solid shape is drawn over it as before.
+  // ---- the farang, painted (the stage, v0.1.73)
+  // A person in a costume: legs in socks and sandals under it, hands holding
+  // it up, an eye through a hole cut by hand, a tongue. One layer is a
+  // cardboard box; two and up is the paper lantern, patched with tape, a
+  // bucket hat on top; a general wears a straw kasa and the same sandals.
+  // Each hit strips a layer, and under the last one is the tourist in the
+  // loud shirt, holding the sign up on a card. The sign is always right; the
+  // costume is the joke. These are warm on purpose — ours is cold, theirs is
+  // warm — and theme.test.mjs is told so by name.
+  const FARANG = { paper:'#e4d7bd', rib:'#c6b58d', tape:'#d9cfa8', skin:'#e8a58f', sock:'#f6f2e8', sandal:'#3a2a22',
+                   box:'#b58a5a', boxEdge:'#8e6a40', hat:'#b8a77a', hatBand:'#a5946a', kasa:'#c9b98a', shirt:'#c9524a',
+                   tongue:'#b9463f', eye:'#fbf7ee', pupil:'#1c1a16', hole:'#2a1e18', candle:'244,194,107' };
+  const layersOf = m => Math.max(1, Math.ceil(m.hp - 1e-9));
+  const rrect = (g, x, y, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fill(); };
+  function paintFarang(g, m, x, y, isT){
+    const L = layersOf(m), box = m.hp0 <= 1, s = m.boss ? 1.12 : 1;
+    g.save(); g.translate(x, y); g.scale(s, s);
+    // legs, socks, sandals: the giveaway
+    g.strokeStyle = FARANG.skin; g.lineWidth = 5; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-9, 30); g.lineTo(-11, 46); g.moveTo(9, 30); g.lineTo(11, 46); g.stroke();
+    g.fillStyle = FARANG.sock; g.fillRect(-15, 40, 8, 7); g.fillRect(7, 40, 8, 7);
+    g.strokeStyle = FARANG.sandal; g.lineWidth = 4;
+    g.beginPath(); g.moveTo(-18, 49); g.lineTo(-4, 49); g.moveTo(4, 49); g.lineTo(18, 49); g.stroke();
+    if (L <= 1 && !box){
+      // the last layer: the tourist in the loud shirt, mortified, sign on a card
+      g.fillStyle = FARANG.shirt; rrect(g, -16, -8, 32, 40, 6);
+      g.fillStyle = FARANG.eye; for (const [fx, fy] of [[-8,2],[6,12],[-2,22],[10,-2]]){ g.beginPath(); g.arc(fx, fy, 2.2, 0, 6.284); g.fill(); }   // the print
+      g.fillStyle = FARANG.skin; g.beginPath(); g.arc(0, -20, 11, 0, 6.284); g.fill();
+      g.fillStyle = FARANG.eye; g.beginPath(); g.arc(-4, -22, 3, 0, 6.284); g.fill(); g.beginPath(); g.arc(4, -22, 3, 0, 6.284); g.fill();
+      g.fillStyle = FARANG.pupil; g.beginPath(); g.arc(-4, -22, 1.4, 0, 6.284); g.fill(); g.beginPath(); g.arc(4, -22, 1.4, 0, 6.284); g.fill();
+      g.strokeStyle = FARANG.pupil; g.lineWidth = 1.5; g.beginPath(); g.arc(0, -13, 3, 0, 6.284); g.stroke();   // the mouth, an o
+      g.fillStyle = FARANG.paper; rrect(g, 14, -12, 30, 30, 3);
+      g.strokeStyle = FARANG.skin; g.lineWidth = 4; g.beginPath(); g.moveTo(12, 8); g.lineTo(20, 14); g.stroke();
+      g.restore();
+      return { sx: x + 29*s, sy: y + 3*s, size: 20*s };
+    }
+    if (box){
+      g.fillStyle = FARANG.box; rrect(g, -26, -32, 52, 64, 3);
+      g.strokeStyle = FARANG.boxEdge; g.lineWidth = 1.5; g.beginPath(); g.moveTo(-26, -32); g.lineTo(0, -26); g.lineTo(26, -32); g.stroke();
+      g.fillStyle = FARANG.tape; g.save(); g.translate(4, -24); g.rotate(0.66); g.fillRect(-6, -10, 12, 20); g.restore();
+    } else {
+      // the cap, the paper, the candle inside, the ribs, the tape
+      g.fillStyle = FARANG.hole; g.fillRect(-12, -42, 24, 6);
+      g.fillStyle = FARANG.paper; g.beginPath(); g.ellipse(0, 0, 27, 36, 0, 0, 6.284); g.fill();
+      glowAt(g, 0, 2, 15, 22, `rgba(${FARANG.candle},.45)`, 1);
+      g.strokeStyle = FARANG.rib; g.lineWidth = 1.2;
+      g.beginPath(); g.moveTo(-22, -16); g.quadraticCurveTo(0, -10, 22, -16); g.moveTo(-26, 0); g.quadraticCurveTo(0, 6, 26, 0); g.moveTo(-22, 16); g.quadraticCurveTo(0, 22, 22, 16); g.stroke();
+      g.fillStyle = FARANG.tape; g.save(); g.translate(-19, 17); g.rotate(0.38); g.fillRect(-7, -3, 14, 6); g.restore();
+      g.fillStyle = FARANG.hole; g.fillRect(-12, 34, 24, 5);
+      // the hat, the third layer: a bucket hat, or a general's kasa
+      if (L >= 3){
+        if (m.boss){
+          g.fillStyle = FARANG.kasa; g.beginPath(); g.moveTo(-36, -40); g.lineTo(0, -66); g.lineTo(36, -40); g.closePath(); g.fill();
+          g.strokeStyle = FARANG.hatBand; g.lineWidth = 3; g.beginPath(); g.moveTo(-36, -40); g.lineTo(36, -40); g.stroke();
+        } else {
+          g.fillStyle = FARANG.hat; g.beginPath(); g.moveTo(-14, -44); g.quadraticCurveTo(0, -60, 14, -44); g.closePath(); g.fill();
+          g.strokeStyle = FARANG.hatBand; g.lineWidth = 4; g.beginPath(); g.moveTo(-22, -42); g.quadraticCurveTo(0, -38, 22, -42); g.stroke();
+        }
+      }
+    }
+    // hands, the eye through its hole, the tongue
+    g.fillStyle = FARANG.skin; g.beginPath(); g.arc(-28, -6, 5, 0, 6.284); g.fill(); g.beginPath(); g.arc(28, -6, 5, 0, 6.284); g.fill();
+    g.fillStyle = FARANG.hole; g.beginPath(); g.moveTo(-18,-24); g.lineTo(-13,-27); g.lineTo(-7,-25); g.lineTo(-5,-19); g.lineTo(-8,-13); g.lineTo(-14,-12); g.lineTo(-19,-16); g.closePath(); g.fill();
+    g.fillStyle = FARANG.eye; g.beginPath(); g.arc(-12, -19, 4.5, 0, 6.284); g.fill();
+    g.fillStyle = FARANG.pupil; g.beginPath(); g.arc(isT ? -10 : -11, -19, 2.2, 0, 6.284); g.fill();
+    g.fillStyle = FARANG.tongue; g.beginPath(); g.moveTo(-4, 28); g.quadraticCurveTo(0, 42, 7, 30); g.closePath(); g.fill();
+    // the block: a phrasebook, held out like a shield
+    if (m.block > 0){
+      g.save(); g.translate(-40, 0); g.rotate(-0.2);
+      g.fillStyle = FARANG.shirt; rrect(g, -12, -18, 24, 36, 2);
+      g.strokeStyle = FARANG.eye; g.lineWidth = 1.4; g.beginPath(); g.moveTo(-7, -7); g.lineTo(7, -7); g.moveTo(-7, -1); g.lineTo(7, -1); g.moveTo(-7, 5); g.lineTo(3, 5); g.stroke();
+      g.restore();
+    }
+    g.restore();
+    return { sx: x, sy: y + 2*s, size: 26*s };   // where the sign goes
+  }
+
   const GLOWS = {};
   function glowAt(g, x, y, rx, ry, color, alpha){
     let sp = GLOWS[color];
@@ -1095,58 +1289,96 @@ LAYER = STYLE + r"""
       g.save(); g.globalAlpha = (1 - since) * 0.9; g.strokeStyle = 'rgba(127,209,196,.9)'; g.lineWidth = 2 + 4*(1 - since);
       g.beginPath(); g.arc(cx(), cy(), 20 + since*Math.max(FW, FH)*0.55, 0, 6.284); g.stroke(); g.restore();
     }
-    // the ward being protected
-    const pulse = 0.6 + 0.4*Math.sin(performance.now()/700);
-    glowAt(g, X, Y, 13 + 22*pulse, 13 + 22*pulse, over ? 'rgba(120,60,50,.5)' : 'rgba(233,196,106,.5)', 1);
-    g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(233,196,106,.92)';
-    g.beginPath(); g.arc(X, Y, 13, 0, 6.284); g.fill();
-    g.strokeStyle = over ? 'rgba(200,90,70,.35)' : 'rgba(233,196,106,.22)';
-    g.lineWidth = 1;
-    g.beginPath(); g.arc(X, Y, 26 + 5*pulse, 0, 6.284); g.stroke();
-
-    // ward health, as pips under it
+    // the ground, and the gate: a torii at the foot of the field, the
+    // household behind it. Life hangs on it as lanterns.
+    g.fillStyle = 'rgba(233,196,106,.045)';
+    g.fillRect(0, Y - 4, FW, FH - Y + 4);
+    g.strokeStyle = 'rgba(233,196,106,.16)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(0, Y - 4); g.quadraticCurveTo(X, Y - 12, FW, Y - 4); g.stroke();
+    const gw = Math.min(FW*0.34, 132), gh = 72;
+    glowAt(g, X, Y - 30, 70, 50, over ? 'rgba(120,60,50,.5)' : 'rgba(233,196,106,.35)', 1);
+    g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(233,196,106,.55)';
+    g.fillRect(X - gw/2 + 8, Y - gh + 10, 9, gh - 10); g.fillRect(X + gw/2 - 17, Y - gh + 10, 9, gh - 10);   // the pillars
+    g.fillRect(X - gw/2 + 14, Y - gh + 24, gw - 28, 6);                                                        // the tie beam
+    g.fillRect(X - 4, Y - gh + 24, 8, 20);                                                                     // the tablet
+    g.beginPath(); g.moveTo(X - gw/2 - 4, Y - gh + 12); g.quadraticCurveTo(X, Y - gh - 2, X + gw/2 + 4, Y - gh + 12);   // the kasagi
+    g.lineTo(X + gw/2 + 1, Y - gh + 20); g.quadraticCurveTo(X, Y - gh + 8, X - gw/2 - 1, Y - gh + 20); g.closePath(); g.fill();
+    // ward health: lanterns hung from the tie beam
     for (let k=0;k<wardMax();k++){
-      g.fillStyle = k < ward ? 'rgba(233,196,106,.85)' : 'rgba(233,196,106,.14)';
-      g.beginPath(); g.arc(X - (wardMax()-1)*5 + k*10, Y + 34, 3, 0, 6.284); g.fill();
+      const lx = X - (wardMax()-1)*7 + k*14, lit = k < ward;
+      if (lit) glowAt(g, lx, Y - gh + 38, 10, 10, 'rgba(233,196,106,.5)', 1);
+      g.fillStyle = lit ? 'rgba(233,196,106,.9)' : 'rgba(233,196,106,.14)';
+      g.beginPath(); if (g.roundRect) g.roundRect(lx - 3, Y - gh + 32, 6, 10, 3); else g.rect(lx - 3, Y - gh + 32, 6, 10); g.fill();
+    }
+
+    // the heroes: people, drawn as 人 — a head and the two strokes. The
+    // calligrapher stands left of the gate, brush in hand; the next hero's
+    // place is dashed, because neither stroke stands alone.
+    const person = (p, color, solid, brush) => {
+      g.save(); g.translate(p.x, p.y);
+      g.strokeStyle = color; g.fillStyle = color; g.lineCap = 'round'; g.lineWidth = 5;
+      if (!solid) g.setLineDash([3, 4]);
+      g.beginPath(); g.arc(0, -30, 7, 0, 6.284); if (solid) g.fill(); else g.stroke();
+      g.beginPath(); g.moveTo(0, -21); g.bezierCurveTo(-2, -11, -6, -2, -14, 10); g.stroke();
+      g.beginPath(); g.moveTo(-1, -12); g.bezierCurveTo(4, -5, 8, 2, 14, 10); g.stroke();
+      if (brush){
+        g.lineWidth = 3.5; g.beginPath(); g.moveTo(5, -14); g.lineTo(20, -28); g.stroke();
+        g.strokeStyle = 'rgba(127,209,196,1)'; g.lineWidth = 4; g.beginPath(); g.moveTo(20, -28); g.lineTo(26, -34); g.stroke();
+      }
+      g.restore();
+    };
+    if (casting()){
+      const h0 = heroAt(0);
+      glowAt(g, h0.x, h0.y - 12, 34, 34, 'rgba(127,209,196,.35)', 1);
+      person(h0, '#bdf0e6', true, true);
+      g.fillStyle = 'rgba(189,240,230,.75)'; g.font = '700 9px ui-sans-serif,system-ui'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+      g.fillText('the calligrapher', h0.x, h0.y - 44);   // above the head: the dashboard has the feet
+      person(heroAt(1), 'rgba(127,209,196,.28)', false, false);
     }
 
     const tgt = target();
+    const holding = performance.now() < stunUntil;
     for (const m of monsters){
       const p = px(m), isT = m === tgt;
-      const bob = Math.sin(performance.now()/500 + m.wob)*2.5;
-
-      // the farang: a pale drifting shape, brighter the closer it gets
+      const bob = holding ? 0 : Math.sin(performance.now()/500 + m.wob)*2.5;
       const near = 1 - m.d;
       g.save();
-      g.globalAlpha = 0.5 + 0.5*near;
-      glowAt(g, p.x, p.y+bob, isT ? 17 + 16 : 17 + 8, isT ? 21 + 16 : 21 + 8, isT ? 'rgba(127,209,196,.45)' : 'rgba(150,170,190,.22)', 1);
-      g.fillStyle = isT ? 'rgba(127,209,196,.30)' : 'rgba(170,185,200,.20)';
-      g.beginPath(); g.ellipse(p.x, p.y+bob, 17, 21, 0, 0, 6.284); g.fill();
+      g.globalAlpha = 0.72 + 0.28*near;
+      if (isT) glowAt(g, p.x, p.y+bob, 46, 54, 'rgba(127,209,196,.35)', 1);
+      const at = paintFarang(g, m, p.x, p.y + bob, isT);
       g.restore();
-
-      // the sign it carries — and for a word, a strip under it showing how
-      // much of it has been written, blank where it has not
+      // a held one wears the hold
+      if (holding){
+        g.strokeStyle = 'rgba(127,209,196,.7)'; g.lineWidth = 1.5; g.setLineDash([4, 5]);
+        g.beginPath(); g.arc(p.x, p.y, 48, 0, 6.284); g.stroke(); g.setLineDash([]);
+      }
+      // the sign: painted on a character's costume; a word's on a card above
+      // it, with a strip of slots showing how much of it has been written
       const label = sign(m);
-      g.font = (m.w ? (CFG.sign === 'kana' ? '600 18px' : '600 14px') : CFG.sign === 'romaji' ? '600 15px' : '600 22px')
-        + ' ui-sans-serif,system-ui,"Klee One",sans-serif';
-      const SP = 15;
-      const w = Math.max(g.measureText(label).width, m.w ? m.w.chars.length*SP : 0) + 18;
-      const bh = m.w ? 44 : 27;
-      const by = p.y + bob - 36 - (bh - 27);
-      g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)';
-      g.strokeStyle = isT ? 'rgba(127,209,196,.65)' : 'rgba(180,195,210,.28)';
-      g.lineWidth = 1;
-      g.beginPath();
-      if (g.roundRect) g.roundRect(p.x-w/2, by-16, w, bh, 8);
-      else g.rect(p.x-w/2, by-16, w, bh);
-      g.fill(); g.stroke();
-      const bb = by - 16 + bh;
-      g.beginPath(); g.moveTo(p.x-5, bb); g.lineTo(p.x, bb+7); g.lineTo(p.x+5, bb);
-      g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)'; g.fill();
-      g.fillStyle = isT ? '#bdf0e6' : 'rgba(226,232,240,.8)';
-      g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText(label, p.x, by-2);
-      if (m.w){
+      const top = p.y + bob - (m.boss ? 76 : layersOf(m) >= 3 && m.hp0 > 1 ? 66 : 50);   // above the costume, hat included
+      let w = 40;
+      if (!m.w){
+        g.font = `600 ${CFG.sign === 'romaji' ? Math.round(at.size*0.62) : CFG.sign === 'gaijin' ? Math.round(at.size*0.5) : at.size}px ui-sans-serif,system-ui,"Klee One",sans-serif`;
+        g.fillStyle = FARANG.pupil; g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText(label, at.sx, at.sy);
+      } else {
+        g.font = (CFG.sign === 'kana' ? '600 18px' : '600 14px') + ' ui-sans-serif,system-ui,"Klee One",sans-serif';
+        const SP = 15;
+        w = Math.max(g.measureText(label).width, m.w.chars.length*SP) + 18;
+        const bh = 44, by = top - 8;
+        g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)';
+        g.strokeStyle = isT ? 'rgba(127,209,196,.65)' : 'rgba(180,195,210,.28)';
+        g.lineWidth = 1;
+        g.beginPath();
+        if (g.roundRect) g.roundRect(p.x-w/2, by-16, w, bh, 8);
+        else g.rect(p.x-w/2, by-16, w, bh);
+        g.fill(); g.stroke();
+        const bb = by - 16 + bh;
+        g.beginPath(); g.moveTo(p.x-5, bb); g.lineTo(p.x, bb+7); g.lineTo(p.x+5, bb);
+        g.fillStyle = isT ? 'rgba(20,32,32,.92)' : 'rgba(22,24,28,.85)'; g.fill();
+        g.fillStyle = isT ? '#bdf0e6' : 'rgba(226,232,240,.8)';
+        g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText(label, p.x, by-2);
         const n = m.w.chars.length, x0 = p.x - (n-1)*SP/2;
         const reveal = CFG.sign === 'kana' || (DIFF[difficulty] && DIFF[difficulty].reveal);
         g.font = '600 13px ui-sans-serif,system-ui,"Klee One",sans-serif';
@@ -1159,26 +1391,46 @@ LAYER = STYLE + r"""
           g.fillText(written || reveal ? m.w.chars[k] : '＿', x0 + k*SP, by + 16);
         }
       }
-      // a boss says so, above its pips
+      // a general says so, and wears a name
+      g.textAlign = 'center'; g.textBaseline = 'middle';
       if (m.boss){
         g.font = '700 12px ui-sans-serif,system-ui,"Klee One",sans-serif';
         g.fillStyle = isT ? 'rgba(233,196,106,.95)' : 'rgba(233,196,106,.6)';
-        g.fillText('将 · less help for all', p.x, by - (m.hp > 1 ? 34 : 24));
+        g.fillText('将 · less help for all', p.x, top - 14);
       }
-      // how much more it takes: one pip per hit still owed, above the bubble
-      // (under it is the farang's own head)
-      if (m.hp > 1){
+      // the layers left, above the costume: one pip per layer, a piece
+      // chipped off the last shown as a part
+      if (m.hp0 > 1 || m.hp < 1){
+        const L = layersOf(m), frac = m.hp - (L - 1);
         g.fillStyle = isT ? 'rgba(233,196,106,.95)' : 'rgba(233,196,106,.6)';
-        for (let k = 0; k < m.hp; k++){
-          g.beginPath(); g.arc(p.x - (m.hp-1)*4 + k*8, by - 23, 2.4, 0, 6.284); g.fill();
+        for (let k = 0; k < L; k++){
+          const r = k === L - 1 ? 1.2 + 1.4*Math.max(0.1, Math.min(1, frac)) : 2.6;
+          g.beginPath(); g.arc(p.x - (L-1)*4 + k*8, top, r, 0, 6.284); g.fill();
         }
+      }
+      // the block, named: only the hand breaks it
+      if (m.block > 0){
+        g.font = '700 9px ui-sans-serif,system-ui';
+        g.fillStyle = 'rgba(233,196,106,.9)';
+        g.fillText('BLOCK · write to break', p.x, top - (m.boss ? 30 : 12));
       }
       // a lit character: its own wisp will answer this one
       if (casting() && charge(key(m)) >= 1){
-        glowAt(g, p.x + w/2 + 2, by-14, 11, 11, 'rgba(127,209,196,.6)', 1);
+        glowAt(g, p.x + w/2 + 2, top, 11, 11, 'rgba(127,209,196,.6)', 1);
         g.fillStyle = 'rgba(160,230,215,.95)';
-        g.beginPath(); g.arc(p.x + w/2 + 2, by-14, 3.2, 0, 6.284); g.fill();
+        g.beginPath(); g.arc(p.x + w/2 + 2, top, 3.2, 0, 6.284); g.fill();
       }
+    }
+
+    // the heroes' darts, small and blue, on their own clock
+    for (const s of darts){
+      const p = px(s.to), t = s.t, e = t*t*(3-2*t);
+      const x = s.from.x + (p.x - s.from.x)*e, y = s.from.y - 24 + (p.y - s.from.y + 24)*e - Math.sin(t*Math.PI)*30;
+      g.globalAlpha = 0.45; g.fillStyle = 'rgba(127,209,196,.9)';
+      g.beginPath(); g.arc(x - (p.x - s.from.x)*0.03, y - (p.y - s.from.y)*0.03 + 2, 2.5, 0, 6.284); g.fill();
+      g.globalAlpha = 0.95;
+      g.beginPath(); g.arc(x, y, 3.5, 0, 6.284); g.fill();
+      g.globalAlpha = 1;
     }
 
     // the glyph in flight
@@ -1207,6 +1459,19 @@ LAYER = STYLE + r"""
         g.fillStyle = 'rgba(20,40,40,.9)';
         g.textAlign = 'center'; g.textBaseline = 'middle';
         g.fillText(s.ch, x, y+1);
+      } else if (s.path){
+        // the hand's own stroke, flung: a brush slash in the shape it was drawn
+        g.globalAlpha = 0.95;
+        glowAt(g, x, y, 34, 34, 'rgba(233,196,106,.5)', 1);
+        const size = 48 + 10*Math.sin(t*Math.PI);
+        g.save(); g.translate(x, y); g.rotate(Math.atan2(p.y - s.from.y, p.x - s.from.x) * 0.22 + 0.2);
+        g.strokeStyle = '#ffe9a8'; g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round';
+        for (const st of s.path){
+          g.beginPath();
+          st.forEach(([qx, qy], k) => k ? g.lineTo(qx*size, qy*size) : g.moveTo(qx*size, qy*size));
+          g.stroke();
+        }
+        g.restore();
       } else {
         g.globalAlpha = 0.9;
         glowAt(g, x, y, 26, 26, 'rgba(233,196,106,.55)', 1);
@@ -1289,7 +1554,7 @@ LAYER = STYLE + r"""
 
   function restart(){
     if (typeof openTab === 'function') openTab(null);
-    monsters = []; shots = []; motes = []; readings = [];
+    monsters = []; shots = []; motes = []; readings = []; darts = []; stunUntil = 0; heroFiredAt = 0;
     upg = freshUpg(); run = newRun(); ended = null;
     zapped = 0;   // a new run starts clean: the counter is otherwise only cleared when a glyph loads,
                   // and a run that restarts on the same character does not load one
@@ -1669,6 +1934,9 @@ LAYER = STYLE + r"""
     earn, buy, costOf, hpFor, biteFor, castMs, hit: strike, UPG,
     get words(){ return WORDS; }, at: AT, keyOf: key,
     charge, kindle, quench, autocast, release, tidy, casting, get flare(){ return flareAt; },
+    // the stage: the heroes' darts, the hold, the stroke that flies
+    get darts(){ return darts; }, get stunUntil(){ return stunUntil; }, stun, autohero, chip, heroHit, forged, flung, heroAt,
+    hero(on){ heroOn = on !== false; return heroOn; },
     touch(){ penAt = performance.now(); },
     bearer,
     spawn, restart, retarget, pick,
@@ -1802,6 +2070,11 @@ def config(pack, deck=None):
         f"energyMax:{int(f.get('energyMax', 24))},energyStart:{int(f.get('energyStart', 6))},"
         f"energyPerStroke:{int(f.get('energyPerStroke', 1))},castCost:{int(f.get('castCost', 2))},vesselStep:{int(f.get('vesselStep', 6))},"
         f"holdMs:{int(f.get('holdMs', 1500))},"
+        # the stage (v0.1.73): the gate's height, the heroes' dart, the blocks, the hold
+        f"gateY:{float(f.get('gateY', 0.84))},"
+        f"heroMs:{int(f.get('heroMs', 1500))},heroHit:{float(f.get('heroHit', 0.34))},heroForge:{int(f.get('heroForge', 25))},"
+        f"bossBlock:{int(f.get('bossBlock', 1))},blockFrom:{int(f.get('blockFrom', 20))},blockRate:{float(f.get('blockRate', 0.25))},"
+        f"stunMs:{int(f.get('stunMs', 2200))},"
         f"tidyStrays:{'true' if f.get('tidyStrays', True) else 'false'}"
         "};</script>"
     )

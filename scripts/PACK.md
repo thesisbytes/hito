@@ -289,6 +289,37 @@ distance, as a fraction of the glyph's diagonal, at which a trace scores zero.
 A guided run is kept in the hand's ledger as practice: it pays nothing and is
 never the furthest wave.
 
+### The stage (v0.1.73): heroes are people, the farang are in costume
+
+```json
+"field": { "gateY": 0.84, "heroMs": 1500, "heroHit": 0.34, "heroForge": 25,
+           "bossBlock": 1, "blockFrom": 20, "blockRate": 0.25, "stunMs": 2200 }
+```
+
+The gate (a torii) stands at the foot of the field and the farang come down
+from above it; the geometry is still polar in `d`, so nothing that reasons
+in `d` changed. The heroes are people drawn as 人 — the calligrapher stands
+left of the gate with a brush — and the farang are foreigners in lantern
+costumes, the sign painted on the costume. **The costume is the hit points**:
+a hit strips a layer (`hp`), and under the last one is the tourist in the
+loud shirt. **The heroes fight on their own; the hand casts the specials.**
+The calligrapher's darts chip a layer a piece at a time; a stroke strips a
+layer whole, breaks a block, and a clean one holds the wave.
+
+| key | default | |
+|---|---|---|
+| `gateY` | 0.84 | where the gate stands, as a fraction of the field's height. The rest is the fan the farang come down through. |
+| `heroMs` | 1500 | the calligrapher throws a dart this often, at the nearest farang that is not blocking and not already owed enough darts. `0` switches the heroes off. Never at a word: a dart cannot write. Guided has nobody at the gate. |
+| `heroHit` | 0.34 | what a dart chips off a layer, times `1 + forged`, where forged is the share of the chart this hand has learned (mastery above 0), up to one. A hero is forged by practice. |
+| `heroForge` | 25 | how many learned characters make a dart twice as heavy. |
+| `bossBlock` | 1 | blocks a general holds up: a phrasebook like a shield. No dart and no light gets through a block; only the hand breaks one, and its hit lands through it. |
+| `blockFrom`, `blockRate` | 20, 0.25 | from this wave, this share of the rank and file arrive with a block too. This is how a stage gets harder in a way the heroes cannot answer alone. Words are never blocked. |
+| `stunMs` | 2200 | a clean trace that lands holds every farang for this long while the heroes catch up. The hand's special, and it is nothing but a clean stroke. |
+
+What flies for the hand's hit is the hand's own stroke: the ink just drawn,
+in its own box, painted as a brush slash on its way across the field. In
+guided there is no ink, and the character flies as text.
+
 ### The three voices
 
 Each glyph carries three labels, and they ask for different things:

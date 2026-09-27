@@ -666,9 +666,11 @@ const still = F.monsters.find(m => m.d >= d0 - 1e-9 && m === F.target);
 ok(!still, 'the target is not advancing — d did not decrease');
 
 // ---- more of them arrive over time
-const n1 = F.monsters.length;
+// Counted by the wave, not the crowd: the calligrapher's darts send the
+// first-timers home about as fast as they arrive (the stage, v0.1.73).
+const n1 = F.wave;
 advance(20000);
-ok(F.monsters.length > n1 || F.ward < 5, `nothing spawned over 20s (still ${n1})`);
+ok(F.wave > n1, `nothing spawned over 20s (wave still ${n1})`);
 
 // ---- a finished glyph reaches the monster and removes it
 fresh();
@@ -1140,10 +1142,91 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   F.setDifficulty('medium'); H.reset(); fresh();
 }
 
+// ---- the stage: heroes are people, the farang are in costume, the hand casts the specials
+// "The heroes are auto attacking ... in order to do like stuns, or block
+// break, you gotta stroke the characters." The checks that matter: the
+// farang come down from above the gate; the calligrapher's darts fly on
+// their own and chip a layer at a time; a block stops a dart and a light
+// and only the hand breaks it; a clean stroke holds the wave; the hand's
+// own stroke is what flies; and guided has nobody at the gate.
+{
+  fresh();
+  // the fan: every farang is above the gate, and the gate is near the ground
+  const gy = F.heroAt(0).y;
+  ok(gy > 300, `the gate is not near the foot of a 400px field (y ${gy})`);
+  for (let k = 0; k < 6; k++) F.spawn();
+  ok(F.monsters.every(m => Math.sin(m.a) < 0 && F.posOf(m).y < gy), 'a farang came from below the gate');
+  ok(F.monsters.every(m => m.hp0 === m.hp && m.block === 0), 'a first-timer arrived blocking, or with a costume that does not match its layers');
+  // the darts: on their own clock, at the nearest, a piece of a layer each
+  fresh(); F.hero(true);
+  { for (const m of F.monsters) m.speed = 0;
+    const m = F.monsters[0]; m.hp = 1; m.hp0 = 1;
+    for (const o of F.monsters) if (o !== m) o.d = 0.95; m.d = 0.5;
+    const hit = F.heroHit();
+    ok(hit >= cfg.heroHit && hit <= 2 * cfg.heroHit + 1e-9, `a dart hits for ${hit}, outside [${cfg.heroHit}, ${2 * cfg.heroHit}]`);
+    advance(100);   // the first dart flies on the first frame: a hero does not wait to be asked
+    ok(F.darts.length === 1 && F.darts[0].to === m, `at the start there are ${F.darts.length} darts (at the nearest: ${F.darts[0] && F.darts[0].to === m})`);
+    advance(400);
+    ok(Math.abs(m.hp - (1 - hit)) < 1e-9, `a dart landed and the farang has ${m.hp} of a layer left, expected ${1 - hit}`);
+    ok(F.monsters.includes(m), 'one dart sent a whole farang home');
+    const k0 = F.killed;
+    advance(cfg.heroMs * 3 + 800);
+    ok(!F.monsters.includes(m) && F.killed > k0, `three more darts did not finish a one-layer farang (hp ${m.hp}, killed ${F.killed - k0})`);   // > not ===: the darts move on to the next one
+  }
+  // the block: a phrasebook. Darts and lights bounce; the hand breaks it and lands
+  fresh(); F.hero(true);
+  { for (const m of F.monsters) m.speed = 0;
+    const m = F.monsters[0]; m.hp = 3; m.hp0 = 3; m.block = 1; m.d = 0.4;
+    for (const o of F.monsters) if (o !== m) o.d = 0.95;
+    advance(cfg.heroMs * 2 + 800);
+    ok(F.darts.every(s => s.to !== m) && m.hp === 3, `a dart went at a blocking farang, or chipped it (hp ${m.hp})`);
+    F.hit(m, false, true);
+    ok(m.hp === 3 && m.block === 1, `a light got through a block (hp ${m.hp}, block ${m.block})`);
+    F.hit(m, false, false);
+    ok(m.block === 0 && m.hp === 3 - (1 + F.lvl('intent')), `the hand did not break the block and land (block ${m.block}, hp ${m.hp})`);
+    ok(F.spawn() === undefined && F.monsters.every(x => !x.boss || x.block >= cfg.bossBlock), 'a general arrived without a block');
+  }
+  // the stun: a clean stroke holds the wave, and a landed clean shot is what calls it
+  fresh(); F.hero(false);
+  { const m = F.monsters[0]; m.d = 0.6; const d0 = m.d;
+    F.stun(T);
+    advance(cfg.stunMs - 300);
+    ok(Math.abs(m.d - d0) < 1e-9, `a held farang moved (d ${m.d} from ${d0})`);
+    advance(600);
+    ok(m.d < d0, 'the hold never lifted');
+    // a clean conjure lands and holds; a zapped one does not
+    const v = F.monsters[0]; F.ask(v.i); F.retarget(true); v.d = 0.5; v.speed = 0;
+    const s0 = F.stunUntil; globalThis.conjure();
+    ok(F.shots.length && F.shots[0].clean === true, 'a clean trace did not fly as a clean shot');
+    advance(600);
+    ok(F.stunUntil > s0 && F.stunUntil >= T, `a clean shot landed and held nothing (stunUntil ${F.stunUntil}, was ${s0}, now ${T})`);
+    advance(cfg.stunMs + 200);
+    const u = F.monsters[0]; F.ask(u.i); F.retarget(true); u.speed = 0; F.quench();
+    globalThis.zap({x: 150, y: 150}); const s1 = F.stunUntil; globalThis.conjure();
+    ok(F.shots.length && F.shots[0].clean === false, 'a zapped trace flew as a clean one');
+    advance(600);
+    ok(F.stunUntil === s1, 'a zapped shot held the wave');
+  }
+  // the hit is the hand's own stroke: the shot carries what was drawn, in its own box
+  fresh(); F.hero(false);
+  { const v = F.monsters[0]; F.ask(v.i); F.retarget(true); v.speed = 0;
+    P.strokes.length = 0; P.strokes.push(line(120, 120, 280, 130, 60), line(200, 100, 210, 300, 80, 900));
+    globalThis.conjure();
+    const s = F.shots[0];
+    ok(s && Array.isArray(s.path) && s.path.length === 2, `the shot carries ${s && s.path ? s.path.length : 'no'} stroke(s), expected 2`);
+    ok(s && s.path.every(st => st.every(([x, y]) => x >= -0.51 && x <= 0.51 && y >= -0.51 && y <= 0.51)), 'the flung stroke is not in its own box');
+    ok(s && s.from.x === F.heroAt(0).x, 'the stroke did not fly from the calligrapher');
+  }
+  // guided: practice, nobody at the gate
+  fresh(); F.hero(true); F.setDifficulty('guided');
+  ok(F.autohero(T + 1e6) === null, 'a hero fought in guided');
+  F.setDifficulty('medium'); fresh();
+}
+
 // every conjure in this file went through the hand; none of its notes may have thrown
 ok(globalThis.__hand.faults === 0, `the hand's note threw ${globalThis.__hand.faults} time(s) during the field's checks`);
 
 if (fail) { console.log(`  ${fail} field check(s) failed`); process.exit(1); }
 console.log(`  monsters advance and spawn, a finished glyph banishes the target, `
   + `the tracer retargets, the ward falls and restarts, `
-  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, and a stage cannot be passed without holding it, nor its gate bought on credit, a recognisable trace pays more, and guided only gets you so far`);
+  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, and a stage cannot be passed without holding it, nor its gate bought on credit, a recognisable trace pays more, and guided only gets you so far; the heroes' darts fly on their own, a block is the hand's to break, a clean stroke holds the wave, and the stroke itself is what flies`);

@@ -630,6 +630,22 @@ wall, a sunrise is getting up with more — and the description is shown on
 every width, since the shop has the sketchbook's room. New UI that names a
 thing in kanji names it in a mark too.
 
+**The stage (v0.1.73): heroes are people, the farang are in costume.** The
+maintainer, after a day of design (NOTES.md, 2026-09-26): "Hito are people.
+So our heroes and farang are people ... the heroes are auto attacking ... in
+order to do like stuns, or block break, you gotta stroke the characters." The
+gate is a torii at the foot of the field and the farang come down from above
+it. The calligrapher, drawn as 人 with a brush, throws darts on their own
+clock, as heavy as the share of the chart this hand has learned; the farang
+are foreigners in lantern costumes with the sign painted on, and **the
+costume is the hit points**: a hit strips a layer, and under the last one is
+the tourist in the loud shirt. A general holds up a phrasebook as a block
+that no dart or light gets through; only the hand breaks it. A clean trace
+holds the wave. The hand's hit is its own stroke, flung across the field.
+The sign on a farang is always right: the comedy is the costume and the
+voice, never the character. Keys in `scripts/PACK.md`, "The stage". Not yet
+built from the same design: finite stages, the estate, the gate, the reader.
+
 **Hitodama (v0.1.21)** is the first piece of the economy in play. Every
 finished glyph kindles a ghost light (人魂) on its character, and a lit
 character throws its own wisp at any monster carrying it, one charge per
