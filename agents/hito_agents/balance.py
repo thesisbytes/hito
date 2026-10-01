@@ -282,7 +282,9 @@ def auto(rows_=None, version=None, threshold=THRESHOLD, balance_dir=BALANCE, arg
     if rows_ is not None:
         use(rows_)
     version = version or pack_version(game)
-    played = [r for r in runs() if r.get("v") == version and r.get("difficulty") == "medium" and not r.get("practice")]
+    # the tower's runs: the judge's arithmetic is of an endless climb, and a
+    # stage fight (a run with a `stage`) is not one
+    played = [r for r in runs() if r.get("v") == version and r.get("difficulty") == "medium" and not r.get("practice") and not r.get("stage")]
     verdict_file = Path(balance_dir) / f"v{version}.json"
     if verdict_file.exists():
         return {"status": "done", "version": version, "runs": len(played), "file": str(verdict_file)}

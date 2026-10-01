@@ -151,7 +151,7 @@ consonants, vowel signs, tone marks, thanthakhat, numerals).
 Next step, once the letterforms are done: a FontForge script that imports the PNGs and
 places combining-mark anchors so tone marks stack correctly.
 
-### Hiragana — `dist/hiragana-v0.1.72.html`
+### Hiragana — `dist/hiragana-v0.1.74.html`
 
 Playable, and traced end to end without a break. The 46 gojūon with KanjiVG
 stroke order baked in, Klee One and Noto Sans JP embedded, laid out as a
@@ -350,7 +350,7 @@ Chrome driven with synthetic pointer events needs two allowances that are
 about the fakery and not the game: `setPointerCapture` refuses a synthetic
 pointer, and `getCoalescedEvents()` is empty for one.
 
-### Katakana — `dist/katakana-game-v0.1.35.html`
+### Katakana — `dist/katakana-game-v0.1.37.html`
 
 The field shell with a deck: the farang carry katakana loanwords. The
 maintainer's own report was freezing on katakana words "although sometimes I
@@ -371,7 +371,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.41.html`
+### Vocab — `dist/vocab-v0.1.42.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -644,7 +644,25 @@ that no dart or light gets through; only the hand breaks it. A clean trace
 holds the wave. The hand's hit is its own stroke, flung across the field.
 The sign on a farang is always right: the comedy is the costume and the
 voice, never the character. Keys in `scripts/PACK.md`, "The stage". Not yet
-built from the same design: finite stages, the estate, the gate, the reader.
+built from the same design: the estate, the gate, the reader.
+
+**Finite stages (v0.1.74).** The maintainer: "the latest stage the player
+cleared is the rate they accrue currency", which needs a stage that can be
+cleared. A stage is a stretch of the tower with an end: `bossEvery` (ten)
+waves, the last its general. Stage *n* is waves *(n-1)·10* to *n·10*, so
+everything keyed to the wave means what it meant, and a stage never grows —
+the v0.1.44 stages were a count that grew, and that was the wall. A run in
+the hiragana game is one stage. **Cleared is the general sent home with the
+ward standing**: the rank and file may get through at the ward's cost, but a
+general who gets in takes his bite and comes round again, and only the hand
+breaks his block, so no stage is cleared by watching the heroes. The furthest
+stage cleared is kept in the ledger (`best[realm].stage`, only rises, merges
+by max) for the estate's rate to read; nothing pays out on it yet. The start
+page opens on the first uncleared stage, with a stepper back through the
+cleared ones; **the tower is still there, endless, behind a button on the
+start page**, and guided is always the tower. The balance judge counts only
+the tower's runs: its arithmetic is of an endless climb, and a judge for
+stages is not built. Keys in `scripts/PACK.md`, "Finite stages".
 
 **Hitodama (v0.1.21)** is the first piece of the economy in play. Every
 finished glyph kindles a ghost light (人魂) on its character, and a lit

@@ -183,9 +183,13 @@ STYLE = """
   .over-pay small{ display:block; font-size:11.5px; font-weight:400; color:rgba(232,224,204,.55); }
   .start-row.lantern button.can{ border-color:#7fd1c4; }
   .start-row.lantern{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
-  .start-row.stages{ grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); }
-  .start-row.stages button{ text-align:center; padding:8px 2px; }
-  .start-row.stages button b{ margin:0; }
+  /* which stage: a step back, the stage, a step forward */
+  .stage-pick{ display:flex; align-items:stretch; gap:8px; margin:0 0 4px; }
+  .stage-pick button{ flex:0 0 52px; font:700 22px ui-sans-serif,system-ui; background:#1d1a16; color:#e9c46a; border:1px solid #57492f; border-radius:10px; cursor:pointer; touch-action:manipulation; }
+  .stage-pick button[disabled]{ opacity:.3; cursor:default; }
+  .stage-pick span{ flex:1; text-align:center; padding:8px 4px; border:1px solid #3d3324; border-radius:10px; }
+  .stage-pick span b{ display:block; font-size:17px; color:#e9c46a; }
+  .stage-pick span small{ color:rgba(232,224,204,.6); font-size:11.5px; }
   .start-h b.needs{ color:#e8a0a0; font-weight:600; letter-spacing:.04em; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(232,224,204,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
@@ -368,6 +372,33 @@ LAYER = STYLE + r"""
   const totalRows = () => Math.max(1, Math.max(...LETTERS.map(L => L[6] || 1)));
   const rowsOpen = w => !ST ? Infinity : Math.min(totalRows(), ST.rows + Math.floor(Math.max(bestWave(), w == null ? wave : w) / ST.rowWaves));
   const nextRowAt = () => (!ST || rowsOpen() >= totalRows()) ? Infinity : (rowsOpen() - ST.rows + 1) * ST.rowWaves;
+  // ---- stages (v0.1.74): a stretch of the tower with an end
+  // The maintainer: "the latest stage the player cleared is the rate they
+  // accrue currency" — which needs a stage that can be cleared. Stages were
+  // tried once (v0.1.44-v0.1.53) and became a wall, because a stage was a
+  // count that grew: stage 8 was 33 farang by finger. This one never grows.
+  // A stage is `bossEvery` waves of the tower, the last its general, and
+  // what climbs is what the tower already climbs by the wave: the layers,
+  // the bite, the pace, the blocks. Stage n is waves (n-1)·len to n·len, so
+  // the furthest wave, the rows it opens and every pace key mean what they
+  // meant. Cleared is the general sent home with the ward standing. The
+  // rank and file may get through, at the ward's cost; the general may not:
+  // he takes his bite and comes round again, and only the hand breaks his
+  // block, so a stage is never cleared by standing and watching. The tower
+  // itself stays, endless, as stage 0. Guided is practice and has no stages.
+  const STAGED = !!(ST && ST.finite);
+  const stageLen = () => ST ? ST.bossEvery : 0;
+  const clearedTo = () => { try { const H = window.__hand; const b = H && H.ledger && H.ledger.best && H.ledger.best[REALM]; return b ? (+b.stage || 0) : 0; } catch(_){ return 0; } };
+  let chosen = null;                        // the stage asked for: null is the first not yet cleared, 0 the endless tower
+  let stageN = 0, wave0 = 0, won = false;   // the stage being fought (0: the tower), the wave it began on, whether it was cleared
+  let bannerAt = -1e9;
+  const wantStage = () => (!STAGED || difficulty === 'guided') ? 0
+    : chosen == null ? clearedTo() + 1 : Math.max(0, Math.min(clearedTo() + 1, chosen));
+  const stageDone = () => stageN > 0 && wave >= wave0 + stageLen();
+  function pickStage(n){ chosen = n == null ? null : Math.max(0, Math.round(+n) || 0); return wantStage(); }
+  function enterStage(){ stageN = wantStage(); wave0 = stageN ? (stageN - 1) * stageLen() : 0; wave = wave0; won = false; bannerAt = performance.now(); }
+  const midRun = () => !!(run && run.started && !over);
+  const rosterAt = w => { const r = rowsOpen(w); return LETTERS.filter(L => (L[6] || 1) <= r).length; };
   const RANK = { guided:0, medium:2, hard:3 };
   const needs = () => !ST ? 'guided' : 'medium';
   const bossAlive = () => monsters.some(m => m.boss);
@@ -1128,7 +1159,7 @@ LAYER = STYLE + r"""
     if (!over){
       // Nothing to answer is not a rest, it is a dead screen. Refill at once.
       if (!monsters.length) spawnAt = Math.min(spawnAt, now);
-      if (now > spawnAt){
+      if (now > spawnAt && !stageDone()){
         spawn();
         spawnAt = now + Math.max(CFG.spawnMin, CFG.spawnMs - wave*CFG.spawnRamp);
       }
@@ -1136,10 +1167,13 @@ LAYER = STYLE + r"""
       for (const m of monsters){
         if (!held) m.d -= m.speed*dt;
         if (m.d <= 0.06){
-          monsters = monsters.filter(x => x !== m);
-          if (m === locked) locked = null;
           const bite = biteFor(wave, m.boss);
           ward = Math.max(0, ward - bite);
+          // A stage's general is not got rid of by letting him in: he takes
+          // his bite and comes round again, from the top, until the hand
+          // sends him home or the ward falls.
+          if (m.boss && stageN && ward > 0) m.d = 1.05;
+          else { monsters = monsters.filter(x => x !== m); if (m === locked) locked = null; }
           try { window.__sync && window.__sync.record('breach', {
             glyph: LETTERS[m.i][0], word: m.w ? m.w.ja : undefined, wardLeft: ward, wave, bite,
           }); } catch(_){}
@@ -1160,6 +1194,10 @@ LAYER = STYLE + r"""
         if (s.t >= 1) chip(s.to, heroHit());
       }
       darts = darts.filter(s => s.t < 1 && monsters.includes(s.to));
+      // The stage is cleared: every one of them has come, none is left, and
+      // the ward is standing. The general is among the gone, and he only
+      // ever goes by being sent.
+      if (!over && stageDone() && !monsters.length && ward > 0){ over = true; won = true; endRun(); }
     }
     // Deferred work, once the hand is free: a queued retarget, or a glyph that
     // no monster carries any more — which would otherwise strand the player
@@ -1296,8 +1334,9 @@ LAYER = STYLE + r"""
     g.strokeStyle = 'rgba(233,196,106,.16)'; g.lineWidth = 1;
     g.beginPath(); g.moveTo(0, Y - 4); g.quadraticCurveTo(X, Y - 12, FW, Y - 4); g.stroke();
     const gw = Math.min(FW*0.34, 132), gh = 72;
-    glowAt(g, X, Y - 30, 70, 50, over ? 'rgba(120,60,50,.5)' : 'rgba(233,196,106,.35)', 1);
-    g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(233,196,106,.55)';
+    const fell = over && !won;   // a cleared stage leaves the gate standing
+    glowAt(g, X, Y - 30, 70, 50, fell ? 'rgba(120,60,50,.5)' : 'rgba(233,196,106,.35)', 1);
+    g.fillStyle = fell ? 'rgba(120,60,50,.9)' : 'rgba(233,196,106,.55)';
     g.fillRect(X - gw/2 + 8, Y - gh + 10, 9, gh - 10); g.fillRect(X + gw/2 - 17, Y - gh + 10, 9, gh - 10);   // the pillars
     g.fillRect(X - gw/2 + 14, Y - gh + 24, gw - 28, 6);                                                        // the tie beam
     g.fillRect(X - 4, Y - gh + 24, 8, 20);                                                                     // the tablet
@@ -1549,7 +1588,17 @@ LAYER = STYLE + r"""
     // Bottom left: the workshop strip has the top, and a tally under buttons
     // is a tally nobody can read. The wave sits with it, because how far a run
     // got is what a run is for.
-    g.fillText(`banished ${killed} · wave ${wave}`, 12, FH - 12);
+    g.fillText(stageN ? `stage ${stageN} · ${Math.min(stageLen(), wave - wave0)} of ${stageLen()} · banished ${killed}` : `banished ${killed} · wave ${wave}`, 12, FH - 12);
+    // the stage says its name as it opens, and gets out of the way
+    const bn = (performance.now() - bannerAt) / 1800;
+    if (stageN && !over && bn >= 0 && bn < 1){
+      g.save(); g.globalAlpha = Math.min(1, (1 - bn) * 2.2); g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillStyle = '#ffe9a8'; g.font = '700 30px ui-sans-serif,system-ui';
+      g.fillText('stage ' + stageN, X, FH * 0.3);
+      g.fillStyle = 'rgba(232,224,204,.75)'; g.font = '12px ui-sans-serif,system-ui';
+      g.fillText(stageLen() + ' farang · the last one is a general', X, FH * 0.3 + 26);
+      g.restore();
+    }
   }
 
   function restart(){
@@ -1564,7 +1613,7 @@ LAYER = STYLE + r"""
     // — the maintainer: "my energy gauge should not persist between games."
     // In the Tower nothing carries but the workshop; what lasts is bought.
     quench();
-    ward = wardMax(); over = false; wave = 0; killed = 0; locked = null; asked = null; queue = []; recent = [];
+    ward = wardMax(); over = false; enterStage(); killed = 0; locked = null; asked = null; queue = []; recent = [];
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; frames = { n:0, slow:0, jank:0 }; spawn(); retarget();
     // The last banish of a stage leaves the engine celebrating: the whole path
     // lit, `done` set. If the first target of the new run is the character
@@ -1593,23 +1642,30 @@ LAYER = STYLE + r"""
     // What the run leaves behind. Paid for tracing, most of all clean tracing;
     // guided cannot be zapped, so there every trace would count as clean, and
     // it pays less instead. Holding a stage to the end is worth half again.
-    const p = purse();
-    const pay = !p ? 0 : Math.round((run.pay + Math.floor(wave/CFG.tamaWaves))
+    // A stage pays for the farang it faced, not for the waves it started
+    // above; and a guided run clears nothing, whatever stood when it ended.
+    const p = purse(), practice = difficulty === 'guided', cleared = won && !practice;
+    const pay = !p ? 0 : Math.round((run.pay + Math.floor((wave - wave0)/CFG.tamaWaves))
                                      * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1)
-                                     * (1 + lvl('rise') * CFG.riseStep));   // 起: get up with more
+                                     * (1 + lvl('rise') * CFG.riseStep)     // 起: get up with more
+                                     * (cleared && ST ? ST.clearBonus : 1));
     if (p) p.earn(pay);
     // guided is practice: the hand keeps the run, but not as a furthest wave
-    const rec = { at: run.at, realm: REALM, practice: difficulty === 'guided' || undefined, tama: pay,
+    const rec = { at: run.at, realm: REALM, practice: practice || undefined, tama: pay,
+                  stage: stageN || undefined, cleared: cleared || undefined, from: wave0 || undefined,
                   quality: run.qn ? Math.round(100*run.q/run.qn)/100 : undefined, wave, banished: killed, traced: run.traced, clean: run.clean,
                   sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
                   difficulty, sign: CFG.sign, upgrades: {...upg},
                   frames: {...frames}, plat: (navigator.platform || '').slice(0, 24) || undefined,
                   v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : undefined };
     let best = null;
+    const before = clearedTo();
     try { if (H && H.run) best = H.run(rec); } catch(_){}
     try { window.__sync && window.__sync.record('run', rec); } catch(_){}
-    ended = { rec, best, since: run.at, pay };
-    if (navigator.vibrate) navigator.vibrate([90, 60, 160]);
+    ended = { rec, best, since: run.at, pay, won: cleared, stage: stageN, first: cleared && stageN > before };
+    // "next" is the stage after the one just cleared; a fall asks for the same again
+    if (stageN) chosen = cleared ? stageN + 1 : stageN;
+    if (navigator.vibrate) navigator.vibrate(cleared ? [40, 40, 40, 40, 160] : [90, 60, 160]);
     // a beat, so the last breach is seen before the page covers it
     setTimeout(() => { if (over && ended) openOver(); }, 700);
     return ended;
@@ -1675,7 +1731,8 @@ LAYER = STYLE + r"""
     const m = bar_('life', '命', ward, wardMax(), 'the ward: ' + ward + ' of ' + wardMax())
       + bar_('energy', '気', energy, energyMax(), '気 — every stroke fills it, every wisp spends it: ' + energy + ' of ' + energyMax())
       + `<span class="n" title="ink — earned by tracing, spent on this run's boosts">墨 ${sumi}</span>`
-      + `<span class="n" title="the wave"><small>波</small> ${wave}</span>`
+      + (stageN ? `<span class="n" title="stage ${stageN}: farang ${Math.min(stageLen(), wave - wave0)} of ${stageLen()}, the last one a general"><small>stage ${stageN}</small> ${Math.min(stageLen(), wave - wave0)}/${stageLen()}</span>`
+                : `<span class="n" title="the wave"><small>波</small> ${wave}</span>`)
       + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook: write" aria-label="the sketchbook">筆<small>write</small></button>`
       + `<button data-tab="boosts" aria-pressed="${tab === 'boosts'}" class="${canBuyAny() ? 'can' : ''}" title="墨 boosts: this run's upgrades" aria-label="boosts: this run's upgrades">${ICON.sword}墨<small>boosts</small></button></span>`;
     if (m === dashMarkup) return;
@@ -1801,17 +1858,31 @@ LAYER = STYLE + r"""
     for (const el of start.querySelectorAll('[data-wpanel]')) el.hidden = el.dataset.wpanel !== t;
   }
   function renderCredits(){ wtab = 'more'; return renderStart(true); }
+  // What is about to be fought. A stage says how long it is and who ends it,
+  // and once one has been cleared the cleared ones can be fought again: a
+  // step back and a step forward, never past the first not yet cleared.
+  function stageHtml(n){
+    if (!ST) return '';
+    if (!n) return `<div class="start-h">the tower · furthest wave ${bestWave()} · ${roster().length} characters on the field${nextRowAt() < Infinity ? ' · next row of the chart at wave ' + nextRowAt() : ' · every row of the chart'}${difficulty === 'guided' ? ' · <b class="needs">practice: nothing counts</b>' : ''}</div>`;
+    const c = clearedTo(), len = stageLen();
+    const head = `<div class="start-h">stage ${n} · ${len} farang, the last one a general · ${rosterAt((n - 1) * len)} characters on the field</div>`;
+    if (midRun() || c < 1) return head;
+    return head + `<div class="stage-pick"><button data-stagepick="${n - 1}"${n <= 1 ? ' disabled' : ''} aria-label="the stage before">‹</button>`
+      + `<span><b>stage ${n}</b><small>${n <= c ? 'cleared · fight it again' : c + ' cleared · this one is next'}</small></span>`
+      + `<button data-stagepick="${n + 1}"${n > c ? ' disabled' : ''} aria-label="the stage after">›</button></div>`;
+  }
   function renderStart(asStart){
     if (view === 'credits' && !asStart) return renderCredits();
     if (view === 'over') return renderOver();
     const hand = window.__hand;
+    const sn = midRun() ? stageN : wantStage();   // the stage this page is about: the one being fought, or the one asked for
     start.innerHTML = markup = `<div class="start-card">
       <div class="start-title">hito<span>人</span></div>
       <div class="start-sub">${esc(REALM)} · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
-      ${ST ? `<div class="start-h">the tower · furthest wave ${bestWave()} · ${roster().length} characters on the field${nextRowAt() < Infinity ? ' · next row of the chart at wave ' + nextRowAt() : ' · every row of the chart'}${difficulty === 'guided' ? ' · <b class="needs">practice: nothing counts</b>' : ''}</div>` : ''}
-      <button class="start-go">${over ? 'begin again' : 'begin'}</button>
+      ${stageHtml(sn)}
+      <button class="start-go">${midRun() ? 'resume' : sn ? 'begin · stage ' + sn : over ? 'begin again' : 'begin'}</button>
       ${workshopHtml()}
-      <div class="start-links"><a class="start-home" href="../index.html">${ICON.flame}home</a></div>
+      <div class="start-links">${STAGED && !midRun() && difficulty !== 'guided' ? `<button data-stagepick="${sn ? 0 : 'front'}">${sn ? 'the tower · endless' : 'back to the stages'}</button>` : ''}<a class="start-home" href="../index.html">${ICON.flame}home</a></div>
       <div class="start-foot">${WORDS ? 'draw below · the farang come from above · write what they are saying, one kana at a time' : 'draw below · the farang come from above · the one you are answering is yours'}</div>
     </div>`;
     wirePage(renderStart);
@@ -1836,6 +1907,7 @@ LAYER = STYLE + r"""
   tapOn(start, 'button[data-wtab]', b => showWtab(b.dataset.wtab));
   tapOn(start, 'button[data-perm]', b => { if (buyPerm(b.dataset.perm)) renderStart(); });
   tapOn(start, 'button[data-lantern]', b => { if (buyLantern(b.dataset.lantern)) renderStart(); });
+  tapOn(start, 'button[data-stagepick]', b => { pickStage(b.dataset.stagepick === 'front' ? null : +b.dataset.stagepick); renderStart(); });
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
   function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
@@ -1847,9 +1919,14 @@ LAYER = STYLE + r"""
     // the handwriting of this run, the way the hand's own page draws it
     let hands = '';
     try { if (H && H.thumbs) hands = H.thumbs(e.since, 12, true); } catch(_){}
-    start.innerHTML = markup = `<div class="start-card over">
-      <div class="start-title">the ward fell</div>
-      <div class="start-sub">${esc(REALM)} · wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave > r.wave ? ' · furthest ' + e.best.wave : ''}</div>
+    // A stage ends two ways, and the page says which: cleared, with the next
+    // one a tap away, or fallen, with the same one again.
+    const sub = e.won ? `the general went home${e.first ? ' · <b>your furthest yet</b>' : ''}`
+      : e.stage ? `stage ${e.stage} · ${Math.min(stageLen(), r.wave - (r.from || 0))} of ${stageLen()} came${e.best && e.best.stage ? ' · ' + e.best.stage + ' cleared' : ''}`
+      : `wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave > r.wave ? ' · furthest ' + e.best.wave : ''}`;
+    start.innerHTML = markup = `<div class="start-card over${e.won ? ' won' : ''}">
+      <div class="start-title">${e.won ? 'stage ' + e.stage + ' cleared' : 'the ward fell'}</div>
+      <div class="start-sub">${esc(REALM)} · ${sub}</div>
       <div class="over-nums">
         <div><b>${r.banished}</b><small>banished</small></div>
         <div><b>${r.traced}</b><small>traced</small></div>
@@ -1858,8 +1935,9 @@ LAYER = STYLE + r"""
       </div>
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
       ${r.practice ? `<p class="over-line">guided is practice: nothing here counts toward the tower or 魂.</p>` : ''}
-      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}clean, readable traces pay the most${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
-      <button class="start-go">again</button>
+      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}clean, readable traces pay the most${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}${e.won ? ' · a cleared stage pays ×' + ST.clearBonus : ''}</small></p>` : ''}
+      ${e.won ? `<p class="over-line">stage ${e.stage + 1} is open: ${rosterAt(e.stage * stageLen())} characters on the field</p>` : ''}
+      <button class="start-go">${e.won ? 'next · stage ' + (e.stage + 1) : 'again'}</button>
       <div class="start-links"><button class="start-workshop">${ICON.sword}workshop</button><a class="start-home" href="../index.html">${ICON.flame}home</a></div>
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
       <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
@@ -1873,7 +1951,10 @@ LAYER = STYLE + r"""
   function openWorkshop(t){ if (t) wtab = t; return renderStart(); }
   function begin(){
     start.hidden = true;
-    if (over) restart(); else paused = false;
+    // The field under the start page was set up for a stage before anyone
+    // chose one; if another was asked for, the run begins there instead.
+    if (over || (!(run && run.started) && wantStage() !== stageN)) restart(); else paused = false;
+    bannerAt = performance.now();
     // the clock starts when the player does, not when the page loaded
     if (run && !run.started){ run.started = true; run.began = performance.now(); run.at = Date.now(); }
     tPrev = 0;
@@ -1915,6 +1996,7 @@ LAYER = STYLE + r"""
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; },
+    get stage(){ return stageN; }, get wave0(){ return wave0; }, get won(){ return won; }, get clearedTo(){ return clearedTo(); }, pickStage, wantStage, stageLen, staged: STAGED,
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     // a synthetic tap: a pointerdown on the first element the selector finds, through the container's own listener
@@ -1982,6 +2064,7 @@ LAYER = STYLE + r"""
   run = newRun();
   // what lasts is in force from the first run, not the second
   ward = wardMax(); sumi = own('inkwell') * CFG.inkwellStep;
+  enterStage();
   spawn(); retarget();
   // The title page is the game's start page now ("let's have the game begin
   // from the title page. The practice button can exist on title"): its Begin
@@ -2033,7 +2116,7 @@ def config(pack, deck=None):
         f"realms:{json.dumps(list(pack.get('realms', [])), ensure_ascii=False)},"
         f"speed:{f.get('speed', 0.055)},"
         f"wardHp:{int(f.get('wardHp', 5))},"
-        f"tower:{js({**{'rows': 2, 'rowWaves': 10, 'bossEvery': 10, 'bossHp': 2, 'bossBite': 1, 'speedStep': 0.03}, **(f.get('tower', f.get('stages')) or {})}) if f.get('tower', f.get('stages', True)) else 'null'},"
+        f"tower:{js({**{'rows': 2, 'rowWaves': 10, 'bossEvery': 10, 'bossHp': 2, 'bossBite': 1, 'speedStep': 0.03, 'clearBonus': 1.5, 'finite': False}, **(f.get('tower', f.get('stages')) or {})}) if f.get('tower', f.get('stages', True)) else 'null'},"
         f"tamaClean:{int(f.get('tamaClean', 2))},"
         f"tamaTrace:{int(f.get('tamaTrace', 1))},"
         f"tamaWaves:{int(f.get('tamaWaves', 3))},"

@@ -98,7 +98,10 @@ def hand_of(runs, version=None, min_runs=5):
     runs go. Medium only, practice left out. With a version and enough runs
     on it, the waves are that version's: a pace is judged by the runs that
     were played at it."""
-    real = [r for r in runs if r.get("difficulty") == "medium" and not r.get("practice") and r.get("traced")]
+    # Tower runs only. A stage fight (v0.1.74) starts above wave 0 with a full
+    # ward and stops at its general, so the wave it ended on says where the
+    # player chose to fight, not where an endless climb outran the hand.
+    real = [r for r in runs if r.get("difficulty") == "medium" and not r.get("practice") and r.get("traced") and not r.get("stage")]
     if version:
         mine = [r for r in real if r.get("v") == version]
         if len(mine) >= min_runs:

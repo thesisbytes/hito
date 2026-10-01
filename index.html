@@ -273,8 +273,8 @@
   const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
   // The furthest wave per level, off the ledger the games keep on this device.
-  function furthest(realm){
-    try { const L = JSON.parse(get('hito-ledger') || 'null'); const b = L && L.best && L.best[realm]; return b ? (+b.wave || 0) : 0; } catch(_){ return 0; }
+  function furthest(realm, what){
+    try { const L = JSON.parse(get('hito-ledger') || 'null'); const b = L && L.best && L.best[realm]; return b ? (+b[what || 'wave'] || 0) : 0; } catch(_){ return 0; }
   }
   // A level opens when the one before it has been climbed LEVEL_WAVES deep.
   const open = k => k === 0 || furthest(LEVELS[k - 1].realm) >= LEVEL_WAVES;
@@ -295,8 +295,8 @@
     $('practice').href = l.file + '?go=guided';
     $('blurb').textContent = l.blurb;
     $('realms').innerHTML = LEVELS.map((r, k) => {
-      const on = open(k), w = furthest(r.realm);
-      const sub = on ? (w ? 'furthest wave ' + w : 'level ' + (k + 1)) : 'opens at wave ' + LEVEL_WAVES + ' of ' + esc(LEVELS[k - 1].name);
+      const on = open(k), w = furthest(r.realm), st = furthest(r.realm, 'stage');
+      const sub = on ? (st ? 'stage ' + st + ' cleared' : w ? 'furthest wave ' + w : 'level ' + (k + 1)) : 'opens at wave ' + LEVEL_WAVES + ' of ' + esc(LEVELS[k - 1].name);
       return `<button data-k="${k}" class="${on ? '' : 'locked'}" aria-pressed="${k === level}"${on ? '' : ' aria-disabled="true"'}><i>${r.kana}</i><span>${esc(r.name)}</span><small>${sub}</small></button>`;
     }).join('');
     for (const b of $('realms').querySelectorAll('button')) b.onclick = () => pick(+b.dataset.k);

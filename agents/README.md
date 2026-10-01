@@ -67,7 +67,14 @@ medium runs on it and no verdict yet, 仏 and 鬼 argue, the judge decides,
 the verdict is committed under `agents/balance/v<version>.json`, the pack is
 patched and bumped, `build/release.sh` rebuilds, `run.sh` checks, and the
 workflow pushes the next build. A build nobody has played enough is left
-alone, and no build is judged twice. It needs two repository secrets:
+alone, and no build is judged twice. **Only the tower's runs count.** As of
+hiragana v0.1.74 the game opens on finite stages, and a stage fight (a `run`
+with a `stage`) starts above wave 0 with a full ward and stops at its
+general: the wave it ended on says where the player chose to fight, not
+where an endless climb outran the hand, and the judge's arithmetic is of a
+climb. So the loop is quiet until the tower (still on the start page) has
+its twelve runs. A judge for stages — the first stage a hand cannot clear,
+against the furthest it has — is not built. It needs two repository secrets:
 
 - `APPWRITE_API_KEY` — an API key on the Appwrite project with **rows read
   on `hito.events` and nothing else** (Appwrite console → the project →

@@ -584,6 +584,10 @@ class Pace(unittest.TestCase):
         rs = [dict(run_row(20)["body"], v="0.1.1")] * 6 + [dict(run_row(200)["body"], v="0.1.2")] * 6
         self.assertEqual(pace.hand_of(rs, "0.1.2")["wave_p50"], 200)
         self.assertEqual(pace.hand_of(rs, "0.1.9")["version"], None)
+        # a stage fight is not a climb: where it ended is where the player chose to fight
+        staged = [dict(run_row(400)["body"], v="0.1.2", stage=40, cleared=True)] * 20
+        self.assertEqual(pace.hand_of(rs + staged, "0.1.2")["wave_p50"], 200)
+        self.assertEqual(pace.hand_of(staged)["runs"], 0)
 
     def test_a_faster_hand_goes_further(self):
         cur = base_cfg()
@@ -705,6 +709,12 @@ class Loop(unittest.TestCase):
         r = self.go(self.played(2) + self.played(10, v="0.1.60"))
         self.assertEqual(r["status"], "thin")
         self.assertEqual(r["runs"], 2)
+        self.assertEqual(self.calls, 0)
+
+    def test_stage_fights_are_not_the_towers_runs(self):
+        staged = [dict(r, body=dict(r["body"], stage=3)) for r in self.played(10)]
+        r = self.go(self.played(2) + staged)
+        self.assertEqual((r["status"], r["runs"]), ("thin", 2))
         self.assertEqual(self.calls, 0)
 
     def test_enough_runs_judge_apply_bump_and_never_twice(self):

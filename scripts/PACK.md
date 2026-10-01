@@ -254,12 +254,13 @@ needs the pen again or a brighter workshop. That is the whole curve.
 ### The tower, 魂 tama and the lantern workshop
 
 ```json
-"field": { "tower": { "rows": 2, "rowWaves": 10, "bossEvery": 10, "bossHp": 2, "bossBite": 1, "speedStep": 0.03 },
+"field": { "tower": { "rows": 2, "rowWaves": 10, "bossEvery": 10, "bossHp": 2, "bossBite": 1, "speedStep": 0.03,
+                      "finite": false, "clearBonus": 1.5 },
            "tamaClean": 2, "tamaTrace": 1, "tamaWaves": 3, "inkwellStep": 6,
            "lanternCost": { "heart": 20, "lamp": 30, "inkwell": 15, "vessel": 25 }, "lanternRamp": 1.6 }
 ```
 
-The waves do not end; a run ends when the ward falls, and how far it got is
+The waves do not end (unless `tower.finite`, below); a run ends when the ward falls, and how far it got is
 the record (v0.1.54 — before that a run was a stage with a fixed count and a
 gate bought with 魂; NOTES.md 2026-09-24 has why). The key `stages` is still
 read as an alias.
@@ -275,6 +276,8 @@ read as an alias.
 | *(the release)* | | a bag of 気 filled to the brim is thrown all at once, every lit character at its nearest bearer until the 気 runs out; a tap on the ward throws whatever is there (v0.1.66). |
 | `rescue` | 0.3 | how close to the ward (the field is 1 across, the ward at 0.06) a farang is "at the door". Inside it the lights answer even the farang the hand is tracing for, and a dark character there is what the tracer asks for next, ahead of its queue. |
 | `tower.speedStep` | 0.03 | farang come this much faster per `bossEvery` waves |
+| `tower.finite` | `false` | `true` cuts the tower into **stages** (v0.1.74): a stage is `bossEvery` waves, the last its general, and a run is one stage. See *Finite stages* below. The hiragana game sets it. A deck is never staged. |
+| `tower.clearBonus` | 1.5 | a cleared stage pays this many times the 魂 |
 | `tamaClean`, `tamaTrace` | 2, 1 | tama for a clean trace, and for one that was zapped |
 | `tamaWaves` | 3 | one tama per this many farang faced |
 | `inkwellStep` | 6 | ink in hand at the start of a run, per inkwell |
@@ -288,6 +291,37 @@ to half again (it could be the book); `hand.qualitySpan` (0.09) is the mean
 distance, as a fraction of the glyph's diagonal, at which a trace scores zero.
 A guided run is kept in the hand's ledger as practice: it pays nothing and is
 never the furthest wave.
+
+### Finite stages (v0.1.74)
+
+With `tower.finite` a run is a **stage**: `bossEvery` waves of the tower,
+the last one its general. Stage *n* is waves *(n-1)·len* to *n·len*, so
+nothing else moves: the layers (`hpEvery`), the bite, the pace, the blocks
+and the rows of the chart are still keyed to the wave, the furthest wave is
+still the record that opens rows, and a stage never gets longer — what
+climbs is what the farang wear. (Stages were tried in v0.1.44-v0.1.53 as a
+count that grew, and stage 8 was 33 farang by finger.)
+
+- **Cleared** is every farang of the stage come and gone with the ward
+  standing. The rank and file may get through, at the ward's cost. **The
+  general may not**: he takes his bite and comes round again from the top,
+  and since only the hand breaks his block, no stage is cleared by standing
+  and watching the heroes.
+- A cleared stage is kept in the hand's ledger as `best[realm].stage`, the
+  furthest stage cleared, beside the furthest wave. It only rises and merges
+  by max. This is the number the estate's away rate will read; nothing reads
+  it yet but the pages.
+- The start page opens on the first stage not yet cleared. Once one is
+  cleared a stepper offers the cleared ones again, never past the first
+  uncleared. A cleared stage's ending offers the next; a fall offers the
+  same again. A fall pays for the farang it faced, not the waves it started
+  above.
+- **The tower stays**, endless, as a button on the start page ("the tower ·
+  endless"): stage 0, from wave 0, as before. Guided is practice and is
+  always the tower: it clears nothing.
+- A `run` event carries `stage`, `cleared` and `from` (the wave the stage
+  began on) when it was a stage. The balance judge counts only runs without
+  a `stage` (see `agents/README.md`).
 
 ### The stage (v0.1.73): heroes are people, the farang are in costume
 

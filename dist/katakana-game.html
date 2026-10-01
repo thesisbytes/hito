@@ -4,7 +4,7 @@
 <meta name="hito-theme" content="night">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>hito 人 · katakana · v0.1.36</title>
+<title>hito 人 · katakana · v0.1.37</title>
 <style>
   :root{
     --lacquer:#0a0f15;--lacquer-2:#0f1820;--gold:#6cb8ff;--gold-hot:#e2f3ff;--ember:#c8842f;
@@ -164,7 +164,7 @@ async function setFont(id){ const f=FONTS.find(x=>x.id===id); if(!f) return; awa
   f.loaded=fontReallyLoaded(f.family);
   fontId=f.id; TEACHER.activeFont=f.id; persist(); renderFontRow(); load(idx);
   if(!f.loaded) toast(`"${f.label}" blocked here — showing device font`); }
-const APP_VERSION='0.1.36';
+const APP_VERSION='0.1.37';
 const LETTERS=[["あ","あ行","a","","a-row",1,1,"A"],["い","あ行","i","","a-row",2,1,"I"],["う","あ行","u","","a-row",3,1,"U"],["え","あ行","e","","a-row",4,1,"E"],["お","あ行","o","","a-row",5,1,"O"],["か","か行","ka","","ka-row",1,2,"KA"],["き","か行","ki","","ka-row",2,2,"KI"],["く","か行","ku","","ka-row",3,2,"KU"],["け","か行","ke","","ka-row",4,2,"KE"],["こ","か行","ko","","ka-row",5,2,"KO"],["さ","さ行","sa","","sa-row",1,3,"SA"],["し","さ行","shi","","sa-row",2,3,"SHI"],["す","さ行","su","","sa-row",3,3,"SU"],["せ","さ行","se","","sa-row",4,3,"SE"],["そ","さ行","so","","sa-row",5,3,"SO"],["た","た行","ta","","ta-row",1,4,"TA"],["ち","た行","chi","","ta-row",2,4,"CHI"],["つ","た行","tsu","","ta-row",3,4,"TSU"],["て","た行","te","","ta-row",4,4,"TE"],["と","た行","to","","ta-row",5,4,"TO"],["な","な行","na","","na-row",1,5,"NA"],["に","な行","ni","","na-row",2,5,"NI"],["ぬ","な行","nu","","na-row",3,5,"NU"],["ね","な行","ne","","na-row",4,5,"NE"],["の","な行","no","","na-row",5,5,"NO"],["は","は行","ha","","ha-row",1,6,"HA"],["ひ","は行","hi","","ha-row",2,6,"HI"],["ふ","は行","fu","","ha-row",3,6,"FU"],["へ","は行","he","","ha-row",4,6,"HE"],["ほ","は行","ho","","ha-row",5,6,"HO"],["ま","ま行","ma","","ma-row",1,7,"MA"],["み","ま行","mi","","ma-row",2,7,"MI"],["む","ま行","mu","","ma-row",3,7,"MU"],["め","ま行","me","","ma-row",4,7,"ME"],["も","ま行","mo","","ma-row",5,7,"MO"],["や","や行","ya","","ya-row",1,8,"YA"],["ゆ","や行","yu","","ya-row",3,8,"YU"],["よ","や行","yo","","ya-row",5,8,"YO"],["ら","ら行","ra","","ra-row",1,9,"RA"],["り","ら行","ri","","ra-row",2,9,"RI"],["る","ら行","ru","","ra-row",3,9,"RU"],["れ","ら行","re","","ra-row",4,9,"RE"],["ろ","ら行","ro","","ra-row",5,9,"RO"],["わ","わ行","wa","","wa-row",1,10,"WA"],["を","わ行","wo","","wa-row",5,10,"WO"],["ん","","n","","",1,37,"N"],["が","が行","ga","","ga-row",1,12,"GA"],["ぎ","が行","gi","","ga-row",2,12,"GI"],["ぐ","が行","gu","","ga-row",3,12,"GU"],["げ","が行","ge","","ga-row",4,12,"GE"],["ご","が行","go","","ga-row",5,12,"GO"],["ざ","ざ行","za","","za-row",1,13,"ZA"],["じ","ざ行","ji","","za-row",2,13,"JI"],["ず","ざ行","zu","","za-row",3,13,"ZU"],["ぜ","ざ行","ze","","za-row",4,13,"ZE"],["ぞ","ざ行","zo","","za-row",5,13,"ZO"],["だ","だ行","da","","da-row",1,14,"DA"],["ぢ","だ行","ji","","da-row",2,14,"JI"],["づ","だ行","zu","","da-row",3,14,"ZU"],["で","だ行","de","","da-row",4,14,"DE"],["ど","だ行","do","","da-row",5,14,"DO"],["ば","ば行","ba","","ba-row",1,15,"BA"],["び","ば行","bi","","ba-row",2,15,"BI"],["ぶ","ば行","bu","","ba-row",3,15,"BU"],["べ","ば行","be","","ba-row",4,15,"BE"],["ぼ","ば行","bo","","ba-row",5,15,"BO"],["ぱ","ぱ行","pa","","pa-row",1,16,"PA"],["ぴ","ぱ行","pi","","pa-row",2,16,"PI"],["ぷ","ぱ行","pu","","pa-row",3,16,"PU"],["ぺ","ぱ行","pe","","pa-row",4,16,"PE"],["ぽ","ぱ行","po","","pa-row",5,16,"PO"],["ぁ","ぁ行","xa","","small-row",1,17,"XA"],["ぃ","ぁ行","xi","","small-row",2,17,"XI"],["ぅ","ぁ行","xu","","small-row",3,17,"XU"],["ぇ","ぁ行","xe","","small-row",4,17,"XE"],["ぉ","ぁ行","xo","","small-row",5,17,"XO"],["ゃ","ぁ行","xya","","small-row",1,17,"XYA"],["ゅ","ぁ行","xyu","","small-row",3,17,"XYU"],["ょ","ぁ行","xyo","","small-row",5,17,"XYO"],["っ","ぁ行","xtsu","","small-row",3,17,"XTSU"],["ゎ","ぁ行","xwa","","small-row",1,17,"XWA"],["ア","ア行","a","","Ka-row",1,18,"A"],["イ","ア行","i","","Ka-row",2,18,"I"],["ウ","ア行","u","","Ka-row",3,18,"U"],["エ","ア行","e","","Ka-row",4,18,"E"],["オ","ア行","o","","Ka-row",5,18,"O"],["カ","カ行","ka","","Kka-row",1,19,"KA"],["キ","カ行","ki","","Kka-row",2,19,"KI"],["ク","カ行","ku","","Kka-row",3,19,"KU"],["ケ","カ行","ke","","Kka-row",4,19,"KE"],["コ","カ行","ko","","Kka-row",5,19,"KO"],["サ","サ行","sa","","Ksa-row",1,20,"SA"],["シ","サ行","shi","","Ksa-row",2,20,"SHI"],["ス","サ行","su","","Ksa-row",3,20,"SU"],["セ","サ行","se","","Ksa-row",4,20,"SE"],["ソ","サ行","so","","Ksa-row",5,20,"SO"],["タ","タ行","ta","","Kta-row",1,21,"TA"],["チ","タ行","chi","","Kta-row",2,21,"CHI"],["ツ","タ行","tsu","","Kta-row",3,21,"TSU"],["テ","タ行","te","","Kta-row",4,21,"TE"],["ト","タ行","to","","Kta-row",5,21,"TO"],["ナ","ナ行","na","","Kna-row",1,22,"NA"],["ニ","ナ行","ni","","Kna-row",2,22,"NI"],["ヌ","ナ行","nu","","Kna-row",3,22,"NU"],["ネ","ナ行","ne","","Kna-row",4,22,"NE"],["ノ","ナ行","no","","Kna-row",5,22,"NO"],["ハ","ハ行","ha","","Kha-row",1,23,"HA"],["ヒ","ハ行","hi","","Kha-row",2,23,"HI"],["フ","ハ行","fu","","Kha-row",3,23,"FU"],["ヘ","ハ行","he","","Kha-row",4,23,"HE"],["ホ","ハ行","ho","","Kha-row",5,23,"HO"],["マ","マ行","ma","","Kma-row",1,24,"MA"],["ミ","マ行","mi","","Kma-row",2,24,"MI"],["ム","マ行","mu","","Kma-row",3,24,"MU"],["メ","マ行","me","","Kma-row",4,24,"ME"],["モ","マ行","mo","","Kma-row",5,24,"MO"],["ヤ","ヤ行","ya","","Kya-row",1,25,"YA"],["ユ","ヤ行","yu","","Kya-row",3,25,"YU"],["ヨ","ヤ行","yo","","Kya-row",5,25,"YO"],["ラ","ラ行","ra","","Kra-row",1,26,"RA"],["リ","ラ行","ri","","Kra-row",2,26,"RI"],["ル","ラ行","ru","","Kra-row",3,26,"RU"],["レ","ラ行","re","","Kra-row",4,26,"RE"],["ロ","ラ行","ro","","Kra-row",5,26,"RO"],["ワ","ワ行","wa","","Kwa-row",1,27,"WA"],["ヲ","ワ行","wo","","Kwa-row",5,27,"WO"],["ン","","n","","",1,37,"N"],["ガ","ガ行","ga","","Kga-row",1,29,"GA"],["ギ","ガ行","gi","","Kga-row",2,29,"GI"],["グ","ガ行","gu","","Kga-row",3,29,"GU"],["ゲ","ガ行","ge","","Kga-row",4,29,"GE"],["ゴ","ガ行","go","","Kga-row",5,29,"GO"],["ザ","ザ行","za","","Kza-row",1,30,"ZA"],["ジ","ザ行","ji","","Kza-row",2,30,"JI"],["ズ","ザ行","zu","","Kza-row",3,30,"ZU"],["ゼ","ザ行","ze","","Kza-row",4,30,"ZE"],["ゾ","ザ行","zo","","Kza-row",5,30,"ZO"],["ダ","ダ行","da","","Kda-row",1,31,"DA"],["ヂ","ダ行","ji","","Kda-row",2,31,"JI"],["ヅ","ダ行","zu","","Kda-row",3,31,"ZU"],["デ","ダ行","de","","Kda-row",4,31,"DE"],["ド","ダ行","do","","Kda-row",5,31,"DO"],["バ","バ行","ba","","Kba-row",1,32,"BA"],["ビ","バ行","bi","","Kba-row",2,32,"BI"],["ブ","バ行","bu","","Kba-row",3,32,"BU"],["ベ","バ行","be","","Kba-row",4,32,"BE"],["ボ","バ行","bo","","Kba-row",5,32,"BO"],["パ","パ行","pa","","Kpa-row",1,33,"PA"],["ピ","パ行","pi","","Kpa-row",2,33,"PI"],["プ","パ行","pu","","Kpa-row",3,33,"PU"],["ペ","パ行","pe","","Kpa-row",4,33,"PE"],["ポ","パ行","po","","Kpa-row",5,33,"PO"],["ァ","ァ行","xa","","Ksmall-row",1,34,"XA"],["ィ","ァ行","xi","","Ksmall-row",2,34,"XI"],["ゥ","ァ行","xu","","Ksmall-row",3,34,"XU"],["ェ","ァ行","xe","","Ksmall-row",4,34,"XE"],["ォ","ァ行","xo","","Ksmall-row",5,34,"XO"],["ャ","ァ行","xya","","Ksmall-row",1,34,"XYA"],["ュ","ァ行","xyu","","Ksmall-row",3,34,"XYU"],["ョ","ァ行","xyo","","Ksmall-row",5,34,"XYO"],["ッ","ァ行","xtsu","","Ksmall-row",3,34,"XTSU"],["ヮ","ァ行","xwa","","Ksmall-row",1,34,"XWA"],["ヴ","ヴ行","vu","","Kvu-row",3,35,"VU"],["ー","ー行","-","","long-row",1,36,"-"]];
 
 // ---------- state
@@ -868,7 +868,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
 (async()=>{ document.getElementById('ver').textContent='v'+APP_VERSION;
   await restore(); await restoreM(); registerCustomFonts();
   if(TEACHER.activeFont&&FONTS.find(f=>f.id===TEACHER.activeFont)) fontId=TEACHER.activeFont;
-  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.36');
+  await loadFontDef(curFont()); curFont().loaded=fontReallyLoaded(curFont().family); renderFontRow(); resize(); load(0); toast('build v0.1.37');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{computeGlyphMask();drawGuide();}); })();
 </script>
 <script>window.__SYNC_CFG={endpoint:"https://hito-sync.sfo.appwrite.run",batch:40,cap:500,bytes:600000,post:48000};</script>
@@ -1467,11 +1467,20 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   // not a score anyone else will ever be ranked by.
   const cleanRun = r => ({ at:+r.at||0, realm:String(r.realm||'').slice(0,24), wave:+r.wave||0, banished:+r.banished||0,
     traced:+r.traced||0, clean:+r.clean||0, sumi:+r.sumi||0, cast:+r.cast||0, ms:+r.ms||0,
-    difficulty:String(r.difficulty||'').slice(0,12), practice: r.practice ? true : undefined });
+    difficulty:String(r.difficulty||'').slice(0,12), practice: r.practice ? true : undefined,
+    stage: +r.stage > 0 ? Math.floor(+r.stage) : undefined, cleared: r.cleared ? true : undefined });
+  // The furthest wave, and beside it the furthest stage cleared. They are
+  // kept apart because they are different facts: a run can reach a stage's
+  // last wave and still fall to its general. Both only ever rise, so two
+  // devices merge by taking the further of each.
   function bestOf(realm, r){
+    if (r.practice) return false;
     const b = LEDGER.best[realm];
-    if (!r.practice && (!b || r.wave > b.wave || (r.wave === b.wave && r.banished > b.banished))){ LEDGER.best[realm] = { wave:r.wave, banished:r.banished, at:r.at }; return true; }
-    return false;
+    const st = Math.max((b && +b.stage) || 0, r.cleared ? (+r.stage || 0) : 0);
+    let further = false;
+    if (!b || r.wave > b.wave || (r.wave === b.wave && r.banished > b.banished)){ LEDGER.best[realm] = { wave:r.wave, banished:r.banished, at:r.at }; further = true; }
+    if (st) LEDGER.best[realm].stage = st;
+    return further;
   }
   function run(rec){
     const r = cleanRun(rec);
@@ -1479,7 +1488,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     LEDGER.runs.push(r); LEDGER.runs = LEDGER.runs.slice(-20);
     save();
     const total = Object.values(LEDGER.g).reduce((a, e) => a + (e.n || 0), 0);
-    return { isBest, wave: (LEDGER.best[r.realm] || {}).wave || 0, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
+    return { isBest, wave: (LEDGER.best[r.realm] || {}).wave || 0, stage: (LEDGER.best[r.realm] || {}).stage || 0, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
   }
   // ---- 魂 tama: what a run leaves behind ----------------------------------
   // Spent between rounds, on things that last. It has to survive being merged
@@ -1678,7 +1687,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         <div><b>${s.streak}</b><small>day${s.streak === 1 ? '' : 's'} running</small></div>
       </div>
       ${Object.keys(LEDGER.best).length ? `<div class="hand-h">furthest you have held</div>`
-        + list(Object.entries(LEDGER.best), ([realm, b]) => `<span><b>${b.wave}</b><small>waves · ${esc(realm)} · ${b.banished} banished</small></span>`, '') : ''}
+        + list(Object.entries(LEDGER.best), ([realm, b]) => `<span><b>${b.wave}</b><small>waves · ${esc(realm)} · ${b.banished} banished${b.stage ? ' · stage ' + (+b.stage) + ' cleared' : ''}</small></span>`, '') : ''}
       <div class="hand-h">these bite you most</div>
       ${list(s.bites, b => `<span><b>${esc(b.c)}</b><small>${b.zaps} zap${b.zaps === 1 ? '' : 's'}, ${b.fizz} fizzle${b.fizz === 1 ? '' : 's'}</small></span>`, 'nothing is biting. the phi pop are bored.')}
       <div class="hand-h">these take you longest, per stroke</div>
@@ -1732,7 +1741,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     }
     LEDGER.runs.sort((a, b) => a.at - b.at); LEDGER.runs = LEDGER.runs.slice(-20);
     for (const [realm, b] of Object.entries(o.ledger.best || {})){
-      if (b && typeof b === 'object' && realm.length <= 24) bestOf(realm, { wave:+b.wave||0, banished:+b.banished||0, at:+b.at||0 });
+      if (b && typeof b === 'object' && realm.length <= 24) bestOf(realm, { wave:+b.wave||0, banished:+b.banished||0, at:+b.at||0, stage:Math.min(9999, Math.floor(+b.stage||0)), cleared:+b.stage > 0 });
     }
     if (purseOK(o.ledger.tama)){
       const up = (mine, theirs, ok) => { for (const [k, v] of Object.entries(theirs)) if (ok(k) && +v > (+mine[k] || 0) && +v < 1e9) mine[k] = Math.floor(+v); };
@@ -1781,7 +1790,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   };
 })();
 </script>
-<script>window.__FIELD_CFG={deck:{"deck":"katakana","words":[{"ja":"アメリカ","romaji":"amerika","en":"U.S.A."},{"ja":"カナダ","romaji":"kanada","en":"Canada"},{"ja":"イギリス","romaji":"igirisu","en":"Britain"},{"ja":"テレビ","romaji":"terebi","en":"TV"},{"ja":"カメラ","romaji":"kamera","en":"camera"},{"ja":"テニス","romaji":"tenisu","en":"tennis"},{"ja":"パン","romaji":"pan","en":"bread"},{"ja":"ピザ","romaji":"piza","en":"pizza"},{"ja":"ホテル","romaji":"hoteru","en":"hotel"},{"ja":"バス","romaji":"basu","en":"bus"},{"ja":"ペン","romaji":"pen","en":"pen"},{"ja":"クラス","romaji":"kurasu","en":"class"},{"ja":"テスト","romaji":"tesuto","en":"test"},{"ja":"ドア","romaji":"doa","en":"door"},{"ja":"トイレ","romaji":"toire","en":"toilet"},{"ja":"カラオケ","romaji":"karaoke","en":"karaoke"},{"ja":"バナナ","romaji":"banana","en":"banana"},{"ja":"トマト","romaji":"tomato","en":"tomato"},{"ja":"ミルク","romaji":"miruku","en":"milk"},{"ja":"ワイン","romaji":"wain","en":"wine"},{"ja":"サラダ","romaji":"sarada","en":"salad"},{"ja":"ピアノ","romaji":"piano","en":"piano"},{"ja":"ハワイ","romaji":"hawai","en":"Hawaii"},{"ja":"パリ","romaji":"pari","en":"Paris"},{"ja":"タオル","romaji":"taoru","en":"towel"},{"ja":"ドラマ","romaji":"dorama","en":"drama"},{"ja":"アニメ","romaji":"anime","en":"anime"},{"ja":"プレゼント","romaji":"purezento","en":"present"},{"ja":"ダンス","romaji":"dansu","en":"dance"},{"ja":"ビデオ","romaji":"bideo","en":"video"},{"ja":"ラジオ","romaji":"rajio","en":"radio"},{"ja":"ズボン","romaji":"zubon","en":"trousers"},{"ja":"ネクタイ","romaji":"nekutai","en":"necktie"},{"ja":"ガソリン","romaji":"gasorin","en":"gasoline"},{"ja":"エアコン","romaji":"eakon","en":"air conditioner"},{"ja":"アルバイト","romaji":"arubaito","en":"part-time job"},{"ja":"レストラン","romaji":"resutoran","en":"restaurant"},{"ja":"クリスマス","romaji":"kurisumasu","en":"Christmas"},{"ja":"サングラス","romaji":"sangurasu","en":"sunglasses"},{"ja":"スマホ","romaji":"sumaho","en":"smartphone"},{"ja":"ロンドン","romaji":"rondon","en":"London"},{"ja":"メロン","romaji":"meron","en":"melon"},{"ja":"オレンジ","romaji":"orenji","en":"orange"},{"ja":"コーヒー","romaji":"koohii","en":"coffee"},{"ja":"デート","romaji":"deeto","en":"date (romantic)"},{"ja":"ハンバーガー","romaji":"hanbaagaa","en":"hamburger"},{"ja":"ビール","romaji":"biiru","en":"beer"},{"ja":"スーパー","romaji":"suupaa","en":"supermarket"},{"ja":"デパート","romaji":"depaato","en":"department store"},{"ja":"タクシー","romaji":"takushii","en":"taxi"},{"ja":"ノート","romaji":"nooto","en":"notebook"},{"ja":"ボールペン","romaji":"boorupen","en":"ballpoint pen"},{"ja":"セーター","romaji":"seetaa","en":"sweater"},{"ja":"ゲーム","romaji":"geemu","en":"game"},{"ja":"ページ","romaji":"peeji","en":"page"},{"ja":"プール","romaji":"puuru","en":"swimming pool"},{"ja":"メール","romaji":"meeru","en":"e-mail"},{"ja":"アパート","romaji":"apaato","en":"apartment"},{"ja":"ケーキ","romaji":"keeki","en":"cake"},{"ja":"ラーメン","romaji":"raamen","en":"ramen"},{"ja":"コート","romaji":"kooto","en":"coat"},{"ja":"スキー","romaji":"sukii","en":"skiing"},{"ja":"ギター","romaji":"gitaa","en":"guitar"},{"ja":"スープ","romaji":"suupu","en":"soup"},{"ja":"ステーキ","romaji":"suteeki","en":"steak"},{"ja":"レポート","romaji":"repooto","en":"report"},{"ja":"エレベーター","romaji":"erebeetaa","en":"elevator"},{"ja":"ジーンズ","romaji":"jiinzu","en":"jeans"},{"ja":"スカート","romaji":"sukaato","en":"skirt"},{"ja":"アイスクリーム","romaji":"aisukuriimu","en":"ice cream"},{"ja":"ホームステイ","romaji":"hoomusutei","en":"homestay"},{"ja":"ルームメイト","romaji":"ruumumeito","en":"roommate"},{"ja":"カード","romaji":"kaado","en":"card"},{"ja":"オーストラリア","romaji":"oosutoraria","en":"Australia"},{"ja":"スポーツ","romaji":"supootsu","en":"sports"},{"ja":"サッカー","romaji":"sakkaa","en":"soccer"},{"ja":"ジュース","romaji":"juusu","en":"juice"},{"ja":"コンピューター","romaji":"konpyuutaa","en":"computer"},{"ja":"シャツ","romaji":"shatsu","en":"shirt"},{"ja":"パーティー","romaji":"paatii","en":"party"},{"ja":"カフェ","romaji":"kafe","en":"cafe"},{"ja":"サンドイッチ","romaji":"sandoitchi","en":"sandwich"},{"ja":"チョコレート","romaji":"chokoreeto","en":"chocolate"},{"ja":"キャンプ","romaji":"kyanpu","en":"camping"},{"ja":"シャワー","romaji":"shawaa","en":"shower"},{"ja":"インターネット","romaji":"intaanetto","en":"internet"},{"ja":"チケット","romaji":"chiketto","en":"ticket"},{"ja":"メニュー","romaji":"menyuu","en":"menu"},{"ja":"ニューヨーク","romaji":"nyuuyooku","en":"New York"},{"ja":"ソファ","romaji":"sofa","en":"sofa"},{"ja":"ジョギング","romaji":"jogingu","en":"jogging"},{"ja":"ファックス","romaji":"fakkusu","en":"fax"},{"ja":"キャンパス","romaji":"kyanpasu","en":"campus"},{"ja":"マッチ","romaji":"matchi","en":"match"},{"ja":"クッキー","romaji":"kukkii","en":"cookie"},{"ja":"ホッチキス","romaji":"hotchikisu","en":"stapler"},{"ja":"ティーシャツ","romaji":"tiishatsu","en":"T-shirt"},{"ja":"ミュージカル","romaji":"myuujikaru","en":"musical"},{"ja":"チャンス","romaji":"chansu","en":"chance"},{"ja":"ラッシュ","romaji":"rasshu","en":"rush hour"},{"ja":"ニュース","romaji":"nyuusu","en":"news"}]},knockback:0.07,sign:"romaji",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",credits:["Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.", "Stroke order recorded and checked by the project's teachers.", "Built by the maintainer, one version at a time."],realms:[],speed:0.03,wardHp:5,tower:{"rows":2,"rowWaves":10,"bossEvery":10,"bossHp":2,"bossBite":1,"speedStep":0.03},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15,"vessel":25},tamaCost:{"intent":24,"quick":16,"breath":20,"shove":12,"mend":20,"wall":20,"tend":18,"dilig":16,"harvest":14,"rise":28},hpEvery:10,biteRate:0.5,noRepeat:4,hpMax:5,biteEvery:20,biteMax:4,tendEvery:10,riseStep:0.2,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"intent":12,"quick":8,"breath":9,"shove":6,"mend":10,"wall":10,"tend":9,"dilig":8,"harvest":7,"rise":14},spawnMs:9000,spawnRamp:200,spawnMin:3600,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,rescue:0.3,energyMax:24,energyStart:6,energyPerStroke:1,castCost:2,vesselStep:6,holdMs:1500,gateY:0.84,heroMs:1500,heroHit:0.34,heroForge:25,bossBlock:1,blockFrom:20,blockRate:0.25,stunMs:2200,tidyStrays:true};</script>
+<script>window.__FIELD_CFG={deck:{"deck":"katakana","words":[{"ja":"アメリカ","romaji":"amerika","en":"U.S.A."},{"ja":"カナダ","romaji":"kanada","en":"Canada"},{"ja":"イギリス","romaji":"igirisu","en":"Britain"},{"ja":"テレビ","romaji":"terebi","en":"TV"},{"ja":"カメラ","romaji":"kamera","en":"camera"},{"ja":"テニス","romaji":"tenisu","en":"tennis"},{"ja":"パン","romaji":"pan","en":"bread"},{"ja":"ピザ","romaji":"piza","en":"pizza"},{"ja":"ホテル","romaji":"hoteru","en":"hotel"},{"ja":"バス","romaji":"basu","en":"bus"},{"ja":"ペン","romaji":"pen","en":"pen"},{"ja":"クラス","romaji":"kurasu","en":"class"},{"ja":"テスト","romaji":"tesuto","en":"test"},{"ja":"ドア","romaji":"doa","en":"door"},{"ja":"トイレ","romaji":"toire","en":"toilet"},{"ja":"カラオケ","romaji":"karaoke","en":"karaoke"},{"ja":"バナナ","romaji":"banana","en":"banana"},{"ja":"トマト","romaji":"tomato","en":"tomato"},{"ja":"ミルク","romaji":"miruku","en":"milk"},{"ja":"ワイン","romaji":"wain","en":"wine"},{"ja":"サラダ","romaji":"sarada","en":"salad"},{"ja":"ピアノ","romaji":"piano","en":"piano"},{"ja":"ハワイ","romaji":"hawai","en":"Hawaii"},{"ja":"パリ","romaji":"pari","en":"Paris"},{"ja":"タオル","romaji":"taoru","en":"towel"},{"ja":"ドラマ","romaji":"dorama","en":"drama"},{"ja":"アニメ","romaji":"anime","en":"anime"},{"ja":"プレゼント","romaji":"purezento","en":"present"},{"ja":"ダンス","romaji":"dansu","en":"dance"},{"ja":"ビデオ","romaji":"bideo","en":"video"},{"ja":"ラジオ","romaji":"rajio","en":"radio"},{"ja":"ズボン","romaji":"zubon","en":"trousers"},{"ja":"ネクタイ","romaji":"nekutai","en":"necktie"},{"ja":"ガソリン","romaji":"gasorin","en":"gasoline"},{"ja":"エアコン","romaji":"eakon","en":"air conditioner"},{"ja":"アルバイト","romaji":"arubaito","en":"part-time job"},{"ja":"レストラン","romaji":"resutoran","en":"restaurant"},{"ja":"クリスマス","romaji":"kurisumasu","en":"Christmas"},{"ja":"サングラス","romaji":"sangurasu","en":"sunglasses"},{"ja":"スマホ","romaji":"sumaho","en":"smartphone"},{"ja":"ロンドン","romaji":"rondon","en":"London"},{"ja":"メロン","romaji":"meron","en":"melon"},{"ja":"オレンジ","romaji":"orenji","en":"orange"},{"ja":"コーヒー","romaji":"koohii","en":"coffee"},{"ja":"デート","romaji":"deeto","en":"date (romantic)"},{"ja":"ハンバーガー","romaji":"hanbaagaa","en":"hamburger"},{"ja":"ビール","romaji":"biiru","en":"beer"},{"ja":"スーパー","romaji":"suupaa","en":"supermarket"},{"ja":"デパート","romaji":"depaato","en":"department store"},{"ja":"タクシー","romaji":"takushii","en":"taxi"},{"ja":"ノート","romaji":"nooto","en":"notebook"},{"ja":"ボールペン","romaji":"boorupen","en":"ballpoint pen"},{"ja":"セーター","romaji":"seetaa","en":"sweater"},{"ja":"ゲーム","romaji":"geemu","en":"game"},{"ja":"ページ","romaji":"peeji","en":"page"},{"ja":"プール","romaji":"puuru","en":"swimming pool"},{"ja":"メール","romaji":"meeru","en":"e-mail"},{"ja":"アパート","romaji":"apaato","en":"apartment"},{"ja":"ケーキ","romaji":"keeki","en":"cake"},{"ja":"ラーメン","romaji":"raamen","en":"ramen"},{"ja":"コート","romaji":"kooto","en":"coat"},{"ja":"スキー","romaji":"sukii","en":"skiing"},{"ja":"ギター","romaji":"gitaa","en":"guitar"},{"ja":"スープ","romaji":"suupu","en":"soup"},{"ja":"ステーキ","romaji":"suteeki","en":"steak"},{"ja":"レポート","romaji":"repooto","en":"report"},{"ja":"エレベーター","romaji":"erebeetaa","en":"elevator"},{"ja":"ジーンズ","romaji":"jiinzu","en":"jeans"},{"ja":"スカート","romaji":"sukaato","en":"skirt"},{"ja":"アイスクリーム","romaji":"aisukuriimu","en":"ice cream"},{"ja":"ホームステイ","romaji":"hoomusutei","en":"homestay"},{"ja":"ルームメイト","romaji":"ruumumeito","en":"roommate"},{"ja":"カード","romaji":"kaado","en":"card"},{"ja":"オーストラリア","romaji":"oosutoraria","en":"Australia"},{"ja":"スポーツ","romaji":"supootsu","en":"sports"},{"ja":"サッカー","romaji":"sakkaa","en":"soccer"},{"ja":"ジュース","romaji":"juusu","en":"juice"},{"ja":"コンピューター","romaji":"konpyuutaa","en":"computer"},{"ja":"シャツ","romaji":"shatsu","en":"shirt"},{"ja":"パーティー","romaji":"paatii","en":"party"},{"ja":"カフェ","romaji":"kafe","en":"cafe"},{"ja":"サンドイッチ","romaji":"sandoitchi","en":"sandwich"},{"ja":"チョコレート","romaji":"chokoreeto","en":"chocolate"},{"ja":"キャンプ","romaji":"kyanpu","en":"camping"},{"ja":"シャワー","romaji":"shawaa","en":"shower"},{"ja":"インターネット","romaji":"intaanetto","en":"internet"},{"ja":"チケット","romaji":"chiketto","en":"ticket"},{"ja":"メニュー","romaji":"menyuu","en":"menu"},{"ja":"ニューヨーク","romaji":"nyuuyooku","en":"New York"},{"ja":"ソファ","romaji":"sofa","en":"sofa"},{"ja":"ジョギング","romaji":"jogingu","en":"jogging"},{"ja":"ファックス","romaji":"fakkusu","en":"fax"},{"ja":"キャンパス","romaji":"kyanpasu","en":"campus"},{"ja":"マッチ","romaji":"matchi","en":"match"},{"ja":"クッキー","romaji":"kukkii","en":"cookie"},{"ja":"ホッチキス","romaji":"hotchikisu","en":"stapler"},{"ja":"ティーシャツ","romaji":"tiishatsu","en":"T-shirt"},{"ja":"ミュージカル","romaji":"myuujikaru","en":"musical"},{"ja":"チャンス","romaji":"chansu","en":"chance"},{"ja":"ラッシュ","romaji":"rasshu","en":"rush hour"},{"ja":"ニュース","romaji":"nyuusu","en":"news"}]},knockback:0.07,sign:"romaji",mode:"medium",credit:"Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.).",credits:["Loanwords from the maintainer's Japanese class, Genki I, and the everyday ones the book leaves out.", "Stroke order recorded and checked by the project's teachers.", "Built by the maintainer, one version at a time."],realms:[],speed:0.03,wardHp:5,tower:{"rows":2,"rowWaves":10,"bossEvery":10,"bossHp":2,"bossBite":1,"speedStep":0.03,"clearBonus":1.5,"finite":false},tamaClean:2,tamaTrace:1,tamaWaves:3,inkwellStep:6,lanternRamp:1.6,lanternCost:{"heart":20,"lamp":30,"inkwell":15,"vessel":25},tamaCost:{"intent":24,"quick":16,"breath":20,"shove":12,"mend":20,"wall":20,"tend":18,"dilig":16,"harvest":14,"rise":28},hpEvery:10,biteRate:0.5,noRepeat:4,hpMax:5,biteEvery:20,biteMax:4,tendEvery:10,riseStep:0.2,inkTrace:2,inkClean:2,inkKill:1,inkMastered:6,shoveStep:0.025,upgradeRamp:1.6,upgradeCost:{"intent":12,"quick":8,"breath":9,"shove":6,"mend":10,"wall":10,"tend":9,"dilig":8,"harvest":7,"rise":14},spawnMs:9000,spawnRamp:200,spawnMin:3600,advanceMs:460,reading:"both",fizzleRestarts:true,hitodamaGain:1,cleanBonus:1,hitodamaCap:6,castMs:900,rescue:0.3,energyMax:24,energyStart:6,energyPerStroke:1,castCost:2,vesselStep:6,holdMs:1500,gateY:0.84,heroMs:1500,heroHit:0.34,heroForge:25,bossBlock:1,blockFrom:20,blockRate:0.25,stunMs:2200,tidyStrays:true};</script>
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
      nothing is torn out, so a pack can switch shells without a rebuild of the
@@ -1931,9 +1940,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   .over-pay small{ display:block; font-size:11.5px; font-weight:400; color:rgba(220,232,242,.55); }
   .start-row.lantern button.can{ border-color:#5fe3a1; }
   .start-row.lantern{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
-  .start-row.stages{ grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); }
-  .start-row.stages button{ text-align:center; padding:8px 2px; }
-  .start-row.stages button b{ margin:0; }
+  /* which stage: a step back, the stage, a step forward */
+  .stage-pick{ display:flex; align-items:stretch; gap:8px; margin:0 0 4px; }
+  .stage-pick button{ flex:0 0 52px; font:700 22px ui-sans-serif,system-ui; background:#101820; color:#6cb8ff; border:1px solid #2a4256; border-radius:10px; cursor:pointer; touch-action:manipulation; }
+  .stage-pick button[disabled]{ opacity:.3; cursor:default; }
+  .stage-pick span{ flex:1; text-align:center; padding:8px 4px; border:1px solid #1e2f3e; border-radius:10px; }
+  .stage-pick span b{ display:block; font-size:17px; color:#6cb8ff; }
+  .stage-pick span small{ color:rgba(220,232,242,.6); font-size:11.5px; }
   .start-h b.needs{ color:#e8a0a0; font-weight:600; letter-spacing:.04em; }
   .start-foot{ margin-top:12px; font-size:11px; color:rgba(220,232,242,.4); text-align:center; }
   .start-links{ display:flex; gap:8px; margin-top:10px; }
@@ -2114,6 +2127,33 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   const totalRows = () => Math.max(1, Math.max(...LETTERS.map(L => L[6] || 1)));
   const rowsOpen = w => !ST ? Infinity : Math.min(totalRows(), ST.rows + Math.floor(Math.max(bestWave(), w == null ? wave : w) / ST.rowWaves));
   const nextRowAt = () => (!ST || rowsOpen() >= totalRows()) ? Infinity : (rowsOpen() - ST.rows + 1) * ST.rowWaves;
+  // ---- stages (v0.1.74): a stretch of the tower with an end
+  // The maintainer: "the latest stage the player cleared is the rate they
+  // accrue currency" — which needs a stage that can be cleared. Stages were
+  // tried once (v0.1.44-v0.1.53) and became a wall, because a stage was a
+  // count that grew: stage 8 was 33 farang by finger. This one never grows.
+  // A stage is `bossEvery` waves of the tower, the last its general, and
+  // what climbs is what the tower already climbs by the wave: the layers,
+  // the bite, the pace, the blocks. Stage n is waves (n-1)·len to n·len, so
+  // the furthest wave, the rows it opens and every pace key mean what they
+  // meant. Cleared is the general sent home with the ward standing. The
+  // rank and file may get through, at the ward's cost; the general may not:
+  // he takes his bite and comes round again, and only the hand breaks his
+  // block, so a stage is never cleared by standing and watching. The tower
+  // itself stays, endless, as stage 0. Guided is practice and has no stages.
+  const STAGED = !!(ST && ST.finite);
+  const stageLen = () => ST ? ST.bossEvery : 0;
+  const clearedTo = () => { try { const H = window.__hand; const b = H && H.ledger && H.ledger.best && H.ledger.best[REALM]; return b ? (+b.stage || 0) : 0; } catch(_){ return 0; } };
+  let chosen = null;                        // the stage asked for: null is the first not yet cleared, 0 the endless tower
+  let stageN = 0, wave0 = 0, won = false;   // the stage being fought (0: the tower), the wave it began on, whether it was cleared
+  let bannerAt = -1e9;
+  const wantStage = () => (!STAGED || difficulty === 'guided') ? 0
+    : chosen == null ? clearedTo() + 1 : Math.max(0, Math.min(clearedTo() + 1, chosen));
+  const stageDone = () => stageN > 0 && wave >= wave0 + stageLen();
+  function pickStage(n){ chosen = n == null ? null : Math.max(0, Math.round(+n) || 0); return wantStage(); }
+  function enterStage(){ stageN = wantStage(); wave0 = stageN ? (stageN - 1) * stageLen() : 0; wave = wave0; won = false; bannerAt = performance.now(); }
+  const midRun = () => !!(run && run.started && !over);
+  const rosterAt = w => { const r = rowsOpen(w); return LETTERS.filter(L => (L[6] || 1) <= r).length; };
   const RANK = { guided:0, medium:2, hard:3 };
   const needs = () => !ST ? 'guided' : 'medium';
   const bossAlive = () => monsters.some(m => m.boss);
@@ -2874,7 +2914,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     if (!over){
       // Nothing to answer is not a rest, it is a dead screen. Refill at once.
       if (!monsters.length) spawnAt = Math.min(spawnAt, now);
-      if (now > spawnAt){
+      if (now > spawnAt && !stageDone()){
         spawn();
         spawnAt = now + Math.max(CFG.spawnMin, CFG.spawnMs - wave*CFG.spawnRamp);
       }
@@ -2882,10 +2922,13 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       for (const m of monsters){
         if (!held) m.d -= m.speed*dt;
         if (m.d <= 0.06){
-          monsters = monsters.filter(x => x !== m);
-          if (m === locked) locked = null;
           const bite = biteFor(wave, m.boss);
           ward = Math.max(0, ward - bite);
+          // A stage's general is not got rid of by letting him in: he takes
+          // his bite and comes round again, from the top, until the hand
+          // sends him home or the ward falls.
+          if (m.boss && stageN && ward > 0) m.d = 1.05;
+          else { monsters = monsters.filter(x => x !== m); if (m === locked) locked = null; }
           try { window.__sync && window.__sync.record('breach', {
             glyph: LETTERS[m.i][0], word: m.w ? m.w.ja : undefined, wardLeft: ward, wave, bite,
           }); } catch(_){}
@@ -2906,6 +2949,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
         if (s.t >= 1) chip(s.to, heroHit());
       }
       darts = darts.filter(s => s.t < 1 && monsters.includes(s.to));
+      // The stage is cleared: every one of them has come, none is left, and
+      // the ward is standing. The general is among the gone, and he only
+      // ever goes by being sent.
+      if (!over && stageDone() && !monsters.length && ward > 0){ over = true; won = true; endRun(); }
     }
     // Deferred work, once the hand is free: a queued retarget, or a glyph that
     // no monster carries any more — which would otherwise strand the player
@@ -3042,8 +3089,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     g.strokeStyle = 'rgba(108,184,255,.16)'; g.lineWidth = 1;
     g.beginPath(); g.moveTo(0, Y - 4); g.quadraticCurveTo(X, Y - 12, FW, Y - 4); g.stroke();
     const gw = Math.min(FW*0.34, 132), gh = 72;
-    glowAt(g, X, Y - 30, 70, 50, over ? 'rgba(120,60,50,.5)' : 'rgba(108,184,255,.35)', 1);
-    g.fillStyle = over ? 'rgba(120,60,50,.9)' : 'rgba(108,184,255,.55)';
+    const fell = over && !won;   // a cleared stage leaves the gate standing
+    glowAt(g, X, Y - 30, 70, 50, fell ? 'rgba(120,60,50,.5)' : 'rgba(108,184,255,.35)', 1);
+    g.fillStyle = fell ? 'rgba(120,60,50,.9)' : 'rgba(108,184,255,.55)';
     g.fillRect(X - gw/2 + 8, Y - gh + 10, 9, gh - 10); g.fillRect(X + gw/2 - 17, Y - gh + 10, 9, gh - 10);   // the pillars
     g.fillRect(X - gw/2 + 14, Y - gh + 24, gw - 28, 6);                                                        // the tie beam
     g.fillRect(X - 4, Y - gh + 24, 8, 20);                                                                     // the tablet
@@ -3295,7 +3343,17 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // Bottom left: the workshop strip has the top, and a tally under buttons
     // is a tally nobody can read. The wave sits with it, because how far a run
     // got is what a run is for.
-    g.fillText(`banished ${killed} · wave ${wave}`, 12, FH - 12);
+    g.fillText(stageN ? `stage ${stageN} · ${Math.min(stageLen(), wave - wave0)} of ${stageLen()} · banished ${killed}` : `banished ${killed} · wave ${wave}`, 12, FH - 12);
+    // the stage says its name as it opens, and gets out of the way
+    const bn = (performance.now() - bannerAt) / 1800;
+    if (stageN && !over && bn >= 0 && bn < 1){
+      g.save(); g.globalAlpha = Math.min(1, (1 - bn) * 2.2); g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillStyle = '#bfe3ff'; g.font = '700 30px ui-sans-serif,system-ui';
+      g.fillText('stage ' + stageN, X, FH * 0.3);
+      g.fillStyle = 'rgba(220,232,242,.75)'; g.font = '12px ui-sans-serif,system-ui';
+      g.fillText(stageLen() + ' farang · the last one is a general', X, FH * 0.3 + 26);
+      g.restore();
+    }
   }
 
   function restart(){
@@ -3310,7 +3368,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // — the maintainer: "my energy gauge should not persist between games."
     // In the Tower nothing carries but the workshop; what lasts is bought.
     quench();
-    ward = wardMax(); over = false; wave = 0; killed = 0; locked = null; asked = null; queue = []; recent = [];
+    ward = wardMax(); over = false; enterStage(); killed = 0; locked = null; asked = null; queue = []; recent = [];
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; frames = { n:0, slow:0, jank:0 }; spawn(); retarget();
     // The last banish of a stage leaves the engine celebrating: the whole path
     // lit, `done` set. If the first target of the new run is the character
@@ -3339,23 +3397,30 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // What the run leaves behind. Paid for tracing, most of all clean tracing;
     // guided cannot be zapped, so there every trace would count as clean, and
     // it pays less instead. Holding a stage to the end is worth half again.
-    const p = purse();
-    const pay = !p ? 0 : Math.round((run.pay + Math.floor(wave/CFG.tamaWaves))
+    // A stage pays for the farang it faced, not for the waves it started
+    // above; and a guided run clears nothing, whatever stood when it ended.
+    const p = purse(), practice = difficulty === 'guided', cleared = won && !practice;
+    const pay = !p ? 0 : Math.round((run.pay + Math.floor((wave - wave0)/CFG.tamaWaves))
                                      * (DIFF[difficulty] && DIFF[difficulty].tama != null ? DIFF[difficulty].tama : 1)
-                                     * (1 + lvl('rise') * CFG.riseStep));   // 起: get up with more
+                                     * (1 + lvl('rise') * CFG.riseStep)     // 起: get up with more
+                                     * (cleared && ST ? ST.clearBonus : 1));
     if (p) p.earn(pay);
     // guided is practice: the hand keeps the run, but not as a furthest wave
-    const rec = { at: run.at, realm: REALM, practice: difficulty === 'guided' || undefined, tama: pay,
+    const rec = { at: run.at, realm: REALM, practice: practice || undefined, tama: pay,
+                  stage: stageN || undefined, cleared: cleared || undefined, from: wave0 || undefined,
                   quality: run.qn ? Math.round(100*run.q/run.qn)/100 : undefined, wave, banished: killed, traced: run.traced, clean: run.clean,
                   sumi: run.earned, cast: run.cast, ms: Math.round(performance.now() - run.began),
                   difficulty, sign: CFG.sign, upgrades: {...upg},
                   frames: {...frames}, plat: (navigator.platform || '').slice(0, 24) || undefined,
                   v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : undefined };
     let best = null;
+    const before = clearedTo();
     try { if (H && H.run) best = H.run(rec); } catch(_){}
     try { window.__sync && window.__sync.record('run', rec); } catch(_){}
-    ended = { rec, best, since: run.at, pay };
-    if (navigator.vibrate) navigator.vibrate([90, 60, 160]);
+    ended = { rec, best, since: run.at, pay, won: cleared, stage: stageN, first: cleared && stageN > before };
+    // "next" is the stage after the one just cleared; a fall asks for the same again
+    if (stageN) chosen = cleared ? stageN + 1 : stageN;
+    if (navigator.vibrate) navigator.vibrate(cleared ? [40, 40, 40, 40, 160] : [90, 60, 160]);
     // a beat, so the last breach is seen before the page covers it
     setTimeout(() => { if (over && ended) openOver(); }, 700);
     return ended;
@@ -3421,7 +3486,8 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     const m = bar_('life', '命', ward, wardMax(), 'the ward: ' + ward + ' of ' + wardMax())
       + bar_('energy', '気', energy, energyMax(), '気 — every stroke fills it, every wisp spends it: ' + energy + ' of ' + energyMax())
       + `<span class="n" title="ink — earned by tracing, spent on this run's boosts">墨 ${sumi}</span>`
-      + `<span class="n" title="the wave"><small>波</small> ${wave}</span>`
+      + (stageN ? `<span class="n" title="stage ${stageN}: farang ${Math.min(stageLen(), wave - wave0)} of ${stageLen()}, the last one a general"><small>stage ${stageN}</small> ${Math.min(stageLen(), wave - wave0)}/${stageLen()}</span>`
+                : `<span class="n" title="the wave"><small>波</small> ${wave}</span>`)
       + `<span class="dash-tabs"><button data-tab="trace" aria-pressed="${tab === null}" title="the sketchbook: write" aria-label="the sketchbook">筆<small>write</small></button>`
       + `<button data-tab="boosts" aria-pressed="${tab === 'boosts'}" class="${canBuyAny() ? 'can' : ''}" title="墨 boosts: this run's upgrades" aria-label="boosts: this run's upgrades">${ICON.sword}墨<small>boosts</small></button></span>`;
     if (m === dashMarkup) return;
@@ -3547,17 +3613,31 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     for (const el of start.querySelectorAll('[data-wpanel]')) el.hidden = el.dataset.wpanel !== t;
   }
   function renderCredits(){ wtab = 'more'; return renderStart(true); }
+  // What is about to be fought. A stage says how long it is and who ends it,
+  // and once one has been cleared the cleared ones can be fought again: a
+  // step back and a step forward, never past the first not yet cleared.
+  function stageHtml(n){
+    if (!ST) return '';
+    if (!n) return `<div class="start-h">the tower · furthest wave ${bestWave()} · ${roster().length} characters on the field${nextRowAt() < Infinity ? ' · next row of the chart at wave ' + nextRowAt() : ' · every row of the chart'}${difficulty === 'guided' ? ' · <b class="needs">practice: nothing counts</b>' : ''}</div>`;
+    const c = clearedTo(), len = stageLen();
+    const head = `<div class="start-h">stage ${n} · ${len} farang, the last one a general · ${rosterAt((n - 1) * len)} characters on the field</div>`;
+    if (midRun() || c < 1) return head;
+    return head + `<div class="stage-pick"><button data-stagepick="${n - 1}"${n <= 1 ? ' disabled' : ''} aria-label="the stage before">‹</button>`
+      + `<span><b>stage ${n}</b><small>${n <= c ? 'cleared · fight it again' : c + ' cleared · this one is next'}</small></span>`
+      + `<button data-stagepick="${n + 1}"${n > c ? ' disabled' : ''} aria-label="the stage after">›</button></div>`;
+  }
   function renderStart(asStart){
     if (view === 'credits' && !asStart) return renderCredits();
     if (view === 'over') return renderOver();
     const hand = window.__hand;
+    const sn = midRun() ? stageN : wantStage();   // the stage this page is about: the one being fought, or the one asked for
     start.innerHTML = markup = `<div class="start-card">
       <div class="start-title">hito<span>人</span></div>
       <div class="start-sub">${esc(REALM)} · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
-      ${ST ? `<div class="start-h">the tower · furthest wave ${bestWave()} · ${roster().length} characters on the field${nextRowAt() < Infinity ? ' · next row of the chart at wave ' + nextRowAt() : ' · every row of the chart'}${difficulty === 'guided' ? ' · <b class="needs">practice: nothing counts</b>' : ''}</div>` : ''}
-      <button class="start-go">${over ? 'begin again' : 'begin'}</button>
+      ${stageHtml(sn)}
+      <button class="start-go">${midRun() ? 'resume' : sn ? 'begin · stage ' + sn : over ? 'begin again' : 'begin'}</button>
       ${workshopHtml()}
-      <div class="start-links"><a class="start-home" href="../index.html">${ICON.flame}home</a></div>
+      <div class="start-links">${STAGED && !midRun() && difficulty !== 'guided' ? `<button data-stagepick="${sn ? 0 : 'front'}">${sn ? 'the tower · endless' : 'back to the stages'}</button>` : ''}<a class="start-home" href="../index.html">${ICON.flame}home</a></div>
       <div class="start-foot">${WORDS ? 'draw below · the farang come from above · write what they are saying, one kana at a time' : 'draw below · the farang come from above · the one you are answering is yours'}</div>
     </div>`;
     wirePage(renderStart);
@@ -3582,6 +3662,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   tapOn(start, 'button[data-wtab]', b => showWtab(b.dataset.wtab));
   tapOn(start, 'button[data-perm]', b => { if (buyPerm(b.dataset.perm)) renderStart(); });
   tapOn(start, 'button[data-lantern]', b => { if (buyLantern(b.dataset.lantern)) renderStart(); });
+  tapOn(start, 'button[data-stagepick]', b => { pickStage(b.dataset.stagepick === 'front' ? null : +b.dataset.stagepick); renderStart(); });
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
   function showRedo(v){ redoShown = v; if (typeof redo !== 'undefined') redo.hidden = !v; }
@@ -3593,9 +3674,14 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     // the handwriting of this run, the way the hand's own page draws it
     let hands = '';
     try { if (H && H.thumbs) hands = H.thumbs(e.since, 12, true); } catch(_){}
-    start.innerHTML = markup = `<div class="start-card over">
-      <div class="start-title">the ward fell</div>
-      <div class="start-sub">${esc(REALM)} · wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave > r.wave ? ' · furthest ' + e.best.wave : ''}</div>
+    // A stage ends two ways, and the page says which: cleared, with the next
+    // one a tap away, or fallen, with the same one again.
+    const sub = e.won ? `the general went home${e.first ? ' · <b>your furthest yet</b>' : ''}`
+      : e.stage ? `stage ${e.stage} · ${Math.min(stageLen(), r.wave - (r.from || 0))} of ${stageLen()} came${e.best && e.best.stage ? ' · ' + e.best.stage + ' cleared' : ''}`
+      : `wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave > r.wave ? ' · furthest ' + e.best.wave : ''}`;
+    start.innerHTML = markup = `<div class="start-card over${e.won ? ' won' : ''}">
+      <div class="start-title">${e.won ? 'stage ' + e.stage + ' cleared' : 'the ward fell'}</div>
+      <div class="start-sub">${esc(REALM)} · ${sub}</div>
       <div class="over-nums">
         <div><b>${r.banished}</b><small>banished</small></div>
         <div><b>${r.traced}</b><small>traced</small></div>
@@ -3604,8 +3690,9 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
       </div>
       <p class="over-line">${r.cast} answered by your own lights${e.best && e.best.total ? ' · ' + e.best.total + ' conjured in all' : ''}</p>
       ${r.practice ? `<p class="over-line">guided is practice: nothing here counts toward the tower or 魂.</p>` : ''}
-      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}clean, readable traces pay the most${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}</small></p>` : ''}
-      <button class="start-go">again</button>
+      ${purse() ? `<p class="over-pay">+ 魂 ${e.pay}<small>${r.quality != null ? Math.round(r.quality*100) + '% recognisable · ' : ''}clean, readable traces pay the most${DIFF[difficulty] && DIFF[difficulty].tama ? ' · ' + difficulty + ' pays ×' + DIFF[difficulty].tama : ''}${e.won ? ' · a cleared stage pays ×' + ST.clearBonus : ''}</small></p>` : ''}
+      ${e.won ? `<p class="over-line">stage ${e.stage + 1} is open: ${rosterAt(e.stage * stageLen())} characters on the field</p>` : ''}
+      <button class="start-go">${e.won ? 'next · stage ' + (e.stage + 1) : 'again'}</button>
       <div class="start-links"><button class="start-workshop">${ICON.sword}workshop</button><a class="start-home" href="../index.html">${ICON.flame}home</a></div>
       ${hands ? `<div class="start-h">as you wrote them</div>${hands}` : ''}
       <div class="start-foot">${H && window.__account && window.__account.user ? 'saved to your account' : 'saved on this device'}</div>
@@ -3619,7 +3706,10 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   function openWorkshop(t){ if (t) wtab = t; return renderStart(); }
   function begin(){
     start.hidden = true;
-    if (over) restart(); else paused = false;
+    // The field under the start page was set up for a stage before anyone
+    // chose one; if another was asked for, the run begins there instead.
+    if (over || (!(run && run.started) && wantStage() !== stageN)) restart(); else paused = false;
+    bannerAt = performance.now();
     // the clock starts when the player does, not when the page loaded
     if (run && !run.started){ run.started = true; run.began = performance.now(); run.at = Date.now(); }
     tPrev = 0;
@@ -3661,6 +3751,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; },
+    get stage(){ return stageN; }, get wave0(){ return wave0; }, get won(){ return won; }, get clearedTo(){ return clearedTo(); }, pickStage, wantStage, stageLen, staged: STAGED,
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     // a synthetic tap: a pointerdown on the first element the selector finds, through the container's own listener
@@ -3728,6 +3819,7 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   run = newRun();
   // what lasts is in force from the first run, not the second
   ward = wardMax(); sumi = own('inkwell') * CFG.inkwellStep;
+  enterStage();
   spawn(); retarget();
   // The title page is the game's start page now ("let's have the game begin
   // from the title page. The practice button can exist on title"): its Begin
@@ -3740,6 +3832,6 @@ addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='A
   requestAnimationFrame(fieldLoop);
 })();
 </script>
-<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.36</div>
+<div class="credit">Stroke order from KanjiVG (kanjivg.tagaini.net), CC BY-SA 3.0. Klee One and Noto Sans JP are licensed under the SIL Open Font License. Loanwords mostly follow Genki I (3rd ed.). · v0.1.37</div>
 </body>
 </html>

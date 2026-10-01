@@ -329,11 +329,20 @@ LAYER = r"""
   // not a score anyone else will ever be ranked by.
   const cleanRun = r => ({ at:+r.at||0, realm:String(r.realm||'').slice(0,24), wave:+r.wave||0, banished:+r.banished||0,
     traced:+r.traced||0, clean:+r.clean||0, sumi:+r.sumi||0, cast:+r.cast||0, ms:+r.ms||0,
-    difficulty:String(r.difficulty||'').slice(0,12), practice: r.practice ? true : undefined });
+    difficulty:String(r.difficulty||'').slice(0,12), practice: r.practice ? true : undefined,
+    stage: +r.stage > 0 ? Math.floor(+r.stage) : undefined, cleared: r.cleared ? true : undefined });
+  // The furthest wave, and beside it the furthest stage cleared. They are
+  // kept apart because they are different facts: a run can reach a stage's
+  // last wave and still fall to its general. Both only ever rise, so two
+  // devices merge by taking the further of each.
   function bestOf(realm, r){
+    if (r.practice) return false;
     const b = LEDGER.best[realm];
-    if (!r.practice && (!b || r.wave > b.wave || (r.wave === b.wave && r.banished > b.banished))){ LEDGER.best[realm] = { wave:r.wave, banished:r.banished, at:r.at }; return true; }
-    return false;
+    const st = Math.max((b && +b.stage) || 0, r.cleared ? (+r.stage || 0) : 0);
+    let further = false;
+    if (!b || r.wave > b.wave || (r.wave === b.wave && r.banished > b.banished)){ LEDGER.best[realm] = { wave:r.wave, banished:r.banished, at:r.at }; further = true; }
+    if (st) LEDGER.best[realm].stage = st;
+    return further;
   }
   function run(rec){
     const r = cleanRun(rec);
@@ -341,7 +350,7 @@ LAYER = r"""
     LEDGER.runs.push(r); LEDGER.runs = LEDGER.runs.slice(-20);
     save();
     const total = Object.values(LEDGER.g).reduce((a, e) => a + (e.n || 0), 0);
-    return { isBest, wave: (LEDGER.best[r.realm] || {}).wave || 0, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
+    return { isBest, wave: (LEDGER.best[r.realm] || {}).wave || 0, stage: (LEDGER.best[r.realm] || {}).stage || 0, runs: LEDGER.runs.filter(x => x.realm === r.realm).length, total };
   }
   // ---- 魂 tama: what a run leaves behind ----------------------------------
   // Spent between rounds, on things that last. It has to survive being merged
@@ -540,7 +549,7 @@ LAYER = r"""
         <div><b>${s.streak}</b><small>day${s.streak === 1 ? '' : 's'} running</small></div>
       </div>
       ${Object.keys(LEDGER.best).length ? `<div class="hand-h">furthest you have held</div>`
-        + list(Object.entries(LEDGER.best), ([realm, b]) => `<span><b>${b.wave}</b><small>waves · ${esc(realm)} · ${b.banished} banished</small></span>`, '') : ''}
+        + list(Object.entries(LEDGER.best), ([realm, b]) => `<span><b>${b.wave}</b><small>waves · ${esc(realm)} · ${b.banished} banished${b.stage ? ' · stage ' + (+b.stage) + ' cleared' : ''}</small></span>`, '') : ''}
       <div class="hand-h">these bite you most</div>
       ${list(s.bites, b => `<span><b>${esc(b.c)}</b><small>${b.zaps} zap${b.zaps === 1 ? '' : 's'}, ${b.fizz} fizzle${b.fizz === 1 ? '' : 's'}</small></span>`, 'nothing is biting. the phi pop are bored.')}
       <div class="hand-h">these take you longest, per stroke</div>
@@ -594,7 +603,7 @@ LAYER = r"""
     }
     LEDGER.runs.sort((a, b) => a.at - b.at); LEDGER.runs = LEDGER.runs.slice(-20);
     for (const [realm, b] of Object.entries(o.ledger.best || {})){
-      if (b && typeof b === 'object' && realm.length <= 24) bestOf(realm, { wave:+b.wave||0, banished:+b.banished||0, at:+b.at||0 });
+      if (b && typeof b === 'object' && realm.length <= 24) bestOf(realm, { wave:+b.wave||0, banished:+b.banished||0, at:+b.at||0, stage:Math.min(9999, Math.floor(+b.stage||0)), cleared:+b.stage > 0 });
     }
     if (purseOK(o.ledger.tama)){
       const up = (mine, theirs, ok) => { for (const [k, v] of Object.entries(theirs)) if (ok(k) && +v > (+mine[k] || 0) && +v < 1e9) mine[k] = Math.floor(+v); };

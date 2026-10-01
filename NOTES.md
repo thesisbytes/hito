@@ -2419,3 +2419,75 @@ Running log. Append at the bottom, don't rewrite history.
   rate, the estate in place of the level switcher, the gate and its doors,
   the reader, the general's motto. The tower loop is what runs under the
   new stage; the stage is what it looks like.
+
+## 2026-09-30 — Finite stages (hiragana v0.1.74, katakana-game v0.1.37, vocab v0.1.42)
+
+- The maintainer: "let's see what we can conjure with finite stages." The
+  09-26 note asked for them because "the latest stage the player cleared"
+  needs a stage that can be cleared.
+- **A stage is a stretch of the tower, not a new thing.** `tower.bossEvery`
+  waves, the last its general; stage n is waves (n-1)·len to n·len. Chosen
+  over a separate stage table because every dial the game has is already
+  keyed to the wave (layers, bite, pace, blocks, rows, the general himself),
+  the furthest wave keeps meaning what the title page and the row gate read
+  it as (stage 10 cleared is wave 100, which is what opens katakana), and
+  the 仏/鬼 pace keys still tune one curve.
+- **Why this is not v0.1.44 again.** Those stages were a count that grew —
+  stage 8 was 33 farang by finger — and a fall paid nothing. A stage here is
+  always ten; what climbs is what the farang wear and how hard they bite.
+  And a fall still pays, for the farang it faced.
+- **Cleared means the general was sent home.** First written as "hold the
+  ward through all of them", the old rule, and thrown out before it shipped:
+  at stage 1 a general bites for 2 of a ward of 5, so the cheapest way to
+  clear was to let him in, and the block — the one thing only the hand can
+  answer — became optional. So a stage's general who reaches the gate takes
+  his bite and goes back to the top of the field, and comes again. The rank
+  and file are still removed by a breach. In the tower (stage 0) a general
+  who gets in is gone, as before. This is the 09-26 rule "a new stage is
+  the hand's" as a mechanic: the calligrapher's darts clear a stage's rank
+  and file at the foot of the tower, and cannot clear its general.
+- **A run is one stage**, the AFK shape: fight, an ending that says "stage
+  n cleared" and offers the next, or "the ward fell" and the same again.
+  Nothing carries between stages but what lasts (the workshop's levels);
+  the lights, 気 and 墨 are the stage's.
+- **Measured in the stub, heroes on, an unforged hand:** with no stroke at
+  all, stage 1's nine rank and file fall to the darts (a field that empties
+  refills at once, so the general is there at 26 s), the general walks in
+  three times and the ward falls at 73-91 s. With one stroke, at the
+  general, stage 1 is cleared in 35 s with the ward untouched. Stage 3,
+  no hand: eight of nine, the ninth was blocking. So a stage cannot be
+  watched to a win, which was the point; and **stage 1 asks for exactly one
+  character**, which may be too little for a game about tracing. That is
+  v0.1.73's dart (a box in 4.5 s against a spawn every 5.8) meeting a stage
+  of ten, not anything new here, and it is a thing for a hand to feel
+  before a number is moved. Also open: whether 墨 boosts mean anything in
+  half a minute. Left in, untouched, until someone has played it.
+- **The ledger keeps `best[realm].stage`**, the furthest stage cleared,
+  beside the furthest wave: different facts (a run can reach a stage's last
+  wave and fall to its general). It only rises; import and the signed-in
+  save merge it by max through the same `bestOf`. **This is the number the
+  estate's rate will read. Nothing pays out on it yet** — the rate and the
+  gate it is collected through are the next piece, and a rate shown before
+  it can be collected would be a number that means nothing.
+- **The tower stays**, as a button on the start page, and guided is always
+  the tower. The run record carries `stage`, `cleared`, `from`.
+- **The balance loop is quiet for stage play, on purpose.** pace.py models
+  an endless climb from wave 0; a stage run's `wave` is where the player
+  chose to fight. Fed to the judge as-is, a hand on stage 3 would read as a
+  hand that falls at wave 30 and the loop would have buffed the game by
+  itself. `hand_of` and `auto` now leave out any run with a `stage`. What
+  is missing: a judge in stage terms (the first stage the model's bare hand
+  cannot clear, against the furthest cleared), and the heroes' darts in the
+  model at all — pace.py has not heard of v0.1.73.
+- Pages checked in headless Chrome at 390px, sharing off: the start page
+  with the stepper, a fight (the seam reads "stage 4 4/10"), the stage's
+  name as it opens, both endings, and `?go=medium` from the title page
+  landing on the first uncleared stage. The bottom-left tally on the field
+  is under the dashboard, as it has been since v0.1.55; the seam says it.
+- Tests: the stage block in `field.test.mjs`; the earlier blocks ask for the
+  tower by name (`F.pickStage(0)`), since they are about the loop underneath.
+  Three mutations were run against it by hand (general removed on breach,
+  spawns past the stage's end, pay by absolute wave) and each failed it.
+- **Not built:** the stage's rate, the estate, the gate, the reader, the
+  general's motto, a stage map. Not played by a hand yet either: v0.1.73
+  has no medium runs in the table, so this is two builds of stage on paper.

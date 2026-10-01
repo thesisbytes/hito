@@ -84,6 +84,11 @@ const advance = (ms, stepMs = 16) => {
 
 ok(F && P, 'the field layer did not initialise');
 if (!F || !P) process.exit(1);
+// Everything up to the stage block is about the loop underneath, which is
+// the tower: endless, wave 0 upward. The hiragana game opens on a stage
+// (v0.1.74), so the tower is asked for by name; the stages have their own
+// block further down.
+if (F.staged) F.pickStage(0);
 // The field's tuning, read off the page. The literal carries JSON strings
 // (the credit line has colons in it), so the keys are picked individually.
 const cfgSrc = html.match(/window\.__FIELD_CFG=(\{[\s\S]*?\});<\/script>/)[1];
@@ -1223,10 +1228,103 @@ const line = (x0, y0, x1, y1, n, t0 = 0) => Array.from({length:n}, (_, i) => ({ 
   F.setDifficulty('medium'); fresh();
 }
 
+// ---- finite stages: a stretch of the tower with an end
+// "The latest stage the player cleared is the rate they accrue currency",
+// which needs a stage that can be cleared. A stage is `bossEvery` waves of
+// the tower and its general is the last of them. The checks that matter: it
+// ends, and exactly once; it is not cleared by letting the general in; a
+// fall clears nothing and pays only for what was faced; the next stage
+// starts where this one stopped; nothing past the first uncleared stage can
+// be asked for; a later, longer tower run does not forget a cleared stage;
+// and the tower and guided are untouched by any of it.
+if (F.staged){
+  const H = globalThis.__hand; H.reset();
+  const tw = JSON.parse(html.match(/tower:(\{[^}]*\})/)[1]), len = tw.bossEvery, realm = 'hiragana';
+  // answer everything on the field, however it is dressed, until the run is over
+  const sweep = (only = () => true, max = 800) => { for (let g = 0; g < max && !F.over; g++){
+    for (const m of [...F.monsters]) if (only(m)){ m.block = 0; m.hp = 1; F.hit(m, false, false); } advance(60); } };
+  F.setDifficulty('medium'); F.pickStage(null); fresh(); F.hero(false);
+  ok(F.stage === 1 && F.wave0 === 0 && F.clearedTo === 0, `a new player is not on stage 1 (stage ${F.stage}, from wave ${F.wave0}, cleared ${F.clearedTo})`);
+  F.openStart();
+  ok(/stage 1 · \d+ farang, the last one a general/.test(F.startHtml) && /begin · stage 1/.test(F.startHtml), 'the start page does not say which stage is about to be fought');
+  ok(!/class="stage-pick"/.test(F.startHtml), 'a stepper is offered with nothing cleared to step back to');
+  ok(/data-stagepick="0"/.test(F.startHtml), 'the tower is not offered beside the stages');
+  F.begin();
+  ok(new RegExp(`stage 1</small> 1/${len}`).test(F.dashHtml), `the seam does not say how far through the stage: ${F.dashHtml.match(/stage[^<]*<\/small>[^<]*/)}`);
+  sweep();
+  ok(F.over && F.won && F.wave === len && F.killed === len, `stage 1 did not end with its ${len} farang answered (over ${F.over}, won ${F.won}, wave ${F.wave}, banished ${F.killed})`);
+  ok(F.ward === cfg.wardHp, 'a swept stage cost the ward something');
+  { const e = F.ended;
+    ok(e && e.won && e.first && e.rec.stage === 1 && e.rec.cleared === true && e.rec.wave === len && e.rec.from === undefined, `the cleared stage's record is ${JSON.stringify(e && e.rec)}`);
+    ok(H.ledger.best[realm] && H.ledger.best[realm].stage === 1 && H.ledger.best[realm].wave === len, `the ledger kept ${JSON.stringify(H.ledger.best[realm])} of a cleared stage 1`);
+    ok(e.pay === Math.round(Math.floor(len / cfg.tamaWaves) * 2 * tw.clearBonus), `a cleared stage with nothing traced paid ${e.pay}`);
+    F.endRun(); advance(900);
+    ok(H.ledger.runs.length === 1, `a cleared stage was recorded ${H.ledger.runs.length} times`);
+    ok(F.view === 'over' && /stage 1 cleared/.test(F.startHtml) && /next · stage 2/.test(F.startHtml) && /start-card over won/.test(F.startHtml) && !/the ward fell/.test(F.startHtml),
+       'the ending of a cleared stage does not say so, or does not offer the next');
+  }
+  // next: the stage after, from where this one stopped, with a new row of the chart
+  F.begin();
+  ok(F.stage === 2 && F.wave0 === len && F.wave === len + 1 && !F.over && !F.won && F.ward === cfg.wardHp, `"next" did not open stage 2 cleanly (stage ${F.stage}, wave ${F.wave}, ward ${F.ward})`);
+  ok(F.rowsOpen() === tw.rows + Math.floor(len / tw.rowWaves), `stage 2 has ${F.rowsOpen()} rows of the chart`);
+  // the general is not got rid of by letting him in
+  sweep(m => !m.boss, 400 );
+  for (let g = 0; g < 400 && !F.monsters.some(m => m.boss); g++) sweep(m => !m.boss, 1);
+  { const gen = F.monsters.find(m => m.boss);
+    ok(gen && F.wave === 2 * len, `stage 2's general did not come last (wave ${F.wave})`);
+    sweep(m => !m.boss, 20);
+    const w0 = F.ward; gen.d = 0.061; advance(40);
+    ok(F.ward < w0 && F.monsters.includes(gen) && gen.d > 0.9 && !F.over, `a general who got in was not sent round again (ward ${F.ward} from ${w0}, d ${gen.d}, over ${F.over})`);
+    gen.speed = 0; advance(20000);
+    ok(F.wave === 2 * len && F.monsters.length === 1 && !F.over, `the stage went on past its general (wave ${F.wave}, ${F.monsters.length} on the field)`);
+    sweep();
+    ok(F.over && F.won && H.ledger.best[realm].stage === 2, 'sending the general home did not clear stage 2');
+  }
+  // the rank and file may get through, at the ward's cost
+  advance(900); F.begin();
+  { F.monsters[0].d = 0.061; advance(40);
+    ok(F.stage === 3 && F.ward === cfg.wardHp - 1 && !F.over, `a breach in stage 3 left the ward at ${F.ward}`);
+    sweep();
+    ok(F.won && H.ledger.best[realm].stage === 3 && F.ended.rec.from === 2 * len, `a stage with one breach was not cleared (${JSON.stringify(F.ended && F.ended.rec)})`);
+  }
+  // a fall: nothing cleared, paid for what was faced, and the same stage again
+  advance(900); F.begin();
+  for (let g = 0; !F.over && g < 400; g++){ for (const m of F.monsters) m.d = 0.061; advance(40); }
+  { const e = F.ended;
+    ok(F.over && !F.won && e && !e.won && e.rec.stage === 4 && e.rec.cleared === undefined && H.ledger.best[realm].stage === 3, `a fall in stage 4 was recorded as ${JSON.stringify(e && e.rec)}`);
+    ok(e.pay <= Math.floor(len / cfg.tamaWaves) * 2, `a fall in stage 4 paid ${e.pay}: for the waves it started above, not the farang it faced`);
+    advance(900);
+    ok(/the ward fell/.test(F.startHtml) && new RegExp(`stage 4 · \\d+ of ${len} came`).test(F.startHtml) && />again</.test(F.startHtml) && !/start-card over won/.test(F.startHtml), 'the ending of a fallen stage does not say which stage, or dresses it as a win');
+    F.begin();
+    ok(F.stage === 4 && F.wave0 === 3 * len, `"again" after a fall went to stage ${F.stage}`);
+  }
+  // which stage: any that has been cleared, and the first that has not; never past it
+  ok(F.pickStage(99) === 4 && F.pickStage(2) === 2, 'a stage past the first uncleared one could be asked for');
+  fresh(); F.openStart();
+  ok(F.stage === 2 && F.wave0 === len, `stage 2 was asked for and stage ${F.stage} began`);
+  ok(/class="stage-pick"/.test(F.startHtml) && /data-stagepick="1"/.test(F.startHtml) && /data-stagepick="3"/.test(F.startHtml) && /cleared · fight it again/.test(F.startHtml), 'the cleared stages cannot be stepped through');
+  F.begin(); sweep();
+  ok(F.won && H.ledger.best[realm].stage === 3 && !F.ended.first, 'clearing stage 2 again moved the furthest stage');
+  // the page mid-run: resume, and no stepping to another stage under a run
+  advance(900); F.begin(); F.openStart();
+  ok(/>resume</.test(F.startHtml) && !/class="stage-pick"/.test(F.startHtml) && !/data-stagepick=/.test(F.startHtml), 'the start page offers another stage in the middle of one');
+  F.begin();
+  // a later, longer tower run does not forget a cleared stage
+  H.run({ at: 1, realm, wave: 40 * len, banished: 30 * len, difficulty: 'medium' });
+  ok(H.ledger.best[realm].wave === 40 * len && H.ledger.best[realm].stage === 3, `a tower run rewrote the furthest stage: ${JSON.stringify(H.ledger.best[realm])}`);
+  // the tower beside the stages, endless as ever; and guided, which has none
+  F.pickStage(0); fresh(); F.openStart();
+  ok(F.stage === 0 && F.wave0 === 0 && /the tower · furthest wave/.test(F.startHtml) && /back to the stages/.test(F.startHtml), 'the tower cannot be asked for by name');
+  F.begin(); ok(/波/.test(F.dashHtml), 'the tower no longer counts its waves on the seam');
+  F.pickStage(null); F.setDifficulty('guided'); fresh();
+  ok(F.stage === 0, 'a guided run was put on a stage');
+  F.setDifficulty('medium'); H.reset(); F.hero(true); F.pickStage(0); fresh();
+}
+
 // every conjure in this file went through the hand; none of its notes may have thrown
 ok(globalThis.__hand.faults === 0, `the hand's note threw ${globalThis.__hand.faults} time(s) during the field's checks`);
 
 if (fail) { console.log(`  ${fail} field check(s) failed`); process.exit(1); }
 console.log(`  monsters advance and spawn, a finished glyph banishes the target, `
   + `the tracer retargets, the ward falls and restarts, `
-  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, and a stage cannot be passed without holding it, nor its gate bought on credit, a recognisable trace pays more, and guided only gets you so far; the heroes' darts fly on their own, a block is the hand's to break, a clean stroke holds the wave, and the stroke itself is what flies`);
+  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, nothing is bought on credit, a stage ends when its general is sent home and not before, a recognisable trace pays more, and guided only gets you so far; the heroes' darts fly on their own, a block is the hand's to break, a clean stroke holds the wave, and the stroke itself is what flies`);
