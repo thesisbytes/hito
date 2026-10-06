@@ -1,6 +1,6 @@
 {
   "deck": "Genki I",
-  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59). Section splits follow the class's vocabulary quizzes, one per page. L2-2 is p.59 as photographed: the page opens at ペン, so everything before it is p.58, which has not been checked against the book. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here. The hundreds-and-thousands section is not a page of the book: it is the Lesson 2 numbers, written out because ろっぴゃく would not come on quiz day.",
+  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59); Lesson 3 vocabulary (pp. 84–85). Section splits follow the class's vocabulary quizzes, one per page. L2-2 is p.59 as photographed: the page opens at ペン, so everything before it is p.58, which has not been checked against the book. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here. The hundreds-and-thousands section is not a page of the book: it is the Lesson 2 numbers, written out because ろっぴゃく would not come on quiz day. Lesson 3 (pp. 84–85) is split the way the class quizzes it — L3-1 to カフェ, L3-2 the verbs, L3-3 the rest — and was written from the class slides and from memory of the book, not from the pages: check it against pp. 84–85. The ます section is the twelve verbs of the L3-2 quiz, each affirmative and negative. The two カタカナ sections are the rows of the class's katakana quizzes 3 and 4, one kana a card.",
   "sections": [
     {
       "id": "l1-1",
@@ -244,6 +244,147 @@
         {"ja": "はっせん", "romaji": "hassen", "en": "8,000", "note": "はち → はっ"},
         {"ja": "きゅうせん", "romaji": "kyuusen", "en": "9,000"},
         {"ja": "いちまん", "romaji": "ichiman", "en": "10,000", "note": "いち is said, unlike ひゃく and せん"}
+      ]
+    },
+    {
+      "id": "l3-1",
+      "title": "L3-1 · p.84 nouns",
+      "words": [
+        {"ja": "えいが", "romaji": "eega", "en": "movie"},
+        {"ja": "おんがく", "romaji": "ongaku", "en": "music"},
+        {"ja": "ざっし", "romaji": "zasshi", "en": "magazine"},
+        {"ja": "スポーツ", "romaji": "supootsu", "en": "sports"},
+        {"ja": "デート", "romaji": "deeto", "en": "date (romantic, not calendar)"},
+        {"ja": "テニス", "romaji": "tenisu", "en": "tennis"},
+        {"ja": "テレビ", "romaji": "terebi", "en": "TV"},
+        {"ja": "アイスクリーム", "romaji": "aisukuriimu", "en": "ice cream"},
+        {"ja": "あさごはん", "romaji": "asagohan", "en": "breakfast"},
+        {"ja": "おさけ", "romaji": "osake", "en": "sake; alcoholic drink"},
+        {"ja": "おちゃ", "romaji": "ocha", "en": "green tea"},
+        {"ja": "コーヒー", "romaji": "koohii", "en": "coffee"},
+        {"ja": "ばんごはん", "romaji": "bangohan", "en": "dinner"},
+        {"ja": "ハンバーガー", "romaji": "hanbaagaa", "en": "hamburger"},
+        {"ja": "ひるごはん", "romaji": "hirugohan", "en": "lunch"},
+        {"ja": "みず", "romaji": "mizu", "en": "water"},
+        {"ja": "いえ", "romaji": "ie", "en": "home; house"},
+        {"ja": "うち", "romaji": "uchi", "en": "home; house; my place"},
+        {"ja": "がっこう", "romaji": "gakkoo", "en": "school"},
+        {"ja": "カフェ", "romaji": "kafe", "en": "cafe"}
+      ]
+    },
+    {
+      "id": "l3-2",
+      "title": "L3-2 · p.85 verbs",
+      "words": [
+        {"ja": "いく", "romaji": "iku", "en": "to go", "note": "u-verb · (place に/へ)"},
+        {"ja": "かえる", "romaji": "kaeru", "en": "to go back; to return", "note": "u-verb, though it ends in る · (place に/へ)"},
+        {"ja": "きく", "romaji": "kiku", "en": "to listen; to hear", "note": "u-verb · (〜を)"},
+        {"ja": "のむ", "romaji": "nomu", "en": "to drink", "note": "u-verb · (〜を)"},
+        {"ja": "はなす", "romaji": "hanasu", "en": "to speak; to talk", "note": "u-verb · (language を/で)"},
+        {"ja": "よむ", "romaji": "yomu", "en": "to read", "note": "u-verb · (〜を)"},
+        {"ja": "おきる", "romaji": "okiru", "en": "to get up", "note": "ru-verb"},
+        {"ja": "たべる", "romaji": "taberu", "en": "to eat", "note": "ru-verb · (〜を)"},
+        {"ja": "ねる", "romaji": "neru", "en": "to sleep; to go to sleep", "note": "ru-verb"},
+        {"ja": "みる", "romaji": "miru", "en": "to see; to look at; to watch", "note": "ru-verb · (〜を)"},
+        {"ja": "くる", "romaji": "kuru", "en": "to come", "note": "irregular · (place に/へ)"},
+        {"ja": "する", "romaji": "suru", "en": "to do", "note": "irregular · (〜を)"},
+        {"ja": "べんきょうする", "romaji": "benkyoo suru", "en": "to study", "note": "irregular · (〜を)"}
+      ]
+    },
+    {
+      "id": "l3-masu",
+      "title": "L3-2 · masu forms",
+      "words": [
+        {"ja": "いきます", "romaji": "ikimasu", "en": "I go (polite)", "note": "いく"},
+        {"ja": "いきません", "romaji": "ikimasen", "en": "I do not go (polite)", "note": "いく"},
+        {"ja": "かえります", "romaji": "kaerimasu", "en": "I go back (polite)", "note": "かえる, an u-verb: かえり, not かえ"},
+        {"ja": "かえりません", "romaji": "kaerimasen", "en": "I do not go back (polite)", "note": "かえる, an u-verb: かえり, not かえ"},
+        {"ja": "ききます", "romaji": "kikimasu", "en": "I listen (polite)", "note": "きく"},
+        {"ja": "ききません", "romaji": "kikimasen", "en": "I do not listen (polite)", "note": "きく"},
+        {"ja": "のみます", "romaji": "nomimasu", "en": "I drink (polite)", "note": "のむ"},
+        {"ja": "のみません", "romaji": "nomimasen", "en": "I do not drink (polite)", "note": "のむ"},
+        {"ja": "はなします", "romaji": "hanashimasu", "en": "I speak (polite)", "note": "はなす"},
+        {"ja": "はなしません", "romaji": "hanashimasen", "en": "I do not speak (polite)", "note": "はなす"},
+        {"ja": "よみます", "romaji": "yomimasu", "en": "I read (polite)", "note": "よむ"},
+        {"ja": "よみません", "romaji": "yomimasen", "en": "I do not read (polite)", "note": "よむ"},
+        {"ja": "おきます", "romaji": "okimasu", "en": "I get up (polite)", "note": "おきる, a ru-verb: drop る"},
+        {"ja": "おきません", "romaji": "okimasen", "en": "I do not get up (polite)", "note": "おきる, a ru-verb: drop る"},
+        {"ja": "たべます", "romaji": "tabemasu", "en": "I eat (polite)", "note": "たべる, a ru-verb: drop る"},
+        {"ja": "たべません", "romaji": "tabemasen", "en": "I do not eat (polite)", "note": "たべる, a ru-verb: drop る"},
+        {"ja": "ねます", "romaji": "nemasu", "en": "I sleep (polite)", "note": "ねる, a ru-verb: drop る"},
+        {"ja": "ねません", "romaji": "nemasen", "en": "I do not sleep (polite)", "note": "ねる, a ru-verb: drop る"},
+        {"ja": "みます", "romaji": "mimasu", "en": "I watch (polite)", "note": "みる, a ru-verb: drop る"},
+        {"ja": "みません", "romaji": "mimasen", "en": "I do not watch (polite)", "note": "みる, a ru-verb: drop る"},
+        {"ja": "きます", "romaji": "kimasu", "en": "I come (polite)", "note": "くる, irregular"},
+        {"ja": "きません", "romaji": "kimasen", "en": "I do not come (polite)", "note": "くる, irregular"},
+        {"ja": "します", "romaji": "shimasu", "en": "I do (polite)", "note": "する, irregular"},
+        {"ja": "しません", "romaji": "shimasen", "en": "I do not do (polite)", "note": "する, irregular"}
+      ]
+    },
+    {
+      "id": "l3-3",
+      "title": "L3-3 · time, adverbs",
+      "words": [
+        {"ja": "あさ", "romaji": "asa", "en": "morning", "note": "the slides put this with the time words; study it for either quiz"},
+        {"ja": "あした", "romaji": "ashita", "en": "tomorrow"},
+        {"ja": "いつ", "romaji": "itsu", "en": "when"},
+        {"ja": "きょう", "romaji": "kyoo", "en": "today"},
+        {"ja": "ごろ", "romaji": "goro", "en": "at about …", "note": "〜ごろ, after a time"},
+        {"ja": "こんばん", "romaji": "konban", "en": "tonight"},
+        {"ja": "しゅうまつ", "romaji": "shuumatsu", "en": "weekend"},
+        {"ja": "どようび", "romaji": "doyoobi", "en": "Saturday"},
+        {"ja": "にちようび", "romaji": "nichiyoobi", "en": "Sunday"},
+        {"ja": "まいにち", "romaji": "mainichi", "en": "every day"},
+        {"ja": "まいばん", "romaji": "maiban", "en": "every night"},
+        {"ja": "いい", "romaji": "ii", "en": "good"},
+        {"ja": "はやい", "romaji": "hayai", "en": "early"},
+        {"ja": "あまり", "romaji": "amari", "en": "not much", "note": "with a negative verb"},
+        {"ja": "ぜんぜん", "romaji": "zenzen", "en": "not at all", "note": "with a negative verb"},
+        {"ja": "たいてい", "romaji": "taitee", "en": "usually"},
+        {"ja": "ちょっと", "romaji": "chotto", "en": "a little"},
+        {"ja": "ときどき", "romaji": "tokidoki", "en": "sometimes"},
+        {"ja": "よく", "romaji": "yoku", "en": "often; much"},
+        {"ja": "そうですね", "romaji": "soo desu ne", "en": "That's right.; Let me see."},
+        {"ja": "でも", "romaji": "demo", "en": "but"},
+        {"ja": "どうですか", "romaji": "doo desu ka", "en": "How about …?; How is …?"}
+      ]
+    },
+    {
+      "id": "kata-3",
+      "title": "Katakana 3 · na–ho",
+      "words": [
+        {"ja": "ナ", "romaji": "na", "en": "na · in katakana"},
+        {"ja": "ニ", "romaji": "ni", "en": "ni · in katakana"},
+        {"ja": "ヌ", "romaji": "nu", "en": "nu · in katakana"},
+        {"ja": "ネ", "romaji": "ne", "en": "ne · in katakana"},
+        {"ja": "ノ", "romaji": "no", "en": "no · in katakana"},
+        {"ja": "ハ", "romaji": "ha", "en": "ha · in katakana"},
+        {"ja": "ヒ", "romaji": "hi", "en": "hi · in katakana"},
+        {"ja": "フ", "romaji": "fu", "en": "fu · in katakana"},
+        {"ja": "ヘ", "romaji": "he", "en": "he · in katakana"},
+        {"ja": "ホ", "romaji": "ho", "en": "ho · in katakana"}
+      ]
+    },
+    {
+      "id": "kata-4",
+      "title": "Katakana 4 · ma–n",
+      "words": [
+        {"ja": "マ", "romaji": "ma", "en": "ma · in katakana"},
+        {"ja": "ミ", "romaji": "mi", "en": "mi · in katakana"},
+        {"ja": "ム", "romaji": "mu", "en": "mu · in katakana"},
+        {"ja": "メ", "romaji": "me", "en": "me · in katakana"},
+        {"ja": "モ", "romaji": "mo", "en": "mo · in katakana"},
+        {"ja": "ヤ", "romaji": "ya", "en": "ya · in katakana"},
+        {"ja": "ユ", "romaji": "yu", "en": "yu · in katakana"},
+        {"ja": "ヨ", "romaji": "yo", "en": "yo · in katakana"},
+        {"ja": "ラ", "romaji": "ra", "en": "ra · in katakana"},
+        {"ja": "リ", "romaji": "ri", "en": "ri · in katakana"},
+        {"ja": "ル", "romaji": "ru", "en": "ru · in katakana"},
+        {"ja": "レ", "romaji": "re", "en": "re · in katakana"},
+        {"ja": "ロ", "romaji": "ro", "en": "ro · in katakana"},
+        {"ja": "ワ", "romaji": "wa", "en": "wa · in katakana"},
+        {"ja": "ヲ", "romaji": "o", "en": "o (wo) · in katakana"},
+        {"ja": "ン", "romaji": "n", "en": "n · in katakana"}
       ]
     }
   ]

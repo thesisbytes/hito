@@ -2491,3 +2491,32 @@ Running log. Append at the bottom, don't rewrite history.
 - **Not built:** the stage's rate, the estate, the gate, the reader, the
   general's motto, a stage map. Not played by a hand yet either: v0.1.73
   has no medium runs in the table, so this is two builds of stage on paper.
+
+## 2026-10-06 — Lesson 3 in the deck, the night before its quiz (vocab v0.1.43)
+
+The maintainer, at half past three in the morning: "I'm super behind in my
+japanese class". The class is JAPN 101, Genki I Lessons 1 to 6, and the
+deck stopped at Lesson 2 while the class had finished Lesson 3. The slides
+and the syllabus are on the maintainer's Drive; the syllabus's schedule is
+what the sections follow.
+
+- **Lesson 3, split the way the class quizzes it**: `l3-1` the nouns of
+  p.84 up to カフェ, `l3-2` the thirteen verbs of p.85, `l3-3` the time words
+  from あした and everything on p.85 that is not a verb. `l3-masu` is the
+  twelve verbs of the L3-2 quiz in ます and ません, since the conjugation is
+  what the quiz and the midterm ask and the dictionary form is not.
+- **Two katakana sections, one kana a card** (`kata-3` ナ to ホ, `kata-4`
+  マ to ン): the rows of the class's katakana quizzes 3 and 4. A one-kana
+  word needed nothing new from the shell. The contracted sounds and the long
+  vowel bar of quiz 4 are what the katakana game's words already drill.
+- **Not checked against the book.** Written from the class slides (Day 10
+  and Day 12) and from memory of pp. 84–85; the deck's `source` says so.
+  あさ is on the slides but its page was not seen, and it sits in `l3-3`.
+- Section titles are in English: カフェ and ません broke across lines at
+  390px, and the maintainer reads a title faster in English anyway.
+- The syllabus forbids AI for the writing assignments. The deck drills;
+  it does not write anybody's Daily Routine for them, and neither does the
+  workspace.
+- Coming: katakana quiz 4 on 10/8, the written midterm (L1-3) on 10/13, the
+  oral on 10/15. The midterm asks for one of three writings in hiragana from
+  memory, which the deck does not cover.

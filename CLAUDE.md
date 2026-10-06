@@ -371,7 +371,7 @@ slot strip filling in, each landed kana knocks the farang back a step
 back, and the ghost light is kept by the word. Slower and sparser than the
 hiragana field, because a word is a longer answer.
 
-### Vocab — `dist/vocab-v0.1.42.html`
+### Vocab — `dist/vocab-v0.1.43.html`
 
 The first word-level realm, and the "layout step" the economy plan always
 said words would be: a word is a sequence of glyph recordings, no new stroke
@@ -381,8 +381,9 @@ tracer is walked through the word's kana one at a time. Finish a kana and
 its slot lights; finish the word and the reading and meaning bloom together.
 
 Decks are class content rather than realm data, so they live in `vocab/`
-outside `scripts/`. The first is Genki I, Lessons 1 and 2, sectioned one per
-quiz page. The pack's glyph list is every hiragana and katakana (164, from
+outside `scripts/`. The first is Genki I, Lessons 1 to 3, sectioned one per
+quiz page (Lesson 3 and the two katakana quiz rows as of v0.1.43, written
+from the class slides: see `NOTES.md`, 2026-10-06). The pack's glyph list is every hiragana and katakana (164, from
 `build/kana_glyphs.py`) so a new lesson is only ever a JSON edit, and the
 stitch refuses a deck that uses a character with no stroke data.
 
