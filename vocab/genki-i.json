@@ -1,6 +1,6 @@
 {
   "deck": "Genki I",
-  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59); Lesson 3 vocabulary (pp. 84–85). Section splits follow the class's vocabulary quizzes, one per page. L2-2 is p.59 as photographed: the page opens at ペン, so everything before it is p.58, which has not been checked against the book. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here. The hundreds-and-thousands section is not a page of the book: it is the Lesson 2 numbers, written out because ろっぴゃく would not come on quiz day. Lesson 3 (pp. 84–85) is split the way the class quizzes it — L3-1 to カフェ, L3-2 the verbs, L3-3 the rest — and was written from the class slides and from memory of the book, not from the pages: check it against pp. 84–85. The ます section is the twelve verbs of the L3-2 quiz, each affirmative and negative. The two カタカナ sections are the rows of the class's katakana quizzes 3 and 4, one kana a card.",
+  "source": "Genki I, 3rd edition. Lesson 1 vocabulary (pp. 38–40) and Useful Expressions: Time (p. 55); Lesson 2 vocabulary (pp. 58–59); Lesson 3 vocabulary (pp. 84–85). Section splits follow the class's vocabulary quizzes, one per page. L2-2 is p.59 as photographed: the page opens at ペン, so everything before it is p.58, which has not been checked against the book. The three “L1 quiz” sections are the class's Lesson 1 quiz (にほんご101 レッスンクイズ 1か): parts II–IV as model answers, written without the 。 the tracer has no stroke for. Part I is listening and is not here. The hundreds-and-thousands section is not a page of the book: it is the Lesson 2 numbers, written out because ろっぴゃく would not come on quiz day. Lesson 3 (pp. 84–85) is split the way the class quizzes it — L3-1 to カフェ, L3-2 the verbs, L3-3 the rest — and was written from the class slides and from memory of the book, not from the pages: check it against pp. 84–85. The ます section is the twelve verbs of the L3-2 quiz, each affirmative and negative. The four katakana sections are the rows of the class's katakana quizzes 1 to 4, one kana a card.",
   "sections": [
     {
       "id": "l1-1",
@@ -347,6 +347,38 @@
         {"ja": "そうですね", "romaji": "soo desu ne", "en": "That's right.; Let me see."},
         {"ja": "でも", "romaji": "demo", "en": "but"},
         {"ja": "どうですか", "romaji": "doo desu ka", "en": "How about …?; How is …?"}
+      ]
+    },
+    {
+      "id": "kata-1",
+      "title": "Katakana 1 · a–ko",
+      "words": [
+        {"ja": "ア", "romaji": "a", "en": "a · in katakana"},
+        {"ja": "イ", "romaji": "i", "en": "i · in katakana"},
+        {"ja": "ウ", "romaji": "u", "en": "u · in katakana"},
+        {"ja": "エ", "romaji": "e", "en": "e · in katakana"},
+        {"ja": "オ", "romaji": "o", "en": "o · in katakana"},
+        {"ja": "カ", "romaji": "ka", "en": "ka · in katakana"},
+        {"ja": "キ", "romaji": "ki", "en": "ki · in katakana"},
+        {"ja": "ク", "romaji": "ku", "en": "ku · in katakana"},
+        {"ja": "ケ", "romaji": "ke", "en": "ke · in katakana"},
+        {"ja": "コ", "romaji": "ko", "en": "ko · in katakana"}
+      ]
+    },
+    {
+      "id": "kata-2",
+      "title": "Katakana 2 · sa–to",
+      "words": [
+        {"ja": "サ", "romaji": "sa", "en": "sa · in katakana"},
+        {"ja": "シ", "romaji": "shi", "en": "shi · in katakana"},
+        {"ja": "ス", "romaji": "su", "en": "su · in katakana"},
+        {"ja": "セ", "romaji": "se", "en": "se · in katakana"},
+        {"ja": "ソ", "romaji": "so", "en": "so · in katakana"},
+        {"ja": "タ", "romaji": "ta", "en": "ta · in katakana"},
+        {"ja": "チ", "romaji": "chi", "en": "chi · in katakana"},
+        {"ja": "ツ", "romaji": "tsu", "en": "tsu · in katakana"},
+        {"ja": "テ", "romaji": "te", "en": "te · in katakana"},
+        {"ja": "ト", "romaji": "to", "en": "to · in katakana"}
       ]
     },
     {
