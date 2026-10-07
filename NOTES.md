@@ -2523,3 +2523,13 @@ what the sections follow.
 - Coming: katakana quiz 4 on 10/8, the written midterm (L1-3) on 10/13, the
   oral on 10/15. The midterm asks for one of three writings in hiragana from
   memory, which the deck does not cover.
+- **v0.1.45, that evening: `marked-wrong`.** The maintainer scanned 32
+  workbook pages into Drive (Adobe Scan; `~/cage/tools/pull_workbook.sh`
+  copies them into the vault with rclone). The graded ones show one mistake
+  three times over: the small っ/ッ written as something else — と on
+  p.127, a long-vowel bar on p.131 three words running — and しゃ/ちゃ,
+  しゅ/ちゅ swapped on p.126. The section is those words, with the
+  teacher's correction as the note, plus long-vowel words to tell ー from ッ
+  by. Katakana quiz 4 on 10/8 is exactly this. The first section of the
+  deck built from the hand's own graded work, which is the mischief the
+  scans were for.
