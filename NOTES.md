@@ -2677,3 +2677,70 @@ which the flashcard shell already measures.
 prompt or cross-script prompt by default in both mode; should practice ever
 feed the game (it writes the ledger either way, so shaky kana already come
 back in the tower).
+
+## 2026-10-14 — Proposal: debugging why a stroke did not land (design only; waiting for a go)
+
+The maintainer wants to store traces and find out why a stroke did not
+complete, and whether a character's width or tolerance wants tuning.
+
+**What exists already.** Every attempt, landed or fizzled, is a `trace`
+event (`hand_layer.py` `note()`): glyph, ok, ms, zaps, tries, stroke count,
+size, input, prof, ease, level, diff, build, and the strokes themselves in
+the book's space (`pack()`, thinned). `traces_gallery.py` draws them over the
+shape. `instrument.py` is an observe-only capture for the debug build.
+`agents/labels/` holds the readability ratings (glyph, verdict, readable,
+coverage, end gap, travel ratio, device; no strokes). Traces from guided
+builds before v0.1.43 hold only their last stroke; the gallery marks them,
+and any replay must skip them.
+
+**1. Failure reasons, in the trace event.** The engine already knows why it
+gave up, as text: `fizzleWhy`, and the toasts for a merged stroke ("lift the
+pen"), a reversed start, past-the-end and a stray. Add a `why` to a failed
+trace: `{check, stroke, at, got, need}`, where check is one of `stray`
+(off the path, offCount past FIZZ), `merged` (no lift between strokes),
+`reversed`, `nowhere` (a stroke that advanced nothing), `pastEnd`,
+`coverage` (under coverThreshold), `travel` (over maxTravel), `heading`,
+`flick`; `stroke` the index; `at` how far along it got (prog within the
+stroke, 0..1); `got`/`need` the measured and allowed numbers of that check.
+It is set where the engine already sets `fizzleWhy` and read by the hand at
+`note(false)`, so it observes and scores nothing. Production, not debug
+only: the failures worth reading happen on the maintainer's phone, not in
+a debug build. Cost: about 60 bytes on a failed trace, nothing on a landed
+one, against a trace's 1-3 KB of strokes. The device profile is already in
+the run record (`plat`, frame counts); a trace gains `vw` (CSS width) and
+`dpr` (10 bytes) so a failure can be grouped by screen.
+
+**2. A replay page, `build/replay.py`.** Like the gallery: reads
+`agents/data/events.jsonl`, writes `scratch/replay.html` (both gitignored;
+handwriting never goes in the repo). It embeds a stitched build's engine and
+feeds a trace back through it as pointer events at the trace's own size and
+profile, so the scorer that judges a replay is the scorer that judged the
+hand, not a copy of it. Overlays: the path, the tolerance band at that size,
+the ink, and a mark where `why` says it gave up. Counterfactual: the same
+page (or a headless run of it under Node's stubbed DOM, as the tests do)
+re-scores every trace under candidate pack settings and reports two numbers
+per candidate, per profile: failures that would land, and scribbles that
+would be accepted, using the readability ratings as ground truth for
+"writing" against "scribble". Pen and finger are separate rows and are never
+tuned by one number.
+
+**3. An investigator agent, `agents/` (after the two above).** Weekly, it
+groups failures by glyph × stroke × check × prof × screen, picks the groups
+that stand out, and proposes pack changes with the replay's two numbers for
+each. The judge is arithmetic like `pace.py`: a change passes only if it
+lands more of the rated-readable failures than it admits rated scribbles,
+per profile, within a cap. 仏 and 鬼 argue it as they do the pace; the
+maintainer applies a verdict with `--apply`; agents never touch a build.
+
+**Whose traces.** The events table has no user id, only the made-up device
+id. Its permissions are empty and row security is off, so no client can read
+it at all; only the CLI (an admin) and the sync function's key can. The save
+row (`hito.saves`, owner-only) lists the devices a signed-in player has
+used, so the maintainer's own traces are the events whose device is in his
+save row's `devices`; everyone else stays a device id. Reports group by
+glyph and profile and never by device in anything shared. Two things to
+know: the owner cannot read their own trace events either (the save row
+holds the ledger, not handwriting), so "readable by their owner" is true of
+the ledger and the device's own log, not of the table; and the committed
+`agents/labels/*.jsonl` carry device ids, which are random and hold no
+handwriting, but are the one place a device id is public.
