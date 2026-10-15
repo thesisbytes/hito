@@ -2533,3 +2533,147 @@ what the sections follow.
   by. Katakana quiz 4 on 10/8 is exactly this. The first section of the
   deck built from the hand's own graded work, which is the mischief the
   scans were for.
+
+## 2026-10-14 — The first playtest of the stage, by a machine (hiragana v0.1.75, katakana-game v0.1.38)
+
+Nobody had played v0.1.73 or v0.1.74. A builder session drove the dist
+builds in headless Chrome (Playwright over the system Chrome) at phone size,
+traced from the build's own `PATH`/`SEGS`, finger by CDP touch events and pen
+by CDP pen events with pressure and hover. It is a regression and pacing
+probe, not evidence of comfort: the bot draws at about 250px/s, never
+misreads a sign, and cannot see its own hand over the target.
+
+- **Strictly offline.** Every non-file request aborted by a route, every
+  hostname unresolvable as a second wall. Across about twenty runs the only
+  requests were the outbox's POSTs to the sync endpoint, all blocked; none
+  completed, no beacons. Nothing reached `hito.events`.
+- **Profiles:** Galaxy S26 Ultra at both ends of the Ultra range (384×832 at
+  3.75, 412×891 at 3.5; the phone's own Chrome numbers are still to come),
+  Pixel 9 (412×923, 2.625), iPhone (393×852, 3), and DeX as measured by the
+  maintainer (1600×820 at 1.2, mouse and pen, no touch).
+- **No crash, no page error, no console error** in any run (the only console
+  lines are the blocked POSTs). No stuck state: every run ended on the
+  ending page, and "next", "again", "workshop" and the five workshop tabs
+  answered a tap.
+- **Stage 1, a hand that traces without stopping:** cleared in 38-75 s
+  (finger and pen, every profile), 5-15 characters traced, 17-34 strokes.
+  It does not ask for one stroke, but it asks for very little: the darts and
+  lights do most of it. Stage 2 cleared in 57-70 s more. Stage 3 fell twice
+  out of two by finger (ward 0 at wave 30, 5-6 of 10 sent home).
+- **Stage 1 with no hand:** the ward falls at 84 s with 9 of 10 sent home by
+  the darts and the general walking in three times. As designed.
+- **The general takes his bite even from a perfect hand.** In 3 of 4 stage-1
+  runs the bot lost 2 of the ward to him. When he arrives the field is
+  empty and the tracer keeps asking from its queue for characters nobody
+  carries; `door()` only gets a say at the next conjure, or once `tracing()`
+  lets go 1.5 s after a lift, and from `rescue` (0.3) to the gate is about
+  4 s. A tap on him asks for him. Left for the maintainer (see below).
+- **The katakana game (stage 0, the tower: decks are not staged):** by
+  finger the ward fell at wave 11-15 in 76-100 s with only 1-4 words sent
+  home and 13-15 kana traced; by pen it lasted to wave 44. The bot is slow,
+  so read this as "words arrive faster than one hand writes them", not as a
+  difficulty number.
+- **Frame times** (the loop's own `frames` counter: a frame over 25 ms is
+  slow, over 50 ms is jank), headless on this laptop, CPU throttled by
+  DevTools as a rough stand-in for a phone: see the table in the summary
+  sent to the coordinator. Headless is not the phone; the Pixel 9's lag
+  stays an open question for the real device.
+- **Fixed, v0.1.75:** the start and ending pages were a .94 sheet, and at
+  384px the dashboard's numbers ("墨 0 stage 1 7/10", "boosts") and "the
+  calligrapher" read through the workshop's transparent tab buttons. The
+  sheet is .985 now.
+- **The pen was fine; the driver was not.** The first pen runs failed every
+  character with "lift the pen — the next stroke is separate". The CDP pen
+  release had no button, so Chrome sent no pointerup. With it, pen clears
+  stages like the finger.
+
+**Codex's review (one round), and where this session disagrees.**
+1. It calls the general's bite a bug: "the required hand action is
+   unavailable". It is available (a tap), and the queue not following the
+   farang is the maintainer's own rule (v0.1.58). The narrow change that
+   keeps both: a blocking farang, which no dart or light can answer, is
+   asked for the moment he is on the field, like `door()`. Not shipped: it
+   changes what the tracer asks for, so it is the maintainer's call.
+2. It says the `run` event's totals (tama, wave, banished...) break
+   "clients send observations, never totals". They are the run's own
+   record, documented since v0.1.43, and the server is write-only and ranks
+   nothing. Pre-existing; noted, not changed.
+3. It says the `gaijin` sign is a deliberately wrong sign. It is the right
+   reading in the farang's accent, the voice the rule allows; the character
+   is never wrong. Disagree.
+
+**For the maintainer to judge by hand:** whether the general should be asked
+for when he arrives; whether stage 1 asks too little of the hand; whether
+the katakana tower is too fast by finger; DeX landscape (the sketchbook is
+a 370px box under a squashed field on a 1600px screen, and ↺ redo sits in
+the far corner).
+
+**A hard rule from the maintainer (relayed by the coordinator, 2026-10-14):**
+hito stays fully playable on one phone alone. Pad-and-screen is an opt-in
+extra, never the default and never a prompt in the way, and every build's
+checks cover single-phone play. Recorded here; CLAUDE.md is the
+maintainer's to amend.
+
+**Strokes from another device.** The engine's input is three anonymous
+pointer handlers on the ink canvas (`engine.html` pointerdown/move/up), and
+the field and the hand add their own listeners on the same canvas. Scoring
+works in canvas-normalised coordinates (`norm()` divides by W,H) against
+`PATH`; the hand's `toBook()` already maps a point into the stroke book's
+0..1 space, and its inverse is two lines. So a pad page that sends book
+coordinates can be replayed as synthetic PointerEvents on the ink canvas,
+with every layer none the wiser, after two small engine changes:
+`setPointerCapture` in a try (it refuses a synthetic pointer), and
+`getCoalescedEvents()` falling back to `[e]` when it is empty (it is, for a
+synthetic event, and the engine would take no points at all).
+
+## 2026-10-14 — Proposal: practise any kana (design only; waiting for a go)
+
+The maintainer: "i didn't have a direct way to practice my katakana ... the
+practice mode being capable of doing hiragana, katakana, both. (later
+kanji)."
+
+**What exists.** "practice" on the title page is the hiragana game's guided
+tower (`?go=guided`): hiragana only, every row, a sandbox. Katakana is only
+reachable as words in the katakana game, or as the vocab deck's `kata-1..4`
+sections (one kana a card), which are not on the title page. The vocab pack
+already carries all 164 kana with strokes, and the stitch refuses a deck
+that uses a character with no strokes.
+
+**Proposal: a kana deck in the vocab shell, its own build.**
+- `vocab/kana.json`, generated by `build/kana_glyphs.py` (which already
+  writes the glyph list): one card per kana, one section per row per script
+  (`hira-a` ... `kata-wa`, voiced and small rows separate). Built as
+  `dist/kana-v*.html` from the vocab pack's strokes; the vocab build itself
+  is untouched.
+- The start page leads with three buttons, ひらがな / カタカナ / both, each a
+  preset over the section chips that are already there; rows stay pickable.
+- The prompt is romaji with the script named (`ka · katakana`), since "ka"
+  alone is ambiguous in both mode. In both mode, half the cards ask across
+  scripts instead (か → write カ), which is the thing a learner of both
+  actually confuses.
+- Picking: the shell already puts unknown words first and slow ones sooner,
+  grading by the time to first pen-down. Add the hand's ledger: `shaky()`
+  kana first, then least recently written, and kana never written introduced
+  in row order a few per round, so a beginner is not handed ヲ first.
+- Signed in, the ledger already follows the player across devices (it is in
+  the save row and merges by the fuller record), so "weak first" uses the
+  whole history with nothing new on the server. The ledger's per-character
+  entry does not split by pen and finger yet; adding a `by: {pen, finger}`
+  pair (merged by max like the rest) lets practice ask "weak by finger".
+  Guests get the same thing from the device's ledger. Sign-in is never
+  required.
+- Kanji later is a deck plus a stroke book: `kanjivg_to_strokes.py` already
+  converts KanjiVG, and Klee One covers the jōyō set. The engine does not
+  change; a kanji pack needs only a font subset and a glyph list.
+- On the title page "practice" opens this build; the guided tower stays
+  reachable from the game's own start page. One phone is enough, as always.
+
+**Alternative:** a set chooser on the guided tower (`?set=hira|kata|both`),
+keeping the farang. Cheaper to wire into the title page, but the tower picks
+by what is on the field and pays nothing, and a drill wants recall timing,
+which the flashcard shell already measures.
+
+**Questions for the maintainer:** flashcard or farang for practice; romaji
+prompt or cross-script prompt by default in both mode; should practice ever
+feed the game (it writes the ledger either way, so shaky kana already come
+back in the tower).

@@ -143,11 +143,13 @@ STYLE = """
   .upg button small i{ font-style:normal; }
 
   /* The start page. A lacquer sheet over everything, with the two axes the
-     game actually has: how much help, and what the sign says. */
+     game actually has: how much help, and what the sign says. Nearly opaque:
+     at .94 the dashboard's numbers read through the workshop's tab buttons,
+     which are transparent (seen at 384px, v0.1.75). */
   .start{ position:fixed; inset:0; z-index:9998; display:flex; align-items:center;
           justify-content:center; padding:18px;
           background:radial-gradient(60% 50% at 50% 40%,rgba(90,160,150,.10),transparent 70%),
-                     rgba(12,10,8,.94); }
+                     rgba(12,10,8,.985); }
   .start[hidden]{ display:none; }
   .start-card{ width:min(94vw,520px); max-height:94dvh; overflow:auto;
                font:14px ui-sans-serif,system-ui; color:#e8e0cc; }
