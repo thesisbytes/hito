@@ -310,6 +310,11 @@ Every other key means what it means in the hiragana game: one tuning.
 |---|---|---|
 | `field.scriptGate` | `LEVEL_WAVES` (100) | Katakana and both open when hiragana has been climbed this many waves deep. The title page's rule, read from `build/make_index.py`. |
 
+`field.openScripts` (v0.1.77, default false) opens every script whatever the
+record. Only the debug build sets it, through the pack's `"debug"` object,
+which `build/stitch.py --debug` lays over the pack (and which also removes
+`account` and `sync`, so a test build cannot sign in or send anything).
+
 ### Finite stages (v0.1.74)
 
 With `tower.finite` a run is a **stage**: `bossEvery` waves of the tower,

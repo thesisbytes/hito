@@ -8,7 +8,10 @@
  * has, since that return drops the query. A script not yet open is never
  * opened by any of them. One boot per process: each case is a child.
  *
- *   node build/test/script.test.mjs dist/kana-game-vX.Y.Z.html
+ * The debug build (v0.1.77), given second, opens every script on a fresh
+ * device, and writes no unlock: the ledger it leaves holds no record.
+ *
+ *   node build/test/script.test.mjs dist/kana-game-vX.Y.Z.html [dist/kana-game-vX.Y.Z-debug.html]
  */
 import { readFileSync } from 'fs';
 import { execFileSync } from 'child_process';
@@ -54,7 +57,7 @@ if (mode === '--child'){
   const bridge = src => { const n = [...src.matchAll(/^function\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]); return n.length ? `\n;${n.map(x => `try{window.${x}=${x};}catch(_){}`).join('')}\n` : ''; };
   new Function(blocks.map(b => b + bridge(b)).join('\n;\n'))();
   const F = globalThis.__field;
-  process.stdout.write(JSON.stringify({ script: F.script, realm: F.realm, kept: (JSON.parse(store['hito-start'] || '{}') || {}).script }));
+  process.stdout.write(JSON.stringify({ script: F.script, realm: F.realm, kept: (JSON.parse(store['hito-start'] || '{}') || {}).script, best: (JSON.parse(store['hito-ledger'] || '{}') || {}).best || {} }));
   process.exit(0);
 }
 
@@ -62,7 +65,7 @@ let fail = 0;
 const ok = (c, m) => { if (!c) { console.log(`  FAIL: ${m}`); fail++; } };
 const open = { 'hito-ledger': JSON.stringify({ v:1, g:{}, days:{}, by:{}, runs:[], best:{ hiragana:{ wave:100, banished:1, at:1 } } }) };
 const remember = s => JSON.stringify({ difficulty:'medium', sign:'kana', script:s });
-const run = (href, store) => JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), target, '--child', href, JSON.stringify(store)], { encoding: 'utf8' }));
+const run = (href, store, file = target) => JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), file, '--child', href, JSON.stringify(store)], { encoding: 'utf8' }));
 const W = 'https://hito.example/dist/';
 const cases = [
   ['a new player, no say', W + 'kana-game.html', {}, 'hiragana'],
@@ -83,5 +86,21 @@ for (const [what, href, store, want] of cases){
   ok(got.script === want && got.realm === realm[want], `${what}: opened on ${got.script} (${got.realm}), not ${want}`);
   ok(got.kept === want, `${what}: saved ${got.kept}, not ${want}, for the return from sign-in`);
 }
+let dbg = 0;
+if (mode){
+  for (const [what, href, want] of [
+    ['debug: katakana on a fresh device', W + 'kana-game-debug.html?script=katakana&go=medium', 'katakana'],
+    ['debug: both on a fresh device', W + 'kana-game-debug.html?script=both', 'both'],
+    ['debug: katakana chosen last, no record', W + 'kana-game-debug.html', 'katakana'],
+  ]){
+    const store = what.includes('chosen last') ? { 'hito-start': remember('katakana') } : {};
+    let got;
+    try { got = run(href, store, mode); } catch (e) { ok(false, `${what}: the page threw: ${String(e.stderr || e).split('\n').slice(0, 3).join(' ')}`); continue; }
+    ok(got.script === want && got.realm === realm[want], `${what}: opened on ${got.script} (${got.realm}), not ${want}`);
+    ok(Object.keys(got.best).length === 0, `${what}: the ledger gained a record: ${JSON.stringify(got.best)}`);
+    dbg++;
+  }
+}
 if (fail){ console.log(`  ${fail} script check(s) failed`); process.exit(1); }
 console.log(`  ${cases.length} ways in: the URL, then the file's name, then what was chosen last; nothing opens a locked script, and the choice is saved for the return from sign-in`);
+if (dbg) console.log(`  the debug build opens katakana and both on a fresh device ${dbg} ways, and writes no record to the ledger`);

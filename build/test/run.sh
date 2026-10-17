@@ -95,7 +95,14 @@ node build/test/field.test.mjs "dist/kana-game-v$ver.html" | sed 's/^/  /' || fa
 
 echo
 echo "── script (hiragana, katakana or both, and how a page knows) ──"
-node build/test/script.test.mjs "dist/kana-game-v$ver.html" | sed 's/^/  /' || fail=1
+node build/test/script.test.mjs "dist/kana-game-v$ver.html" "dist/kana-game-v$ver-debug.html" | sed 's/^/  /' || fail=1
+# The debug build's gate is the debug build's only: the game opens nothing
+# early, and the debug build has no sign-in and no sync to carry anything out.
+k="dist/kana-game-v$ver.html"; d="dist/kana-game-v$ver-debug.html"
+if grep -q 'openScripts:false' "$k" && grep -q 'openScripts:true' "$d" \
+   && ! grep -q 'appwrite' "$d" && grep -q '__SYNC_CFG={endpoint:""' "$d"; then
+  echo "  only the debug build opens every script, and it has no sign-in or sync"
+else echo "  FAIL: the debug build's open scripts leaked into the game, or it can sign in or sync"; fail=1; fi
 
 echo
 echo "── vocab (a word is walked through the seam) ───────"
@@ -118,9 +125,9 @@ cp -r scripts/kana "$tmp/kana-before"
 .venv/bin/python build/kana_game.py >/dev/null
 if diff -rq "$tmp/kana-before" scripts/kana >/dev/null; then echo "  scripts/kana is what build/kana_game.py writes"
 else echo "  MISMATCH: scripts/kana was not what build/kana_game.py writes (rewritten now; commit it)"; fail=1; fi
-for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:kana-game-v$ver" "scripts/vocab:vocab-v$vver"; do
-  src=${pack%%:*}; name=${pack##*:}
-  .venv/bin/python build/stitch.py build/engine.html "$src" "$tmp/$name.html" >/dev/null
+for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:kana-game-v$ver" "scripts/hiragana/game.json:kana-game-v$ver-debug:--debug" "scripts/vocab:vocab-v$vver"; do
+  IFS=: read -r src name flag <<<"$pack"
+  .venv/bin/python build/stitch.py build/engine.html "$src" "$tmp/$name.html" $flag >/dev/null
   if cmp -s "$tmp/$name.html" "dist/$name.html"; then
     echo "  $name rebuilds byte-identical"
   else

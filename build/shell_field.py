@@ -262,7 +262,9 @@ LAYER = STYLE + r"""
   }
   // Katakana and both open when hiragana has been climbed `scriptGate` waves
   // deep: the title page's rule (LEVEL_WAVES), not a second one.
-  const scriptOpen = sc => !SWITCH || sc === 'hiragana' || (() => { try { const b = window.__hand.ledger.best.hiragana; return (+b.wave || 0) >= CFG.scriptGate; } catch(_){ return false; } })();
+  // `openScripts` is the debug build's alone (stitch.py --debug): every script
+  // open for testing, decided by the page and never written to any save.
+  const scriptOpen = sc => !SWITCH || sc === 'hiragana' || CFG.openScripts || (() => { try { const b = window.__hand.ledger.best.hiragana; return (+b.wave || 0) >= CFG.scriptGate; } catch(_){ return false; } })();
   let script = 'hiragana';
   const inScript = i => !SWITCH || script === 'both' || scriptOf(LETTERS[i][0]) === script;
   let REALM = WORDS ? CFG.deck.deck : SCRIPTS[script].realm;
@@ -2227,6 +2229,7 @@ def config(pack, deck=None):
         f"rescue:{float(f.get('rescue', 0.3))},"
         # katakana and both open where the title page opens them
         f"scriptGate:{int(f.get('scriptGate', _level_waves()))},"
+        f"openScripts:{'true' if f.get('openScripts') else 'false'},"
         f"energyMax:{int(f.get('energyMax', 24))},energyStart:{int(f.get('energyStart', 6))},"
         f"energyPerStroke:{int(f.get('energyPerStroke', 1))},castCost:{int(f.get('castCost', 2))},vesselStep:{int(f.get('vesselStep', 6))},"
         f"holdMs:{int(f.get('holdMs', 1500))},"

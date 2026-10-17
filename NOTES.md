@@ -2938,3 +2938,33 @@ progress (`view: over`), the driver's doing. Frames: under 0.4% slow.
   ledger over (✋ hand, export then import) or climb hiragana first.
 - The title page opens on the furthest open level, which is now "both"
   for anyone who has climbed hiragana: the old rule, with a new card.
+
+## 2026-10-16 — A debug build that opens every script (hiragana and kana-game v0.1.77)
+
+Jeff, through the vault session: a way to test katakana and both without
+climbing hiragana to wave 100 first. It must not ship as a cheat in the game
+and must not write an unlock into the ledger or the save row. The real
+unlock, export from ✋ hand on nira-hito.tech and import on the preview, stays
+as it was; walking it once is worth doing.
+
+- **Its own file, not a query.** A `?debug=unlock` would be in the build
+  everyone gets, so anyone could type it. `dist/kana-game-vX.Y.Z-debug.html`
+  is built beside the game and linked from nowhere, like the workshop's
+  `hiragana-vX.Y.Z-debug.html`.
+- **One pack, an overlay.** `game.json` carries a `"debug"` object that
+  `stitch.py --debug` lays over the pack (a key at a time, one level into
+  objects, `null` removes a key), so the two builds cannot drift. It sets
+  `field.openScripts` and the title, and removes `account` and `sync`.
+- **Nothing to write it with.** `openScripts` is read by `scriptOpen()` and
+  stored nowhere. With no account and no sync endpoint, the debug build cannot
+  sign in, cannot reach a save row and sends nothing to the events table. It
+  still keeps the ordinary ledger on its own origin (mastery, runs, a
+  `katakana-chars` stage cleared), because that is the game being tested. The
+  ledger is per origin, so on the preview that is the preview's. Opened on
+  nira-hito.tech it would share the real ledger, but those records are play,
+  not the unlock: the gate reads only the hiragana record.
+- **Tests:** `script.test.mjs` boots the debug build on an empty device three
+  ways and checks it opens katakana and both and leaves no record. A mutation
+  check (the game passed as the debug build) fails all three. `run.sh` checks
+  `openScripts` is false in the game and true only in the debug build, that the
+  debug build has no sign-in or sync, and that it rebuilds byte-identical.
