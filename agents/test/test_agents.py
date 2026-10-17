@@ -588,6 +588,10 @@ class Pace(unittest.TestCase):
         staged = [dict(run_row(400)["body"], v="0.1.2", stage=40, cleared=True)] * 20
         self.assertEqual(pace.hand_of(rs + staged, "0.1.2")["wave_p50"], 200)
         self.assertEqual(pace.hand_of(staged)["runs"], 0)
+        # other realms are other rosters: the old word game, and the kana game's katakana and both
+        others = [dict(run_row(400)["body"], v="0.1.2", realm=k) for k in ("katakana", "katakana-chars", "kana-both")] * 10
+        self.assertEqual(pace.hand_of(rs + others, "0.1.2")["wave_p50"], 200)
+        self.assertEqual(pace.hand_of(others)["runs"], 0)
 
     def test_a_faster_hand_goes_further(self):
         cur = base_cfg()

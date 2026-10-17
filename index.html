@@ -55,7 +55,7 @@
   .practice small{ display:block; margin-top:3px; font-size:10.5px; font-weight:400; color:rgba(220,232,242,.5); }
   @keyframes breathe{ 50%{ box-shadow:0 0 0 1px rgba(226,243,255,.6),0 10px 44px rgba(108,184,255,.42); } }
 
-  .realms{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:12px; }
+  .realms{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
   .realms button.locked{ opacity:.55; cursor:default; }
   .realms button.locked i{ color:rgba(220,232,242,.4); }
   .realms button small{ display:block; margin-top:4px; font-size:10.5px; letter-spacing:.02em; color:rgba(220,232,242,.55); }
@@ -100,8 +100,8 @@
   <p class="tag">learn to write by writing · draw below, the farang come from above</p>
 
   <div class="menu">
-    <a class="begin" id="begin" href="dist/hiragana-game.html?go=medium">begin<small id="beginSub">ひらがな</small></a>
-    <a class="practice" id="practice" href="dist/hiragana-game.html?go=guided">practice<small>guided · every row · nothing counts</small></a>
+    <a class="begin" id="begin" href="dist/kana-game.html?script=hiragana&amp;go=medium">begin<small id="beginSub">ひらがな</small></a>
+    <a class="practice" id="practice" href="dist/kana-game.html?script=hiragana&amp;go=guided">practice<small>guided · every row · nothing counts</small></a>
     <div class="realms" id="realms" role="group" aria-label="level"></div>
     <p class="blurb" id="blurb"></p>
     <div class="tally" id="tally"></div>
@@ -267,7 +267,7 @@
 <script>
 /* ---- the title screen ---------------------------------------------------- */
 (function(){
-  const LEVELS = [{"id":"hiragana","kana":"ひ","name":"ひらがな","file":"dist/hiragana-game.html","realm":"hiragana","blurb":"the farang carry the characters you are forgetting"},{"id":"katakana","kana":"カ","name":"カタカナ","file":"dist/katakana-game.html","realm":"katakana","blurb":"loanwords, one kana at a time — the farang say coffee in their accent"}], LEVEL_WAVES = 100;
+  const LEVELS = [{"id":"hiragana","kana":"ひ","name":"ひらがな","file":"dist/kana-game.html","script":"hiragana","realm":"hiragana","blurb":"the farang carry the characters you are forgetting"},{"id":"katakana","kana":"カ","name":"カタカナ","file":"dist/kana-game.html","script":"katakana","realm":"katakana-chars","opensAfter":"hiragana","blurb":"the same stages and the same general, in katakana"},{"id":"both","kana":"ひカ","name":"both","file":"dist/kana-game.html","script":"both","realm":"kana-both","opensAfter":"hiragana","blurb":"hiragana and katakana on one field, row by row"}], LEVEL_WAVES = 100;
   const $ = id => document.getElementById(id);
   const get = k => { try { return localStorage.getItem(k); } catch(_){ return null; } };
   const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -277,7 +277,8 @@
     try { const L = JSON.parse(get('hito-ledger') || 'null'); const b = L && L.best && L.best[realm]; return b ? (+b[what || 'wave'] || 0) : 0; } catch(_){ return 0; }
   }
   // A level opens when the one before it has been climbed LEVEL_WAVES deep.
-  const open = k => k === 0 || furthest(LEVELS[k - 1].realm) >= LEVEL_WAVES;
+  const open = k => !LEVELS[k].opensAfter || furthest(LEVELS[k].opensAfter) >= LEVEL_WAVES;
+  const nameOf = realm => (LEVELS.find(l => l.realm === realm) || {}).name || realm;
   // Begin goes to the level you were last in, if it is still yours; else the
   // furthest one open. A title screen that asks which game you meant, every
   // time, is a menu.
@@ -291,12 +292,12 @@
   }
   function draw(){
     const l = LEVELS[level];
-    $('begin').href = l.file + '?go=medium'; $('beginSub').textContent = l.name;
-    $('practice').href = l.file + '?go=guided';
+    $('begin').href = l.file + '?script=' + l.script + '&go=medium'; $('beginSub').textContent = l.name;
+    $('practice').href = l.file + '?script=' + l.script + '&go=guided';
     $('blurb').textContent = l.blurb;
     $('realms').innerHTML = LEVELS.map((r, k) => {
       const on = open(k), w = furthest(r.realm), st = furthest(r.realm, 'stage');
-      const sub = on ? (st ? 'stage ' + st + ' cleared' : w ? 'furthest wave ' + w : 'level ' + (k + 1)) : 'opens at wave ' + LEVEL_WAVES + ' of ' + esc(LEVELS[k - 1].name);
+      const sub = on ? (st ? 'stage ' + st + ' cleared' : w ? 'furthest wave ' + w : 'level ' + (k + 1)) : 'opens at wave ' + LEVEL_WAVES + ' of ' + esc(nameOf(LEVELS[k].opensAfter));
       return `<button data-k="${k}" class="${on ? '' : 'locked'}" aria-pressed="${k === level}"${on ? '' : ' aria-disabled="true"'}><i>${r.kana}</i><span>${esc(r.name)}</span><small>${sub}</small></button>`;
     }).join('');
     for (const b of $('realms').querySelectorAll('button')) b.onclick = () => pick(+b.dataset.k);

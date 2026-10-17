@@ -18,14 +18,14 @@ node build/test/scoring.test.mjs | sed 's/^/  /' || fail=1
 
 echo
 echo "── alignment (strokes, glyph and grid agree) ───────"
-for f in dist/hiragana-*-v*.html dist/hiragana-v*.html; do
+for f in dist/kana-game-v*.html dist/hiragana-v*.html; do
   case "$f" in *-debug.html) continue;; esac
   node build/test/alignment.test.mjs "$f" | sed 's/^/  /' || fail=1
 done
 
 echo
 echo "── state (an attempt restart clears everything) ────"
-for f in dist/hiragana-*-v*.html dist/hiragana-v*.html; do
+for f in dist/kana-game-v*.html dist/hiragana-v*.html; do
   case "$f" in *-debug.html) continue;; esac
   node build/test/state.test.mjs "$f" | sed 's/^/  /' || fail=1
 done
@@ -69,26 +69,33 @@ node build/test/server.test.mjs | sed 's/^/  /' || fail=1
 
 echo
 echo "── account (guest or signed in, never required) ────"
-node build/test/account.test.mjs index.html "dist/hiragana-game-v$ver.html" "dist/vocab-v$vver.html" | sed 's/^/  /' || fail=1
+node build/test/account.test.mjs index.html "dist/kana-game-v$ver.html" "dist/vocab-v$vver.html" | sed 's/^/  /' || fail=1
 
 echo
 echo "── hand (pen or finger, and what it drew) ──────────"
-node build/test/hand.test.mjs "dist/hiragana-v$ver.html" "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
-node build/test/hand.test.mjs "dist/vocab-v$vver.html" "dist/katakana-game-v$kver.html" | sed 's/^/  /' || fail=1
+node build/test/hand.test.mjs "dist/hiragana-v$ver.html" "dist/kana-game-v$ver.html" | sed 's/^/  /' || fail=1
+# The loanword game is no longer shipped (v0.1.76) but its pack is the word
+# tier to come, so it is built here, into the temp dir, and kept honest.
+.venv/bin/python build/stitch.py build/engine.html scripts/vocab/katakana.json "$tmp/katakana-game-v$kver.html" >/dev/null
+node build/test/hand.test.mjs "dist/vocab-v$vver.html" "$tmp/katakana-game-v$kver.html" | sed 's/^/  /' || fail=1
 
 echo
 echo "── stray (a stroke that went nowhere never happened) ──"
 # The workshop and the field: the card shells load no character until a
 # card is dealt, so there is nothing for the hand to note there.
-node build/test/stray.test.mjs "dist/hiragana-v$ver.html" "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
+node build/test/stray.test.mjs "dist/hiragana-v$ver.html" "dist/kana-game-v$ver.html" | sed 's/^/  /' || fail=1
 
 echo
 echo "── flick (a stroke shorter than a fingertip) ───────"
-node build/test/flick.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
+node build/test/flick.test.mjs "dist/kana-game-v$ver.html" | sed 's/^/  /' || fail=1
 
 echo
 echo "── field (the game loop runs and the seam holds) ───"
-node build/test/field.test.mjs "dist/hiragana-game-v$ver.html" | sed 's/^/  /' || fail=1
+node build/test/field.test.mjs "dist/kana-game-v$ver.html" | sed 's/^/  /' || fail=1
+
+echo
+echo "── script (hiragana, katakana or both, and how a page knows) ──"
+node build/test/script.test.mjs "dist/kana-game-v$ver.html" | sed 's/^/  /' || fail=1
 
 echo
 echo "── vocab (a word is walked through the seam) ───────"
@@ -96,7 +103,7 @@ node build/test/vocab.test.mjs "dist/vocab-v$vver.html" | sed 's/^/  /' || fail=
 
 echo
 echo "── words (the farang carry words, one kana at a time) ──"
-node build/test/words.test.mjs "dist/katakana-game-v$kver.html" | sed 's/^/  /' || fail=1
+node build/test/words.test.mjs "$tmp/katakana-game-v$kver.html" | sed 's/^/  /' || fail=1
 
 echo
 echo "── smoke (engine executes, frames run) ─────────────"
@@ -106,7 +113,12 @@ done
 
 echo
 echo "── build reproducibility ───────────────────────────"
-for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:hiragana-game-v$ver" "scripts/vocab:vocab-v$vver" "scripts/vocab/katakana.json:katakana-game-v$kver"; do
+# The kana game's glyphs and strokes are generated; a hand edit is lost.
+cp -r scripts/kana "$tmp/kana-before"
+.venv/bin/python build/kana_game.py >/dev/null
+if diff -rq "$tmp/kana-before" scripts/kana >/dev/null; then echo "  scripts/kana is what build/kana_game.py writes"
+else echo "  MISMATCH: scripts/kana was not what build/kana_game.py writes (rewritten now; commit it)"; fail=1; fi
+for pack in "scripts/hiragana:hiragana-v$ver" "scripts/hiragana/game.json:kana-game-v$ver" "scripts/vocab:vocab-v$vver"; do
   src=${pack%%:*}; name=${pack##*:}
   .venv/bin/python build/stitch.py build/engine.html "$src" "$tmp/$name.html" >/dev/null
   if cmp -s "$tmp/$name.html" "dist/$name.html"; then
@@ -131,7 +143,9 @@ echo
 echo "── stable links (dist/<script>.html is the current build) ──"
 # The public links carry no version, so the page has to: the unversioned
 # file is a byte-for-byte copy of the current versioned build, nothing else.
-for pair in "hiragana:hiragana-v$ver" "hiragana-game:hiragana-game-v$ver" "vocab:vocab-v$vver" "katakana-game:katakana-game-v$kver"; do
+# The old game links are the kana game too: whole copies, so a downloaded one
+# still opens offline, and each reads its own name for its script.
+for pair in "hiragana:hiragana-v$ver" "kana-game:kana-game-v$ver" "hiragana-game:kana-game-v$ver" "katakana-game:kana-game-v$ver" "vocab:vocab-v$vver"; do
   alias=${pair%%:*}; name=${pair##*:}
   if cmp -s "dist/$alias.html" "dist/$name.html"; then
     echo "  dist/$alias.html is $name"
@@ -146,7 +160,7 @@ echo "── title (the page title wears the pack's version) ─"
 # A cached build is spotted by its version, and the tab is the first place
 # anyone looks. The title was hand-typed in each pack and had drifted in all
 # three, so the stitch now stamps it — and this makes sure it stays stamped.
-for pair in "hiragana-v$ver:$ver" "hiragana-game-v$ver:$ver" "vocab-v$vver:$vver" "katakana-game-v$kver:$kver"; do
+for pair in "hiragana-v$ver:$ver" "kana-game-v$ver:$ver" "vocab-v$vver:$vver"; do
   name=${pair%%:*}; want=${pair##*:}
   if grep -q "<title>[^<]*v$want</title>" "dist/$name.html"; then
     echo "  $name: title says v$want"

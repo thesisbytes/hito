@@ -2744,3 +2744,197 @@ holds the ledger, not handwriting), so "readable by their owner" is true of
 the ledger and the device's own log, not of the table; and the committed
 `agents/labels/*.jsonl` carry device ids, which are random and hold no
 handwriting, but are the one place a device id is public.
+
+## 2026-10-16 — Plan: one kana game, with a script switch (plan; Codex pass below)
+
+The maintainer said yes (2026-10-16, through the crew's coordinator) to
+merging the hiragana game and the katakana game into one game that asks for
+hiragana, katakana or both. The reason is his own: hiragana is solid now,
+and katakana is weak because the katakana game never got what the hiragana
+game got: stages, the general, the tuning since v0.1.44. This is the
+"tower with a script chooser" option from the practise-any-kana proposal
+(2026-10-14, above). Mechanical only: no new look, no art. The single-phone
+rule holds: the switch is a row on the start page, nothing needs a second
+device.
+
+**What each game has that the other lacks.**
+
+| | hiragana game (v0.1.75) | katakana game (v0.1.38) |
+|---|---|---|
+| what a farang carries | one character | a loanword, one kana at a time |
+| stages, the general, the block | yes (`tower.finite`) | no: `ST` is null for any deck |
+| the tower's rows gate | yes, by furthest wave | no: every word from the start |
+| hp and bite climb with the wave | `hpEvery` 60, `biteEvery` 40, caps 99/6 | words only (hp is the word's length) |
+| pace | speed .055, spawn 5.8 s ramping to 3.4 s | speed .03, spawn 9 s to 3.6 s: a word is a longer answer |
+| knockback per kana | no | yes, `knockback` .07 |
+| the sign | kana / romaji / gaijin accent (AH, KAH) | kana / romaji (koohii) / gaijin = the English word |
+| 気 at the start | 0 | 6 (the shell default) |
+| upgrade ramp | 1.85 | 1.6 (default) |
+| start-page memory | `hito-start` | `hito-start-katakana` |
+| ledger realm | `hiragana` | `katakana` (the deck's name) |
+
+Both already share everything else: the engine, the hand and its ledger
+(per character, one per origin, in the save row), the purse and the lasting
+upgrades (one purse, not per realm), the workshop tabs, the heroes and
+costumes, the sync outbox.
+
+**What the merged game is.** The hiragana game with katakana added as
+characters, not the katakana game with stages bolted on. A farang carries
+one character in all three modes, because that is the game that has had
+the stages, the general and five weeks of tuning, and because a weak
+katakana hand needs the characters before the words. The loanwords are
+not thrown away: they are the "farang grow up" tier already written down
+(words after characters), and that tier gets built inside this game later.
+
+- **The glyphs.** The hiragana game's 75 (gojūon, voiced rows, ゃゅょ, っ)
+  and the 75 katakana that mirror them (アイウエオ … ン, ガ … ポ, ャュョ, ッ).
+  Not ァィゥェォ or ヴ or ー: the hiragana game leaves the same ones out, and
+  ー is a mark, not a character to trace alone. The strokes are the vocab
+  pack's book (same KanjiVG converter; its hiragana are the hiragana pack's,
+  checked when generated). A katakana's accent sign is its hiragana twin's
+  (カ says KAH like か). Generated into `scripts/kana/` by a small build
+  script, so nothing is copied by hand.
+- **The pack stays `scripts/hiragana/game.json`**, naming the kana glyph list
+  and stroke book (two new optional pack keys, `glyphs` and `strokes`). The
+  balance loop, `pace.py` and `.github/workflows/balance.yml` all point at
+  that file; moving it would cut the loop. The version line stays the
+  hiragana one (v0.1.76), shared with the workshop as now.
+- **The build is `dist/kana-game-v0.1.76.html`**, stable link
+  `dist/kana-game.html`.
+- **The switch.** A row at the top of the start page: ひらがな · カタカナ ·
+  both. It is chosen between runs only (hidden mid-run), remembered in
+  `hito-start` with the difficulty and the sign, and can be set by the URL
+  (`?script=katakana`), which is how the title page and the redirects open
+  it. Katakana and both open when hiragana has been climbed `LEVEL_WAVES`
+  (100) deep, the same rule the title page already has; the switch shows a
+  locked one as locked and says why.
+- **Rows per script.** The rows gate counts rows within the chosen script:
+  row *k* of katakana opens when row *k* of hiragana would. In both, row *k*
+  of each opens together, so stage 1 is あ-row, か-row, ア-row, カ-row.
+- **Weak characters first, from the player's own history.** Already true of
+  the queue: shaky characters first, then the ones written longest ago,
+  read off the ledger, which follows a signed-in player between devices
+  and is the device's own for a guest. Every katakana the word game ever
+  had written is already in that ledger, so its shaky ones come first on
+  day one. Sign-in is never required for any of it.
+- **Pace.** One tuning, the hiragana game's. A katakana character is the
+  same size of answer as a hiragana one; the word game was slower because a
+  word is longer. If katakana by finger turns out too hard at stage 1, that
+  is a pace key with its own data, not a second tuning now.
+
+**Saves, so nobody loses progress.** Nothing in a save row changes shape.
+
+- The ledger, mastery, the handwriting, the purse and the lasting upgrades
+  are keyed by character or are global already: nothing to migrate.
+- `best[realm]` and `tama.cleared[realm]`: hiragana keeps the key
+  `hiragana`, so every stage cleared and the furthest wave carry over
+  untouched. Katakana-as-characters and both get fresh keys,
+  `katakana-chars` and `kana-both`. Not `katakana`: that key holds the word
+  game's furthest wave, and records merge by max between devices forever,
+  so reusing it would mean a word-tower wave 40 opening four katakana rows
+  in a game that never played them. The old `katakana` record stays in the
+  ledger as what it was (the hand page lists it), and nothing new writes it.
+- Runs carry their realm as now, so the table can tell them apart.
+- **The balance judge** counts medium tower runs and today does not filter
+  by realm: a katakana word run would have been pooled with the hiragana
+  game's. `pace.py`'s `hand_of` gains `realm == "hiragana"`, since its model
+  is of the hiragana roster's pace.
+
+**The old URLs.** `dist/hiragana-game.html` and `dist/katakana-game.html`
+become small redirect pages (`location.replace` to
+`kana-game.html?script=…`, keeping any `?go=` and sign-in return
+parameters), with a plain link for a browser that runs no script. They are
+the links on phones and in the title page's history. The versioned
+`katakana-game-v*.html` goes out of `dist/` as every superseded build does;
+the loanword pack (`scripts/vocab/katakana.json`) stays, and run.sh still
+builds it into a temp file for `words.test.mjs`, so the word path in the
+shell keeps working for the tier that will use it. The title page's two
+level cards become three (ひらがな, カタカナ, both), all opening the one game.
+
+**Tests.** run.sh's game checks move to the kana build; a new `script.test`
+part of `field.test.mjs`: each mode's roster is only its script (both:
+both), rows open per script, the realm key follows the switch and never
+writes `katakana`, a stage cleared in katakana does not clear hiragana's,
+the URL sets the switch, and a locked script cannot be picked. The redirect
+pages are checked for their target. Then the offline phone-size playtest
+from 2026-10-14 on all three modes, finger and pen.
+
+**Not in this.** No new look. Cross-script prompts in both (か asking for
+カ), the pen/finger split of the ledger, and the loanword tier are later.
+Not deployed: committed locally only, until the maintainer has played it
+(a push to main redeploys the sites).
+
+**Codex's pass on the plan (one round), and what changed.** Full text in
+`~/.local/state/panel/codex-hito-merge-plan.md`.
+
+- *Taken, and it changes the plan: the old links stay whole games.* A
+  redirect page breaks a downloaded `hiragana-game.html` opened from a
+  file with nothing beside it, which is the single-file rule. So there
+  are no redirects: `hiragana-game.html` and `katakana-game.html` stay
+  byte-identical copies of the kana build, as every stable link is, and
+  the page reads its own file name: opened as `katakana-game.html` it
+  starts on katakana. Order of who decides: `?script=`, then the file
+  name, then what was last chosen, then hiragana.
+- *Taken: sign-in drops the query.* The OAuth return is the bare page
+  (account_layer.py:61-66, and `finish()` strips the query). So the
+  switch is saved to `hito-start` the moment it is set, from the URL or
+  a tap, and a page coming back from sign-in finds it there. Tested.
+- *Taken: rows per script are real work*, not a bigger array. stitch
+  numbers rows across the flat list; the shell ranks each letter's row
+  within its own script (`script()` by codepoint block), and the gate,
+  the totals and the roster count those ranks.
+- *Taken: the stitch has no `glyphs`/`strokes` keys yet*; they are added
+  and validated (every glyph needs strokes, which the stitch already
+  checks per deck). And the release, run.sh and the title page are
+  rewired by name, with the judge's realm filter tested.
+- *Disagreed: concurrent saves as a critical risk of this plan.* The
+  GET-merge-PATCH race (account_layer.py:138-155) and the
+  larger-count-wins glyph merge are as old as the save row (v0.1.41) and
+  touch every realm the same way; new realm keys merge by max like the
+  old one. Noted for the backlog, not part of a merge that changes no
+  shape in the row.
+
+## 2026-10-16 — One kana game (hiragana and kana-game v0.1.76)
+
+Built as planned above, with Codex's two changes (no redirects; the
+switch saved for the return from sign-in). `dist/kana-game.html` is the
+game; `hiragana-game.html` and `katakana-game.html` are byte-identical
+copies that open on their own script. `build/kana_game.py` writes
+`scripts/kana/` (150 glyphs: the hiragana game's 75 and their katakana
+twins; the hiragana strokes were checked identical between the two books).
+The loanword game is no longer in `dist/`; run.sh builds it into a temp
+file for `words.test` and the hand test.
+
+**A bug the new test caught before it shipped.** `applyDifficulty()` saves
+the start settings at boot, which wrote `script: hiragana` over the
+remembered choice before the boot read it, so a page back from sign-in
+always opened on hiragana. The remembered script is now read with the
+other start settings, first. `script.test.mjs` boots the build ten ways
+(URL, file name, memory, locked, nonsense, a downloaded file) in child
+processes.
+
+**The playtest, offline, as on 2026-10-14.** Twelve runs of two stages
+each: hiragana, katakana and both; S26 Ultra at 384 and 412 px, Pixel 9,
+iPhone, DeX; finger, pen, mouse. Sharing was switched off in the driver
+this time (`hito-share` = 0), so nothing was queued at all; every
+non-file request was blocked regardless, and none was made. All 24
+stages were cleared except one hiragana stage 1 on the S26 at 384 by
+finger (fell, then cleared on the retry). No page errors, no console
+errors. Katakana runs asked only for katakana, both for both. Stage 1
+by finger: 57-70 s, 7-9 characters, in every script; by pen 44-51 s.
+Every failed trace (0-2 a run) was the stage ending under a stroke in
+progress (`view: over`), the driver's doing. Frames: under 0.4% slow.
+
+**Seen, not changed (for the maintainer):**
+- The general still bites a perfect hand while the sketchbook asks for
+  something else (a mid-run shot: ケ's general at the gate, き asked).
+  The 2026-10-14 finding, now in all three scripts.
+- In both, a romaji or accent sign does not say which script: "ke" is
+  け or ケ, and only one hits. With the default kana sign there is no
+  question. Options: show the kana under the romaji in both, or let both
+  force the kana sign. Not decided here.
+- Katakana opens at hiragana wave 100, on the device's own ledger. A
+  guest on a fresh origin (the tailnet preview is one) has to bring the
+  ledger over (✋ hand, export then import) or climb hiragana first.
+- The title page opens on the furthest open level, which is now "both"
+  for anyone who has climbed hiragana: the old rule, with a new card.

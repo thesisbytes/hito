@@ -101,7 +101,11 @@ def hand_of(runs, version=None, min_runs=5):
     # Tower runs only. A stage fight (v0.1.74) starts above wave 0 with a full
     # ward and stops at its general, so the wave it ended on says where the
     # player chose to fight, not where an endless climb outran the hand.
-    real = [r for r in runs if r.get("difficulty") == "medium" and not r.get("practice") and r.get("traced") and not r.get("stage")]
+    # And the hiragana roster's runs only (v0.1.76): the model is of its pace,
+    # and the kana game's katakana and both, like the old word game, are
+    # other realms with other rosters.
+    real = [r for r in runs if r.get("difficulty") == "medium" and not r.get("practice") and r.get("traced") and not r.get("stage")
+            and r.get("realm", "hiragana") == "hiragana"]
     if version:
         mine = [r for r in real if r.get("v") == version]
         if len(mine) >= min_runs:

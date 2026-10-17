@@ -116,7 +116,9 @@ for (const file of process.argv.slice(2)){
       ok(Q.awaitLift === true, `a finger covering the end (0.6R short) did not close the stroke (prog ${Q.prog} of ${b})`);
     }
     // and guided draws from every row, where easy at stage 1 does not
-    ok(g.__field.roster().length === P.LETTERS.length, `guided offers ${g.__field.roster().length} of ${P.LETTERS.length} characters`);
+    // every row of the script being played (the kana game, v0.1.76: one script at a time, or both)
+    const all = g.__field.every ? g.__field.every().length : P.LETTERS.length;
+    ok(g.__field.roster().length === all, `guided offers ${g.__field.roster().length} of ${all} characters`);
     g.__field.setDifficulty('medium');
     ok(g.__field.roster().length < P.LETTERS.length, 'medium at stage 1 offers the whole chart');
   }

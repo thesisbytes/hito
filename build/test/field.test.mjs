@@ -1321,10 +1321,61 @@ if (F.staged){
   F.setDifficulty('medium'); H.reset(); F.hero(true); F.pickStage(0); fresh();
 }
 
+// ---- the script (the kana game, v0.1.76): hiragana, katakana, or both
+// Each script is its own realm in the ledger. Hiragana keeps `hiragana`;
+// katakana and both are fresh keys, never `katakana`, which holds the old
+// word game's waves. Katakana opens where the title page opens it. The
+// switch is saved the moment it is set, because a page coming back from
+// sign-in has lost its query.
+if (F.switched){
+  const H = globalThis.__hand; H.reset();
+  const store = {}, LS = globalThis.localStorage, was = { get: LS.getItem, set: LS.setItem };
+  LS.getItem = k => k in store ? store[k] : null; LS.setItem = (k, v) => { store[k] = String(v); };
+  const tw = JSON.parse(html.match(/tower:(\{[^}]*\})/)[1]), len = tw.bossEvery;
+  const kata = i => { const c = P.LETTERS[i][0].codePointAt(0); return c >= 0x30A0 && c <= 0x30FF; };
+  const sweep = (max = 800) => { for (let g = 0; g < max && !F.over; g++){
+    for (const m of [...F.monsters]){ m.block = 0; m.hp = 1; F.hit(m, false, false); } advance(60); } };
+  F.setDifficulty('medium'); F.pickStage(null); F.hero(false);
+  ok(F.script === 'hiragana' && F.realm === 'hiragana', `a new player does not start on hiragana (${F.script}, ${F.realm})`);
+  ok(!F.setScript('katakana') && F.script === 'hiragana', 'katakana could be picked before hiragana opened it');
+  F.openStart();
+  ok(/class="script-pick"/.test(F.startHtml) && /data-script="katakana"[^>]*disabled/.test(F.startHtml) && /opens at wave \d+/.test(F.startHtml), 'the start page does not show katakana locked, and why');
+  // the old word game's furthest wave opens nothing here
+  H.ledger.best.katakana = { wave: 400, banished: 300, at: 1 };
+  H.run({ at: 2, realm: 'hiragana', wave: cfg.scriptGate, banished: 1, difficulty: 'medium' });
+  ok(F.setScript('katakana') && F.script === 'katakana' && F.realm === 'katakana-chars', 'katakana did not open at the gate');
+  ok(JSON.parse(store['hito-start'] || '{}').script === 'katakana', `the switch was not saved: ${store['hito-start']}`);
+  F.pickStage(null); fresh();
+  ok(F.stage === 1 && F.clearedTo === 0, `katakana did not start on its own stage 1 (stage ${F.stage}, cleared ${F.clearedTo})`);
+  ok(F.every().length === 75 && F.every().every(kata), `katakana's characters are ${F.every().length}, not its own 75`);
+  const r = F.roster();
+  ok(r.length && r.every(kata) && r.every(i => F.rowOf(i) <= tw.rows), `katakana's stage 1 is not its first ${tw.rows} rows: ${r.map(i => P.LETTERS[i][0]).join('')}`);
+  ok(F.monsters.length && F.monsters.every(m => kata(m.i)), 'a katakana field carries something else');
+  F.openStart();
+  ok(/カタカナ ·/.test(F.startHtml) && /aria-pressed="true">カタカナ/.test(F.startHtml), 'the start page does not say katakana');
+  F.begin(); sweep();
+  ok(F.won && H.ledger.best['katakana-chars'] && H.ledger.best['katakana-chars'].stage === 1, `clearing katakana's stage 1 kept ${JSON.stringify(H.ledger.best['katakana-chars'])}`);
+  ok(!H.ledger.best.hiragana.stage && H.ledger.best.katakana.wave === 400 && !H.ledger.best.katakana.stage, 'a katakana stage was written into another realm');
+  ok(F.ended && F.ended.rec.realm === 'katakana-chars', `the run says it was ${F.ended && F.ended.rec.realm}`);
+  F.endRun(); advance(900);
+  // both: row k of each script, together
+  ok(F.setScript('both') && F.realm === 'kana-both', 'both did not open');
+  F.pickStage(null); fresh();
+  const b = F.roster(), bk = b.filter(kata), bh = b.filter(i => !kata(i));
+  ok(bk.length && bk.length === bh.length && bk.every(i => bh.some(j => P.LETTERS[j][0].codePointAt(0) + 0x60 === P.LETTERS[i][0].codePointAt(0))), `both's stage 1 is not the same rows of each script: ${b.map(i => P.LETTERS[i][0]).join('')}`);
+  // and back: hiragana's own record was never touched
+  ok(F.setScript('hiragana') && F.realm === 'hiragana', 'hiragana could not be picked again');
+  F.pickStage(null); fresh();
+  ok(F.every().length === 75 && !F.every().some(kata) && F.clearedTo === 0, 'hiragana came back as something else');
+  ok(!F.setScript('nonsense') && F.script === 'hiragana', 'an unknown script was taken');
+  LS.getItem = was.get; LS.setItem = was.set;
+  H.reset(); F.pickStage(0); fresh();
+}
+
 // every conjure in this file went through the hand; none of its notes may have thrown
 ok(globalThis.__hand.faults === 0, `the hand's note threw ${globalThis.__hand.faults} time(s) during the field's checks`);
 
 if (fail) { console.log(`  ${fail} field check(s) failed`); process.exit(1); }
 console.log(`  monsters advance and spawn, a finished glyph banishes the target, `
   + `the tracer retargets, the ward falls and restarts, `
-  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, nothing is bought on credit, a stage ends when its general is sent home and not before, a recognisable trace pays more, and guided only gets you so far; the heroes' darts fly on their own, a block is the hand's to break, a clean stroke holds the wave, and the stroke itself is what flies`);
+  + `ink is earned by tracing, upgrades multiply the hand without replacing it, a tough farang is finished by the lights one trace lit, a fallen ward ends the run and writes it down, nothing is bought on credit, a stage ends when its general is sent home and not before, a recognisable trace pays more, and guided only gets you so far; the heroes' darts fly on their own, a block is the hand's to break, a clean stroke holds the wave, and the stroke itself is what flies; and the script switch keeps each script's stages apart`);

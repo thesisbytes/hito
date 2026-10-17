@@ -20,8 +20,8 @@ dependencies. Open it on a tablet and start tracing. The front door is
 **[thesisbytes.github.io/hito](https://thesisbytes.github.io/hito/)**, or go
 straight in:
 
-**[Play](https://thesisbytes.github.io/hito/dist/hiragana-game.html)** — the game: draw below, farang advance above.  
-**[Katakana](https://thesisbytes.github.io/hito/dist/katakana-game.html)** — the game with loanwords: the farang say "coffee" in their accent, you write コーヒー.  
+**[Play](https://thesisbytes.github.io/hito/dist/kana-game.html)** — the game: draw below, farang advance above. Hiragana, katakana, or both.  
+**[Katakana](https://thesisbytes.github.io/hito/dist/katakana-game.html)** — the same game, opened on katakana.  
 **[Vocab](https://thesisbytes.github.io/hito/dist/vocab.html)** — Genki I vocabulary, Lessons 1 to 3, as flashcards written one kana at a time.  
 **[Workshop](https://thesisbytes.github.io/hito/dist/hiragana.html)** — the full gojūon chart and every control, which is what this project uses on itself.
 

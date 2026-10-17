@@ -33,6 +33,10 @@ substitutions. It touches the engine only through globals it already exposes
 stay the single source of truth for what counts as a correct glyph.
 """
 
+import sys
+from pathlib import Path
+
+
 STYLE = """
 <style>
   /* The workshop's furniture, hidden. The engine still maintains all of it —
@@ -185,6 +189,12 @@ STYLE = """
   .over-pay small{ display:block; font-size:11.5px; font-weight:400; color:rgba(232,224,204,.55); }
   .start-row.lantern button.can{ border-color:#7fd1c4; }
   .start-row.lantern{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
+  /* which script: ひらがな, カタカナ, both */
+  .script-pick{ display:flex; gap:6px; margin:0 0 8px; }
+  .script-pick button{ flex:1; font:700 16px ui-sans-serif,system-ui; background:#1d1a16; color:rgba(232,224,204,.8); border:1px solid #3d3324; border-radius:10px; padding:8px 4px; cursor:pointer; touch-action:manipulation; }
+  .script-pick button small{ display:block; font-weight:400; font-size:10.5px; color:rgba(232,224,204,.55); margin-top:2px; }
+  .script-pick button[aria-pressed="true"]{ border-color:#e9c46a; color:#e9c46a; }
+  .script-pick button[disabled]{ opacity:.35; cursor:default; }
   /* which stage: a step back, the stage, a step forward */
   .stage-pick{ display:flex; align-items:stretch; gap:8px; margin:0 0 4px; }
   .stage-pick button{ flex:0 0 52px; font:700 22px ui-sans-serif,system-ui; background:#1d1a16; color:#e9c46a; border:1px solid #57492f; border-radius:10px; cursor:pointer; touch-action:manipulation; }
@@ -231,7 +241,37 @@ LAYER = STYLE + r"""
   // a flashcard, wrong for a game where the farang grow into sentences: you
   // cannot have traced every sentence, but you can have lit every kana in one.
   const key = m => LETTERS[m.i][0];
-  const REALM = WORDS ? CFG.deck.deck : 'hiragana';
+  // ---- the script (v0.1.76): hiragana, katakana, or both
+  // The maintainer, 2026-10-16: hiragana is solid, katakana is weak, and the
+  // katakana game never got the stages, the general or the tuning. So it is
+  // one game now, and the start page says which script the farang carry.
+  // A build whose letters are one script has no switch and plays as before.
+  // Each script is its own realm in the ledger: hiragana keeps `hiragana`, so
+  // every stage and wave carries over; katakana and both are fresh keys,
+  // because `katakana` holds the word game's waves, and records merge by max
+  // between devices forever.
+  const scriptOf = ch => { const c = ch.codePointAt(0); return c >= 0x30A0 && c <= 0x30FF ? 'katakana' : 'hiragana'; };
+  const SCRIPTS = { hiragana: { name:'ひらがな', realm:'hiragana' }, katakana: { name:'カタカナ', realm:'katakana-chars' }, both: { name:'both', realm:'kana-both' } };
+  const SWITCH = !WORDS && LETTERS.some(L => scriptOf(L[0]) === 'katakana') && LETTERS.some(L => scriptOf(L[0]) === 'hiragana');
+  // A row is ranked within its own script, so row k of katakana opens when
+  // row k of hiragana would, and in both the two open together.
+  const ROW = [];
+  for (const sc of ['hiragana', 'katakana']){
+    const rs = [...new Set(LETTERS.filter(L => scriptOf(L[0]) === sc).map(L => L[6] || 1))].sort((a, b) => a - b);
+    LETTERS.forEach((L, i) => { if (scriptOf(L[0]) === sc) ROW[i] = rs.indexOf(L[6] || 1) + 1; });
+  }
+  // Katakana and both open when hiragana has been climbed `scriptGate` waves
+  // deep: the title page's rule (LEVEL_WAVES), not a second one.
+  const scriptOpen = sc => !SWITCH || sc === 'hiragana' || (() => { try { const b = window.__hand.ledger.best.hiragana; return (+b.wave || 0) >= CFG.scriptGate; } catch(_){ return false; } })();
+  let script = 'hiragana';
+  const inScript = i => !SWITCH || script === 'both' || scriptOf(LETTERS[i][0]) === script;
+  let REALM = WORDS ? CFG.deck.deck : SCRIPTS[script].realm;
+  function setScript(sc){
+    if (!SWITCH || !SCRIPTS[sc] || !scriptOpen(sc)) return false;
+    script = sc; REALM = SCRIPTS[sc].realm; chosen = null; queue = []; recent = []; asked = null;
+    try { const o = JSON.parse(localStorage.getItem('hito-start') || '{}') || {}; o.script = sc; localStorage.setItem('hito-start', JSON.stringify(o)); } catch(_){}
+    return true;
+  }
 
   document.body.classList.add('field');
   const wrap = document.createElement('div');
@@ -371,7 +411,7 @@ LAYER = STYLE + r"""
   // are affected by the debuff from the boss"). Guided is practice: it pays
   // nothing and its waves open nothing.
   const bestWave = () => { try { const H = window.__hand; const b = H && H.ledger && H.ledger.best && H.ledger.best[REALM]; return b ? (+b.wave || 0) : 0; } catch(_){ return 0; } };
-  const totalRows = () => Math.max(1, Math.max(...LETTERS.map(L => L[6] || 1)));
+  const totalRows = () => Math.max(1, ...LETTERS.map((L, i) => inScript(i) ? ROW[i] : 1));
   const rowsOpen = w => !ST ? Infinity : Math.min(totalRows(), ST.rows + Math.floor(Math.max(bestWave(), w == null ? wave : w) / ST.rowWaves));
   const nextRowAt = () => (!ST || rowsOpen() >= totalRows()) ? Infinity : (rowsOpen() - ST.rows + 1) * ST.rowWaves;
   // ---- stages (v0.1.74): a stretch of the tower with an end
@@ -393,21 +433,23 @@ LAYER = STYLE + r"""
   const clearedTo = () => { try { const H = window.__hand; const b = H && H.ledger && H.ledger.best && H.ledger.best[REALM]; return b ? (+b.stage || 0) : 0; } catch(_){ return 0; } };
   let chosen = null;                        // the stage asked for: null is the first not yet cleared, 0 the endless tower
   let stageN = 0, wave0 = 0, won = false;   // the stage being fought (0: the tower), the wave it began on, whether it was cleared
+  let fieldScript = null;                   // the script the field was set up for
   let bannerAt = -1e9;
   const wantStage = () => (!STAGED || difficulty === 'guided') ? 0
     : chosen == null ? clearedTo() + 1 : Math.max(0, Math.min(clearedTo() + 1, chosen));
   const stageDone = () => stageN > 0 && wave >= wave0 + stageLen();
   function pickStage(n){ chosen = n == null ? null : Math.max(0, Math.round(+n) || 0); return wantStage(); }
-  function enterStage(){ stageN = wantStage(); wave0 = stageN ? (stageN - 1) * stageLen() : 0; wave = wave0; won = false; bannerAt = performance.now(); }
+  function enterStage(){ fieldScript = script; stageN = wantStage(); wave0 = stageN ? (stageN - 1) * stageLen() : 0; wave = wave0; won = false; bannerAt = performance.now(); }
   const midRun = () => !!(run && run.started && !over);
-  const rosterAt = w => { const r = rowsOpen(w); return LETTERS.filter(L => (L[6] || 1) <= r).length; };
+  const rosterAt = w => { const r = rowsOpen(w); return LETTERS.filter((L, i) => inScript(i) && ROW[i] <= r).length; };
   const RANK = { guided:0, medium:2, hard:3 };
   const needs = () => !ST ? 'guided' : 'medium';
   const bossAlive = () => monsters.some(m => m.boss);
   // Guided draws from every row: it holds nothing and opens nothing, so the
   // gate costs it nothing.
-  const roster = () => { if (DIFF[difficulty] && DIFF[difficulty].allRows) return LETTERS.map((_, i) => i);
-    const r = rowsOpen(); const a = []; LETTERS.forEach((L, i) => { if ((L[6] || 1) <= r) a.push(i); }); return a.length ? a : LETTERS.map((_, i) => i); };
+  const every = () => LETTERS.map((_, i) => i).filter(inScript);
+  const roster = () => { if (DIFF[difficulty] && DIFF[difficulty].allRows) return every();
+    const r = rowsOpen(); const a = every().filter(i => ROW[i] <= r); return a.length ? a : every(); };
   function buyLantern(id){
     const p = purse(); if (!p || !LANTERN[id]) return false;
     return p.buy(id, lanternCost(id), LANTERN[id].max);
@@ -505,13 +547,16 @@ LAYER = STYLE + r"""
   };
   // A word realm remembers its own sign: what "gaijin" means differs.
   const SKEY = WORDS ? 'hito-start-' + CFG.deck.deck : 'hito-start';
+  // read now: applyDifficulty() below saves the start settings, script and all
+  let keptScript = null;
   let difficulty = CFG.mode in DIFF && !DIFF[CFG.mode].locked ? CFG.mode : 'medium';
   try {
     const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {};
     if (s.difficulty in DIFF && !DIFF[s.difficulty].locked) difficulty = s.difficulty;
     if (s.sign in SIGNS) CFG.sign = s.sign;
+    if (s.script in SCRIPTS) keptScript = s.script;
   } catch(_){}
-  function saveStart(){ try { localStorage.setItem(SKEY, JSON.stringify({difficulty, sign:CFG.sign})); } catch(_){} }
+  function saveStart(){ try { localStorage.setItem(SKEY, JSON.stringify(SWITCH ? {difficulty, sign:CFG.sign, script} : {difficulty, sign:CFG.sign})); } catch(_){} }
   function applyDifficulty(name){
     const d = DIFF[name];
     if (!d || d.locked) return false;
@@ -660,7 +705,7 @@ LAYER = STYLE + r"""
   // heroes are auto attacking ... in order to do like stuns, or block
   // break, you gotta stroke the characters.")
   let heroOn = true;
-  const forged = () => { try { return Math.min(1, LETTERS.filter(L => (MASTERY[L[0]] || 0) > 0).length / CFG.heroForge); } catch(_){ return 0; } };
+  const forged = () => { try { return Math.min(1, LETTERS.filter((L, i) => inScript(i) && (MASTERY[L[0]] || 0) > 0).length / CFG.heroForge); } catch(_){ return 0; } };
   const heroHit = () => CFG.heroHit * (1 + forged());
   const dartsOwed = m => m.hp - darts.filter(s => s.to === m).length * heroHit();
   function autohero(now){
@@ -1873,6 +1918,13 @@ LAYER = STYLE + r"""
       + `<span><b>stage ${n}</b><small>${n <= c ? 'cleared · fight it again' : c + ' cleared · this one is next'}</small></span>`
       + `<button data-stagepick="${n + 1}"${n > c ? ' disabled' : ''} aria-label="the stage after">›</button></div>`;
   }
+  // Which script the farang carry. Between runs only; a locked one says why.
+  function scriptHtml(){
+    return `<div class="script-pick" role="group" aria-label="script">` + Object.keys(SCRIPTS).map(sc => {
+      const on = scriptOpen(sc);
+      return `<button data-script="${sc}" aria-pressed="${sc === script}"${on ? '' : ' disabled'}>${SCRIPTS[sc].name}<small>${on ? (sc === 'both' ? 'あ + ア' : sc) : 'opens at wave ' + CFG.scriptGate}</small></button>`;
+    }).join('') + `</div>`;
+  }
   function renderStart(asStart){
     if (view === 'credits' && !asStart) return renderCredits();
     if (view === 'over') return renderOver();
@@ -1880,7 +1932,8 @@ LAYER = STYLE + r"""
     const sn = midRun() ? stageN : wantStage();   // the stage this page is about: the one being fought, or the one asked for
     start.innerHTML = markup = `<div class="start-card">
       <div class="start-title">hito<span>人</span></div>
-      <div class="start-sub">${esc(REALM)} · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
+      <div class="start-sub">${esc(SWITCH ? SCRIPTS[script].name : REALM)} · v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</div>
+      ${SWITCH && !midRun() ? scriptHtml() : ''}
       ${stageHtml(sn)}
       <button class="start-go">${midRun() ? 'resume' : sn ? 'begin · stage ' + sn : over ? 'begin again' : 'begin'}</button>
       ${workshopHtml()}
@@ -1909,6 +1962,7 @@ LAYER = STYLE + r"""
   tapOn(start, 'button[data-wtab]', b => showWtab(b.dataset.wtab));
   tapOn(start, 'button[data-perm]', b => { if (buyPerm(b.dataset.perm)) renderStart(); });
   tapOn(start, 'button[data-lantern]', b => { if (buyLantern(b.dataset.lantern)) renderStart(); });
+  tapOn(start, 'button[data-script]', b => { if (setScript(b.dataset.script)) renderStart(); });
   tapOn(start, 'button[data-stagepick]', b => { pickStage(b.dataset.stagepick === 'front' ? null : +b.dataset.stagepick); renderStart(); });
   // The redo button belongs to a run, not to the page over it.
   let redoShown = false;
@@ -1928,7 +1982,7 @@ LAYER = STYLE + r"""
       : `wave ${r.wave}${fresh ? ' · <b>your furthest yet</b>' : e.best && e.best.wave > r.wave ? ' · furthest ' + e.best.wave : ''}`;
     start.innerHTML = markup = `<div class="start-card over${e.won ? ' won' : ''}">
       <div class="start-title">${e.won ? 'stage ' + e.stage + ' cleared' : 'the ward fell'}</div>
-      <div class="start-sub">${esc(REALM)} · ${sub}</div>
+      <div class="start-sub">${esc(SWITCH ? SCRIPTS[script].name : REALM)} · ${sub}</div>
       <div class="over-nums">
         <div><b>${r.banished}</b><small>banished</small></div>
         <div><b>${r.traced}</b><small>traced</small></div>
@@ -1955,7 +2009,7 @@ LAYER = STYLE + r"""
     start.hidden = true;
     // The field under the start page was set up for a stage before anyone
     // chose one; if another was asked for, the run begins there instead.
-    if (over || (!(run && run.started) && wantStage() !== stageN)) restart(); else paused = false;
+    if (over || (!(run && run.started) && (wantStage() !== stageN || fieldScript !== script))) restart(); else paused = false;
     bannerAt = performance.now();
     // the clock starts when the player does, not when the page loaded
     if (run && !run.started){ run.started = true; run.began = performance.now(); run.at = Date.now(); }
@@ -1999,6 +2053,7 @@ LAYER = STYLE + r"""
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
     needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; },
     get stage(){ return stageN; }, get wave0(){ return wave0; }, get won(){ return won; }, get clearedTo(){ return clearedTo(); }, pickStage, wantStage, stageLen, staged: STAGED,
+    get script(){ return script; }, setScript, scriptOpen, switched: SWITCH, every, get realm(){ return REALM; }, rowOf: i => ROW[i], scriptHtml,
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
     get upgHtml(){ return upgMarkup; },
     // a synthetic tap: a pointerdown on the first element the selector finds, through the container's own listener
@@ -2063,6 +2118,18 @@ LAYER = STYLE + r"""
   }).observe(wrap);
   addEventListener('DOMContentLoaded', () => { sizeField(); resize(); });
   sizeField();
+  // Which script, at boot: the URL says (the title page's level cards), then
+  // the file's own name (the old links, hiragana-game.html and
+  // katakana-game.html, are copies of this file and still mean what they
+  // meant), then what was chosen last, which is also what a page coming
+  // back from sign-in finds, since that return drops the query.
+  if (SWITCH){
+    let want = null;
+    try { want = new URLSearchParams(location.search).get('script'); } catch(_){}
+    if (!SCRIPTS[want]){ try { const f = (location.pathname || '').split('/').pop(); want = /^katakana-game/.test(f) ? 'katakana' : /^hiragana-game/.test(f) ? 'hiragana' : null; } catch(_){} }
+    if (!SCRIPTS[want]) want = keptScript;
+    if (!setScript(want)) setScript('hiragana');
+  }
   run = newRun();
   // what lasts is in force from the first run, not the second
   ward = wardMax(); sumi = own('inkwell') * CFG.inkwellStep;
@@ -2080,6 +2147,12 @@ LAYER = STYLE + r"""
 })();
 </script>
 """
+
+
+def _level_waves():
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from make_index import LEVEL_WAVES
+    return LEVEL_WAVES
 
 
 def config(pack, deck=None):
@@ -2152,6 +2225,8 @@ def config(pack, deck=None):
         f"hitodamaCap:{int(f.get('hitodamaCap', 6))},"
         f"castMs:{int(f.get('castMs', 900))},"
         f"rescue:{float(f.get('rescue', 0.3))},"
+        # katakana and both open where the title page opens them
+        f"scriptGate:{int(f.get('scriptGate', _level_waves()))},"
         f"energyMax:{int(f.get('energyMax', 24))},energyStart:{int(f.get('energyStart', 6))},"
         f"energyPerStroke:{int(f.get('energyPerStroke', 1))},castCost:{int(f.get('castCost', 2))},vesselStep:{int(f.get('vesselStep', 6))},"
         f"holdMs:{int(f.get('holdMs', 1500))},"

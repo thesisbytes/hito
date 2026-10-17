@@ -1,11 +1,13 @@
 {
   "script": "hiragana",
-  "version": "0.1.75",
-  "title": "hito 人 · hiragana · v0.1.29",
+  "version": "0.1.76",
+  "glyphs": "../kana/glyphs.json",
+  "strokes": "../kana/strokes.json",
+  "title": "hito 人 · kana · v0.1.76",
   "brand": "hito 人",
   "fontDir": "fonts",
-  "probeChars": "あがっ",
-  "exportName": "hito-hiragana-strokes.json",
+  "probeChars": "あがっカ",
+  "exportName": "hito-kana-strokes.json",
   "fonts": [
     {
       "id": "klee-one",
