@@ -32,20 +32,26 @@ done
 
 echo
 echo "── tail (a stroke's end cannot be skipped) ─────────"
-node build/test/tail.test.mjs "dist/hiragana-v$ver.html" | sed 's/^/  /' || fail=1
+# The workshop's 75 and the kana game's 150: the katakana went untested here
+# from the day they arrived until 2026-10-26.
+for f in "dist/hiragana-v$ver.html" "dist/kana-game-v$ver.html"; do
+  node build/test/tail.test.mjs "$f" | sed 's/^/  /' || fail=1
 
-# The same guard with a finger's forgiveness switched on. Easing the tolerance
-# is only safe while the end of a stroke still cannot be skipped.
-sed "s/let HAND_EASE=1,/let HAND_EASE=1.5,/" "dist/hiragana-v$ver.html" > "$tmp/eased.html"
-grep -q "let HAND_EASE=1.5," "$tmp/eased.html" || { echo "  FAIL: could not ease a copy of the build — the seam moved"; fail=1; }
-node build/test/tail.test.mjs "$tmp/eased.html" | sed 's/^/  (finger) /' || fail=1
+  # The same guard with a finger's forgiveness switched on. Easing the tolerance
+  # is only safe while the end of a stroke still cannot be skipped.
+  sed "s/let HAND_EASE=1,/let HAND_EASE=1.5,/" "$f" > "$tmp/eased.html"
+  grep -q "let HAND_EASE=1.5," "$tmp/eased.html" || { echo "  FAIL: could not ease a copy of $f — the seam moved"; fail=1; }
+  node build/test/tail.test.mjs "$tmp/eased.html" | sed 's/^/  (finger) /' || fail=1
+done
 
 echo
 echo "── size (an honest trace passes at every size) ─────"
-# Only the current build, and only the verdict. The full glyph x size table is
+# Only the current builds, and only the verdict. The full glyph x size table is
 # what you want when investigating, not when shipping:
-#   node build/test/size.test.mjs dist/hiragana-vX.Y.Z.html
-node build/test/size.test.mjs "dist/hiragana-v$ver.html" --brief | sed 's/^/  /' || fail=1
+#   node build/test/size.test.mjs dist/kana-game-vX.Y.Z.html
+for f in "dist/hiragana-v$ver.html" "dist/kana-game-v$ver.html"; do
+  node build/test/size.test.mjs "$f" --brief | sed 's/^/  /' || fail=1
+done
 
 echo
 echo "── harness (the debug controls reach the engine) ───"
