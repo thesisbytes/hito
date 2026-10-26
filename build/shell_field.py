@@ -126,6 +126,12 @@ STYLE = """
           z-index:2; overflow:auto; border-radius:12px; padding:10px;
           background:rgba(22,20,17,.93); border:1px solid #3d3324; font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
   body.field .stage[hidden]{ display:none; }
+  /* buddies: what to write, when the sketchbook shows no shape */
+  .buddy-ask{ position:absolute; left:10px; top:8px; z-index:3; pointer-events:none; font:600 13px ui-sans-serif,system-ui,sans-serif;
+              color:#e9c46a; background:rgba(29,26,22,.85); border:1px solid #57492f; border-radius:8px; padding:4px 9px; }
+  .buddy-ask b{ font-size:17px; margin:0 2px; }
+  .buddy-ask[hidden]{ display:none; }
+  body.field .toast{ width:max-content; max-width:calc(100% - 24px); white-space:normal; text-align:center; }   /* a buddy's hint is a line, not a word */
   .panel .panel-h{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:rgba(232,224,204,.55); margin:0 0 8px; }
   .panel .start-h, .panel .start-row{ margin-top:0; }
   .upg-ink{ display:flex; align-items:center; gap:5px; padding:0 9px; border-radius:9px;
@@ -760,6 +766,39 @@ LAYER = STYLE + r"""
   // still bites. One that does keeps coming back however high its level —
   // conjured six times with a fizzle each time is not a character to skip.
   const shaky = c => { try { return !!(window.__hand && window.__hand.shaky(c)); } catch(_){ return false; } };
+  // ---- buddies (v0.1.78): look-alikes, side by side
+  // Medium draws the shape asked for, so シ and ツ were only ever copied, never
+  // told apart, and telling them apart is what a katakana quiz asks. Jeff:
+  // "i think i have it down, but love the practice. 'shin' buddies lol". So a
+  // general whose chart holds a look-alike group (`field.buddies`) brings it
+  // along: he carries one of the group and each buddy another, every buddy
+  // holds up a phrasebook (only the hand sends it home), the sketchbook asks
+  // for each of them in turn, in no telling order, and for those characters
+  // it shows no shape at all, only the sign on the farang. The path is still
+  // judged underneath, so ツ drawn for シ is a miss. After `buddyMisses` misses
+  // on one, its shape comes back faint, as the general's always is, so a
+  // stage is never a wall. A group needs two of its members open.
+  // A group may carry a hint, shown once a run on its first miss: the
+  // mnemonic Jeff learned from a video (Satou's Nihongo Playground) and said
+  // "really helped", that a look-alike is traced like its hiragana twin.
+  const BUDDIES = (CFG.buddies || []).map(([g, name, hint]) => ({ chars: [...g], name, hint }));
+  let buddyQ = [], buddyMiss = {}, buddyHint = null, hinted = {};
+  const buddyAsk = document.createElement('div');
+  buddyAsk.className = 'buddy-ask'; buddyAsk.hidden = true;
+  try { stage.appendChild(buddyAsk); } catch(_){}
+  function buddiesFor(){
+    if (!BUDDIES.length || WORDS || difficulty === 'guided') return null;
+    const open = new Set(roster().map(i => LETTERS[i][0]));
+    const groups = BUDDIES.map(b => ({ name: b.name, chars: b.chars.filter(c => open.has(c) && AT[c] != null) })).filter(b => b.chars.length >= 2);
+    if (!groups.length) return null;
+    // a group with a character this hand keeps getting wrong comes first
+    const sore = groups.filter(b => b.chars.some(shaky)), from = sore.length ? sore : groups;
+    const b = from[Math.floor(Math.random()*from.length)];
+    return { name: b.name, hint: BUDDIES.find(x => x.name === b.name && b.chars.every(c => x.chars.includes(c))).hint, chars: b.chars.map(c => AT[c]).sort(() => Math.random() - 0.5) };
+  }
+  // owed: still to be written by the hand, and someone on the field carries it
+  const buddyOwed = i => buddyQ.includes(i) && monsters.some(m => m.i === i);
+  const unshown = i => buddyOwed(i) && (buddyMiss[i] || 0) < CFG.buddyMisses;
   function spawn(){
     // Bias toward glyphs whose flame has gone out: a monster is a character
     // you are forgetting, so the roster is the gojuon and the encounter rate
@@ -789,6 +828,8 @@ LAYER = STYLE + r"""
     // trace disappears ... perhaps not completely blank, just less help.")
     // Words are not bossed: a word is long enough.
     const boss = !!(ST && !w && (wave + 1) % ST.bossEvery === 0);
+    const pals = boss ? buddiesFor() : null;
+    if (pals) i = pals.chars[0];
     // The costume is the hit points (the stage, v0.1.73): a hit strips a
     // layer, and under the last one is a tourist in a loud shirt. `hp0` says
     // what it arrived in — one layer is a cardboard box, more is the paper
@@ -810,7 +851,20 @@ LAYER = STYLE + r"""
       i, w, ci: 0, zaps: 0, a, d: 1.05, boss,
       speed: CFG.speed * (0.8 + Math.random()*0.5) * (ST ? 1 + ST.speedStep*Math.floor(wave / ST.bossEvery) : 1),
       hp, hp0: hp, block, wob: Math.random()*6.28, born: performance.now(),
+      pals: pals ? pals.name : null,
     });
+    // the buddies walk in with him, a step to either side; they are not waves
+    if (pals){
+      // he walks in far enough from the edge for one on either side
+      const gen = monsters[monsters.length - 1], SP = 0.55, reach = SP * Math.ceil((pals.chars.length - 1) / 2);
+      gen.a = Math.max(Math.PI + 0.38 + reach, Math.min(2*Math.PI - 0.38 - reach, gen.a));
+      pals.chars.slice(1).forEach((k, n) => monsters.push({
+        i: k, w: null, ci: 0, zaps: 0, d: 1.12, boss: false, buddy: true,
+        a: gen.a + (n % 2 ? -1 : 1) * SP * (1 + (n >> 1)),
+        speed: gen.speed, hp: 1, hp0: 1, block: 1, wob: Math.random()*6.28, born: performance.now(),
+      }));
+      buddyQ = pals.chars.slice(); buddyMiss = {}; buddyHint = pals.hint || null;
+    }
     wave++;
     // 癒 tend: for every `tendEvery` waves held, a life back per level, up to
     // the ward's size. Held, not survived: it is paid when the wave comes,
@@ -874,6 +928,7 @@ LAYER = STYLE + r"""
   function nextAsk(){
     if (asked !== null) return asked;
     const d = door(); if (d) return d.i;
+    const b = buddyQ.find(buddyOwed); if (b != null) return b;
     if (!queue.length){
       const pool = roster().filter(i => !recent.includes(i));
       const H = window.__hand;
@@ -883,7 +938,7 @@ LAYER = STYLE + r"""
     }
     return queue[0];
   }
-  function askDone(i){ if (asked === i) asked = null; if (queue[0] === i) queue.shift(); recent = [i, ...recent.filter(x => x !== i)].slice(0, CFG.noRepeat); }
+  function askDone(i){ buddyQ = buddyQ.filter(x => x !== i); if (asked === i) asked = null; if (queue[0] === i) queue.shift(); recent = [i, ...recent.filter(x => x !== i)].slice(0, CFG.noRepeat); }
   function ask(i){ asked = i; }
   function targetIdx(){ if (!WORDS) return nextAsk(); const t = target(); return t ? t.i : null; }
 
@@ -913,8 +968,9 @@ LAYER = STYLE + r"""
   let loading = false;
   window.load = function(i){
     zapped = 0; credited = 0;
-    if (loading) return _load.apply(this, arguments);
+    if (loading){ applyShadow(i); return _load.apply(this, arguments); }
     const t = targetIdx();
+    applyShadow(t === null ? i : t);
     return _load.call(this, t === null ? i : t);
   };
   // A trace in progress is not to be interrupted. When several monsters land
@@ -981,10 +1037,16 @@ LAYER = STYLE + r"""
   let pendingRetarget = false;
   // While a boss lives, every character is traced with less help: the shape
   // faint, the start dot kept. The full shape is back the moment it falls.
-  function applyShadow(){
+  // A buddy still owed is traced with no shape at all (see buddies, above).
+  // Decided for the character about to load, so it is given the index.
+  function applyShadow(i){
     const shown = (DIFF[difficulty] && DIFF[difficulty].shadow) || 'none';
-    const want = (bossAlive() && shown !== 'none') ? 'faint' : shown;
+    const want = shown === 'none' ? shown : unshown(i == null ? idx : i) ? 'none' : bossAlive() ? 'faint' : shown;
     if (want !== SHADOW_MODE){ SHADOW_MODE = want; try { drawGuide(); } catch(_){} }
+    // with no shape the sketchbook says what it asks, in the farang's own sign
+    const bare = want === 'none' && shown !== 'none';
+    buddyAsk.hidden = !bare;
+    if (bare){ const t = `write <b>${labelOf({ i: i == null ? idx : i, w: null }, CFG.sign)}</b> · no shape`; if (buddyAsk.innerHTML !== t) buddyAsk.innerHTML = t; }
   }
   function retarget(force){
     if (locked && !monsters.includes(locked)) locked = null;
@@ -998,7 +1060,7 @@ LAYER = STYLE + r"""
     // the full shape back for the next farang. Decided from who carries the
     // character, whether or not a reload follows: the farang after a boss
     // can carry the same character, and then nothing reloads.
-    applyShadow();
+    applyShadow(t === null ? idx : t);
     if (t === null || (t === idx && !done)) { pendingRetarget = false; return; }
     if (!force && tracing()){ pendingRetarget = true; return; }
     pendingRetarget = false;
@@ -1484,7 +1546,11 @@ LAYER = STYLE + r"""
       if (m.boss){
         g.font = '700 12px ui-sans-serif,system-ui,"Klee One",sans-serif';
         g.fillStyle = isT ? 'rgba(233,196,106,.95)' : 'rgba(233,196,106,.6)';
-        g.fillText('将 · less help for all', p.x, top - 14);
+        g.fillText(m.pals ? `将 · ${m.pals}` : '将 · less help for all', p.x, top - 14);
+      } else if (m.buddy){
+        g.font = '700 11px ui-sans-serif,system-ui,"Klee One",sans-serif';
+        g.fillStyle = isT ? 'rgba(233,196,106,.95)' : 'rgba(233,196,106,.6)';
+        g.fillText('buddy', p.x, top - 14);
       }
       // the layers left, above the costume: one pip per layer, a piece
       // chipped off the last shown as a part
@@ -1500,7 +1566,7 @@ LAYER = STYLE + r"""
       if (m.block > 0){
         g.font = '700 9px ui-sans-serif,system-ui';
         g.fillStyle = 'rgba(233,196,106,.9)';
-        g.fillText('BLOCK · write to break', p.x, top - (m.boss ? 30 : 12));
+        g.fillText('BLOCK · write to break', p.x, top - (m.boss || m.buddy ? 30 : 12));
       }
       // a lit character: its own wisp will answer this one
       if (casting() && charge(key(m)) >= 1){
@@ -1662,7 +1728,7 @@ LAYER = STYLE + r"""
     // — the maintainer: "my energy gauge should not persist between games."
     // In the Tower nothing carries but the workshop; what lasts is bought.
     quench();
-    ward = wardMax(); over = false; enterStage(); killed = 0; locked = null; asked = null; queue = []; recent = [];
+    ward = wardMax(); over = false; enterStage(); killed = 0; locked = null; asked = null; queue = []; recent = []; buddyQ = []; buddyMiss = {}; buddyHint = null; hinted = {};
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; frames = { n:0, slow:0, jank:0 }; spawn(); retarget();
     // The last banish of a stage leaves the engine celebrating: the whole path
     // lit, `done` set. If the first target of the new run is the character
@@ -1914,7 +1980,7 @@ LAYER = STYLE + r"""
     if (!ST) return '';
     if (!n) return `<div class="start-h">the tower · furthest wave ${bestWave()} · ${roster().length} characters on the field${nextRowAt() < Infinity ? ' · next row of the chart at wave ' + nextRowAt() : ' · every row of the chart'}${difficulty === 'guided' ? ' · <b class="needs">practice: nothing counts</b>' : ''}</div>`;
     const c = clearedTo(), len = stageLen();
-    const head = `<div class="start-h">stage ${n} · ${len} farang, the last one a general · ${rosterAt((n - 1) * len)} characters on the field</div>`;
+    const head = `<div class="start-h">stage ${n} · ${len} farang, the last one a general${BUDDIES.length && SWITCH && script !== 'hiragana' ? ' and his look-alike buddies' : ''} · ${rosterAt((n - 1) * len)} characters on the field</div>`;
     if (midRun() || c < 1) return head;
     return head + `<div class="stage-pick"><button data-stagepick="${n - 1}"${n <= 1 ? ' disabled' : ''} aria-label="the stage before">‹</button>`
       + `<span><b>stage ${n}</b><small>${n <= c ? 'cleared · fight it again' : c + ' cleared · this one is next'}</small></span>`
@@ -2053,7 +2119,7 @@ LAYER = STYLE + r"""
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
-    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; },
+    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; }, get buddyQ(){ return buddyQ; }, get buddyMiss(){ return buddyMiss; }, get buddyHint(){ return buddyHint; }, get hinted(){ return hinted; }, buddyAsk,
     get stage(){ return stageN; }, get wave0(){ return wave0; }, get won(){ return won; }, get clearedTo(){ return clearedTo(); }, pickStage, wantStage, stageLen, staged: STAGED,
     get script(){ return script; }, setScript, scriptOpen, switched: SWITCH, every, get realm(){ return REALM; }, rowOf: i => ROW[i], scriptHtml,
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
@@ -2094,6 +2160,11 @@ LAYER = STYLE + r"""
   const _fizzle = window.fizzle;
   window.fizzle = function(){
     const r = _fizzle.apply(this, arguments);
+    if (buddyOwed(idx)){
+      buddyMiss[idx] = (buddyMiss[idx] || 0) + 1;   // two misses and the shape comes back faint
+      if (buddyHint && !hinted[buddyHint]){ hinted[buddyHint] = 1; try { toast(buddyHint); clearTimeout(toastT); toastT = setTimeout(() => $('toast').classList.remove('show'), 4500); } catch(_){}
+      }   // held for a line's reading, not the toast's usual flash
+    }
     if (CFG.fizzleRestarts) setTimeout(() => {
       if (!done) { loading = true; try { _load(idx); } finally { loading = false; } }
     }, 260);
@@ -2236,6 +2307,8 @@ def config(pack, deck=None):
         # the stage (v0.1.73): the gate's height, the heroes' dart, the blocks, the hold
         f"gateY:{float(f.get('gateY', 0.84))},"
         f"heroMs:{int(f.get('heroMs', 1500))},heroHit:{float(f.get('heroHit', 0.34))},heroForge:{int(f.get('heroForge', 25))},"
+        # buddies (v0.1.78): look-alike groups a general brings along, [chars, name]
+        f"buddies:{js([[str(x) for x in b] for b in f.get('buddies', [])])},buddyMisses:{int(f.get('buddyMisses', 2))},"
         f"bossBlock:{int(f.get('bossBlock', 1))},blockFrom:{int(f.get('blockFrom', 20))},blockRate:{float(f.get('blockRate', 0.25))},"
         f"stunMs:{int(f.get('stunMs', 2200))},"
         f"tidyStrays:{'true' if f.get('tidyStrays', True) else 'false'}"

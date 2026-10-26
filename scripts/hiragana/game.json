@@ -1,9 +1,9 @@
 {
   "script": "hiragana",
-  "version": "0.1.77",
+  "version": "0.1.78",
   "glyphs": "../kana/glyphs.json",
   "strokes": "../kana/strokes.json",
-  "title": "hito 人 · kana · v0.1.77",
+  "title": "hito 人 · kana · v0.1.78",
   "brand": "hito 人",
   "fontDir": "fonts",
   "probeChars": "あがっカ",
@@ -72,6 +72,15 @@
     "advanceMs": 460,
     "reading": "both",
     "fizzleRestarts": true,
+    "buddies": [
+      ["シツ", "the shin buddies", "シ shi like し, sweeps up · ツ tsu like つ, falls down"],
+      ["ソン", "look-alikes", "ソ so like そ, comes down · ン n like ん, sweeps up"],
+      ["クケタ", "look-alikes"],
+      ["ウワ", "look-alikes"],
+      ["スヌ", "look-alikes"],
+      ["チテ", "look-alikes"],
+      ["コユロ", "look-alikes"]
+    ],
     "hitodamaGain": 1,
     "cleanBonus": 1,
     "hitodamaCap": 6,
@@ -101,7 +110,7 @@
   ],
   "debug": {
     "_why": "stitch.py --debug: dist/kana-game-v*-debug.html, for testing katakana and both without the hiragana unlock. No sign-in and no sync, so it never reaches a save row or the events table.",
-    "title": "hito 人 · kana debug · v0.1.77",
+    "title": "hito 人 · kana debug · v0.1.78",
     "field": {
       "openScripts": true
     },

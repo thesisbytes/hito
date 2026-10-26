@@ -3071,3 +3071,53 @@ Thai script (สวัสดี: he hears it, and writes how a Japanese tourist 
 it), the romaji (sawadii), or the English? Thai script is the one only he can
 answer at a glance, which is the point of the idea; it is also the one that
 needs the font.
+
+## 2026-10-26 — Buddies: katakana's look-alikes, side by side (hiragana and kana-game v0.1.78)
+
+Jeff, through the vault session, on the first of the open calls above: "i
+think i have it down, but love the practice. 'shin' buddies lol". So there is
+now practice for the look-alikes.
+
+- **A general brings his buddies.** When a stage's general arrives and the
+  open chart holds two or more of a look-alike group (`field.buddies` in
+  `game.json`: シツ, ソン, クケタ, ウワ, スヌ, チテ, コユロ), he carries one of
+  the group and a buddy walks in beside him with each of the others. Buddies
+  are not waves. Each is one layer behind a phrasebook, so the heroes' darts
+  and the lights bounce off and only the hand sends it home. A group with a
+  character the ledger calls shaky is picked first. Hiragana stages, guided
+  and word realms are untouched; in both mode the buddies are katakana.
+  Katakana stage 1 already has one (ク/ケ: the か row is open).
+- **The sketchbook asks for each of them, with no shape.** After a dark
+  character at the door, the tracer asks for the buddies before its own
+  queue, in shuffled order so the order gives nothing away. For those
+  characters it shows no shape. A label in the sketchbook ("write シ · no
+  shape") says which, in the farang's own sign. The path is still judged
+  underneath, so ツ drawn for シ is a miss. The general is asked for once
+  this way too. That fixes "the general bites while the sketchbook asks for
+  something else" on these stages only.
+- **Two misses bring the shape back faint** (`buddyMisses`), as the
+  general's always is, so a buddy stage is never a wall.
+- **The twins' hint.** A group may carry a line, shown once a run on its
+  first miss and held 4.5 s. Jeff learned it from Satou's Nihongo Playground
+  and said it "really helped": a look-alike is traced like its hiragana twin.
+  - シツ: "シ shi like し, sweeps up · ツ tsu like つ, falls down"
+  - ソン: "ソ so like そ, comes down · ン n like ん, sweeps up"
+  
+  The other groups have no twins rule and no hint. The field's toast now
+  wraps, since a hint is a line.
+- **Names.** シツ is "the shin buddies", Jeff's name, worn by the general.
+  The other groups are "look-alikes" until he names them.
+- **Tests:** `buddies.test.mjs` (in run.sh) covers the following. A hiragana
+  and a guided general come alone. With シ shaky, the general brings the shin
+  buddies, the right count and block. The sketchbook asks for one of the
+  group, shows no shape and labels it. A miss is counted and shows the hint
+  once; two misses bring the shape back faint and take the label down. A
+  written one is no longer owed and the next is asked. A new run clears it
+  all. Twelve generals bring at least two groups, all from one group. In
+  both mode the buddies are katakana. A build without `buddies` in its pack
+  fails it. Screenshots in headless Chrome at 412 px at stages 1 and 4: the
+  buddies flank the general (he walks in far enough from the edge for one on
+  either side), and the label and hint read in full.
+- **Left for Jeff:** whether no shape is too hard (the faint-after-two rule
+  is a guess), names for the other groups, and the other six calls above.
+  Not pushed: Jeff plays it first.

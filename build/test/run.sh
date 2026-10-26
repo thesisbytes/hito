@@ -111,6 +111,10 @@ if grep -q 'openScripts:false' "$k" && grep -q 'openScripts:true' "$d" \
 else echo "  FAIL: the debug build's open scripts leaked into the game, or it can sign in or sync"; fail=1; fi
 
 echo
+echo "── buddies (katakana's look-alikes, with no shape) ──"
+node build/test/buddies.test.mjs "dist/kana-game-v$ver.html" | sed 's/^/  /' || fail=1
+
+echo
 echo "── vocab (a word is walked through the seam) ───────"
 node build/test/vocab.test.mjs "dist/vocab-v$vver.html" | sed 's/^/  /' || fail=1
 
