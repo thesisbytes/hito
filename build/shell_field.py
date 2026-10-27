@@ -126,11 +126,11 @@ STYLE = """
           z-index:2; overflow:auto; border-radius:12px; padding:10px;
           background:rgba(22,20,17,.93); border:1px solid #3d3324; font:12px ui-sans-serif,system-ui; color:#e8e0cc; }
   body.field .stage[hidden]{ display:none; }
-  /* buddies: what to write, when the sketchbook shows no shape */
-  .buddy-ask{ position:absolute; left:10px; top:8px; z-index:3; pointer-events:none; font:600 13px ui-sans-serif,system-ui,sans-serif;
+  /* what is being stroked: the kana, its reading, and a buddy's count */
+  .kana-tag{ position:absolute; left:10px; top:8px; z-index:3; pointer-events:none; font:600 15px ui-sans-serif,system-ui,sans-serif;
               color:#e9c46a; background:rgba(29,26,22,.85); border:1px solid #57492f; border-radius:8px; padding:4px 9px; }
-  .buddy-ask b{ font-size:17px; margin:0 2px; }
-  .buddy-ask[hidden]{ display:none; }
+  .kana-tag b{ font-size:19px; margin:0 2px; }
+  .kana-tag[hidden]{ display:none; }
   body.field .toast{ width:max-content; max-width:calc(100% - 24px); white-space:normal; text-align:center; }   /* a buddy's hint is a line, not a word */
   .panel .panel-h{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:rgba(232,224,204,.55); margin:0 0 8px; }
   .panel .start-h, .panel .start-row{ margin-top:0; }
@@ -787,9 +787,19 @@ LAYER = STYLE + r"""
   // "really helped", that a look-alike is traced like its hiragana twin.
   const BUDDIES = (CFG.buddies || []).map(([g, name, hint]) => ({ chars: [...g], name, hint }));
   let buddyQ = [], buddyHint = null, hinted = {};
-  const buddyAsk = document.createElement('div');
-  buddyAsk.className = 'buddy-ask'; buddyAsk.hidden = true;
-  try { stage.appendChild(buddyAsk); } catch(_){}
+  // The sketchbook's tag: what is being stroked, by name (v0.1.80). Jeff:
+  // "on the practice mode, it would be nice to know what i'm stroking.
+  // probably romanji for now, and then we can add sound later." Shown in
+  // every mode, guided and medium; a buddy's adds how far its shape is from
+  // fading. Written by applyShadow, which every load goes through.
+  const kanaTag = document.createElement('div');
+  kanaTag.className = 'kana-tag'; kanaTag.hidden = true;
+  try { stage.appendChild(kanaTag); } catch(_){}
+  // Sound, later: a layer that can speak replaces __field.voice.say. It is
+  // called once each time the sketchbook turns to a character, with the
+  // character and its romaji. Silent today.
+  const voice = { say(ch, romaji){} };
+  let saidI = null;
   function buddiesFor(){
     if (!BUDDIES.length || WORDS || difficulty === 'guided') return null;
     const open = new Set(roster().map(i => LETTERS[i][0]));
@@ -960,6 +970,7 @@ LAYER = STYLE + r"""
     if (best && best !== locked){
       locked = best; ask(best.i);
       pendingRetarget = false;
+      applyShadow(best.i);
       loading = true; try { _load(best.i); } finally { loading = false; }
       return true;
     }
@@ -1051,16 +1062,19 @@ LAYER = STYLE + r"""
     const shown = (DIFF[difficulty] && DIFF[difficulty].shadow) || 'none', bs = buddyShape(i);
     const want = shown === 'none' ? shown : bs || (bossAlive() ? 'faint' : shown);
     if (want !== SHADOW_MODE){ SHADOW_MODE = want; try { drawGuide(); } catch(_){} }
-    // a buddy's sketchbook says what it asks, in the farang's own sign, and
-    // how far the shape is from fading
-    buddyAsk.hidden = !bs || shown === 'none';
-    if (!buddyAsk.hidden){
-      const sg = `<b>${labelOf({ i, w: null }, CFG.sign)}</b>`, s = sureOf(i);
-      const t = bs === 'none' ? `write ${sg} · no shape`
-        : bs === 'faint' ? `${sg} · ${CFG.buddyFade[1] - s} clean and it's gone`
-        : `${sg} · ${CFG.buddyFade[0] - s} clean and it fades`;
-      if (buddyAsk.innerHTML !== t) buddyAsk.innerHTML = t;
-    }
+    // the tag: the kana and its romaji; for a buddy, how far its shape is from
+    // fading. With no shape and a romaji or accent sign, the kana would be the
+    // answer, so then it says the farang's sign alone.
+    const L = LETTERS[i], s = sureOf(i);
+    const name = want === 'none' && shown !== 'none' && CFG.sign !== 'kana'
+      ? `<b>${labelOf({ i, w: null }, CFG.sign)}</b>` : `<b>${L[0]}</b> · ${L[2]}`;
+    const t = !bs || shown === 'none' ? name
+      : bs === 'none' ? `write ${name} · no shape`
+      : bs === 'faint' ? `${name} · ${CFG.buddyFade[1] - s} clean and it's gone`
+      : `${name} · ${CFG.buddyFade[0] - s} clean and it fades`;
+    kanaTag.hidden = false;
+    if (kanaTag.innerHTML !== t) kanaTag.innerHTML = t;
+    if (i !== saidI){ saidI = i; try { voice.say(L[0], L[2]); } catch(_){} }
   }
   function retarget(force){
     if (locked && !monsters.includes(locked)) locked = null;
@@ -2133,7 +2147,7 @@ LAYER = STYLE + r"""
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
-    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; }, get buddyQ(){ return buddyQ; }, buddyShape, get buddyHint(){ return buddyHint; }, get hinted(){ return hinted; }, buddyAsk,
+    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; }, get buddyQ(){ return buddyQ; }, buddyShape, get buddyHint(){ return buddyHint; }, get hinted(){ return hinted; }, kanaTag, voice,
     get stage(){ return stageN; }, get wave0(){ return wave0; }, get won(){ return won; }, get clearedTo(){ return clearedTo(); }, pickStage, wantStage, stageLen, staged: STAGED,
     get script(){ return script; }, setScript, scriptOpen, switched: SWITCH, every, get realm(){ return REALM; }, rowOf: i => ROW[i], scriptHtml,
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },

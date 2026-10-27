@@ -3158,3 +3158,30 @@ one kana at a time. Built that way:
   run.sh passes. Screenshot at 412 px: the full シ with its count.
 - **Thresholds are a guess** (3 and 6). They are pack keys, so Jeff's play
   can move them without a code change.
+
+## 2026-10-26 — The sketchbook says what is being stroked (hiragana and kana-game v0.1.80)
+
+Jeff, from playing: "on the practice mode, it would be nice to know what i'm
+stroking. probably romanji for now, and then we can add sound later."
+
+- **Which mode.** "Practice" is the kana game's guided mode: the title
+  page's Practice opens `?go=guided`. The practise-any-kana page (2026-10-14)
+  was never built. The tag is in every mode of the kana game, though, guided
+  and medium, hiragana and katakana, since knowing the name of what is being
+  traced does not give the shape away.
+- **The tag.** Top left of the sketchbook: the kana and its romaji (コ · ko).
+  It is the buddies' label (v0.1.78), generalised, so a buddy reads "シ · shi
+  · 3 clean and it fades". With no shape and a romaji or accent sign, the kana
+  would be the answer, so then the tag gives the farang's sign alone ("write
+  shi · no shape"). 15/19 px; checked at 412 px.
+- **Every load sets it.** It is written in `applyShadow`, which every load
+  goes through. A tap on a farang (`pick`) loaded straight past it, so that
+  load now goes through it too (it also skipped the buddies' shape rule).
+- **Sound, later.** `__field.voice.say(ch, romaji)` is called once each time
+  the sketchbook turns to a character. It is a no-op today; a layer that can
+  speak replaces it, and nothing else has to change.
+- **Tests:** `buddies.test.mjs` checks the tag in guided and medium, for
+  hiragana and katakana. It checks that the voice hook hears a new character
+  once (not again on a retarget to the same one), and that a bare buddy under
+  the romaji sign does not show its kana. The v0.1.79 build fails it, and
+  run.sh passes.

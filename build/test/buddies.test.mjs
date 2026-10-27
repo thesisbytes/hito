@@ -55,17 +55,17 @@ const groupOf = c => BUDS.find(b => b.includes(c));
   // a fresh hand, the whole shape (not even the general's faint), and a count
   F.retarget(true);
   const first = P.LETTERS[P.idx][0], H = g.__hand, fi = P.idx;
-  const ask = () => F.buddyAsk.innerHTML;
+  const ask = () => F.kanaTag.innerHTML;
   const sure = c => (H.ledger.g[c] && H.ledger.g[c].sure) || 0;
   const setSure = (c, n) => { (H.ledger.g[c] = H.ledger.g[c] || {n:0, clean:0, zaps:0, fizz:0, ms:0, rt:[], tr:0}).sure = n; };
   ok(grp.includes(first), `the sketchbook asked for ${first}, not one of ${grp}`);
   ok(P.SHADOW_MODE === 'strokes', `a buddy this hand has never written was not shown its shape (${P.SHADOW_MODE})`);
-  ok(F.buddyAsk && !F.buddyAsk.hidden && ask().includes(`<b>${first}</b>`) && /3 clean and it fades/.test(ask()), `the label did not say ${first} and 3 to fade (${ask()})`);
+  ok(F.kanaTag && !F.kanaTag.hidden && ask().includes(`<b>${first}</b>`) && /3 clean and it fades/.test(ask()), `the label did not say ${first} and 3 to fade (${ask()})`);
   // earned: three clean in a row and it is faint, six and it is gone
   setSure(first, 3); F.retarget(true); g.load(fi);
   ok(P.SHADOW_MODE === 'faint' && /3 clean and it's gone/.test(ask()), `three clean did not fade ${first} (${P.SHADOW_MODE}, ${ask()})`);
   setSure(first, 6); F.retarget(true); g.load(fi);
-  ok(P.SHADOW_MODE === 'none' && /write <b>.<\/b> · no shape/.test(ask()), `six clean did not take ${first}'s shape away (${P.SHADOW_MODE}, ${ask()})`);
+  ok(P.SHADOW_MODE === 'none' && /write <b>.<\/b> · [a-z]+ · no shape/.test(ask()), `six clean did not take ${first}'s shape away (${P.SHADOW_MODE}, ${ask()})`);
   // a miss, with ink on the page as a real one has: the ledger's run is back to
   // nothing and the shape is back in full; and the twins' hint, once
   const ink = () => P.setStrokes([[{x:150, y:150, t:0}, {x:170, y:160, t:40}, {x:190, y:175, t:80}]]);
@@ -107,5 +107,23 @@ const groupOf = c => BUDS.find(b => b.includes(c));
 { const r = rig('both');
   ok(r.F.monsters.filter(m => m.buddy).every(m => /[゠-ヿ]/.test(r.P.LETTERS[m.i][0])), 'a buddy in both was not katakana'); }
 
+// the tag (v0.1.80): what is being stroked, kana and romaji, in practice
+// (guided) and in the game, hiragana and katakana; the voice hook hears each
+// character once; a bare buddy under a romaji sign does not give the kana away
+for (const [script, diff] of [['hiragana', 'guided'], ['katakana', 'guided'], ['hiragana', 'medium'], ['katakana', 'medium']]){
+  const r = rig(script, { diff }); const { F, P } = r;
+  const heard = []; F.voice.say = (c, rom) => heard.push(c + rom);
+  F.retarget(true);
+  const L = P.LETTERS[P.idx];
+  ok(!F.kanaTag.hidden && F.kanaTag.innerHTML.startsWith(`<b>${L[0]}</b> · ${L[2]}`), `${script} ${diff}: the tag says ${F.kanaTag.innerHTML}, not ${L[0]} · ${L[2]}`);
+  const other = F.roster().find(k => k !== P.idx); F.ask(other); F.retarget(true); F.retarget(true);
+  ok(heard.length === 1 && heard[0] === P.LETTERS[other][0] + P.LETTERS[other][2], `${script} ${diff}: the voice heard ${JSON.stringify(heard)} for ${P.LETTERS[other][0]}`);
+}
+{ const r = rig('katakana', { sore:'シ' }); const { F, P, g } = r;
+  F.setSign('romaji'); F.retarget(true);
+  const c = P.LETTERS[P.idx][0], e = g.__hand.ledger.g[c] = g.__hand.ledger.g[c] || {n:0, clean:0, zaps:0, fizz:0, ms:0, rt:[], tr:0};
+  e.sure = 6; F.retarget(true); g.load(P.idx);
+  ok(P.SHADOW_MODE === 'none' && !F.kanaTag.innerHTML.includes(c) && F.kanaTag.innerHTML.includes(`<b>${P.LETTERS[P.idx][2]}</b>`), `a bare buddy under the romaji sign showed ${F.kanaTag.innerHTML}`); }
+
 if (fail){ console.log(`  ${fail} failure(s)`); process.exit(1); }
-console.log('  a katakana general brings his look-alikes; each one\'s shape fades with clean traces in a row and comes back whole on a miss; the hint shows once; hiragana and guided are untouched');
+console.log('  a katakana general brings his look-alikes; each one\'s shape fades with clean traces in a row and comes back whole on a miss; the hint shows once; hiragana and guided are untouched; the tag names what is stroked, kana and romaji');

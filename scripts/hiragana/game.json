@@ -1,9 +1,9 @@
 {
   "script": "hiragana",
-  "version": "0.1.79",
+  "version": "0.1.80",
   "glyphs": "../kana/glyphs.json",
   "strokes": "../kana/strokes.json",
-  "title": "hito 人 · kana · v0.1.79",
+  "title": "hito 人 · kana · v0.1.80",
   "brand": "hito 人",
   "fontDir": "fonts",
   "probeChars": "あがっカ",
@@ -111,7 +111,7 @@
   ],
   "debug": {
     "_why": "stitch.py --debug: dist/kana-game-v*-debug.html, for testing katakana and both without the hiragana unlock. No sign-in and no sync, so it never reaches a save row or the events table.",
-    "title": "hito 人 · kana debug · v0.1.79",
+    "title": "hito 人 · kana debug · v0.1.80",
     "field": {
       "openScripts": true
     },
