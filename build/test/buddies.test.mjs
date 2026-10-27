@@ -2,9 +2,10 @@
  * Medium draws the shape asked for, so シ and ツ were copied, never told
  * apart. A general whose chart holds a look-alike group brings it along:
  * he carries one, a buddy carries each of the others behind a phrasebook,
- * the sketchbook asks for each of them with no shape shown, and two misses
- * on one bring its shape back faint. A group with a hint shows it once a
- * run, on its first miss. Hiragana and guided are untouched.
+ * the sketchbook asks for each of them, and each one's shape is earned away
+ * (v0.1.79): whole, faint after three clean traces in a row, gone after six,
+ * whole again on a miss, counted in the hand's ledger. A group with a hint
+ * shows it once a run, on its first miss. Hiragana and guided are untouched.
  *   node build/test/buddies.test.mjs dist/kana-game-vX.Y.Z.html
  */
 import { boot } from './dom.mjs';
@@ -50,28 +51,43 @@ const groupOf = c => BUDS.find(b => b.includes(c));
   ok(buds.every(m => m.block === 1 && m.hp === 1 && grp.includes(P.LETTERS[m.i][0]) && P.LETTERS[m.i][0] !== gc),
      `the buddies are not the rest of ${grp} behind a phrasebook (${buds.map(m => P.LETTERS[m.i][0] + m.block + '/' + m.hp).join(' ')})`);
   ok(F.buddyQ.length === grp.length, `owed ${F.buddyQ.length}, expected ${grp.length}`);
-  // the sketchbook asks for one of them, and shows no shape
+  // the sketchbook asks for one of them, and shows what this hand has earned:
+  // a fresh hand, the whole shape (not even the general's faint), and a count
   F.retarget(true);
-  const first = P.LETTERS[P.idx][0];
+  const first = P.LETTERS[P.idx][0], H = g.__hand, fi = P.idx;
+  const ask = () => F.buddyAsk.innerHTML;
+  const sure = c => (H.ledger.g[c] && H.ledger.g[c].sure) || 0;
+  const setSure = (c, n) => { (H.ledger.g[c] = H.ledger.g[c] || {n:0, clean:0, zaps:0, fizz:0, ms:0, rt:[], tr:0}).sure = n; };
   ok(grp.includes(first), `the sketchbook asked for ${first}, not one of ${grp}`);
-  ok(P.SHADOW_MODE === 'none', `a buddy was shown a shape (${P.SHADOW_MODE})`);
-  ok(F.buddyAsk && !F.buddyAsk.hidden && F.buddyAsk.innerHTML.includes(`<b>${first}</b>`), `a bare sketchbook did not say to write ${first} (${F.buddyAsk && F.buddyAsk.innerHTML})`);
-  // a miss: the hint, once; two misses: the shape comes back faint
-  g.fizzle();
-  ok(F.buddyMiss[P.idx] === 1, `a miss on ${first} was not counted (${JSON.stringify(F.buddyMiss)})`);
+  ok(P.SHADOW_MODE === 'strokes', `a buddy this hand has never written was not shown its shape (${P.SHADOW_MODE})`);
+  ok(F.buddyAsk && !F.buddyAsk.hidden && ask().includes(`<b>${first}</b>`) && /3 clean and it fades/.test(ask()), `the label did not say ${first} and 3 to fade (${ask()})`);
+  // earned: three clean in a row and it is faint, six and it is gone
+  setSure(first, 3); F.retarget(true); g.load(fi);
+  ok(P.SHADOW_MODE === 'faint' && /3 clean and it's gone/.test(ask()), `three clean did not fade ${first} (${P.SHADOW_MODE}, ${ask()})`);
+  setSure(first, 6); F.retarget(true); g.load(fi);
+  ok(P.SHADOW_MODE === 'none' && /write <b>.<\/b> · no shape/.test(ask()), `six clean did not take ${first}'s shape away (${P.SHADOW_MODE}, ${ask()})`);
+  // a miss, with ink on the page as a real one has: the ledger's run is back to
+  // nothing and the shape is back in full; and the twins' hint, once
+  const ink = () => P.setStrokes([[{x:150, y:150, t:0}, {x:170, y:160, t:40}, {x:190, y:175, t:80}]]);
+  ink(); g.fizzle(); F.retarget(true); g.load(fi);
+  ok(sure(first) === 0, `a miss left ${first}'s run of clean traces at ${sure(first)}`);
+  ok(P.SHADOW_MODE === 'strokes', `a miss did not bring ${first}'s shape straight back (${P.SHADOW_MODE})`);
   ok(F.buddyHint && F.hinted[F.buddyHint] === 1, 'the first miss showed no hint');
   ok(/シ shi.*し.*ツ tsu.*つ/.test(F.buddyHint || ''), `the hint is not the twins' rule: ${F.buddyHint}`);
+  // landed after that miss, it is not clean, and the run stays where it was
+  setSure(first, 2); ink(); g.conjure();
+  ok(sure(first) === 2, `a trace landed after a miss counted as clean (${sure(first)})`);
+  // written: the next one is asked for, with its own count
   F.retarget(true);
-  ok(P.SHADOW_MODE === 'none', `one miss brought the shape back (${P.SHADOW_MODE})`);
-  g.fizzle(); F.retarget(true); g.load(P.idx);
-  ok(P.SHADOW_MODE === 'faint', `two misses did not bring the shape back faint (${P.SHADOW_MODE})`);
-  ok(F.buddyAsk.hidden, 'the label stayed up over a faint shape');
-  // written: the next one is asked for, still with no shape
-  g.conjure(); F.retarget(true);
   const second = P.LETTERS[P.idx][0];
-  ok(!F.buddyQ.includes(P.LETTERS.findIndex(L => L[0] === first)), `${first} was written and is still owed`);
+  ok(F.buddyShape(P.idx) === (sure(second) >= 6 ? 'none' : sure(second) >= 3 ? 'faint' : 'strokes'), `${second} was not shown its own count`);
+  // and a clean trace counts one, in the ledger
+  { const before = sure(second); ink(); g.conjure();
+    ok(sure(second) === before + 1, `a clean trace of ${second} did not count (${before} -> ${sure(second)})`); }
+  ok(!F.buddyQ.includes(fi), `${first} was written and is still owed`);
   ok(second !== first && grp.includes(second), `after ${first} the sketchbook asked for ${second}`);
-  ok(P.SHADOW_MODE === 'none', `the second buddy was shown a shape (${P.SHADOW_MODE})`);
+  // not a buddy any more: the general's faint rule is back for it
+  ok(F.buddyShape(fi) === null, `${first}, written, is still judged as a buddy`);
   // the hint is once a run
   g.fizzle();
   ok(Object.keys(F.hinted).length === 1, 'the hint was counted twice');
@@ -92,4 +108,4 @@ const groupOf = c => BUDS.find(b => b.includes(c));
   ok(r.F.monsters.filter(m => m.buddy).every(m => /[゠-ヿ]/.test(r.P.LETTERS[m.i][0])), 'a buddy in both was not katakana'); }
 
 if (fail){ console.log(`  ${fail} failure(s)`); process.exit(1); }
-console.log('  a katakana general brings his look-alikes, asked for with no shape; two misses bring it back faint; the hint shows once; hiragana and guided are untouched');
+console.log('  a katakana general brings his look-alikes; each one\'s shape fades with clean traces in a row and comes back whole on a miss; the hint shows once; hiragana and guided are untouched');

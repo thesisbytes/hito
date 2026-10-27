@@ -3121,3 +3121,40 @@ now practice for the look-alikes.
 - **Left for Jeff:** whether no shape is too hard (the faint-after-two rule
   is a guess), names for the other groups, and the other six calls above.
   Not pushed: Jeff plays it first.
+
+## 2026-10-26 — The buddies' blank page is earned, per kana (hiragana and kana-game v0.1.79)
+
+Jeff's first playtest of v0.1.78, on the site: "omg. i'm no where ready for
+the no template stroking." He is still learning these shapes, so starting
+with no shape was a wall. The vault session proposed earning the blank page
+one kana at a time. Built that way:
+
+- **The full shape at first.** A buddy this hand has not got right in a row
+  is shown its whole shape, not even the general's faint one, because these
+  are the shapes being learned. It is the same scaffold medium gives every
+  hiragana.
+- **It fades with clean traces in a row** (`field.buddyFade`, [3, 6]): faint
+  after three, gone after six. A clean trace is one with no zap and no miss
+  before it, which is how the ledger already counts `clean`. The sketchbook
+  label counts it down: "シ · 3 clean and it fades", "シ · 2 clean and it's
+  gone", then "write シ · no shape".
+- **A miss brings the whole shape straight back**, on the restart itself.
+  The run goes back to nothing, and a trace that lands after that miss is
+  not clean.
+- **Kept in the hand's ledger**, as `sure` on the character (clean traces in
+  a row, zeroed by a fizzle). So every clean trace of that kana counts,
+  whether or not a buddy asked for it, and the count lasts between runs. It
+  travels in the save row and in export and import (`importText` carries
+  it; the fuller record wins per character as before). A trace that landed
+  with a zap leaves it where it was.
+- The twins' hint is unchanged: once a run, on a buddy's first miss.
+  `buddyMisses` is gone.
+- **Tests:** `buddies.test.mjs` now checks the following. A buddy the hand
+  has never written gets the full shape and "3 clean and it fades". Three
+  in a row make it faint and six take it away. A real miss (with ink) zeroes
+  the ledger's run and brings the shape back whole. A trace landed after a
+  miss does not count, and a clean one counts one. A buddy once written is
+  judged by the general's rule again. The v0.1.78 build fails four of these.
+  run.sh passes. Screenshot at 412 px: the full シ with its count.
+- **Thresholds are a guess** (3 and 6). They are pack keys, so Jeff's play
+  can move them without a code change.

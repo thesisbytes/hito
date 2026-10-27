@@ -774,15 +774,19 @@ LAYER = STYLE + r"""
   // along: he carries one of the group and each buddy another, every buddy
   // holds up a phrasebook (only the hand sends it home), the sketchbook asks
   // for each of them in turn, in no telling order, and for those characters
-  // it shows no shape at all, only the sign on the farang. The path is still
-  // judged underneath, so ツ drawn for シ is a miss. After `buddyMisses` misses
-  // on one, its shape comes back faint, as the general's always is, so a
-  // stage is never a wall. A group needs two of its members open.
+  // its shape is earned away, per kana (v0.1.79, after Jeff met the blank
+  // page in v0.1.78: "omg. i'm no where ready for the no template
+  // stroking"). The full shape at first, faint after `buddyFade[0]` clean
+  // traces in a row of that kana, none after `buddyFade[1]`; a miss and it is
+  // back in full. The run of clean traces is the hand's ledger's (`sure`), so
+  // it counts every clean trace of the kana, buddy or not, and lasts between
+  // runs and devices. The path is judged underneath whatever is shown, so ツ
+  // drawn for シ is a miss. A group needs two of its members open.
   // A group may carry a hint, shown once a run on its first miss: the
   // mnemonic Jeff learned from a video (Satou's Nihongo Playground) and said
   // "really helped", that a look-alike is traced like its hiragana twin.
   const BUDDIES = (CFG.buddies || []).map(([g, name, hint]) => ({ chars: [...g], name, hint }));
-  let buddyQ = [], buddyMiss = {}, buddyHint = null, hinted = {};
+  let buddyQ = [], buddyHint = null, hinted = {};
   const buddyAsk = document.createElement('div');
   buddyAsk.className = 'buddy-ask'; buddyAsk.hidden = true;
   try { stage.appendChild(buddyAsk); } catch(_){}
@@ -798,7 +802,9 @@ LAYER = STYLE + r"""
   }
   // owed: still to be written by the hand, and someone on the field carries it
   const buddyOwed = i => buddyQ.includes(i) && monsters.some(m => m.i === i);
-  const unshown = i => buddyOwed(i) && (buddyMiss[i] || 0) < CFG.buddyMisses;
+  const sureOf = i => { try { const e = window.__hand.ledger.g[LETTERS[i][0]]; return (e && +e.sure) || 0; } catch(_){ return 0; } };
+  // what an owed buddy is shown: the shape, faint, or nothing; null if not a buddy
+  const buddyShape = i => !buddyOwed(i) ? null : sureOf(i) >= CFG.buddyFade[1] ? 'none' : sureOf(i) >= CFG.buddyFade[0] ? 'faint' : 'strokes';
   function spawn(){
     // Bias toward glyphs whose flame has gone out: a monster is a character
     // you are forgetting, so the roster is the gojuon and the encounter rate
@@ -863,7 +869,7 @@ LAYER = STYLE + r"""
         a: gen.a + (n % 2 ? -1 : 1) * SP * (1 + (n >> 1)),
         speed: gen.speed, hp: 1, hp0: 1, block: 1, wob: Math.random()*6.28, born: performance.now(),
       }));
-      buddyQ = pals.chars.slice(); buddyMiss = {}; buddyHint = pals.hint || null;
+      buddyQ = pals.chars.slice(); buddyHint = pals.hint || null;
     }
     wave++;
     // 癒 tend: for every `tendEvery` waves held, a life back per level, up to
@@ -1037,16 +1043,24 @@ LAYER = STYLE + r"""
   let pendingRetarget = false;
   // While a boss lives, every character is traced with less help: the shape
   // faint, the start dot kept. The full shape is back the moment it falls.
-  // A buddy still owed is traced with no shape at all (see buddies, above).
-  // Decided for the character about to load, so it is given the index.
+  // A buddy still owed is shown what it has earned (see buddies, above), the
+  // general's faint rule notwithstanding. Decided for the character about to
+  // load, so it is given the index.
   function applyShadow(i){
-    const shown = (DIFF[difficulty] && DIFF[difficulty].shadow) || 'none';
-    const want = shown === 'none' ? shown : unshown(i == null ? idx : i) ? 'none' : bossAlive() ? 'faint' : shown;
+    if (i == null) i = idx;
+    const shown = (DIFF[difficulty] && DIFF[difficulty].shadow) || 'none', bs = buddyShape(i);
+    const want = shown === 'none' ? shown : bs || (bossAlive() ? 'faint' : shown);
     if (want !== SHADOW_MODE){ SHADOW_MODE = want; try { drawGuide(); } catch(_){} }
-    // with no shape the sketchbook says what it asks, in the farang's own sign
-    const bare = want === 'none' && shown !== 'none';
-    buddyAsk.hidden = !bare;
-    if (bare){ const t = `write <b>${labelOf({ i: i == null ? idx : i, w: null }, CFG.sign)}</b> · no shape`; if (buddyAsk.innerHTML !== t) buddyAsk.innerHTML = t; }
+    // a buddy's sketchbook says what it asks, in the farang's own sign, and
+    // how far the shape is from fading
+    buddyAsk.hidden = !bs || shown === 'none';
+    if (!buddyAsk.hidden){
+      const sg = `<b>${labelOf({ i, w: null }, CFG.sign)}</b>`, s = sureOf(i);
+      const t = bs === 'none' ? `write ${sg} · no shape`
+        : bs === 'faint' ? `${sg} · ${CFG.buddyFade[1] - s} clean and it's gone`
+        : `${sg} · ${CFG.buddyFade[0] - s} clean and it fades`;
+      if (buddyAsk.innerHTML !== t) buddyAsk.innerHTML = t;
+    }
   }
   function retarget(force){
     if (locked && !monsters.includes(locked)) locked = null;
@@ -1728,7 +1742,7 @@ LAYER = STYLE + r"""
     // — the maintainer: "my energy gauge should not persist between games."
     // In the Tower nothing carries but the workshop; what lasts is bought.
     quench();
-    ward = wardMax(); over = false; enterStage(); killed = 0; locked = null; asked = null; queue = []; recent = []; buddyQ = []; buddyMiss = {}; buddyHint = null; hinted = {};
+    ward = wardMax(); over = false; enterStage(); killed = 0; locked = null; asked = null; queue = []; recent = []; buddyQ = []; buddyHint = null; hinted = {};
     spawnAt = 0; tPrev = 0; castAt = 0; paused = false; frames = { n:0, slow:0, jank:0 }; spawn(); retarget();
     // The last banish of a stage leaves the engine celebrating: the whole path
     // lit, `done` set. If the first target of the new run is the character
@@ -2119,7 +2133,7 @@ LAYER = STYLE + r"""
     get view(){ return view; }, get startHtml(){ return markup; }, get redoShown(){ return redoShown; },
     get hitodama(){ return HITODAMA; },
     get ink(){ return sumi; }, get bestWave(){ return bestWave(); }, get wave(){ return wave; },
-    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; }, get buddyQ(){ return buddyQ; }, get buddyMiss(){ return buddyMiss; }, get buddyHint(){ return buddyHint; }, get hinted(){ return hinted; }, buddyAsk,
+    needs, rowsOpen, nextRowAt, totalRows, bossAlive, roster, buyLantern, lanternCost, capNow, LANTERN, ask, buyPerm, permCost, lvl, own, showWtab, get wtab(){ return wtab; }, get asked(){ return asked; }, get queue(){ return queue; }, get buddyQ(){ return buddyQ; }, buddyShape, get buddyHint(){ return buddyHint; }, get hinted(){ return hinted; }, buddyAsk,
     get stage(){ return stageN; }, get wave0(){ return wave0; }, get won(){ return won; }, get clearedTo(){ return clearedTo(); }, pickStage, wantStage, stageLen, staged: STAGED,
     get script(){ return script; }, setScript, scriptOpen, switched: SWITCH, every, get realm(){ return REALM; }, rowOf: i => ROW[i], scriptHtml,
     get run(){ return run; }, get ended(){ return ended; }, get frames(){ return frames; }, endRun, openOver, get upgrades(){ return upg; }, get wardMax(){ return wardMax(); },
@@ -2160,13 +2174,12 @@ LAYER = STYLE + r"""
   const _fizzle = window.fizzle;
   window.fizzle = function(){
     const r = _fizzle.apply(this, arguments);
-    if (buddyOwed(idx)){
-      buddyMiss[idx] = (buddyMiss[idx] || 0) + 1;   // two misses and the shape comes back faint
+    if (buddyOwed(idx)){   // the hand has set its run of clean traces back to nothing: the reload shows the shape
       if (buddyHint && !hinted[buddyHint]){ hinted[buddyHint] = 1; try { toast(buddyHint); clearTimeout(toastT); toastT = setTimeout(() => $('toast').classList.remove('show'), 4500); } catch(_){}
       }   // held for a line's reading, not the toast's usual flash
     }
     if (CFG.fizzleRestarts) setTimeout(() => {
-      if (!done) { loading = true; try { _load(idx); } finally { loading = false; } }
+      if (!done) { applyShadow(idx); loading = true; try { _load(idx); } finally { loading = false; } }
     }, 260);
     return r;
   };
@@ -2308,7 +2321,7 @@ def config(pack, deck=None):
         f"gateY:{float(f.get('gateY', 0.84))},"
         f"heroMs:{int(f.get('heroMs', 1500))},heroHit:{float(f.get('heroHit', 0.34))},heroForge:{int(f.get('heroForge', 25))},"
         # buddies (v0.1.78): look-alike groups a general brings along, [chars, name]
-        f"buddies:{js([[str(x) for x in b] for b in f.get('buddies', [])])},buddyMisses:{int(f.get('buddyMisses', 2))},"
+        f"buddies:{js([[str(x) for x in b] for b in f.get('buddies', [])])},buddyFade:{js([int(x) for x in f.get('buddyFade', [3, 6])])},"
         f"bossBlock:{int(f.get('bossBlock', 1))},blockFrom:{int(f.get('blockFrom', 20))},blockRate:{float(f.get('blockRate', 0.25))},"
         f"stunMs:{int(f.get('stunMs', 2200))},"
         f"tidyStrays:{'true' if f.get('tidyStrays', True) else 'false'}"

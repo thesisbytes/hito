@@ -256,7 +256,9 @@ LAYER = r"""
   // ---- the ledger ----------------------------------------------------------
   // Keyed by character. `tr` is trouble, smoothed: a zap is one, a fizzle is
   // three, and it decays with every clean attempt, so a character stops being
-  // called shaky two clean traces after it stops being shaky.
+  // called shaky two clean traces after it stops being shaky. `sure` (v0.1.79)
+  // is clean traces in a row, back to nothing on a miss: what the field fades
+  // a look-alike's shape by.
   let LEDGER = read(K_LEDGER, null);
   if (!LEDGER || typeof LEDGER !== 'object' || !LEDGER.g) LEDGER = {v:1, g:{}, days:{}, by:{}};
   if (!Array.isArray(LEDGER.runs)) LEDGER.runs = [];
@@ -305,11 +307,11 @@ LAYER = r"""
     e.tr = Math.round(((e.tr || 0)*0.7 + trouble*0.3) * 100) / 100;
     e.zaps += zaps;
     if (ok){
-      e.n++; if (!zaps && !tries) e.clean++;
+      e.n++; if (!zaps && !tries){ e.clean++; e.sure = (e.sure || 0) + 1; }
       e.ms += ms; e.rt = (e.rt || []).concat(Math.round(ms / raw.length)).slice(-5);
       if (!e.best || ms < e.best) e.best = ms;
       if (rec.q != null) e.q = Math.round(((e.q == null ? rec.q : e.q*0.7 + rec.q*0.3)) * 100) / 100;
-    } else e.fizz++;
+    } else { e.fizz++; e.sure = 0; }
     e.last = Date.now();
     const d = LEDGER.days[today()] || (LEDGER.days[today()] = [0, 0, 0]);
     if (ok){ d[0]++; if (!zaps && !tries) d[2]++; }
@@ -592,7 +594,7 @@ LAYER = r"""
       if (!mine || attempts(e) > attempts(mine)) LEDGER.g[c] = {
         n:+e.n||0, clean:+e.clean||0, zaps:+e.zaps||0, fizz:+e.fizz||0, ms:+e.ms||0,
         rt:(Array.isArray(e.rt) ? e.rt : []).map(Number).filter(isFinite).slice(-5),
-        tr:+e.tr||0, best:+e.best||0, last:+e.last||0 };
+        tr:+e.tr||0, best:+e.best||0, last:+e.last||0, sure:+e.sure||0 };
     }
     const seen = new Set(LEDGER.runs.map(r => r.at + '/' + r.realm));
     for (const r0 of (Array.isArray(o.ledger.runs) ? o.ledger.runs.slice(-40) : [])){
